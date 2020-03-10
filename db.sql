@@ -35,15 +35,27 @@ SET default_with_oids = false;
 
 CREATE TABLE public.fiscals (
     id serial NOT NULL,
-    title character varying NOT NULL
+    title character varying NOT NULL,
+    description text
 )
 
-
 COMMENT ON TABLE public.fiscals IS 'Relacion que alberga los organos fiscalizadores';
-
 
 ALTER TABLE ONLY public.fiscals
     ADD CONSTRAINT fiscal_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.fiscals
     ADD CONSTRAINT fiscal_unique_title UNIQUE (title);
+
+
+CREATE TABLE public.sectors (
+    id serial NOT NULL,
+    title character varying NOT NULL,
+    description text
+)
+
+ALTER TABLE ONLY public.sectors
+    ADD CONSTRAINT sector_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.sectors
+    ADD CONSTRAINT sector_unique_title UNIQUE (title);

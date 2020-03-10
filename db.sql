@@ -51,11 +51,26 @@ ALTER TABLE ONLY public.fiscals
 CREATE TABLE public.sectors (
     id serial NOT NULL,
     title character varying NOT NULL,
-    description text
 )
+
+COMMENT ON TABLE public.sectors IS 'Relacion que alberga los sectores (utilizados como attributos de agrupacion para las dependencias)';
 
 ALTER TABLE ONLY public.sectors
     ADD CONSTRAINT sector_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.sectors
     ADD CONSTRAINT sector_unique_title UNIQUE (title);
+
+CREATE TABLE public.dependencies (
+    id serial NOT NULL,
+    title character varying NOT NULL,
+    description text
+)
+
+COMMENT ON TABLE public.dependencies IS 'Relacion que alberga las dependencias de gobierno';
+
+ALTER TABLE ONLY public.dependencies
+    ADD CONSTRAINT dependency_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.dependencies
+    ADD CONSTRAINT dependency_unique_title UNIQUE (title);

@@ -91,3 +91,15 @@ ALTER TABLE ONLY public.group_sector_dependency
 
 ALTER TABLE ONLY public.group_sector_dependency
     ADD CONSTRAINT group_sector_dependency_fk_sector FOREIGN KEY (sector_id) REFERENCES public.sectors(id);
+
+
+CREATE TABLE public.observation_types (
+    id integer NOT NULL,
+    title character varying NOT NULL
+)
+
+ALTER TABLE ONLY public.observation_types
+    ADD CONSTRAINT observation_type_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.observation_types
+    ADD CONSTRAINT observation_type_unique_title UNIQUE (title);

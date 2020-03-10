@@ -34,7 +34,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 CREATE TABLE public.fiscals (
-    id serial NOT NULL,
+    id integer NOT NULL,
     title character varying NOT NULL,
     description text
 )
@@ -49,7 +49,7 @@ ALTER TABLE ONLY public.fiscals
 
 
 CREATE TABLE public.sectors (
-    id serial NOT NULL,
+    id integer NOT NULL,
     title character varying NOT NULL,
 )
 
@@ -62,7 +62,7 @@ ALTER TABLE ONLY public.sectors
     ADD CONSTRAINT sector_unique_title UNIQUE (title);
 
 CREATE TABLE public.dependencies (
-    id serial NOT NULL,
+    id integer NOT NULL,
     title character varying NOT NULL,
     description text
 )
@@ -74,3 +74,20 @@ ALTER TABLE ONLY public.dependencies
 
 ALTER TABLE ONLY public.dependencies
     ADD CONSTRAINT dependency_unique_title UNIQUE (title);
+
+CREATE TABLE public.group_sector_dependency (
+    id integer NOT NULL,
+    dependency_id integer NOT NULL,
+    sector_id integer NOT NULL
+)
+
+COMMENT ON TABLE public.group_sector_dependency IS 'Representa la relacion N a N entre sectores y dependencias';
+
+ALTER TABLE ONLY public.group_sector_dependency
+    ADD CONSTRAINT group_sector_dependency_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.group_sector_dependency
+    ADD CONSTRAINT group_sector_dependency_fk_dependency FOREIGN KEY (dependency_id) REFERENCES public.dependencies(id);
+
+ALTER TABLE ONLY public.group_sector_dependency
+    ADD CONSTRAINT group_sector_dependency_fk_sector FOREIGN KEY (sector_id) REFERENCES public.sectors(id);

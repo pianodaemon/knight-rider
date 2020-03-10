@@ -21,13 +21,11 @@ SET row_security = off;
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
-
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
 
 SET default_tablespace = '';
 
@@ -74,23 +72,6 @@ ALTER TABLE ONLY public.dependencies
 
 ALTER TABLE ONLY public.dependencies
     ADD CONSTRAINT dependency_unique_title UNIQUE (title);
-
-CREATE TABLE public.group_sector_dependency (
-    id integer NOT NULL,
-    dependency_id integer NOT NULL,
-    sector_id integer NOT NULL
-)
-
-COMMENT ON TABLE public.group_sector_dependency IS 'Representa la relacion N a N entre sectores y dependencias';
-
-ALTER TABLE ONLY public.group_sector_dependency
-    ADD CONSTRAINT group_sector_dependency_pkey PRIMARY KEY (id);
-
-ALTER TABLE ONLY public.group_sector_dependency
-    ADD CONSTRAINT group_sector_dependency_fk_dependency FOREIGN KEY (dependency_id) REFERENCES public.dependencies(id);
-
-ALTER TABLE ONLY public.group_sector_dependency
-    ADD CONSTRAINT group_sector_dependency_fk_sector FOREIGN KEY (sector_id) REFERENCES public.sectors(id);
 
 CREATE TABLE public.observation_types (
     id integer NOT NULL,

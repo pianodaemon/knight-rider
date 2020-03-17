@@ -35,7 +35,7 @@ CREATE TABLE public.fiscals (
     id integer NOT NULL,
     title character varying NOT NULL,
     description text
-)
+);
 
 COMMENT ON TABLE public.fiscals IS 'Relacion que alberga los organos fiscalizadores';
 
@@ -48,8 +48,8 @@ ALTER TABLE ONLY public.fiscals
 
 CREATE TABLE public.sectors (
     id integer NOT NULL,
-    title character varying NOT NULL,
-)
+    title character varying NOT NULL
+);
 
 COMMENT ON TABLE public.sectors IS 'Relacion que alberga los sectores (utilizados como attributos de agrupacion para las dependencias)';
 
@@ -63,7 +63,7 @@ CREATE TABLE public.dependencies (
     id integer NOT NULL,
     title character varying NOT NULL,
     description text
-)
+);
 
 COMMENT ON TABLE public.dependencies IS 'Relacion que alberga las dependencias de gobierno';
 
@@ -76,7 +76,7 @@ ALTER TABLE ONLY public.dependencies
 CREATE TABLE public.observation_types (
     id integer NOT NULL,
     title character varying NOT NULL
-)
+);
 
 ALTER TABLE ONLY public.observation_types
     ADD CONSTRAINT observation_type_pkey PRIMARY KEY (id);
@@ -86,11 +86,11 @@ ALTER TABLE ONLY public.observation_types
 
 CREATE TABLE public.observations (
     id integer NOT NULL,
-    observation_type_id NOT NULL
-)
+    observation_type_id integer NOT NULL
+);
 
 ALTER TABLE ONLY public.observations
     ADD CONSTRAINT observation_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.observations
-    ADD CONSTRAINT observations_fk_type FOREIGN KEY (observation_type_id) REFERENCES public.observations(id);
+    ADD CONSTRAINT observations_fk_type FOREIGN KEY (observation_type_id) REFERENCES public.observation_types(id);

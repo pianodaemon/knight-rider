@@ -138,9 +138,19 @@ ALTER TABLE ONLY public.observation_types
 ALTER TABLE ONLY public.observation_types
     ADD CONSTRAINT observation_type_unique_title UNIQUE (title);
 
+CREATE TABLE public.social_programs (
+    id integer NOT NULL,
+    title character varying NOT NULL
+    CONSTRAINT social_programs_pkey PRIMARY KEY (id),
+    CONSTRAINT social_programs_titulo_key UNIQUE (title)
+);
+
+COMMENT ON TABLE public.social_programas IS 'Alberga los programas sociales a los que esta vinculada una observacion';
+
 CREATE TABLE public.observations (
     id integer NOT NULL,
-    observation_type_id integer NOT NULL
+    observation_type_id integer NOT NULL,
+    social_program_id integer NOT NULL
 );
 
 ALTER TABLE ONLY public.observations
@@ -154,3 +164,4 @@ CREATE TABLE public.security_app_context (
     orgchart_role_id integer NOT NULL,
     app_id integer NOT NULL
 )
+

@@ -31,12 +31,27 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
+
+CREATE TABLE public.orgchart_roles (
+    id integer NOT NULL,
+    title character varying NOT NULL
+);
+
+COMMENT ON TABLE public.orgchart_roles IS 'Roles de el diagrama organizacional';
+
+ALTER TABLE ONLY public.orgchart_roles
+    ADD CONSTRAINT orgchart_role_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.orgchart_roles
+    ADD CONSTRAINT orgchart_role_unique_title UNIQUE (title);
+
+
 CREATE TABLE public.divisions (
     id integer NOT NULL,
     title character varying NOT NULL
 );
 
-COMMENT ON TABLE public.divisions IS 'Relacion que alberga las direcciones';
+COMMENT ON TABLE public.divisions IS 'Relacion que alberga las direcciones de la contraloria';
 
 ALTER TABLE ONLY public.divisions
     ADD CONSTRAINT division_pkey PRIMARY KEY (id);

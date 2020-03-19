@@ -31,6 +31,19 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
+CREATE TABLE public.divisions (
+    id integer NOT NULL,
+    title character varying NOT NULL
+);
+
+COMMENT ON TABLE public.divisions IS 'Relacion que alberga las direcciones';
+
+ALTER TABLE ONLY public.divisions
+    ADD CONSTRAINT division_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.divisions
+    ADD CONSTRAINT division_unique_title UNIQUE (title);
+
 CREATE TABLE public.fiscals (
     id integer NOT NULL,
     title character varying NOT NULL,

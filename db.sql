@@ -148,3 +148,9 @@ ALTER TABLE ONLY public.observations
 
 ALTER TABLE ONLY public.observations
     ADD CONSTRAINT observations_fk_type FOREIGN KEY (observation_type_id) REFERENCES public.observation_types(id);
+
+CREATE TABLE public.security_app_context (
+    id integer NOT NULL,
+    orgchart_role_id integer NOT NULL,
+    app_id integer NOT NULL
+)

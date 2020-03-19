@@ -31,7 +31,6 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
-
 CREATE TABLE public.orgchart_roles (
     id integer NOT NULL,
     title character varying NOT NULL
@@ -44,7 +43,6 @@ ALTER TABLE ONLY public.orgchart_roles
 
 ALTER TABLE ONLY public.orgchart_roles
     ADD CONSTRAINT orgchart_role_unique_title UNIQUE (title);
-
 
 CREATE TABLE public.divisions (
     id integer NOT NULL,
@@ -73,6 +71,23 @@ ALTER TABLE ONLY public.fiscals
 ALTER TABLE ONLY public.fiscals
     ADD CONSTRAINT fiscal_unique_title UNIQUE (title);
 
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    username character varying NOT NULL,
+    password character varying NOT NULL,
+    orgchart_role_id integer NOT NULL,
+    division_id integer NOT NULL,
+    enabled  boolean NOT NULL DEFAULT false
+);
+
+COMMENT ON TABLE public.users IS 'Relacion que alberga usuarios de el sistema';
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT user_role_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT user_role_unique_username UNIQUE (username);
 
 CREATE TABLE public.sectors (
     id integer NOT NULL,

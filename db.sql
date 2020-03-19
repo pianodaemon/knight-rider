@@ -147,6 +147,15 @@ CREATE TABLE public.social_programs (
 
 COMMENT ON TABLE public.social_programas IS 'Alberga los programas sociales a los que esta vinculada una observacion';
 
+CREATE TABLE public.observation_statuses (
+    id integer NOT NULL,
+    title character varying NOT NULL
+    CONSTRAINT observation_status_pkey PRIMARY KEY (id),
+    CONSTRAINT observation_status_titulo_key UNIQUE (title)
+);
+
+COMMENT ON TABLE public.observation_statuses IS 'Estado transitivo de una entidad observacion';
+
 CREATE TABLE public.observations (
     id integer NOT NULL,
     observation_type_id integer NOT NULL,

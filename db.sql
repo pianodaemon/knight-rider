@@ -72,6 +72,17 @@ ALTER TABLE ONLY public.fiscals
     ADD CONSTRAINT fiscal_unique_title UNIQUE (title);
 
 
+CREATE TABLE public.apps
+(
+    id integer NOT NULL, -- Identificador de la aplicacion, cada aplicacion tiene un identificador unico representador por un entero
+    descripcion character varying NOT NULL,
+    nombre_app character varying,
+    CONSTRAINT app_pkey PRIMARY KEY (id),
+    CONSTRAINT app_titulo_key UNIQUE (nombre_app)
+);
+
+COMMENT ON TABLE public.apps IS 'Relacion que alberga las aplicaciones que seran gobernadas por roles';
+
 CREATE TABLE public.users (
     id integer NOT NULL,
     username character varying NOT NULL,

@@ -140,7 +140,7 @@ ALTER TABLE ONLY public.observation_types
 
 CREATE TABLE public.social_programs (
     id integer NOT NULL,
-    title character varying NOT NULL
+    title character varying NOT NULL,
     CONSTRAINT social_programs_pkey PRIMARY KEY (id),
     CONSTRAINT social_programs_titulo_key UNIQUE (title)
 );
@@ -149,7 +149,7 @@ COMMENT ON TABLE public.social_programas IS 'Alberga los programas sociales a lo
 
 CREATE TABLE public.observation_statuses (
     id integer NOT NULL,
-    title character varying NOT NULL
+    title character varying NOT NULL,
     CONSTRAINT observation_status_pkey PRIMARY KEY (id),
     CONSTRAINT observation_status_titulo_key UNIQUE (title)
 );

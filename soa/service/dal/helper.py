@@ -9,13 +9,11 @@ def run_stored_procedure(conn, sql):
 
     # For this case we are just expecting one row
     if len(r) != 1:
-        raise Exception("unexpected result regarding execution of store")
+        raise Exception("unexpected result regarding execution of stored procedure")
 
     rcode, rmsg = r.pop()
     if rcode < 0:
-        # FIXME
-        # We should feature a better exception that also catches the rcode
-        raise Exception(rmsg)
+        raise Exception(str(rcode) + ', ' + rmsg)
 
     return (rcode, rmsg)
 

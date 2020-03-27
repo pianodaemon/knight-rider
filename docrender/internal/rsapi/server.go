@@ -1,4 +1,4 @@
-package practical-rest
+package rsapi
 
 import (
 	"context"

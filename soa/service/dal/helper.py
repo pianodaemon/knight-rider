@@ -9,13 +9,9 @@ def run_stored_procedure(conn, sql):
 
     # For this case we are just expecting one row
     if len(r) != 1:
-        raise Exception("unexpected result regarding execution of stored procedure")
+        return -1, "Unexpected result regarding execution of stored procedure"
 
-    rcode, rmsg = r.pop()
-    if rcode < 0:
-        raise Exception(str(rcode) + ', ' + rmsg)
-
-    return (rcode, rmsg)
+    return r.pop()
 
 
 @pgslack_connected

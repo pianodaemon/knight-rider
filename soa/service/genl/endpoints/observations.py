@@ -1,10 +1,12 @@
 from flask_restplus import Resource, fields
 from flask import request
 
-# from dal.helper import exec_steady, update_steady
-from dal import observations, helper
 from genl.restplus import api
+from dal import observations, helper
+from misc.helper import get_search_params
 from misc.helperpg import EmptySetError
+
+import psycopg2
 
 ns = api.namespace("observations", description="Observation services")
 
@@ -13,6 +15,7 @@ observation = api.model(
     {
         'id': fields.Integer(required=True, description='Observation identifier'),
         'observation_type_id': fields.Integer(required=True, description='Observation type identifier'),
+        'social_program_id': fields.Integer(required=True, description='Social program identifier'),
     }
 )
 
@@ -20,95 +23,84 @@ observation = api.model(
 class ObservationList(Resource):
 
     @ns.marshal_list_with(observation)
+    @ns.param("offset", "Which record to start from")
+    @ns.param("limit", "How many records will be returned")
+    @ns.param("order_by", "Which field to order by")
+    @ns.param("order", "ASC or DESC, which ordering to use")
+    @ns.param("observation type id", "An integer")
+    @ns.param("social program id", "An integer")
     def get(self):
         ''' To fetch several observations '''
 
-        sql = """
-            SELECT id, observation_type_id
-            FROM observations
-            ORDER BY id ASC;
-        """
-        try:
-            rows = helper.exec_steady(sql)
-        except EmptySetError:
-            return []
-        except:
-            ns.abort(500)
+        offset = request.args.get('offset', '0')
+        limit = request.args.get('limit', '10')
+        order_by = request.args.get('order_by', 'id')
+        order = request.args.get('order', 'ASC')
 
-        entities = []
-        for row in rows:
-            entities.append(dict(row))
-        
-        return entities
+        search_params = get_search_params(request.args, ['observation_type_id', 'social_program_id'])
+
+        return observations.read_page(offset, limit, order_by, order, search_params)
 
 
     @ns.expect(observation)
     @ns.marshal_with(observation, code=201)
+    @ns.response(400, 'There is a problem with your request data')
     # @ns.param('observation_data', description='Observation data (json)', _in='body')
     def post(self):
         ''' To create an observation '''
-        
-        # TODO: validate payload before calling stored proc...
-
         try:
-            id, rmsg = observations.create(**api.payload)
-        except:
-            ns.abort(500)
+            obs = observations.create(**api.payload)
+        except psycopg2.Error as err:
+            ns.abort(400, message=err.pgerror)
+        except KeyError as err:
+            ns.abort(400, message='Review the keys in your payload: {}'.format(err))
+        except Exception:
+            ns.abort(400, message='Something in your payload is wrong')
         
-        return (
-            {
-                'id': id,
-                'observation_type_id': api.payload['observation_type_id']
-            },
-            201
-        )
+        return obs, 201
 
 
 
 @ns.route('/<int:id>')
 @ns.response(404, 'Observation not found')
+@ns.response(400, 'There is a problem with your request data')
 @ns.param('id', 'Observation identifier')
 class Observation(Resource):
+    obs_not_found = 'Observation not found'
 
     @ns.marshal_with(observation)
     def get(self, id):
         ''' To fetch an observation '''
-
-        sql = """
-            SELECT id, observation_type_id
-            FROM observations
-            WHERE id = {};
-        """.format(id)
-
         try:
-            rows = helper.exec_steady(sql)
-        except EmptySetError:
-            ns.abort(404)
+            obs = observations.read(id)
         except:
-            ns.abort(500)
-
-        return dict(rows[0])
+            ns.abort(404, message=Observation.obs_not_found)
+        
+        return obs
 
 
     @ns.expect(observation)
     @ns.marshal_with(observation)
     def put(self, id):
         ''' To update an observation '''
-
-        # TODO: validate payload before calling stored proc...
-
         try:
-            _, rmsg = observations.edit(id, **api.payload)
-        except:
-            ns.abort(404)
-
-        return {
-            'id': id,
-            'observation_type_id': api.payload['observation_type_id']
-        }
+            obs = observations.update(id, **api.payload)
+        except psycopg2.Error as err:
+            ns.abort(400, message=err.pgerror)
+        except KeyError as err:
+            ns.abort(400, message='Review the keys in your payload: {}'.format(err))
+        except Exception:
+            ns.abort(404, message=Observation.obs_not_found)
+        
+        return obs
 
 
     @ns.marshal_with(observation)
     def delete(self, id):
-        ''' To delete an observation '''
-        pass
+        ''' To delete (or block logically when field was added) an observation '''
+        try:
+            obs = observations.delete(id)
+        except:
+            ns.abort(404, message=Observation.obs_not_found)
+        
+        return obs

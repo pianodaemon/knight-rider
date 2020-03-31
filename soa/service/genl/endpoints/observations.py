@@ -1,14 +1,14 @@
 from flask_restplus import Resource, fields
 from flask import request
+import psycopg2
 
 from genl.restplus import api
 from dal import observations, helper
 from misc.helper import get_search_params
 from misc.helperpg import EmptySetError
 
-import psycopg2
 
-ns = api.namespace("observations", description="Observation services")
+ns = api.namespace("observations", description="Available services for an observation")
 
 observation = api.model(
     'Observation model',
@@ -27,8 +27,9 @@ class ObservationList(Resource):
     @ns.param("limit", "How many records will be returned")
     @ns.param("order_by", "Which field to order by")
     @ns.param("order", "ASC or DESC, which ordering to use")
-    @ns.param("observation type id", "An integer")
-    @ns.param("social program id", "An integer")
+    @ns.param("observation_type_id", "An integer id as observation type")
+    @ns.param("social_program_id", "An integer id as social program")
+    @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations '''
 
@@ -39,13 +40,17 @@ class ObservationList(Resource):
 
         search_params = get_search_params(request.args, ['observation_type_id', 'social_program_id'])
 
-        return observations.read_page(offset, limit, order_by, order, search_params)
+        try:
+            obs_list = observations.read_page(offset, limit, order_by, order, search_params)
+        except psycopg2.Error as err:
+            ns.abort(400, message=err.pgerror)
+        
+        return obs_list
 
 
     @ns.expect(observation)
     @ns.marshal_with(observation, code=201)
     @ns.response(400, 'There is a problem with your request data')
-    # @ns.param('observation_data', description='Observation data (json)', _in='body')
     def post(self):
         ''' To create an observation '''
         try:
@@ -97,7 +102,7 @@ class Observation(Resource):
 
     @ns.marshal_with(observation)
     def delete(self, id):
-        ''' To delete (or block logically when field was added) an observation '''
+        ''' To delete an observation '''
         try:
             obs = observations.delete(id)
         except:

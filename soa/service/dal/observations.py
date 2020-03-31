@@ -1,6 +1,6 @@
+import psycopg2
 from dal.helper import run_stored_procedure, exec_steady
 from dal.entity import delete_entity, fetch_entity, page_entities
-import psycopg2
 
 
 def _alter_observation(**kwargs):
@@ -23,7 +23,7 @@ def create(**kwargs):
     sql = '''
         INSERT INTO observations (observation_type_id, social_program_id)
         VALUES ({}, {})
-        RETURNING *;
+        RETURNING id, observation_type_id, social_program_id;
     '''.format(kwargs['observation_type_id'], kwargs['social_program_id'])
 
     rows = exec_steady(sql)
@@ -43,7 +43,8 @@ def update(id, **kwargs):
         UPDATE observations
         SET observation_type_id = {}, social_program_id = {}
         WHERE id = {}
-        RETURNING *;
+        AND blocked = false
+        RETURNING id, observation_type_id, social_program_id;
     '''.format(kwargs['observation_type_id'], kwargs['social_program_id'], id)
 
     rows = exec_steady(sql)

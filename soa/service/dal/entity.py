@@ -1,4 +1,6 @@
+import psycopg2
 from dal.helper import exec_steady
+
 
 class NoResultFound(Exception):
     pass
@@ -12,9 +14,10 @@ def fetch_entity(table, id):
     ''' Fetches an entity '''
     
     sql = '''
-        SELECT *
+        SELECT id, observation_type_id, social_program_id
         FROM {}
-        WHERE id = {};
+        WHERE id = {}
+        AND blocked = false;
     '''.format(table, id)
 
     rows = exec_steady(sql)
@@ -32,9 +35,11 @@ def delete_entity(table, id):
     ''' Deletes an entity '''
     
     sql = '''
-        DELETE FROM {}
+        UPDATE {}
+        SET blocked = true
         WHERE id = {}
-        RETURNING *;
+        AND blocked = false
+        RETURNING id, observation_type_id, social_program_id;
     '''.format(table, id)
 
     rows = exec_steady(sql)
@@ -52,18 +57,21 @@ def page_entities(table, offset, limit, order_by, order, search_params):
     ''' Returns a set of entities '''
     
     query = '''
-        SELECT *
+        SELECT id, observation_type_id, social_program_id
         FROM {}
+        WHERE blocked = false
     '''.format(table)
 
     if search_params is not None:
-        query += ' WHERE ' + _setup_search_criteria(table, search_params)
+        query += ' AND ' + _setup_search_criteria(table, search_params)
 
     query += ' ORDER BY {} {} LIMIT {} OFFSET {};'.format(order_by, order, limit, offset)
 
     try:
         rows = exec_steady(query)
-    except Exception:
+    except psycopg2.Error:
+        raise
+    except:
         return []
 
     entities = []

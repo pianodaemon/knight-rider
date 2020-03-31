@@ -160,6 +160,53 @@ COMMENT ON TABLE public.fiscals IS 'Relacion que alberga los organos fiscalizado
 
 
 --
+-- Name: geo_countries; Type: TABLE; Schema: public; Owner: knight_rider
+--
+
+CREATE TABLE public.geo_countries (
+    id integer NOT NULL,
+    title character varying,
+    abrev character varying
+);
+
+
+ALTER TABLE public.geo_countries OWNER TO knight_rider;
+
+--
+-- Name: geo_municipalities; Type: TABLE; Schema: public; Owner: knight_rider
+--
+
+CREATE TABLE public.geo_municipalities (
+    id integer NOT NULL,
+    title character varying,
+    geo_state_id integer
+);
+
+
+ALTER TABLE public.geo_municipalities OWNER TO knight_rider;
+
+--
+-- Name: TABLE geo_municipalities; Type: COMMENT; Schema: public; Owner: knight_rider
+--
+
+COMMENT ON TABLE public.geo_municipalities IS 'Tabla que alberga los municipios que pueden ser seleccionados en los aplicativos de el sistema , en base al pais y estado que se seleccione sobre el aplicativo en curso';
+
+
+--
+-- Name: geo_states; Type: TABLE; Schema: public; Owner: knight_rider
+--
+
+CREATE TABLE public.geo_states (
+    id integer NOT NULL,
+    title character varying,
+    abrev character varying,
+    country_id integer NOT NULL
+);
+
+
+ALTER TABLE public.geo_states OWNER TO knight_rider;
+
+--
 -- Name: observation_statuses; Type: TABLE; Schema: public; Owner: knight_rider
 --
 
@@ -225,7 +272,8 @@ COMMENT ON SEQUENCE public.observations_seq IS 'Sequence object for observations
 CREATE TABLE public.observations (
     id integer DEFAULT nextval('public.observations_seq'::regclass) NOT NULL,
     observation_type_id integer NOT NULL,
-    social_program_id integer NOT NULL
+    social_program_id integer NOT NULL,
+    blocked boolean DEFAULT false NOT NULL
 );
 
 
@@ -464,10 +512,87 @@ COPY public.divisions (id, title) FROM stdin;
 --
 
 COPY public.fiscals (id, title, description) FROM stdin;
-1	ASENL	\N
-2	ASF	\N
-3	SFP	\N
-4	CyTG	\N
+2	ASF	AUDITORÍA SUPERIOR DE LA FEDERACIÓN
+3	SFP	SECRETARÍA DE LA FUNCIÓN PÚBLICA
+4	CyTG	CONTRALORÍA Y TRANSPARENCIA GUBERNAMENTAL
+1	ASENL	AUDITORÍA SUPERIOR DEL ESTADO DE NUEVO LEÓN
+\.
+
+
+--
+-- Data for Name: geo_countries; Type: TABLE DATA; Schema: public; Owner: knight_rider
+--
+
+COPY public.geo_countries (id, title, abrev) FROM stdin;
+1	MEXICO	MX
+\.
+
+
+--
+-- Data for Name: geo_municipalities; Type: TABLE DATA; Schema: public; Owner: knight_rider
+--
+
+COPY public.geo_municipalities (id, title, geo_state_id) FROM stdin;
+1	ABASOLO	19
+2	AGUALEGUAS	19
+3	LOS ALDAMAS	19
+4	ALLENDE	19
+5	ANÁHUAC	19
+6	APODACA	19
+7	ARAMBERRI	19
+8	BUSTAMANTE	19
+9	CADEREYTA JIMÉNEZ	19
+10	CARMEN	19
+11	CERRALVO	19
+12	CIÉNEGA DE FLORES	19
+13	CHINA	19
+14	DR. ARROYO	19
+15	DR. COSS	19
+16	DR. GONZÁLEZ	19
+17	GALEANA	19
+18	GARCÍA	19
+19	SAN PEDRO GARZA GARCÍA	19
+20	GRAL. BRAVO	19
+21	GRAL. ESCOBEDO	19
+22	GRAL. TERÁN	19
+23	GRAL. TREVIÑO	19
+24	GRAL. ZARAGOZA	19
+25	GRAL. ZUAZUA	19
+26	GUADALUPE	19
+27	LOS HERRERAS	19
+28	HIGUERAS	19
+29	HUALAHUISES	19
+30	ITURBIDE	19
+31	JUÁREZ	19
+32	LAMPAZOS DE NARANJO	19
+33	LINARES	19
+34	MARÍN	19
+35	MELCHOR OCAMPO	19
+36	MIER Y NORIEGA	19
+37	MINA	19
+38	MONTEMORELOS	19
+39	MONTERREY	19
+40	PARÁS	19
+41	PESQUERÍA	19
+42	LOS RAMONES	19
+43	RAYONES	19
+44	SABINAS HIDALGO	19
+45	SALINAS VICTORIA	19
+46	SAN NICOLÁS DE LOS GARZA	19
+47	HIDALGO	19
+48	SANTA CATARINA	19
+49	SANTIAGO	19
+50	VALLECILLO	19
+51	VILLALDAMA	19
+\.
+
+
+--
+-- Data for Name: geo_states; Type: TABLE DATA; Schema: public; Owner: knight_rider
+--
+
+COPY public.geo_states (id, title, abrev, country_id) FROM stdin;
+19	Nuevo León	NL	1
 \.
 
 
@@ -495,11 +620,11 @@ COPY public.observation_types (id, title) FROM stdin;
 -- Data for Name: observations; Type: TABLE DATA; Schema: public; Owner: knight_rider
 --
 
-COPY public.observations (id, observation_type_id, social_program_id) FROM stdin;
-3	3	1
-4	2	1
-5	1	1
-2	4	1
+COPY public.observations (id, observation_type_id, social_program_id, blocked) FROM stdin;
+3	3	1	f
+4	2	1	f
+5	1	1	f
+2	4	1	f
 \.
 
 
@@ -521,6 +646,9 @@ COPY public.orgchart_roles (id, title) FROM stdin;
 --
 
 COPY public.sectors (id, title) FROM stdin;
+1	CENTRAL
+2	PARAESTATAL
+3	OBRA PÚBLICA
 \.
 
 
@@ -551,6 +679,7 @@ COPY public.social_programs (id, title) FROM stdin;
 
 COPY public.users (id, username, password, orgchart_role_id, division_id, disabled) FROM stdin;
 1	garaujo	123qwe	5	1	f
+2	contralor	123qwe	1	1	f
 \.
 
 
@@ -575,6 +704,22 @@ ALTER TABLE ONLY public.apps
 
 ALTER TABLE ONLY public.apps
     ADD CONSTRAINT app_titulo_key UNIQUE (nombre_app);
+
+
+--
+-- Name: geo_countries country_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.geo_countries
+    ADD CONSTRAINT country_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: geo_countries country_title_key; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.geo_countries
+    ADD CONSTRAINT country_title_key UNIQUE (title);
 
 
 --
@@ -623,6 +768,14 @@ ALTER TABLE ONLY public.fiscals
 
 ALTER TABLE ONLY public.fiscals
     ADD CONSTRAINT fiscal_unique_title UNIQUE (title);
+
+
+--
+-- Name: geo_municipalities geo_municipality_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.geo_municipalities
+    ADD CONSTRAINT geo_municipality_pkey PRIMARY KEY (id);
 
 
 --
@@ -722,6 +875,14 @@ ALTER TABLE ONLY public.social_programs
 
 
 --
+-- Name: geo_states state_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.geo_states
+    ADD CONSTRAINT state_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
 --
 
@@ -767,6 +928,14 @@ ALTER TABLE ONLY public.security_app_context
 
 ALTER TABLE ONLY public.security_app_context
     ADD CONSTRAINT sec_app_ctxt_orgchart_roles_fkey FOREIGN KEY (orgchart_role_id) REFERENCES public.orgchart_roles(id) NOT VALID;
+
+
+--
+-- Name: geo_states state_country_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.geo_states
+    ADD CONSTRAINT state_country_fkey FOREIGN KEY (country_id) REFERENCES public.geo_countries(id);
 
 
 --

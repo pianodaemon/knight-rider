@@ -1,5 +1,5 @@
 import psycopg2
-from dal.helper import exec_steady
+from dal.helper import exec_steady, update_steady
 
 
 class NoResultFound(Exception):
@@ -14,7 +14,7 @@ def fetch_entity(table, id):
     ''' Fetches an entity '''
     
     sql = '''
-        SELECT id, observation_type_id, social_program_id
+        SELECT *
         FROM {}
         WHERE id = {}
         AND blocked = false;
@@ -38,26 +38,21 @@ def delete_entity(table, id):
         UPDATE {}
         SET blocked = true
         WHERE id = {}
-        AND blocked = false
-        RETURNING id, observation_type_id, social_program_id;
+        AND blocked = false;
     '''.format(table, id)
 
-    rows = exec_steady(sql)
+    hits = update_steady(sql)
 
-    # For this case we are just expecting one row
-    if len(rows) == 0:
-        raise NoResultFound('No result found')
-    elif len(rows) > 1:
-        raise MultipleResultsFound('Multiple results found. Only one expected')
-
-    return dict(rows.pop())
+    # Expecting just one hit
+    if hits > 1:
+        raise Exception('{} rows updated, really?'.format(hits))
 
 
 def page_entities(table, offset, limit, order_by, order, search_params):
     ''' Returns a set of entities '''
     
     query = '''
-        SELECT id, observation_type_id, social_program_id
+        SELECT *
         FROM {}
         WHERE blocked = false
     '''.format(table)

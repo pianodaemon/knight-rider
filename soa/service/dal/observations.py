@@ -1,6 +1,5 @@
-import psycopg2
 from dal.helper import run_stored_procedure, exec_steady
-from dal.entity import delete_entity, fetch_entity, page_entities
+from dal.entity import page_entities
 
 
 def _alter_observation(**kwargs):
@@ -32,9 +31,15 @@ def create(**kwargs):
 
 def read(id):
     ''' Fetches an observation entity '''
-    ent = fetch_entity('observations', id)
-    fields = set(['id', 'observation_type_id', 'social_program_id'])
-    return {field: ent[field] for field in fields}
+    sql = '''
+        SELECT id, observation_type_id, social_program_id
+        FROM observations
+        WHERE id = {}
+        AND blocked = false;
+    '''.format(id)
+
+    rows = exec_steady(sql)
+    return dict(rows.pop())
 
 
 def update(id, **kwargs):
@@ -53,11 +58,39 @@ def update(id, **kwargs):
 
 def delete(id):
     ''' Deletes an observation entity '''
-    ent = delete_entity('observations', id)
-    fields = set(['id', 'observation_type_id', 'social_program_id'])
-    return {field: ent[field] for field in fields}
+    sql = '''
+        UPDATE observations
+        SET blocked = true
+        WHERE id = {}
+        AND blocked = false
+        RETURNING id, observation_type_id, social_program_id;
+    '''.format(id)
+  
+    rows = exec_steady(sql)
+    return dict(rows.pop())
 
 
 def read_page(offset, limit, order_by, order, search_params):
+    ''' Reads a page of observations '''
     return page_entities('observations', offset, limit, order_by, order, search_params)
-    
+
+
+def get_catalogs(table_name_list):
+    ''' Fetches values and captions from a list of tables. These pairs can be used on input screens '''
+    fields_d = {}
+
+    for table in table_name_list:
+        values_l = []
+        sql = '''
+            SELECT *
+            FROM {}
+            ORDER BY id;
+        '''.format(table)
+
+        rows = exec_steady(sql)
+        for row in rows:
+            values_l.append(dict(row))
+        
+        fields_d[table] = values_l
+
+    return fields_d

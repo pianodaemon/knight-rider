@@ -24,7 +24,7 @@ def _connect():
         conn_str = "dbname={0} user={1} host={2} password={3} port={4}".format(*t)
         return psycopg2.connect(conn_str)
     except:
-        raise Exception("It is not possible to connect with database")
+        raise
 
 
 def pgslack_exec(conn, sql):
@@ -72,3 +72,13 @@ def pgslack_connected(func):
             c.close()
 
     return wrapper
+
+
+def get_msg_pgerror(err):
+    ''' It works only for psycopg2.Error exception. It is called in several places of endpoints layer.
+        Reason for this is that there are cases in which pgerror is None but args does have a message '''
+    if err.pgerror is None:
+        msg = err.args[0]
+    else:
+        msg = err.pgerror
+    return msg

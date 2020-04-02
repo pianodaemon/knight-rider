@@ -1,4 +1,6 @@
-from dal.helper import exec_steady
+import psycopg2
+from dal.helper import exec_steady, update_steady
+
 
 class NoResultFound(Exception):
     pass
@@ -14,7 +16,8 @@ def fetch_entity(table, id):
     sql = '''
         SELECT *
         FROM {}
-        WHERE id = {};
+        WHERE id = {}
+        AND blocked = false;
     '''.format(table, id)
 
     rows = exec_steady(sql)
@@ -32,20 +35,17 @@ def delete_entity(table, id):
     ''' Deletes an entity '''
     
     sql = '''
-        DELETE FROM {}
+        UPDATE {}
+        SET blocked = true
         WHERE id = {}
-        RETURNING *;
+        AND blocked = false;
     '''.format(table, id)
 
-    rows = exec_steady(sql)
+    hits = update_steady(sql)
 
-    # For this case we are just expecting one row
-    if len(rows) == 0:
-        raise NoResultFound('No result found')
-    elif len(rows) > 1:
-        raise MultipleResultsFound('Multiple results found. Only one expected')
-
-    return dict(rows.pop())
+    # Expecting just one hit
+    if hits > 1:
+        raise Exception('{} rows updated, really?'.format(hits))
 
 
 def page_entities(table, offset, limit, order_by, order, search_params):
@@ -54,16 +54,19 @@ def page_entities(table, offset, limit, order_by, order, search_params):
     query = '''
         SELECT *
         FROM {}
+        WHERE blocked = false
     '''.format(table)
 
     if search_params is not None:
-        query += ' WHERE ' + _setup_search_criteria(table, search_params)
+        query += ' AND ' + _setup_search_criteria(table, search_params)
 
     query += ' ORDER BY {} {} LIMIT {} OFFSET {};'.format(order_by, order, limit, offset)
 
     try:
         rows = exec_steady(query)
-    except Exception:
+    except psycopg2.Error:
+        raise
+    except:
         return []
 
     entities = []

@@ -5,7 +5,7 @@ import psycopg2
 from genl.restplus import api
 from dal import observations
 from misc.helper import get_search_params
-from misc.helperpg import get_msg_pgerror
+from misc.helperpg import get_msg_pgerror, EmptySetError
 
 
 ns = api.namespace("observations", description="Available services for an observation")
@@ -16,6 +16,7 @@ observation = api.model(
         'id': fields.Integer(required=True, description='Observation identifier'),
         'observation_type_id': fields.Integer(required=True, description='Observation type identifier'),
         'social_program_id': fields.Integer(required=True, description='Social program identifier'),
+        'audit_id': fields.Integer(required=True, description='Audit identifier'),
     }
 )
 
@@ -29,6 +30,7 @@ class ObservationList(Resource):
     @ns.param("order", "ASC or DESC, which ordering to use")
     @ns.param("observation_type_id", "An integer as observation type identifier")
     @ns.param("social_program_id", "An integer as social program identifier")
+    @ns.param("audit_id", "An integer as audit identifier")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations '''
@@ -38,7 +40,7 @@ class ObservationList(Resource):
         order_by = request.args.get('order_by', 'id')
         order = request.args.get('order', 'ASC')
 
-        search_params = get_search_params(request.args, ['observation_type_id', 'social_program_id'])
+        search_params = get_search_params(request.args, ['observation_type_id', 'social_program_id', 'audit_id'])
 
         try:
             obs_list = observations.read_page(offset, limit, order_by, order, search_params)
@@ -61,8 +63,8 @@ class ObservationList(Resource):
             ns.abort(400, message=get_msg_pgerror(err))
         except KeyError as err:
             ns.abort(400, message='Review the keys in your payload: {}'.format(err))
-        except:
-            ns.abort(400, message='Something in your payload is wrong')
+        except Exception as err:
+            ns.abort(400, message=err)
         
         return obs, 201
 
@@ -82,7 +84,7 @@ class Observation(Resource):
             obs = observations.read(id)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
-        except:
+        except EmptySetError:
             ns.abort(404, message=Observation.obs_not_found)
         
         return obs
@@ -98,7 +100,7 @@ class Observation(Resource):
             ns.abort(400, message=get_msg_pgerror(err))
         except KeyError as err:
             ns.abort(400, message='Review the keys in your payload: {}'.format(err))
-        except:
+        except EmptySetError:
             ns.abort(404, message=Observation.obs_not_found)
         
         return obs
@@ -111,7 +113,7 @@ class Observation(Resource):
             obs = observations.delete(id)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
-        except:
+        except EmptySetError:
             ns.abort(404, message=Observation.obs_not_found)
         
         return obs
@@ -125,7 +127,7 @@ class Catalog(Resource):
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of id/title pairs) '''
         try:
-            field_catalog = observations.get_catalogs(['observation_types', 'social_programs'])
+            field_catalog = observations.get_catalogs(['observation_types', 'social_programs', 'audits'])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))
         except Exception as err:

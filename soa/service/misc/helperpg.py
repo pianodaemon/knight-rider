@@ -39,8 +39,7 @@ def pgslack_exec(conn, sql):
         return rows
 
     # We should not have reached this point
-    # raise EmptySetError("There is not data retrieved")
-    raise
+    raise EmptySetError("There is no data to be returned")
 
 
 def pgslack_update(conn, sql):

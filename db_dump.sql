@@ -101,6 +101,33 @@ COMMENT ON TABLE public.apps IS 'Relacion que alberga las aplicaciones que seran
 
 
 --
+-- Name: audits; Type: TABLE; Schema: public; Owner: knight_rider
+--
+
+CREATE TABLE public.audits (
+    id integer NOT NULL,
+    title character varying NOT NULL,
+    dependency_id integer
+);
+
+
+ALTER TABLE public.audits OWNER TO knight_rider;
+
+--
+-- Name: COLUMN audits.title; Type: COMMENT; Schema: public; Owner: knight_rider
+--
+
+COMMENT ON COLUMN public.audits.title IS 'Este es el alphanumerico que identifica a una auditoria';
+
+
+--
+-- Name: COLUMN audits.dependency_id; Type: COMMENT; Schema: public; Owner: knight_rider
+--
+
+COMMENT ON COLUMN public.audits.dependency_id IS 'Dependencia que ha originado la auditoria';
+
+
+--
 -- Name: dependencies; Type: TABLE; Schema: public; Owner: knight_rider
 --
 
@@ -273,7 +300,8 @@ CREATE TABLE public.observations (
     id integer DEFAULT nextval('public.observations_seq'::regclass) NOT NULL,
     observation_type_id integer NOT NULL,
     social_program_id integer NOT NULL,
-    blocked boolean DEFAULT false NOT NULL
+    blocked boolean DEFAULT false NOT NULL,
+    audit_id integer NOT NULL
 );
 
 
@@ -409,6 +437,15 @@ COPY public.apps (id, descripcion, nombre_app) FROM stdin;
 2	Altas, bajas y cambios de usuarios	CAT_USUARIOS
 3	Altas, bajas y cambios de direcciones	CAT_DIRECCIONES
 4	Altas, bajas y cambios de organos fiscalizadores	CAT_FISCAL
+\.
+
+
+--
+-- Data for Name: audits; Type: TABLE DATA; Schema: public; Owner: knight_rider
+--
+
+COPY public.audits (id, title, dependency_id) FROM stdin;
+1	CTG-OP-15-023	27
 \.
 
 
@@ -620,11 +657,66 @@ COPY public.observation_types (id, title) FROM stdin;
 -- Data for Name: observations; Type: TABLE DATA; Schema: public; Owner: knight_rider
 --
 
-COPY public.observations (id, observation_type_id, social_program_id, blocked) FROM stdin;
-3	3	1	f
-4	2	1	f
-5	1	1	f
-2	4	1	f
+COPY public.observations (id, observation_type_id, social_program_id, blocked, audit_id) FROM stdin;
+49	2	2	f	1
+50	3	1	f	1
+51	2	3	f	1
+52	2	2	f	1
+54	2	2	t	1
+55	2	3	t	1
+56	3	3	t	1
+53	2	2	t	1
+27	1	1	t	1
+28	1	1	t	1
+57	2	1	f	1
+58	1	3	f	1
+59	2	2	f	1
+60	1	3	f	1
+61	4	3	f	1
+35	2	2	t	1
+62	3	2	f	1
+63	4	3	f	1
+2	4	1	t	1
+3	3	1	t	1
+4	2	1	t	1
+5	1	1	t	1
+6	4	1	t	1
+10	1	1	t	1
+11	1	1	t	1
+12	3	1	t	1
+31	1	1	f	1
+32	1	1	f	1
+13	1	1	t	1
+14	1	1	t	1
+15	1	1	t	1
+16	1	1	t	1
+17	1	1	t	1
+22	1	1	t	1
+18	1	1	t	1
+24	1	1	t	1
+19	1	1	t	1
+20	1	1	t	1
+25	1	1	t	1
+21	1	1	t	1
+23	1	1	t	1
+30	1	1	t	1
+29	1	1	t	1
+33	1	1	t	1
+34	2	2	f	1
+36	3	3	f	1
+37	2	3	f	1
+39	2	1	f	1
+40	2	3	f	1
+41	2	3	f	1
+42	2	3	f	1
+43	2	3	f	1
+44	2	3	f	1
+45	2	3	f	1
+46	1	3	f	1
+47	1	3	f	1
+48	1	3	f	1
+38	2	1	t	1
+26	1	1	t	1
 \.
 
 
@@ -669,7 +761,9 @@ COPY public.security_app_context (orgchart_role_id, app_id) FROM stdin;
 --
 
 COPY public.social_programs (id, title) FROM stdin;
-1	XXX
+1	Liconsa
+2	Solidaridad
+3	Gobierno que paga a tiempo
 \.
 
 
@@ -687,7 +781,7 @@ COPY public.users (id, username, password, orgchart_role_id, division_id, disabl
 -- Name: observations_seq; Type: SEQUENCE SET; Schema: public; Owner: knight_rider
 --
 
-SELECT pg_catalog.setval('public.observations_seq', 5, true);
+SELECT pg_catalog.setval('public.observations_seq', 63, true);
 
 
 --
@@ -704,6 +798,14 @@ ALTER TABLE ONLY public.apps
 
 ALTER TABLE ONLY public.apps
     ADD CONSTRAINT app_titulo_key UNIQUE (nombre_app);
+
+
+--
+-- Name: audits audits_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.audits
+    ADD CONSTRAINT audits_pkey PRIMARY KEY (id);
 
 
 --
@@ -896,6 +998,14 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_unique_username UNIQUE (username);
+
+
+--
+-- Name: observations audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.observations
+    ADD CONSTRAINT audits_fkey FOREIGN KEY (audit_id) REFERENCES public.audits(id) NOT VALID;
 
 
 --

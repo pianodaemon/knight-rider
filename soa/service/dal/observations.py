@@ -20,10 +20,10 @@ def _alter_observation(**kwargs):
 def create(**kwargs):
     '''Creates an observation entity'''
     sql = '''
-        INSERT INTO observations (observation_type_id, social_program_id)
-        VALUES ({}, {})
-        RETURNING id, observation_type_id, social_program_id;
-    '''.format(kwargs['observation_type_id'], kwargs['social_program_id'])
+        INSERT INTO observations (observation_type_id, social_program_id, audit_id)
+        VALUES ({}, {}, {})
+        RETURNING id, observation_type_id, social_program_id, audit_id;
+    '''.format(kwargs['observation_type_id'], kwargs['social_program_id'], kwargs['audit_id'])
 
     rows = exec_steady(sql)
     return dict(rows.pop())
@@ -32,7 +32,7 @@ def create(**kwargs):
 def read(id):
     ''' Fetches an observation entity '''
     sql = '''
-        SELECT id, observation_type_id, social_program_id
+        SELECT id, observation_type_id, social_program_id, audit_id
         FROM observations
         WHERE id = {}
         AND blocked = false;
@@ -46,11 +46,11 @@ def update(id, **kwargs):
     '''Updates an observation entity'''
     sql = '''
         UPDATE observations
-        SET observation_type_id = {}, social_program_id = {}
+        SET observation_type_id = {}, social_program_id = {}, audit_id = {}
         WHERE id = {}
         AND blocked = false
-        RETURNING id, observation_type_id, social_program_id;
-    '''.format(kwargs['observation_type_id'], kwargs['social_program_id'], id)
+        RETURNING id, observation_type_id, social_program_id, audit_id;
+    '''.format(kwargs['observation_type_id'], kwargs['social_program_id'], kwargs['audit_id'], id)
 
     rows = exec_steady(sql)
     return dict(rows.pop())
@@ -63,7 +63,7 @@ def delete(id):
         SET blocked = true
         WHERE id = {}
         AND blocked = false
-        RETURNING id, observation_type_id, social_program_id;
+        RETURNING id, observation_type_id, social_program_id, audit_id;
     '''.format(id)
   
     rows = exec_steady(sql)

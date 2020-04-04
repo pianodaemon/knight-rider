@@ -9,6 +9,7 @@ export interface Observation {
 
 interface ObservationsSlice {
   observations: Array<Observation> | null;
+  observation: Observation | null;
   catalog: Catalog | null;
   loading: boolean;
 }
@@ -32,6 +33,7 @@ export type Catalog = {
 
 const initialState: ObservationsSlice = {
   observations: null,
+  observation: null,
   catalog: null,
   loading: false,
 };

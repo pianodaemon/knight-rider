@@ -17,10 +17,10 @@ export const AppRoutes = (props: Props) => {
   return (
     <Router history={props.history}>
       <Switch>
-        <Route exact path="/list">
+        <Route exact path="/observation/list">
           <TableContainer />
         </Route>
-        <Route exact path="/create">
+        <Route exact path={['/observation/create', '/observation/:id/edit']}>
           <FormContainer />
         </Route>
       </Switch>

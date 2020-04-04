@@ -31,6 +31,7 @@ function* createObservationWorker(action: any): Generator<any, any, any> {
     const { releaseForm } = action.payload;
     yield releaseForm();
     yield put(createObservationActionErrorAction());
+    yield console.log(e);
   }
 }
 

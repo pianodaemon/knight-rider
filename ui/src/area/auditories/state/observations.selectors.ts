@@ -8,6 +8,11 @@ export const observationsSelector = createSelector(
   (slice: any) => slice.observations
 );
 
+export const observationSelector = createSelector(
+  sliceSelector,
+  (slice: any) => slice.observation
+);
+
 export const isLoadingSelector = createSelector(
   sliceSelector,
   (slice: any) => slice.loading

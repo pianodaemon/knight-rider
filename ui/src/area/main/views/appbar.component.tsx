@@ -27,8 +27,8 @@ import { createBrowserHistory } from 'history';
 import { AppRoutesContainer } from './app-routes.container';
 
 const breadcrumbNameMap: { [key: string]: string } = {
-  '/create': 'Crear',
-  '/list': 'Listar',
+  '/observation/create': 'Crear',
+  '/observation/list': 'Listar',
 };
 
 const customHistory = createBrowserHistory();
@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawerPaper: {
       width: drawerWidth,
-      backgroundImage: 'url(NuevoleonB.jpg)',
+      backgroundImage: 'url(/NuevoleonB.jpg)',
       backgroundPosition: 'center',
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
@@ -169,7 +169,7 @@ export function AppBarComponent() {
         }}
       >
         <div className={classes.drawerHeader}>
-          <img className={classes.imageLogo} src="./ll3.png" alt="Logo" />
+          <img className={classes.imageLogo} src="/ll3.png" alt="Logo" />
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? (
               <ChevronLeftIcon />

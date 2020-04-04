@@ -24,3 +24,13 @@ export function createObservation(fields: Observation): Promise<any> {
     data: fields,
   });
 }
+
+export function readObservation(id: number | string): Promise<any> {
+  return axiosApi(`http://54.251.129.178/api/v1/observations/${id}`, {
+    method: 'get',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  });
+}

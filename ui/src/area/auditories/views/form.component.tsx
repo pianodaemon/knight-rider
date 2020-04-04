@@ -1,5 +1,5 @@
-import React from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { Formik } from 'formik';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -10,11 +10,13 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
-import { Catalog } from '../state/observations.reducer';
+import { Catalog, Observation } from '../state/observations.reducer';
 
 type Props = {
   createObservationAction: Function,
+  readObservationAction: Function,
   catalog: Catalog | null,
+  observation: Observation | null,
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -46,23 +48,31 @@ const useStyles = makeStyles((theme: Theme) =>
       '&:hover': {
         background: '#008aba',
         color: '#FFF',
-      }
+      },
     },
-  }),
+  })
 );
 
 export const ObservationsForm = (props: Props) => {
+  const { catalog, createObservationAction, observation } = props;
   const classes = useStyles();
   const history = useHistory();
-  const { catalog, createObservationAction } = props;
+  const { id } = useParams();
+  const initialValues = {
+    observation_type_id: '',
+    social_program_id: '',
+    audit_id: '',
+  };
+  useEffect(() => {
+    if (id) {
+      props.readObservationAction({ id, history });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <Paper className={classes.paper}>
       <Formik
-        initialValues={{
-          observation_type_id: '',
-          social_program_id: '',
-          audit_id: '',
-        }}
+        initialValues={observation || initialValues}
         validate={(values: any) => {
           const errors: any = {};
           if (!values.observation_type_id) {
@@ -90,6 +100,7 @@ export const ObservationsForm = (props: Props) => {
           const fields: any = values;
           createObservationAction({ fields, history, releaseForm });
         }}
+        enableReinitialize
       >
         {({
           values,

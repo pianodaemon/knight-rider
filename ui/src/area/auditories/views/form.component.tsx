@@ -39,6 +39,15 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: '20px 0px',
     },
     textErrorHelper: { color: theme.palette.error.light },
+    submitInput: {
+      backgroundColor: '#FFFFFF',
+      color: '#008aba',
+      border: '1px solid #008aba',
+      '&:hover': {
+        background: '#008aba',
+        color: '#FFF',
+      }
+    },
   }),
 );
 
@@ -227,7 +236,7 @@ export const ObservationsForm = (props: Props) => {
                   */}
                 <Button
                   variant="contained"
-                  color="primary"
+                  className={classes.submitInput}
                   disabled={isSubmitting}
                   type="submit"
                 >

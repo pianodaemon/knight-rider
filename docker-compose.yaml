@@ -16,3 +16,9 @@ services:
       - '10070:10070'
     depends_on:
       - 'mongo-staging-db'
+
+  api-dos:
+    container_name: 'api'
+    build: './soa'
+    ports:
+      - '8080:8080'

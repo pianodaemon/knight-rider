@@ -1,5 +1,5 @@
 # Building stage
-FROM agnux/go:builder as builder
+FROM golang:1.13-buster as builder
 
 LABEL MAINTAINER="Gerardo Araujo <garaujo@agnux.com>"
 
@@ -15,15 +15,20 @@ COPY internal internal
 
 COPY cmd cmd
 
-RUN go build -o /docrender cmd/http/run.go
+RUN CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64 \
+    go build -ldflags="-w -s" -o /docrender cmd/http/run.go
 
 # Final image
-FROM agnux/alpine:3.10
+FROM golang:1.13-alpine
 
 LABEL MAINTAINER="Gerardo Araujo <garaujo@agnux.com>"
 
-COPY --from=builder /docrender .
-COPY scripts/run_service.sh .
+ENV APP_DIR=/
+COPY --from=builder /docrender $APP_DIR
+COPY scripts/run_service.sh $APP_DIR
+WORKDIR $APP_DIR
 
 ENV DOC_RENDER_HTTP_PORT=10070
 

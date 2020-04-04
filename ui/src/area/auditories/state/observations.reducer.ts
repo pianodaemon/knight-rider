@@ -4,6 +4,7 @@ export interface Observation {
   id: number;
   observation_type_id: number;
   social_program_id: number;
+  audit_id: number;
 }
 
 interface ObservationsSlice {
@@ -17,9 +18,16 @@ type CatalogItem = {
   title: string,
 };
 
+type Audit = {
+  id: number,
+  title: string,
+  dependency_id: number
+};
+
 export type Catalog = {
   observation_types: Array<CatalogItem> | null,
   social_programs: Array<CatalogItem> | null,
+  audits: Array<Audit> | null,
 };
 
 const initialState: ObservationsSlice = {

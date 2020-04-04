@@ -22,11 +22,13 @@ export const Table = (props: Props) => {
     loadObservationsAction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // const options = { initialPage: 3, paging: true, pageSize: 12 };
   return (
     <MaterialTable
       title="Observaciones"
       columns={[
         { title: 'ID', field: 'id', sorting: true, defaultSort: 'desc' },
+        { title: 'Auditoría no.', field: 'audit_id_title' },
         { title: 'Tipo de Observación', field: 'observation_type_id_title' },
         {
           title: 'Programa',

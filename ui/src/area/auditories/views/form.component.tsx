@@ -38,7 +38,8 @@ const useStyles = makeStyles((theme: Theme) =>
       borderStyle: 'solid',
       margin: '20px 0px',
     },
-  })
+    textErrorHelper: { color: theme.palette.error.light },
+  }),
 );
 
 export const ObservationsForm = (props: Props) => {
@@ -48,7 +49,11 @@ export const ObservationsForm = (props: Props) => {
   return (
     <Paper className={classes.paper}>
       <Formik
-        initialValues={{ observation_type_id: '', social_program_id: '' }}
+        initialValues={{
+          observation_type_id: '',
+          social_program_id: '',
+          audit_id: '',
+        }}
         validate={(values: any) => {
           const errors: any = {};
           if (!values.observation_type_id) {
@@ -57,6 +62,10 @@ export const ObservationsForm = (props: Props) => {
 
           if (!values.social_program_id) {
             errors.social_program_id = 'Required';
+          }
+
+          if (!values.audit_id) {
+            errors.audit_id = 'Required';
           }
           return errors;
         }}
@@ -69,7 +78,8 @@ export const ObservationsForm = (props: Props) => {
           }, 400);
           */
           const releaseForm: () => void = () => setSubmitting(false);
-          createObservationAction({ ...values, history, releaseForm });
+          const fields: any = values;
+          createObservationAction({ fields, history, releaseForm });
         }}
       >
         {({
@@ -115,7 +125,10 @@ export const ObservationsForm = (props: Props) => {
                         {errors.observation_type_id &&
                           touched.observation_type_id &&
                           errors.observation_type_id && (
-                            <FormHelperText>
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
                               Seleccione un tipo de Auditoría
                             </FormHelperText>
                           )}
@@ -146,10 +159,52 @@ export const ObservationsForm = (props: Props) => {
                         {errors.social_program_id &&
                           touched.social_program_id &&
                           errors.social_program_id && (
-                            <FormHelperText>Elige un programa</FormHelperText>
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Elige un programa
+                            </FormHelperText>
                           )}
                       </FormControl>
                     </Grid>
+                  </Grid>
+                  <Grid container spacing={3}>
+                    <Grid item xs={6}>
+                      <FormControl className={classes.formControl}>
+                        <InputLabel id="audit">Auditor&iacute;a no.</InputLabel>
+                        <Select
+                          labelId="audit"
+                          id="audit-select"
+                          value={values.audit_id || ''}
+                          onChange={handleChange('audit_id')}
+                        >
+                          {catalog &&
+                            catalog.audits &&
+                            catalog.audits.map((item) => {
+                              return (
+                                <MenuItem
+                                  value={item.id}
+                                  key={`type-${item.id}`}
+                                >
+                                  {item.title}
+                                </MenuItem>
+                              );
+                            })}
+                        </Select>
+                        {errors.audit_id &&
+                          touched.audit_id &&
+                          errors.audit_id && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Seleccione una Auditoría
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={6} />
                   </Grid>
                 </fieldset>
                 {/*

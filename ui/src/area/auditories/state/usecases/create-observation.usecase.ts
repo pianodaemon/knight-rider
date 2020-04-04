@@ -22,12 +22,8 @@ export const createObservationActionErrorAction: ActionFunctionAny<
 
 function* createObservationWorker(action: any): Generator<any, any, any> {
   try {
-    const { observation_type_id, social_program_id, history } = action.payload;
-    const result = yield call(
-      createObservation,
-      observation_type_id,
-      social_program_id
-    );
+    const { fields, history } = action.payload;
+    const result = yield call(createObservation, fields);
     yield put(createObservationActionSuccessAction(result));
     yield history.push('/list');
     yield put(loadObservationsAction());

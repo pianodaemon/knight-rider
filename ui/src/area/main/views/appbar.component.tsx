@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme: Theme) =>
       ...theme.mixins.toolbar,
       justifyContent: 'flex-end',
       background: '#5232C2',
-      '& button':{
+      '& button': {
         color: '#FFF',
       },
     },
@@ -112,11 +112,10 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 'auto',
       width: '75%',
     },
-    imageGobMx:{
+    imageGobMx: {
       height: '2.2em',
-      width: 'auto',  
+      width: 'auto',
     },
-
   }),
 );
 
@@ -152,11 +151,7 @@ export function AppBarComponent() {
           >
             <MenuIcon />
           </IconButton>
-          <img
-            className={classes.imageGobMx}
-            src="/nlgobmx.png"
-            alt="Inicio"
-          />
+          <img className={classes.imageGobMx} src="/nlgobmx.png" alt="Inicio" />
           {/*
           <Typography variant="h6" noWrap>
             Gobierno Nuevo Le&oacute;n
@@ -173,16 +168,9 @@ export function AppBarComponent() {
           paper: classes.drawerPaper,
         }}
       >
-        
         <div className={classes.drawerHeader}>
-          <img 
-            className={classes.imageLogo}
-            src="./ll3.png"
-            alt="Logo"
-          />
-          <IconButton 
-            onClick={handleDrawerClose}
-          >
+          <img className={classes.imageLogo} src="./ll3.png" alt="Logo" />
+          <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? (
               <ChevronLeftIcon />
             ) : (

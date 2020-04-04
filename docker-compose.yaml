@@ -1,7 +1,18 @@
 version: '3.7'
 services:
-  mongo-staging:
+
+  mongo-staging-db:
     image: 'mongo:latest'
     container_name: 'mongo'
     ports:
       - '27100:27017'
+
+  docrender-staging-etl:
+    container_name: 'docrender'
+    build:
+      context: ./docrender/
+      dockerfile: Dockerfile
+    ports:
+      - '10070:10070'
+    depends_on:
+      - 'mongo-staging-db'

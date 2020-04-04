@@ -1,5 +1,5 @@
 from flask_restplus import Resource, fields
-from flask import request
+from flask import request, make_response
 import psycopg2
 
 from genl.restplus import api
@@ -24,10 +24,12 @@ observation = api.model(
 class ObservationList(Resource):
 
     @ns.marshal_list_with(observation)
-    @ns.param("offset", "Which record to start from")
-    @ns.param("limit", "How many records will be returned")
-    @ns.param("order_by", "Which field to order by")
-    @ns.param("order", "ASC or DESC, which ordering to use")
+    @ns.param("offset", "Which record to start from, default is 0")
+    @ns.param("limit", "How many records will be returned at most, default is 10")
+    @ns.param("order_by", "Which field to order by, default is id column")
+    @ns.param("order", "ASC or DESC, which ordering to use, default is ASC")
+    @ns.param("per_page", "How many items per page, default is 10")
+    @ns.param("page", "Which page to fetch, default is 1")
     @ns.param("observation_type_id", "An integer as observation type identifier")
     @ns.param("social_program_id", "An integer as social program identifier")
     @ns.param("audit_id", "An integer as audit identifier")
@@ -39,11 +41,13 @@ class ObservationList(Resource):
         limit = request.args.get('limit', '10')
         order_by = request.args.get('order_by', 'id')
         order = request.args.get('order', 'ASC')
+        per_page = request.args.get('per_page', '10')
+        page = request.args.get('page', '1')
 
         search_params = get_search_params(request.args, ['observation_type_id', 'social_program_id', 'audit_id'])
 
         try:
-            obs_list = observations.read_page(offset, limit, order_by, order, search_params)
+            obs_list = observations.read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except Exception as err:

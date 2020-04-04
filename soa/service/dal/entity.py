@@ -82,3 +82,26 @@ def _setup_search_criteria(table, search_params):
         criteria.append("{}.{} = {}".format(table, field, value))
 
     return ' AND '.join(criteria)
+
+
+def count_entities(table, search_params):
+    ''' Counts non-blocked entities '''
+    
+    query = '''
+        SELECT count(id)::int as total
+        FROM {}
+        WHERE blocked = false
+    '''.format(table)
+
+    if search_params is not None:
+        query += ' AND ' + _setup_search_criteria(table, search_params)
+    
+    rows = exec_steady(query)
+
+    # For this case we are just expecting one row
+    if len(rows) == 0:
+        raise NoResultFound('Just expecting one total as a result')
+    elif len(rows) > 1:
+        raise MultipleResultsFound('Multiple results found, but only one expected')
+
+    return rows.pop()['total']

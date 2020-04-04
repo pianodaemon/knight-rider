@@ -1,5 +1,5 @@
 from dal.helper import run_stored_procedure, exec_steady
-from dal.entity import page_entities
+from dal.entity import page_entities, count_entities
 
 
 def _alter_observation(**kwargs):
@@ -73,6 +73,27 @@ def delete(id):
 def read_page(offset, limit, order_by, order, search_params):
     ''' Reads a page of observations '''
     return page_entities('observations', offset, limit, order_by, order, search_params)
+
+
+def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
+    ''' Reads a page of observations '''
+    limit = int(limit)
+    per_page = int(per_page)
+    page = int(page)
+
+    total = count_entities('observations', search_params)
+    if total > limit:
+        total = limit
+    
+    whole_pages_offset = per_page * (page - 1)
+    if whole_pages_offset >= total:
+        return []
+    
+    target_items_qty = total - whole_pages_offset
+    if target_items_qty > per_page:
+        target_items_qty = per_page
+
+    return page_entities('observations', int(offset) + whole_pages_offset, target_items_qty, order_by, order, search_params)
 
 
 def get_catalogs(table_name_list):

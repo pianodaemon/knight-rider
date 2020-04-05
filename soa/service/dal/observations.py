@@ -11,7 +11,7 @@ def _alter_observation(**kwargs):
         {}::integer,
         '{}'::text)
         AS result( rc integer, msg text )""".format(
-        kwargs["id"], kwargs["type_id"],  kwargs["social_program_id"],
+        kwargs["id"], kwargs["observation_type_id"],  kwargs["social_program_id"],
         kwargs["audit_id"], kwargs["fiscal_id"], kwargs["description"]
     )
 

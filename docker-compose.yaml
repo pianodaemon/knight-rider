@@ -28,7 +28,13 @@ services:
       - '8080:8080'
 
   ui_dos:
-    container_name: ui
+    container_name: 'ui'
     build: './ui'
     ports:
      - '3000:80'
+
+  pg_dos:
+    image: 'postgres:12-alpine'
+    container_name: 'pgsql'
+    ports:
+      - '5432:5432'

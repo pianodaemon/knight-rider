@@ -1,17 +1,20 @@
 from dal.helper import run_stored_procedure, exec_steady
 from dal.entity import page_entities, count_entities
 
-
 def _alter_observation(**kwargs):
-    ''' Calls postgresql function in charge of creation/edition of an observation entity '''
-    sql = '''
-        SELECT * FROM alter_observation(
-            {}::integer,
-            {}::integer,
-        )
-        AS result( rc integer, msg text );
-    '''.format(kwargs['id'], kwargs['observation_type_id'])
-    
+    """Calls sp in charge of create and edit a observation"""
+    sql = """SELECT * FROM alter_provider(
+        {}::integer,
+        {}::integer,
+        {}::integer,
+        {}::integer,
+        {}::integer,
+        '{}'::text)
+        AS result( rc integer, msg text )""".format(
+        kwargs["id"], kwargs["type_id"],  kwargs["social_program_id"],
+        kwargs["audit_id"], kwargs["fiscal_id"], kwargs["description"]
+    )
+
     rcode, rmsg = run_stored_procedure(sql)
     if rcode < 0:
         raise Exception(rmsg)

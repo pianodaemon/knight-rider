@@ -1,5 +1,5 @@
-import React from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { Formik } from 'formik';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -10,11 +10,13 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
-import { Catalog } from '../state/observations.reducer';
+import { Catalog, Observation } from '../state/observations.reducer';
 
 type Props = {
   createObservationAction: Function,
+  readObservationAction: Function,
   catalog: Catalog | null,
+  observation: Observation | null,
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -38,17 +40,39 @@ const useStyles = makeStyles((theme: Theme) =>
       borderStyle: 'solid',
       margin: '20px 0px',
     },
+    textErrorHelper: { color: theme.palette.error.light },
+    submitInput: {
+      backgroundColor: '#FFFFFF',
+      color: '#008aba',
+      border: '1px solid #008aba',
+      '&:hover': {
+        background: '#008aba',
+        color: '#FFF',
+      },
+    },
   })
 );
 
 export const ObservationsForm = (props: Props) => {
+  const { catalog, createObservationAction, observation } = props;
   const classes = useStyles();
   const history = useHistory();
-  const { catalog, createObservationAction } = props;
+  const { id } = useParams();
+  const initialValues = {
+    observation_type_id: '',
+    social_program_id: '',
+    audit_id: '',
+  };
+  useEffect(() => {
+    if (id) {
+      props.readObservationAction({ id, history });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <Paper className={classes.paper}>
       <Formik
-        initialValues={{ observation_type_id: '', social_program_id: '' }}
+        initialValues={observation || initialValues}
         validate={(values: any) => {
           const errors: any = {};
           if (!values.observation_type_id) {
@@ -57,6 +81,10 @@ export const ObservationsForm = (props: Props) => {
 
           if (!values.social_program_id) {
             errors.social_program_id = 'Required';
+          }
+
+          if (!values.audit_id) {
+            errors.audit_id = 'Required';
           }
           return errors;
         }}
@@ -69,8 +97,10 @@ export const ObservationsForm = (props: Props) => {
           }, 400);
           */
           const releaseForm: () => void = () => setSubmitting(false);
-          createObservationAction({ ...values, history, releaseForm });
+          const fields: any = values;
+          createObservationAction({ fields, history, releaseForm });
         }}
+        enableReinitialize
       >
         {({
           values,
@@ -115,7 +145,10 @@ export const ObservationsForm = (props: Props) => {
                         {errors.observation_type_id &&
                           touched.observation_type_id &&
                           errors.observation_type_id && (
-                            <FormHelperText>
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
                               Seleccione un tipo de Auditoría
                             </FormHelperText>
                           )}
@@ -146,10 +179,52 @@ export const ObservationsForm = (props: Props) => {
                         {errors.social_program_id &&
                           touched.social_program_id &&
                           errors.social_program_id && (
-                            <FormHelperText>Elige un programa</FormHelperText>
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Elige un programa
+                            </FormHelperText>
                           )}
                       </FormControl>
                     </Grid>
+                  </Grid>
+                  <Grid container spacing={3}>
+                    <Grid item xs={6}>
+                      <FormControl className={classes.formControl}>
+                        <InputLabel id="audit">Auditor&iacute;a no.</InputLabel>
+                        <Select
+                          labelId="audit"
+                          id="audit-select"
+                          value={values.audit_id || ''}
+                          onChange={handleChange('audit_id')}
+                        >
+                          {catalog &&
+                            catalog.audits &&
+                            catalog.audits.map((item) => {
+                              return (
+                                <MenuItem
+                                  value={item.id}
+                                  key={`type-${item.id}`}
+                                >
+                                  {item.title}
+                                </MenuItem>
+                              );
+                            })}
+                        </Select>
+                        {errors.audit_id &&
+                          touched.audit_id &&
+                          errors.audit_id && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Seleccione una Auditoría
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={6} />
                   </Grid>
                 </fieldset>
                 {/*
@@ -172,7 +247,7 @@ export const ObservationsForm = (props: Props) => {
                   */}
                 <Button
                   variant="contained"
-                  color="primary"
+                  className={classes.submitInput}
                   disabled={isSubmitting}
                   type="submit"
                 >

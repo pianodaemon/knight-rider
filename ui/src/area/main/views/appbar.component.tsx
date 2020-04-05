@@ -27,8 +27,8 @@ import { createBrowserHistory } from 'history';
 import { AppRoutesContainer } from './app-routes.container';
 
 const breadcrumbNameMap: { [key: string]: string } = {
-  '/create': 'Crear',
-  '/list': 'Listar',
+  '/observation/create': 'Crear',
+  '/observation/list': 'Listar',
 };
 
 const customHistory = createBrowserHistory();
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
     },
     appBar: {
-      background: 'linear-gradient(to right,#038bbb,#5232C2)',
+      background: 'linear-gradient(to left,#038bbb,#5232C2)',
       transition: theme.transitions.create(['margin', 'width'], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
@@ -66,8 +66,25 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawerPaper: {
       width: drawerWidth,
+      backgroundImage: 'url(/NuevoleonB.jpg)',
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backgroundPositionX: '-170px',
     },
     drawerHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      padding: theme.spacing(0, 1),
+      // necessary for content to be below app bar
+      ...theme.mixins.toolbar,
+      justifyContent: 'flex-end',
+      background: '#5232C2',
+      '& button': {
+        color: '#FFF',
+      },
+    },
+    drawerHeaderMargin: {
       display: 'flex',
       alignItems: 'center',
       padding: theme.spacing(0, 1),
@@ -90,6 +107,14 @@ const useStyles = makeStyles((theme: Theme) =>
         duration: theme.transitions.duration.enteringScreen,
       }),
       marginLeft: 0,
+    },
+    imageLogo: {
+      height: 'auto',
+      width: '75%',
+    },
+    imageGobMx: {
+      height: '2.2em',
+      width: 'auto',
     },
   }),
 );
@@ -126,10 +151,7 @@ export function AppBarComponent() {
           >
             <MenuIcon />
           </IconButton>
-          <img
-            src="https://beta.nl.gob.mx/sites/all/themes/gobnl/logo-genl.svg"
-            alt="Inicio"
-          />
+          <img className={classes.imageGobMx} src="/nlgobmx.png" alt="Inicio" />
           {/*
           <Typography variant="h6" noWrap>
             Gobierno Nuevo Le&oacute;n
@@ -147,6 +169,7 @@ export function AppBarComponent() {
         }}
       >
         <div className={classes.drawerHeader}>
+          <img className={classes.imageLogo} src="/ll3.png" alt="Logo" />
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? (
               <ChevronLeftIcon />
@@ -180,7 +203,7 @@ export function AppBarComponent() {
           [classes.contentShift]: open,
         })}
       >
-        <div className={classes.drawerHeader} />
+        <div className={classes.drawerHeaderMargin} />
         <AppRoutesContainer history={customHistory} />
       </main>
     </div>

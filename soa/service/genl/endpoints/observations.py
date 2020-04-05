@@ -17,7 +17,8 @@ observation = api.model(
         'observation_type_id': fields.Integer(required=True, description='Observation type identifier'),
         'social_program_id': fields.Integer(required=True, description='Social program identifier'),
         'audit_id': fields.Integer(required=True, description='Audit identifier'),
-        'fiscal_id': fields.Integer(required=True, description='Audit identifier'),
+        'fiscal_id': fields.Integer(required=True, description='Fiscal entity that audits'),
+        "description": fields.String(required=True, description="Desc of observation"),
     }
 )
 

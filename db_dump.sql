@@ -17,64 +17,90 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: alter_observation(integer, integer); Type: FUNCTION; Schema: public; Owner: knight_rider
+-- Name: alter_observation(integer, integer, integer, integer, integer, text); Type: FUNCTION; Schema: public; Owner: knight_rider
 --
 
-CREATE FUNCTION public.alter_observation(_id integer, _type_id integer) RETURNS record
+CREATE FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text) RETURNS record
     LANGUAGE plpgsql
     AS $$
-declare
-	last_id integer := 0;
-	rmsg text := '';
-	updates_count integer := 0;
-	
-begin
-	case
-		when _id = 0 then
-		
-			insert into observations (observation_type_id)
-			values (_type_id)
-			returning id into last_id;
-			
-		when _id > 0 then
-		
-			with rows as (
-				update observations
-				set observation_type_id = _type_id
-				where id = _id
-				returning 1
-			)
-			select count(*) from rows into updates_count;
-			
-			if updates_count = 0 then
-				raise exception 'Observation object with id % was not updated', _id
-					using hint = 'Does it exist?';
-			end if;
-			
-			last_id = _id;
-			
-		else
-			raise exception 'Observation id % is not supported', _id;
-	end case;
-	
-	return (last_id::integer, ''::text);
-	
-	exception
-		when others then
-			get stacked diagnostics rmsg = message_text;
-			return (-1::integer, rmsg::text);
-end;
+
+DECLARE
+
+    current_moment timestamp with time zone = now();
+    coincidences integer := 0;
+    latter_id integer := 0;
+
+    -- dump of errors
+    rmsg text;
+
+BEGIN
+
+    CASE
+
+        WHEN _observation_id = 0 THEN
+
+            INSERT INTO observations (
+                observation_type_id,
+                social_program_id,
+                audit_id,
+                title,
+                fiscal_id,
+                touch_latter_time
+            ) VALUES (
+                _type_id,
+                _social_program_id,
+                _audit_id,
+                _title,
+                _fiscal_id,
+                current_moment
+            ) RETURNING id INTO latter_id;
+
+        WHEN _observation_id > 0 THEN
+
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- STARTS - Validates observation id
+            --
+            -- JUSTIFICATION: Because UPDATE statement does not issue
+            -- any exception if nothing was updated.
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            SELECT count(id)
+            FROM observations INTO coincidences
+            WHERE not blocked AND id = _observation_id;
+
+            IF not coincidences = 1 THEN
+                RAISE EXCEPTION 'observation identifier % does not exist', _observation_id;
+            END IF;
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- ENDS - Validate observation id
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            UPDATE observations
+            SET title  = _title, observation_type_id = _type_id,
+                social_program_id = _social_program_id,
+                audit_id = _audit_id, fiscal_id = _fiscal_id,
+                touch_latter_time = current_moment
+            WHERE id = _observation_id;
+
+            -- Upon edition we return observation id as latter id
+            latter_id = _observation_id;
+
+        ELSE
+            RAISE EXCEPTION 'negative observation identifier % is unsupported', _observation_id;
+
+    END CASE;
+
+    return ( latter_id::integer, ''::text );
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS rmsg = MESSAGE_TEXT;
+            return ( -1::integer, rmsg::text );
+
+END;
 $$;
 
 
-ALTER FUNCTION public.alter_observation(_id integer, _type_id integer) OWNER TO knight_rider;
-
---
--- Name: FUNCTION alter_observation(_id integer, _type_id integer); Type: COMMENT; Schema: public; Owner: knight_rider
---
-
-COMMENT ON FUNCTION public.alter_observation(_id integer, _type_id integer) IS 'Function intended to update or insert an observation';
-
+ALTER FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text) OWNER TO knight_rider;
 
 SET default_tablespace = '';
 
@@ -301,7 +327,10 @@ CREATE TABLE public.observations (
     observation_type_id integer NOT NULL,
     social_program_id integer NOT NULL,
     blocked boolean DEFAULT false NOT NULL,
-    audit_id integer NOT NULL
+    audit_id integer NOT NULL,
+    title text NOT NULL,
+    fiscal_id integer NOT NULL,
+    touch_latter_time timestamp with time zone
 );
 
 
@@ -312,6 +341,20 @@ ALTER TABLE public.observations OWNER TO knight_rider;
 --
 
 COMMENT ON TABLE public.observations IS 'Alberga la entidad observacion';
+
+
+--
+-- Name: COLUMN observations.title; Type: COMMENT; Schema: public; Owner: knight_rider
+--
+
+COMMENT ON COLUMN public.observations.title IS 'La descripcion de la auditoria';
+
+
+--
+-- Name: COLUMN observations.fiscal_id; Type: COMMENT; Schema: public; Owner: knight_rider
+--
+
+COMMENT ON COLUMN public.observations.fiscal_id IS 'Representa la entidad fiscalizadora que ejecuta la observacion';
 
 
 --
@@ -657,66 +700,74 @@ COPY public.observation_types (id, title) FROM stdin;
 -- Data for Name: observations; Type: TABLE DATA; Schema: public; Owner: knight_rider
 --
 
-COPY public.observations (id, observation_type_id, social_program_id, blocked, audit_id) FROM stdin;
-49	2	2	f	1
-50	3	1	f	1
-51	2	3	f	1
-52	2	2	f	1
-54	2	2	t	1
-55	2	3	t	1
-56	3	3	t	1
-53	2	2	t	1
-27	1	1	t	1
-28	1	1	t	1
-57	2	1	f	1
-58	1	3	f	1
-59	2	2	f	1
-60	1	3	f	1
-61	4	3	f	1
-35	2	2	t	1
-62	3	2	f	1
-63	4	3	f	1
-2	4	1	t	1
-3	3	1	t	1
-4	2	1	t	1
-5	1	1	t	1
-6	4	1	t	1
-10	1	1	t	1
-11	1	1	t	1
-12	3	1	t	1
-31	1	1	f	1
-32	1	1	f	1
-13	1	1	t	1
-14	1	1	t	1
-15	1	1	t	1
-16	1	1	t	1
-17	1	1	t	1
-22	1	1	t	1
-18	1	1	t	1
-24	1	1	t	1
-19	1	1	t	1
-20	1	1	t	1
-25	1	1	t	1
-21	1	1	t	1
-23	1	1	t	1
-30	1	1	t	1
-29	1	1	t	1
-33	1	1	t	1
-34	2	2	f	1
-36	3	3	f	1
-37	2	3	f	1
-39	2	1	f	1
-40	2	3	f	1
-41	2	3	f	1
-42	2	3	f	1
-43	2	3	f	1
-44	2	3	f	1
-45	2	3	f	1
-46	1	3	f	1
-47	1	3	f	1
-48	1	3	f	1
-38	2	1	t	1
-26	1	1	t	1
+COPY public.observations (id, observation_type_id, social_program_id, blocked, audit_id, title, fiscal_id, touch_latter_time) FROM stdin;
+4	2	1	f	1	123qwe	1	\N
+5	1	1	t	1	freebsd2	1	\N
+6	4	1	t	1	heman	1	\N
+10	1	1	t	1	skeletor	1	\N
+11	1	1	t	1	este dato debe ser actualizado	1	\N
+12	3	1	t	1	sting and shaggy	1	\N
+31	1	1	f	1	www.youtube.com	1	\N
+32	1	1	f	1	que kilombo	1	\N
+25	1	1	t	1	Alan parson project	1	\N
+21	1	1	t	1	Blue monday	1	\N
+23	1	1	t	1	Esto va evolucionando	1	\N
+30	1	1	t	1	Esto necesita atencion	1	\N
+29	1	1	t	1	Rafa ya no esta aqui, pero Omar cubre su rol	1	\N
+49	2	2	f	1	Yo tenia 3 perritos	1	\N
+50	3	1	f	1	Uno se callo en la nieve	1	\N
+51	2	3	f	1	Y ya nada mas me quedan nueva	1	\N
+52	2	2	f	1	Coca es mejor que pepsi	1	\N
+54	2	2	t	1	Pero pepsi junta mitades	1	\N
+33	1	1	t	1	el hector ceron ama javascript	1	\N
+34	2	2	f	1	el frances es hacker	1	\N
+36	3	3	f	1	extrano las carne de monterrey	1	\N
+37	2	3	f	1	vivir en gdl es caro	1	\N
+39	2	1	f	1	que buen clima	1	\N
+14	1	1	t	1	12345678	1	\N
+15	1	1	t	1	ewfvdsfzz	1	\N
+16	1	1	t	1	lorem ipsum	1	\N
+17	1	1	t	1	wesdvdv	1	\N
+22	1	1	t	1	ewerwerwer	1	\N
+18	1	1	t	1	werwerwer	1	\N
+24	1	1	t	1	sdfsdfg	1	\N
+19	1	1	t	1	eryfgfdadf	1	\N
+20	1	1	t	1	rterdfsdffasd	1	\N
+72	2	2	t	1	y	1	\N
+73	2	2	f	1	u	1	\N
+2	4	1	t	1	o	1	\N
+3	3	1	t	1	p	1	\N
+13	1	1	t	1	sdfshhfghsfheargssrth	1	\N
+74	2	3	t	1	i	1	\N
+55	2	3	t	1	Los pepcilintros son de os 90s	1	\N
+56	3	3	t	1	Los tazos aun tiene seguidores	1	\N
+45	2	3	f	1	Jaime el nino tiene sed y no hay naranjas	1	\N
+46	1	3	f	1	Pero el gran sabor de tang le va a encantar	1	\N
+47	1	3	f	1	La vida es una tombola, ton ton tombola	1	\N
+48	1	3	f	1	Tigres versus rayados	1	\N
+38	2	1	t	1	chespirito se ha pelado con villagran	1	\N
+26	1	1	t	1	La caravina de ambrosio rules	1	\N
+40	2	3	f	1	carnes selectas san juan marinadas	1	\N
+41	2	3	f	1	Tortugas ninja quieren pizza	1	\N
+42	2	3	f	1	Tomando una pepsi kick	1	\N
+43	2	3	f	1	De nino siempre quice unos nunchakos	1	\N
+44	2	3	f	1	Pongale aguacate cabron	1	\N
+53	2	2	t	1	Busqueda binaria	1	\N
+27	1	1	t	1	quick sort	1	\N
+28	1	1	t	1	Las nenas con zapatos de tacon se ven mejor	1	\N
+57	2	1	f	1	bronco es el gigante de america ?	1	\N
+58	1	3	f	1	A como extrano ir a los tacos	1	\N
+59	2	2	f	1	Los hackatones estan chidos pero son extremadamente cansados	1	\N
+60	1	3	f	1	Esta descripciontiene que editarce	1	\N
+61	4	3	f	1	Las alfombras siempre estaran de moda	1	\N
+35	2	2	t	1	El titanic no fue el unico barco gigante	1	\N
+62	3	2	f	1	es dificil no cargarla con las prisas	1	\N
+63	4	3	f	1	Que pedo con el corona virus	1	\N
+66	1	1	f	1	restauran menu menu	1	\N
+68	1	1	f	1	a	1	\N
+69	2	3	f	1	b	1	\N
+70	1	1	f	1	d	1	\N
+71	1	1	f	1	t	1	\N
 \.
 
 
@@ -781,7 +832,7 @@ COPY public.users (id, username, password, orgchart_role_id, division_id, disabl
 -- Name: observations_seq; Type: SEQUENCE SET; Schema: public; Owner: knight_rider
 --
 
-SELECT pg_catalog.setval('public.observations_seq', 63, true);
+SELECT pg_catalog.setval('public.observations_seq', 101, true);
 
 
 --
@@ -894,6 +945,14 @@ ALTER TABLE ONLY public.observation_statuses
 
 ALTER TABLE ONLY public.observation_statuses
     ADD CONSTRAINT observation_status_titulo_key UNIQUE (title);
+
+
+--
+-- Name: observations observation_title_unique; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.observations
+    ADD CONSTRAINT observation_title_unique UNIQUE (title);
 
 
 --

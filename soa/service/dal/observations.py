@@ -12,7 +12,7 @@ def _alter_observation(**kwargs):
         '{}'::text)
         AS result( rc integer, msg text )""".format(
         kwargs["id"], kwargs["observation_type_id"],  kwargs["social_program_id"],
-        kwargs["audit_id"], kwargs["fiscal_id"], kwargs["description"]
+        kwargs["audit_id"], kwargs["fiscal_id"], kwargs["title"]
     )
 
     rcode, rmsg = run_stored_procedure(sql)

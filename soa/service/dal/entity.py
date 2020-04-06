@@ -79,7 +79,11 @@ def page_entities(table, offset, limit, order_by, order, search_params):
 def _setup_search_criteria(table, search_params):
     criteria = []
     for field, value in search_params.items():
-        criteria.append("{}.{} = {}".format(table, field, value))
+        # For text fields... a different condition syntax is needed
+        if field == 'title':
+            criteria.append("{}.{} ILIKE '%{}%'".format(table, field, value))
+        else:
+            criteria.append("{}.{} = {}".format(table, field, value))
 
     return ' AND '.join(criteria)
 

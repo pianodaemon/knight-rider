@@ -35,6 +35,8 @@ class ObservationList(Resource):
     @ns.param("observation_type_id", "An integer as observation type identifier")
     @ns.param("social_program_id", "An integer as social program identifier")
     @ns.param("audit_id", "An integer as audit identifier")
+    @ns.param("fiscal_id", "Fiscal entity that audits")
+    @ns.param("title", "Description of observation")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations '''
@@ -46,7 +48,10 @@ class ObservationList(Resource):
         per_page = request.args.get('per_page', '10')
         page = request.args.get('page', '1')
 
-        search_params = get_search_params(request.args, ['observation_type_id', 'social_program_id', 'audit_id'])
+        search_params = get_search_params(
+            request.args,
+            ['observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title']
+        )
 
         try:
             obs_list = observations.read_per_page(offset, limit, order_by, order, search_params, per_page, page)
@@ -133,7 +138,9 @@ class Catalog(Resource):
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of id/title pairs) '''
         try:
-            field_catalog = observations.get_catalogs(['observation_types', 'social_programs', 'audits'])
+            field_catalog = observations.get_catalogs(
+                ['observation_types', 'social_programs', 'audits', 'fiscals']
+            )
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))
         except Exception as err:

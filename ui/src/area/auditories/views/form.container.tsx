@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import { ObservationsForm } from './form.component';
 import { createObservationAction } from '../state/usecases/create-observation.usecase';
 import { readObservationAction } from '../state/usecases/read-observation.usecase';
+import { updateObservationAction } from '../state/usecases/update-observation.usecate';
 
 import {
   catalogSelector,
@@ -11,6 +12,7 @@ import {
 const mapDispatchToProps = {
   createObservationAction,
   readObservationAction,
+  updateObservationAction,
 };
 
 function mapStateToProps(state: any) {

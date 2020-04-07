@@ -25,7 +25,7 @@ function* createObservationWorker(action: any): Generator<any, any, any> {
     const { fields, history } = action.payload;
     const result = yield call(createObservation, fields);
     yield put(createObservationActionSuccessAction(result));
-    yield history.push('/list');
+    yield history.push('/observation/list');
     yield put(loadObservationsAction());
   } catch (e) {
     const { releaseForm } = action.payload;
@@ -50,6 +50,7 @@ const observationsReducerHandlers = {
     return {
       ...state,
       loading: false,
+      observation: null,
     };
   },
   [CREATE_OBSERVATION_ERROR]: (state: any) => {

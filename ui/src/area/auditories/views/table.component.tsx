@@ -33,6 +33,7 @@ export const Table = (props: Props) => {
         { title: 'Auditoría no.', field: 'audit_id_title' },
         { title: 'Tipo de Observación', field: 'observation_type_id_title' },
         { title: 'Programa', field: 'social_program_id_title' },
+        { title: 'Título', field: 'title' },
       ]}
       data={mutatedObservations || []}
       actions={[

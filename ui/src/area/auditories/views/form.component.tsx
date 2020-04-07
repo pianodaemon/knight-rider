@@ -10,11 +10,14 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+
 import { Catalog, Observation } from '../state/observations.reducer';
 
 type Props = {
   createObservationAction: Function,
   readObservationAction: Function,
+  updateObservationAction: Function,
   catalog: Catalog | null,
   observation: Observation | null,
 };
@@ -50,11 +53,16 @@ const useStyles = makeStyles((theme: Theme) =>
         color: '#FFF',
       },
     },
-  })
+  }),
 );
 
 export const ObservationsForm = (props: Props) => {
-  const { catalog, createObservationAction, observation } = props;
+  const {
+    catalog,
+    createObservationAction,
+    observation,
+    updateObservationAction,
+  } = props;
   const classes = useStyles();
   const history = useHistory();
   const { id } = useParams();
@@ -62,6 +70,8 @@ export const ObservationsForm = (props: Props) => {
     observation_type_id: '',
     social_program_id: '',
     audit_id: '',
+    fiscal_id: '',
+    title: '',
   };
   useEffect(() => {
     if (id) {
@@ -72,7 +82,7 @@ export const ObservationsForm = (props: Props) => {
   return (
     <Paper className={classes.paper}>
       <Formik
-        initialValues={observation || initialValues}
+        initialValues={id ? observation || initialValues : initialValues}
         validate={(values: any) => {
           const errors: any = {};
           if (!values.observation_type_id) {
@@ -86,19 +96,25 @@ export const ObservationsForm = (props: Props) => {
           if (!values.audit_id) {
             errors.audit_id = 'Required';
           }
+
+          if (!values.fiscal_id) {
+            errors.fiscal_id = 'Required';
+          }
+
+          if (!values.title) {
+            errors.title = 'Required';
+          }
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
-          /*
-          console.log('lool');
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            setSubmitting(false);
-          }, 400);
-          */
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = values;
-          createObservationAction({ fields, history, releaseForm });
+          if (id) {
+            delete fields.id;
+            updateObservationAction({ id, fields, history, releaseForm });
+          } else {
+            createObservationAction({ fields, history, releaseForm });
+          }
         }}
         enableReinitialize
       >
@@ -224,7 +240,61 @@ export const ObservationsForm = (props: Props) => {
                           )}
                       </FormControl>
                     </Grid>
-                    <Grid item xs={6} />
+                    <Grid item xs={6}>
+                      <FormControl className={classes.formControl}>
+                        <InputLabel id="fiscal">Auditor</InputLabel>
+                        <Select
+                          labelId="fiscal"
+                          id="fiscal-select"
+                          value={values.fiscal_id || ''}
+                          onChange={handleChange('fiscal_id')}
+                        >
+                          {catalog &&
+                            catalog.fiscals &&
+                            catalog.fiscals.map((item) => {
+                              return (
+                                <MenuItem
+                                  value={item.id}
+                                  key={`type-${item.id}`}
+                                >
+                                  {item.title}
+                                </MenuItem>
+                              );
+                            })}
+                        </Select>
+                        {errors.fiscal_id &&
+                          touched.fiscal_id &&
+                          errors.fiscal_id && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Seleccione una Auditor
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+
+                  <Grid container spacing={3}>
+                    <Grid item xs={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="title"
+                          label="Título"
+                          value={values.title || ''}
+                          onChange={handleChange('title')}
+                        />
+                        {errors.title && touched.title && errors.title && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingresa un t&iacute;tulo
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+                    </Grid>
                   </Grid>
                 </fieldset>
                 {/*
@@ -251,7 +321,7 @@ export const ObservationsForm = (props: Props) => {
                   disabled={isSubmitting}
                   type="submit"
                 >
-                  Crear
+                  {!id ? 'Crear' : 'Actualizar'}
                 </Button>
               </form>
             </>

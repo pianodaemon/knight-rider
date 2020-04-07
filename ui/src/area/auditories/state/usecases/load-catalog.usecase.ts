@@ -25,6 +25,7 @@ function* loadCatalogsWorker(): Generator<any, any, any> {
     yield put(loadCatalogSuccessAction(result));
   } catch (e) {
     yield put(loadCatalogErrorAction());
+    console.log(e);
   }
 }
 

@@ -27,8 +27,9 @@ export const observationsCatalogSelector = createSelector(
   sliceSelector,
   catalogSelector,
   (slice: any, catalog: any) =>
-    slice.observations &&
     catalog &&
+    slice.observations &&
+    Array.isArray(slice.observations) &&
     slice.observations.map((observation: Observation) => {
       let observation_type_id_title = catalog.observation_types.find(
         (item: any) => item.id === observation.observation_type_id,

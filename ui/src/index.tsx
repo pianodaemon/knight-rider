@@ -6,10 +6,19 @@ import { ThemeProvider } from '@material-ui/core';
 import App from './App';
 import { configureStore } from './store';
 import * as serviceWorker from './serviceWorker';
+import { setAppSettings } from './shared/utils/app-settings.util';
 
 const initialState: any = {};
 const store: any = configureStore(initialState, {});
 const theme: Theme = createMuiTheme();
+const appSettings = {
+  baseUrl:
+    process.env.NODE_ENV === 'production'
+      ? `${process.env.PUBLIC_URL}`
+      : 'http://54.251.129.178:8080/api/v1', // @todo this should be fetch from docker image container env vars
+};
+
+setAppSettings(Object.freeze(appSettings));
 
 ReactDOM.render(
   <React.StrictMode>
@@ -19,7 +28,7 @@ ReactDOM.render(
       </ThemeProvider>
     </Provider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
 
 // If you want your app to work offline and load faster, you can change

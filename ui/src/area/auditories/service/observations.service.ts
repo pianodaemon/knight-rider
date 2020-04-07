@@ -1,24 +1,25 @@
 import { axiosApi } from 'src/redux-utils/axios.helper';
+import { getAppSettings } from 'src/shared/utils/app-settings.util';
 import { Observation } from '../state/observations.reducer';
 
 export function getObservations(): Promise<any> {
   return axiosApi(
-    'http://54.251.129.178/api/v1/observations/?limit=100&order=desc',
+    `${getAppSettings().baseUrl}/observations/?limit=100&order=desc`,
     {
       method: 'get',
       headers: { accept: 'application/json' },
-    },
+    }
   );
 }
 
 export function removeObservation(id: number | string): Promise<any> {
-  return axiosApi(`http://54.251.129.178/api/v1/observations/${id}`, {
+  return axiosApi(`${getAppSettings().baseUrl}/observations/${id}`, {
     method: 'delete',
   });
 }
 
 export function createObservation(fields: Observation): Promise<any> {
-  return axiosApi(`http://54.251.129.178/api/v1/observations/`, {
+  return axiosApi(`${getAppSettings().baseUrl}/observations/`, {
     method: 'post',
     headers: {
       accept: 'application/json',
@@ -29,7 +30,7 @@ export function createObservation(fields: Observation): Promise<any> {
 }
 
 export function readObservation(id: number | string): Promise<any> {
-  return axiosApi(`http://54.251.129.178/api/v1/observations/${id}`, {
+  return axiosApi(`${getAppSettings().baseUrl}/observations/${id}`, {
     method: 'get',
     headers: {
       accept: 'application/json',
@@ -42,7 +43,7 @@ export function updateObservation(
   id: number | string,
   fields: Observation
 ): Promise<any> {
-  return axiosApi(`http://54.251.129.178/api/v1/observations/${id}`, {
+  return axiosApi(`${getAppSettings().baseUrl}/observations/${id}`, {
     method: 'put',
     headers: {
       accept: 'application/json',

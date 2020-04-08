@@ -14,9 +14,11 @@ const theme: Theme = createMuiTheme();
 const appSettings = {
   baseUrl:
     process.env.NODE_ENV === 'production'
-      ? `${process.env.PUBLIC_URL}`
+      ? `${process.env.REACT_APP_HOST_API}`
       : 'http://54.251.129.178:8080/api/v1', // @todo this should be fetch from docker image container env vars
 };
+
+console.log(process.env);
 
 setAppSettings(Object.freeze(appSettings));
 

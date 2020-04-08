@@ -34,7 +34,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     formControl: {
       margin: theme.spacing(1),
-      minWidth: 150,
+      minWidth: 200,
+      [theme.breakpoints.down('sm')]: {
+        display: 'flex',
+      },
     },
     fieldset: {
       borderRadius: 3,
@@ -134,10 +137,10 @@ export const ObservationsForm = (props: Props) => {
                 <fieldset className={classes.fieldset}>
                   <legend>CyTG:</legend>
                   <Grid container spacing={3}>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <InputLabel id="observation-type">
-                          Tipo de Auditoría
+                          Tipo de observación
                         </InputLabel>
                         <Select
                           labelId="observation-type"
@@ -170,7 +173,7 @@ export const ObservationsForm = (props: Props) => {
                           )}
                       </FormControl>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <InputLabel id="social-program-id">Programa</InputLabel>
                         <Select
@@ -206,7 +209,7 @@ export const ObservationsForm = (props: Props) => {
                     </Grid>
                   </Grid>
                   <Grid container spacing={3}>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <InputLabel id="audit">Auditor&iacute;a no.</InputLabel>
                         <Select
@@ -240,7 +243,7 @@ export const ObservationsForm = (props: Props) => {
                           )}
                       </FormControl>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <InputLabel id="fiscal">Auditor</InputLabel>
                         <Select
@@ -277,11 +280,11 @@ export const ObservationsForm = (props: Props) => {
                   </Grid>
 
                   <Grid container spacing={3}>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
                           id="title"
-                          label="Título"
+                          label="Descripción"
                           value={values.title || ''}
                           onChange={handleChange('title')}
                         />
@@ -290,7 +293,7 @@ export const ObservationsForm = (props: Props) => {
                             error
                             classes={{ error: classes.textErrorHelper }}
                           >
-                            Ingresa un t&iacute;tulo
+                            Ingrese una descripción
                           </FormHelperText>
                         )}
                       </FormControl>

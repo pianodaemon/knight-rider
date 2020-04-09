@@ -3,6 +3,7 @@ import { History } from 'history';
 import { Router, Switch, Route } from 'react-router-dom';
 import { TableContainer } from '../../auditories/views/table.container';
 import { FormContainer } from '../../auditories/views/form.container';
+import { NotFound } from './not-found.component';
 
 type Props = {
   history: History,
@@ -17,11 +18,14 @@ export const AppRoutes = (props: Props) => {
   return (
     <Router history={props.history}>
       <Switch>
-        <Route exact path="/observation/list">
+        <Route exact path={['/', '/observation/list']}>
           <TableContainer />
         </Route>
         <Route exact path={['/observation/create', '/observation/:id/edit']}>
           <FormContainer />
+        </Route>
+        <Route path="*">
+          <NotFound />
         </Route>
       </Switch>
     </Router>

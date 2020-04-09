@@ -39,7 +39,7 @@ class ObservationList(Resource):
     @ns.param("title", "Description of observation")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
-        ''' To fetch several observations '''
+        ''' To fetch several observations. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
 
         offset = request.args.get('offset', '0')
         limit = request.args.get('limit', '10')
@@ -54,13 +54,15 @@ class ObservationList(Resource):
         )
 
         try:
-            obs_list = observations.read_per_page(offset, limit, order_by, order, search_params, per_page, page)
+            obs_list, total_items, total_pages = observations.read_per_page(
+                offset, limit, order_by, order, search_params, per_page, page
+            )
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except Exception as err:
-            ns.abort(500, message=err)
+            ns.abort(400, message=err)
         
-        return obs_list
+        return obs_list, 200, {'X-SOA-Total-Items': total_items, 'X-SOA-Total-Pages': total_pages}
 
 
     @ns.expect(observation)
@@ -97,6 +99,8 @@ class Observation(Resource):
             ns.abort(400, message=get_msg_pgerror(err))
         except EmptySetError:
             ns.abort(404, message=Observation.obs_not_found)
+        except Exception as err:
+            ns.abort(400, message=err)
         
         return obs
 
@@ -113,6 +117,8 @@ class Observation(Resource):
             ns.abort(400, message='Review the keys in your payload: {}'.format(err))
         except EmptySetError:
             ns.abort(404, message=Observation.obs_not_found)
+        except Exception as err:
+            ns.abort(400, message=err)
         
         return obs
 
@@ -126,6 +132,8 @@ class Observation(Resource):
             ns.abort(400, message=get_msg_pgerror(err))
         except EmptySetError:
             ns.abort(404, message=Observation.obs_not_found)
+        except Exception as err:
+            ns.abort(400, message=err)
         
         return obs
 

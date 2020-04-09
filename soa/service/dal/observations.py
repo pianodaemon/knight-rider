@@ -1,3 +1,5 @@
+import math
+
 from dal.helper import run_stored_procedure, exec_steady
 from dal.entity import page_entities, count_entities
 
@@ -94,19 +96,25 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     per_page = int(per_page)
     page = int(page)
 
-    total = count_entities('observations', search_params)
-    if total > limit:
-        total = limit
+    total_items = count_entities('observations', search_params)
+    if total_items > limit:
+        total_items = limit
     
-    whole_pages_offset = per_page * (page - 1)
-    if whole_pages_offset >= total:
-        return []
-    
-    target_items_qty = total - whole_pages_offset
-    if target_items_qty > per_page:
-        target_items_qty = per_page
+    total_pages = math.ceil(total_items / per_page)
 
-    return page_entities('observations', int(offset) + whole_pages_offset, target_items_qty, order_by, order, search_params)
+    whole_pages_offset = per_page * (page - 1)
+    if whole_pages_offset >= total_items:
+        return [], total_items, total_pages
+    
+    target_items = total_items - whole_pages_offset
+    if target_items > per_page:
+        target_items = per_page
+
+    return (
+        page_entities('observations', int(offset) + whole_pages_offset, target_items, order_by, order, search_params),
+        total_items,
+        total_pages
+    )
 
 
 def get_catalogs(table_name_list):

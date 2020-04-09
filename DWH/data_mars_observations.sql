@@ -1,3 +1,8 @@
+DROP DATABASE IF EXISTS data_mars_observations;
+CREATE DATABASE data_mars_observations;
+
+USE data_mars_observations;
+
 DROP TABLE IF EXISTS dim_time;
 CREATE TABLE dim_time (
         id                      INTEGER PRIMARY KEY,  -- year*10000+month*100+day
@@ -46,3 +51,23 @@ DELIMITER ;
 TRUNCATE TABLE dim_time;
 CALL fill_date_dimension('2017-01-01','2027-01-01');
 OPTIMIZE TABLE dim_time;
+
+
+DROP TABLE IF EXISTS dim_geo;
+CREATE TABLE dim_geo(
+    id INTEGER PRIMARY KEY,
+    country_name VARCHAR(50),
+    country_id INTEGER,
+    state_name VARCHAR(50),
+    state_id INTEGER,
+    municipality_name VARCHAR(50),
+    municipality_id INTEGER,
+    created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+LOAD DATA LOCAL INFILE './dim_geo.csv'
+INTO TABLE dim_geo
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;

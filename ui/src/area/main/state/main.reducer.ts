@@ -24,5 +24,5 @@ export const sliceName = 'mainSlice';
 export const mainReducer = createAndMergeSliceReducer(
   sliceName,
   initialState,
-  null,
+  null
 );

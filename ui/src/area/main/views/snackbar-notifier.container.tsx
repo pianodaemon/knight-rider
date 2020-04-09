@@ -5,7 +5,7 @@ import { notificationCloseAction } from '../state/usecase/notification.usecase';
 
 const mapDispatchToProps = { notificationCloseAction };
 
-function mapStateToProps(state: any): any {
+function mapStateToProps(state: any) {
   return {
     notification: notificationSelector(state),
   };

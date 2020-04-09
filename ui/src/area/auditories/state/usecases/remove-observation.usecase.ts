@@ -1,6 +1,7 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
+import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
 import { removeObservation } from '../../service/observations.service';
 import { observationsReducer } from '../observations.reducer';
 import { loadObservationsAction } from './load-observations.usecase';
@@ -25,8 +26,24 @@ function* removeObservationWorker(action: any): Generator<any, any, any> {
     const result = yield call(removeObservation, action.payload);
     yield put(removeObservationActionSuccessAction(result));
     yield put(loadObservationsAction());
+    yield put(
+      notificationAction({
+        message: `¡Observación ${result.id} ha sido eliminada!`,
+      })
+    );
   } catch (e) {
+    const message =
+      e.response && e.response.data && e.response.data.message
+        ? e.response.data.message
+        : '¡Error de inesperado! Por favor contacte al Administrador.';
     yield put(removeObservationActionErrorAction());
+    yield put(
+      notificationAction({
+        message,
+        type: 'error',
+      })
+    );
+    yield console.log(e);
   }
 }
 

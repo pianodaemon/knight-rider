@@ -1,6 +1,7 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
+import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
 import { createObservation } from '../../service/observations.service';
 import { observationsReducer } from '../observations.reducer';
 import { loadObservationsAction } from './load-observations.usecase';
@@ -27,10 +28,26 @@ function* createObservationWorker(action: any): Generator<any, any, any> {
     yield put(createObservationActionSuccessAction(result));
     yield history.push('/observation/list');
     yield put(loadObservationsAction());
+    yield put(
+      notificationAction({
+        message: `¡Observación ${result.id} ha sido creada!`,
+        type: 'success',
+      })
+    );
   } catch (e) {
     const { releaseForm } = action.payload;
+    const message =
+      e.response && e.response.data && e.response.data.message
+        ? e.response.data.message
+        : '¡Error de inesperado! Por favor contacte al Administrador.';
     yield releaseForm();
     yield put(createObservationActionErrorAction());
+    yield put(
+      notificationAction({
+        message,
+        type: 'error',
+      })
+    );
     yield console.log(e);
   }
 }

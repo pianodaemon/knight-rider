@@ -1,12 +1,17 @@
 import { connect } from 'react-redux';
-import { loadCatalogAction } from 'src/area/auditories/state/usecases/load-catalog.usecase';
 import { SnackbarNotifier } from 'src/shared/components/snackbar/snackbar-notifier.component';
+import { notificationSelector } from '../state/main.selectors';
+import { notificationCloseAction } from '../state/usecase/notification.usecase';
 
-const mapDispatchToProps = {
-  loadCatalogAction,
-};
+const mapDispatchToProps = { notificationCloseAction };
+
+function mapStateToProps(state: any): any {
+  return {
+    notification: notificationSelector(state),
+  };
+}
 
 export const SnackbarContainer = connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(SnackbarNotifier);

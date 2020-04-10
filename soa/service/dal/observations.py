@@ -5,16 +5,22 @@ from dal.entity import page_entities, count_entities
 
 def _alter_observation(**kwargs):
     """Calls sp in charge of create and edit a observation"""
-    sql = """SELECT * FROM alter_provider(
+    sql = """SELECT * FROM alter_observation(
         {}::integer,
         {}::integer,
         {}::integer,
         {}::integer,
         {}::integer,
-        '{}'::text)
+        '{}'::text,
+        {}::double precision,
+        {}::double precision,
+        {}::double precision,
+	'{}'::text)
         AS result( rc integer, msg text )""".format(
         kwargs["id"], kwargs["observation_type_id"],  kwargs["social_program_id"],
-        kwargs["audit_id"], kwargs["fiscal_id"], kwargs["title"]
+        kwargs["audit_id"], kwargs["fiscal_id"], kwargs["title"],
+        kwargs["observed"], kwargs["projected"], kwargs["solved"],
+        kwargs["comments"]
     )
 
     rcode, rmsg = run_stored_procedure(sql)

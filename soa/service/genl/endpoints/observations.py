@@ -13,12 +13,13 @@ ns = api.namespace("observations", description="Available services for an observ
 observation = api.model(
     'Observation model',
     {
-        'id': fields.Integer(required=True, description='Observation identifier'),
+        'id': fields.Integer(required=False, description='Observation identifier'),
         'observation_type_id': fields.Integer(required=True, description='Observation type identifier'),
         'social_program_id': fields.Integer(required=True, description='Social program identifier'),
         'audit_id': fields.Integer(required=True, description='Audit identifier'),
         'fiscal_id': fields.Integer(required=True, description='Fiscal entity that audits'),
-        "title": fields.String(required=True, description="Desc of observation"),
+        'title': fields.String(required=True, description='Desc of observation'),
+        'amount_observed': fields.Float(required=True, description='Observed amount')
     }
 )
 
@@ -66,7 +67,7 @@ class ObservationList(Resource):
 
 
     @ns.expect(observation)
-    @ns.marshal_with(observation, code=201)
+    # @ns.marshal_with(observation, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
         ''' To create an observation '''
@@ -90,7 +91,7 @@ class ObservationList(Resource):
 class Observation(Resource):
     obs_not_found = 'Observation not found'
 
-    @ns.marshal_with(observation)
+    # @ns.marshal_with(observation)
     def get(self, id):
         ''' To fetch an observation '''
         try:
@@ -106,7 +107,7 @@ class Observation(Resource):
 
 
     @ns.expect(observation)
-    @ns.marshal_with(observation)
+    # @ns.marshal_with(observation)
     def put(self, id):
         ''' To update an observation '''
         try:
@@ -123,7 +124,7 @@ class Observation(Resource):
         return obs
 
 
-    @ns.marshal_with(observation)
+    # @ns.marshal_with(observation)
     def delete(self, id):
         ''' To delete an observation '''
         try:

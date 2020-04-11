@@ -17,7 +17,7 @@ def fetch_entity(table, id):
         SELECT *
         FROM {}
         WHERE id = {}
-        AND blocked = false;
+        AND NOT blocked;
     '''.format(table, id)
 
     rows = exec_steady(sql)
@@ -26,7 +26,7 @@ def fetch_entity(table, id):
     if len(rows) == 0:
         raise NoResultFound('No result found')
     elif len(rows) > 1:
-        raise MultipleResultsFound('Multiple results found. Only one expected')
+        raise MultipleResultsFound('Only one result expected, but multiple found')
 
     return dict(rows.pop())
 
@@ -38,14 +38,19 @@ def delete_entity(table, id):
         UPDATE {}
         SET blocked = true
         WHERE id = {}
-        AND blocked = false;
+        AND NOT blocked
+        RETURNING *;
     '''.format(table, id)
 
-    hits = update_steady(sql)
+    rows = exec_steady(sql)
 
-    # Expecting just one hit
-    if hits > 1:
-        raise Exception('{} rows updated, really?'.format(hits))
+    # For this case we are just expecting one row
+    if len(rows) == 0:
+        raise NoResultFound('No result found')
+    elif len(rows) > 1:
+        raise MultipleResultsFound('Only one result expected, but multiple found')
+
+    return dict(rows.pop())
 
 
 def page_entities(table, offset, limit, order_by, order, search_params):
@@ -54,7 +59,7 @@ def page_entities(table, offset, limit, order_by, order, search_params):
     query = '''
         SELECT *
         FROM {}
-        WHERE blocked = false
+        WHERE NOT blocked
     '''.format(table)
 
     if search_params is not None:
@@ -94,7 +99,7 @@ def count_entities(table, search_params):
     query = '''
         SELECT count(id)::int as total
         FROM {}
-        WHERE blocked = false
+        WHERE NOT blocked
     '''.format(table)
 
     if search_params is not None:

@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 12.2
--- Dumped by pg_dump version 12.2
+-- Dumped by pg_dump version 12.2 (Ubuntu 12.2-2.pgdg18.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -17,14 +17,17 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: alter_observation(integer, integer, integer, integer, integer, text); Type: FUNCTION; Schema: public; Owner: knight_rider
+-- Name: alter_observation(integer, integer, integer, integer, integer, text, double precision, double precision, double precision, text); Type: FUNCTION; Schema: public; Owner: knight_rider
 --
 
-CREATE FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text) RETURNS record
+CREATE FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text, _amount_observed double precision, _amount_projected double precision, _amount_solved double precision, _amount_comments text) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
 DECLARE
+
+    -- latter amount to be compared with the newer one
+    latter_amount amounts;
 
     current_moment timestamp with time zone = now();
     coincidences integer := 0;
@@ -45,6 +48,7 @@ BEGIN
                 audit_id,
                 title,
                 fiscal_id,
+                amount_observed,
                 touch_latter_time
             ) VALUES (
                 _type_id,
@@ -52,8 +56,23 @@ BEGIN
                 _audit_id,
                 _title,
                 _fiscal_id,
+                _amount_observed,
                 current_moment
             ) RETURNING id INTO latter_id;
+
+            INSERT INTO amounts (
+                comments,
+                projected,
+                solved,
+                observation_id,
+                inception_time
+            ) VALUES (
+                _amount_comments,
+                _amount_projected,
+                _amount_solved,
+                latter_id,
+                current_moment
+            );
 
         WHEN _observation_id > 0 THEN
 
@@ -78,8 +97,36 @@ BEGIN
             SET title  = _title, observation_type_id = _type_id,
                 social_program_id = _social_program_id,
                 audit_id = _audit_id, fiscal_id = _fiscal_id,
-                touch_latter_time = current_moment
+                amount_observed = _amount_observed, touch_latter_time = current_moment
             WHERE id = _observation_id;
+
+            SELECT * FROM amounts
+            WHERE amounts.observation_id = _observation_id
+            ORDER BY inception_time DESC LIMIT 1
+            INTO latter_amount;
+
+            IF latter_amount.solved != _amount_solved OR latter_amount.projected != _amount_projected THEN
+
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- Insertion solely occurs if any of solved or projected fields
+			-- contains newer data otherwise nothing regarding amounts
+			-- shall be inserted as the latest version of such fields.
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                INSERT INTO amounts (
+                    comments,
+                    projected,
+                    solved,
+                    observation_id,
+                    inception_time
+                ) VALUES (
+                    _amount_comments,
+                    _amount_projected,
+                    _amount_solved,
+                    _observation_id,
+                    current_moment
+                );
+
+            END IF;
 
             -- Upon edition we return observation id as latter id
             latter_id = _observation_id;
@@ -100,11 +147,49 @@ END;
 $$;
 
 
-ALTER FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text) OWNER TO knight_rider;
+ALTER FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text, _amount_observed double precision, _amount_projected double precision, _amount_solved double precision, _amount_comments text) OWNER TO knight_rider;
 
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: amounts; Type: TABLE; Schema: public; Owner: knight_rider
+--
+
+CREATE TABLE public.amounts (
+    id integer NOT NULL,
+    projected double precision NOT NULL,
+    solved double precision NOT NULL,
+    observation_id integer NOT NULL,
+    inception_time timestamp with time zone NOT NULL,
+    comments text
+);
+
+
+ALTER TABLE public.amounts OWNER TO knight_rider;
+
+--
+-- Name: amounts_id_seq; Type: SEQUENCE; Schema: public; Owner: knight_rider
+--
+
+CREATE SEQUENCE public.amounts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.amounts_id_seq OWNER TO knight_rider;
+
+--
+-- Name: amounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: knight_rider
+--
+
+ALTER SEQUENCE public.amounts_id_seq OWNED BY public.amounts.id;
+
 
 --
 -- Name: apps; Type: TABLE; Schema: public; Owner: knight_rider
@@ -330,7 +415,8 @@ CREATE TABLE public.observations (
     audit_id integer NOT NULL,
     title text NOT NULL,
     fiscal_id integer NOT NULL,
-    touch_latter_time timestamp with time zone
+    touch_latter_time timestamp with time zone,
+    amount_observed double precision DEFAULT 0 NOT NULL
 );
 
 
@@ -470,6 +556,168 @@ CREATE VIEW public.user_app_access AS
 
 
 ALTER TABLE public.user_app_access OWNER TO knight_rider;
+
+--
+-- Name: amounts id; Type: DEFAULT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.amounts ALTER COLUMN id SET DEFAULT nextval('public.amounts_id_seq'::regclass);
+
+
+--
+-- Data for Name: amounts; Type: TABLE DATA; Schema: public; Owner: knight_rider
+--
+
+COPY public.amounts (id, projected, solved, observation_id, inception_time, comments) FROM stdin;
+1	1	1	4	2020-04-09 20:03:01.808318-05	\N
+2	1	1	218	2020-04-09 20:03:01.808318-05	\N
+3	1	1	216	2020-04-09 20:03:01.808318-05	\N
+4	1	1	106	2020-04-09 20:03:01.808318-05	\N
+5	1	1	108	2020-04-09 20:03:01.808318-05	\N
+6	1	1	114	2020-04-09 20:03:01.808318-05	\N
+7	1	1	116	2020-04-09 20:03:01.808318-05	\N
+8	1	1	180	2020-04-09 20:03:01.808318-05	\N
+9	1	1	186	2020-04-09 20:03:01.808318-05	\N
+10	1	1	188	2020-04-09 20:03:01.808318-05	\N
+11	1	1	122	2020-04-09 20:03:01.808318-05	\N
+12	1	1	120	2020-04-09 20:03:01.808318-05	\N
+13	1	1	124	2020-04-09 20:03:01.808318-05	\N
+14	1	1	228	2020-04-09 20:03:01.808318-05	\N
+15	1	1	5	2020-04-09 20:03:01.808318-05	\N
+16	1	1	126	2020-04-09 20:03:01.808318-05	\N
+17	1	1	232	2020-04-09 20:03:01.808318-05	\N
+18	1	1	134	2020-04-09 20:03:01.808318-05	\N
+19	1	1	236	2020-04-09 20:03:01.808318-05	\N
+20	1	1	148	2020-04-09 20:03:01.808318-05	\N
+21	1	1	150	2020-04-09 20:03:01.808318-05	\N
+22	1	1	234	2020-04-09 20:03:01.808318-05	\N
+23	1	1	158	2020-04-09 20:03:01.808318-05	\N
+24	1	1	160	2020-04-09 20:03:01.808318-05	\N
+25	1	1	162	2020-04-09 20:03:01.808318-05	\N
+26	1	1	166	2020-04-09 20:03:01.808318-05	\N
+27	1	1	168	2020-04-09 20:03:01.808318-05	\N
+28	1	1	242	2020-04-09 20:03:01.808318-05	\N
+29	1	1	224	2020-04-09 20:03:01.808318-05	\N
+30	1	1	176	2020-04-09 20:03:01.808318-05	\N
+31	1	1	178	2020-04-09 20:03:01.808318-05	\N
+32	1	1	182	2020-04-09 20:03:01.808318-05	\N
+33	1	1	6	2020-04-09 20:03:01.808318-05	\N
+34	1	1	10	2020-04-09 20:03:01.808318-05	\N
+35	1	1	11	2020-04-09 20:03:01.808318-05	\N
+36	1	1	12	2020-04-09 20:03:01.808318-05	\N
+37	1	1	31	2020-04-09 20:03:01.808318-05	\N
+38	1	1	32	2020-04-09 20:03:01.808318-05	\N
+39	1	1	25	2020-04-09 20:03:01.808318-05	\N
+40	1	1	21	2020-04-09 20:03:01.808318-05	\N
+41	1	1	23	2020-04-09 20:07:23.360009-05	\N
+42	1	1	30	2020-04-09 20:07:23.360009-05	\N
+43	1	1	29	2020-04-09 20:07:23.360009-05	\N
+44	1	1	49	2020-04-09 20:07:23.360009-05	\N
+45	1	1	50	2020-04-09 20:07:23.360009-05	\N
+46	1	1	51	2020-04-09 20:07:23.360009-05	\N
+47	1	1	52	2020-04-09 20:07:23.360009-05	\N
+48	1	1	54	2020-04-09 20:07:23.360009-05	\N
+49	1	1	33	2020-04-09 20:07:23.360009-05	\N
+50	1	1	34	2020-04-09 20:07:23.360009-05	\N
+51	1	1	36	2020-04-09 20:07:23.360009-05	\N
+52	1	1	37	2020-04-09 20:07:23.360009-05	\N
+53	1	1	39	2020-04-09 20:07:23.360009-05	\N
+54	1	1	14	2020-04-09 20:07:23.360009-05	\N
+55	1	1	15	2020-04-09 20:07:23.360009-05	\N
+56	1	1	16	2020-04-09 20:07:23.360009-05	\N
+57	1	1	17	2020-04-09 20:07:23.360009-05	\N
+58	1	1	22	2020-04-09 20:07:23.360009-05	\N
+59	1	1	18	2020-04-09 20:07:23.360009-05	\N
+60	1	1	24	2020-04-09 20:07:23.360009-05	\N
+61	1	1	19	2020-04-09 20:07:23.360009-05	\N
+62	1	1	20	2020-04-09 20:07:23.360009-05	\N
+63	1	1	194	2020-04-09 20:07:23.360009-05	\N
+64	1	1	196	2020-04-09 20:07:23.360009-05	\N
+65	1	1	200	2020-04-09 20:07:23.360009-05	\N
+66	1	1	202	2020-04-09 20:07:23.360009-05	\N
+67	1	1	204	2020-04-09 20:07:23.360009-05	\N
+68	1	1	206	2020-04-09 20:07:23.360009-05	\N
+69	1	1	208	2020-04-09 20:07:23.360009-05	\N
+70	1	1	210	2020-04-09 20:07:23.360009-05	\N
+71	1	1	72	2020-04-09 20:07:23.360009-05	\N
+72	1	1	73	2020-04-09 20:07:23.360009-05	\N
+73	1	1	214	2020-04-09 20:07:23.360009-05	\N
+74	1	1	2	2020-04-09 20:07:23.360009-05	\N
+75	1	1	3	2020-04-09 20:07:23.360009-05	\N
+76	1	1	13	2020-04-09 20:07:23.360009-05	\N
+77	1	1	74	2020-04-09 20:07:23.360009-05	\N
+78	1	1	55	2020-04-09 20:07:23.360009-05	\N
+79	1	1	56	2020-04-09 20:07:23.360009-05	\N
+80	1	1	45	2020-04-09 20:07:23.360009-05	\N
+81	1	1	46	2020-04-09 20:07:23.360009-05	\N
+82	1	1	47	2020-04-09 20:07:23.360009-05	\N
+83	1	1	48	2020-04-09 20:07:23.360009-05	\N
+84	1	1	38	2020-04-09 20:07:23.360009-05	\N
+85	1	1	26	2020-04-09 20:07:23.360009-05	\N
+86	1	1	40	2020-04-09 20:07:23.360009-05	\N
+87	1	1	41	2020-04-09 20:07:23.360009-05	\N
+88	1	1	44	2020-04-09 20:07:23.360009-05	\N
+89	1	1	53	2020-04-09 20:07:23.360009-05	\N
+90	1	1	27	2020-04-09 20:07:23.360009-05	\N
+91	1	1	28	2020-04-09 20:07:23.360009-05	\N
+92	1	1	57	2020-04-09 20:07:23.360009-05	\N
+93	1	1	58	2020-04-09 20:07:23.360009-05	\N
+94	1	1	59	2020-04-09 20:07:23.360009-05	\N
+95	1	1	60	2020-04-09 20:07:23.360009-05	\N
+96	1	1	61	2020-04-09 20:07:23.360009-05	\N
+97	1	1	35	2020-04-09 20:07:23.360009-05	\N
+98	1	1	62	2020-04-09 20:07:23.360009-05	\N
+99	1	1	63	2020-04-09 20:07:23.360009-05	\N
+100	1	1	66	2020-04-09 20:07:23.360009-05	\N
+101	1	1	68	2020-04-09 20:07:23.360009-05	\N
+102	1	1	69	2020-04-09 20:07:23.360009-05	\N
+103	1	1	70	2020-04-09 20:07:23.360009-05	\N
+104	1	1	71	2020-04-09 20:07:23.360009-05	\N
+105	1	1	105	2020-04-09 20:07:23.360009-05	\N
+106	1	1	107	2020-04-09 20:07:23.360009-05	\N
+107	1	1	42	2020-04-09 20:07:23.360009-05	\N
+108	1	1	43	2020-04-09 20:07:23.360009-05	\N
+109	1	1	109	2020-04-09 20:07:23.360009-05	\N
+110	1	1	219	2020-04-09 20:07:23.360009-05	\N
+111	1	1	115	2020-04-09 20:07:23.360009-05	\N
+112	1	1	117	2020-04-09 20:07:23.360009-05	\N
+113	1	1	121	2020-04-09 20:07:23.360009-05	\N
+114	1	1	215	2020-04-09 20:07:23.360009-05	\N
+115	1	1	125	2020-04-09 20:07:23.360009-05	\N
+116	1	1	129	2020-04-09 20:07:23.360009-05	\N
+117	1	1	133	2020-04-09 20:07:23.360009-05	\N
+118	1	1	135	2020-04-09 20:07:23.360009-05	\N
+119	1	1	139	2020-04-09 20:07:23.360009-05	\N
+120	1	1	141	2020-04-09 20:07:23.360009-05	\N
+121	1	1	145	2020-04-09 20:07:23.360009-05	\N
+122	1	1	153	2020-04-09 20:07:23.360009-05	\N
+123	1	1	155	2020-04-09 20:07:23.360009-05	\N
+124	1	1	159	2020-04-09 20:07:23.360009-05	\N
+125	1	1	165	2020-04-09 20:07:23.360009-05	\N
+126	1	1	167	2020-04-09 20:07:23.360009-05	\N
+127	1	1	169	2020-04-09 20:07:23.360009-05	\N
+128	1	1	173	2020-04-09 20:07:23.360009-05	\N
+129	1	1	177	2020-04-09 20:07:23.360009-05	\N
+130	1	1	179	2020-04-09 20:07:23.360009-05	\N
+131	1	1	213	2020-04-09 20:07:23.360009-05	\N
+132	1	1	181	2020-04-09 20:07:23.360009-05	\N
+133	1	1	229	2020-04-09 20:07:23.360009-05	\N
+134	1	1	187	2020-04-09 20:07:23.360009-05	\N
+135	1	1	193	2020-04-09 20:07:23.360009-05	\N
+136	1	1	199	2020-04-09 20:07:23.360009-05	\N
+137	1	1	201	2020-04-09 20:07:23.360009-05	\N
+138	1	1	203	2020-04-09 20:07:23.360009-05	\N
+139	1	1	205	2020-04-09 20:07:23.360009-05	\N
+140	1	1	207	2020-04-09 20:07:23.360009-05	\N
+141	1	1	209	2020-04-09 20:07:23.360009-05	\N
+142	1	1	235	2020-04-09 20:07:23.360009-05	\N
+143	1	1	237	2020-04-09 20:07:23.360009-05	\N
+144	1	1	233	2020-04-09 20:07:23.360009-05	\N
+145	1	1	241	2020-04-09 20:07:23.360009-05	\N
+146	1	1	243	2020-04-09 20:07:23.360009-05	\N
+147	8	3	4	2020-04-10 00:48:08.457834-05	Buen rollito
+\.
+
 
 --
 -- Data for Name: apps; Type: TABLE DATA; Schema: public; Owner: knight_rider
@@ -700,74 +948,153 @@ COPY public.observation_types (id, title) FROM stdin;
 -- Data for Name: observations; Type: TABLE DATA; Schema: public; Owner: knight_rider
 --
 
-COPY public.observations (id, observation_type_id, social_program_id, blocked, audit_id, title, fiscal_id, touch_latter_time) FROM stdin;
-4	2	1	f	1	123qwe	1	\N
-5	1	1	t	1	freebsd2	1	\N
-6	4	1	t	1	heman	1	\N
-10	1	1	t	1	skeletor	1	\N
-11	1	1	t	1	este dato debe ser actualizado	1	\N
-12	3	1	t	1	sting and shaggy	1	\N
-31	1	1	f	1	www.youtube.com	1	\N
-32	1	1	f	1	que kilombo	1	\N
-25	1	1	t	1	Alan parson project	1	\N
-21	1	1	t	1	Blue monday	1	\N
-23	1	1	t	1	Esto va evolucionando	1	\N
-30	1	1	t	1	Esto necesita atencion	1	\N
-29	1	1	t	1	Rafa ya no esta aqui, pero Omar cubre su rol	1	\N
-49	2	2	f	1	Yo tenia 3 perritos	1	\N
-50	3	1	f	1	Uno se callo en la nieve	1	\N
-51	2	3	f	1	Y ya nada mas me quedan nueva	1	\N
-52	2	2	f	1	Coca es mejor que pepsi	1	\N
-54	2	2	t	1	Pero pepsi junta mitades	1	\N
-33	1	1	t	1	el hector ceron ama javascript	1	\N
-34	2	2	f	1	el frances es hacker	1	\N
-36	3	3	f	1	extrano las carne de monterrey	1	\N
-37	2	3	f	1	vivir en gdl es caro	1	\N
-39	2	1	f	1	que buen clima	1	\N
-14	1	1	t	1	12345678	1	\N
-15	1	1	t	1	ewfvdsfzz	1	\N
-16	1	1	t	1	lorem ipsum	1	\N
-17	1	1	t	1	wesdvdv	1	\N
-22	1	1	t	1	ewerwerwer	1	\N
-18	1	1	t	1	werwerwer	1	\N
-24	1	1	t	1	sdfsdfg	1	\N
-19	1	1	t	1	eryfgfdadf	1	\N
-20	1	1	t	1	rterdfsdffasd	1	\N
-72	2	2	t	1	y	1	\N
-73	2	2	f	1	u	1	\N
-2	4	1	t	1	o	1	\N
-3	3	1	t	1	p	1	\N
-13	1	1	t	1	sdfshhfghsfheargssrth	1	\N
-74	2	3	t	1	i	1	\N
-55	2	3	t	1	Los pepcilintros son de os 90s	1	\N
-56	3	3	t	1	Los tazos aun tiene seguidores	1	\N
-45	2	3	f	1	Jaime el nino tiene sed y no hay naranjas	1	\N
-46	1	3	f	1	Pero el gran sabor de tang le va a encantar	1	\N
-47	1	3	f	1	La vida es una tombola, ton ton tombola	1	\N
-48	1	3	f	1	Tigres versus rayados	1	\N
-38	2	1	t	1	chespirito se ha pelado con villagran	1	\N
-26	1	1	t	1	La caravina de ambrosio rules	1	\N
-40	2	3	f	1	carnes selectas san juan marinadas	1	\N
-41	2	3	f	1	Tortugas ninja quieren pizza	1	\N
-42	2	3	f	1	Tomando una pepsi kick	1	\N
-43	2	3	f	1	De nino siempre quice unos nunchakos	1	\N
-44	2	3	f	1	Pongale aguacate cabron	1	\N
-53	2	2	t	1	Busqueda binaria	1	\N
-27	1	1	t	1	quick sort	1	\N
-28	1	1	t	1	Las nenas con zapatos de tacon se ven mejor	1	\N
-57	2	1	f	1	bronco es el gigante de america ?	1	\N
-58	1	3	f	1	A como extrano ir a los tacos	1	\N
-59	2	2	f	1	Los hackatones estan chidos pero son extremadamente cansados	1	\N
-60	1	3	f	1	Esta descripciontiene que editarce	1	\N
-61	4	3	f	1	Las alfombras siempre estaran de moda	1	\N
-35	2	2	t	1	El titanic no fue el unico barco gigante	1	\N
-62	3	2	f	1	es dificil no cargarla con las prisas	1	\N
-63	4	3	f	1	Que pedo con el corona virus	1	\N
-66	1	1	f	1	restauran menu menu	1	\N
-68	1	1	f	1	a	1	\N
-69	2	3	f	1	b	1	\N
-70	1	1	f	1	d	1	\N
-71	1	1	f	1	t	1	\N
+COPY public.observations (id, observation_type_id, social_program_id, blocked, audit_id, title, fiscal_id, touch_latter_time, amount_observed) FROM stdin;
+218	1	1	t	1	12	1	\N	0
+216	1	1	t	1	343434ffdfdf	1	\N	0
+106	3	1	f	1	otro title	3	\N	0
+108	1	1	f	1	test	1	\N	0
+114	2	2	f	1	TEST EEEH!	4	\N	0
+116	3	1	f	1	asdasddddd	3	\N	0
+180	1	1	f	1	..x	2	\N	0
+186	4	2	f	1	test! !!!	3	\N	0
+188	4	3	f	1	DEFICIENCIAS EN LA EJECUCIÓN Y CONCLUSIÓN DE LOS TRABAJOS	3	\N	0
+122	3	1	t	1	Amazing!mmm	2	\N	0
+120	3	1	f	1	Updated title	1	\N	0
+124	3	1	f	1	Amazing!	2	\N	0
+228	2	2	f	1	TEX	1	\N	0
+5	1	1	t	1	freebsd2	1	\N	0
+126	1	1	f	1	b.	2	\N	0
+232	1	1	f	1	TEXX	1	\N	0
+134	1	1	t	1	test x!	2	\N	0
+236	1	1	t	1	tttttt	1	\N	0
+148	3	1	f	1	g.	3	\N	0
+150	3	1	f	1	h.	3	\N	0
+234	1	2	t	1	te	1	\N	0
+158	1	1	f	1	..k	2	\N	0
+160	1	1	f	1	..l	2	\N	0
+162	1	1	f	1	..n	2	\N	0
+166	1	1	f	1	..p	2	\N	0
+168	1	1	f	1	..r	2	\N	0
+242	1	1	f	1	tttttc	1	\N	0
+224	1	1	f	1	Test notification¡	1	\N	0
+176	1	1	f	1	..t	2	\N	0
+178	1	1	f	1	..v	2	\N	0
+182	1	1	f	1	..z	2	\N	0
+6	4	1	t	1	heman	1	\N	0
+10	1	1	t	1	skeletor	1	\N	0
+11	1	1	t	1	este dato debe ser actualizado	1	\N	0
+12	3	1	t	1	sting and shaggy	1	\N	0
+31	1	1	f	1	www.youtube.com	1	\N	0
+32	1	1	f	1	que kilombo	1	\N	0
+25	1	1	t	1	Alan parson project	1	\N	0
+21	1	1	t	1	Blue monday	1	\N	0
+23	1	1	t	1	Esto va evolucionando	1	\N	0
+30	1	1	t	1	Esto necesita atencion	1	\N	0
+29	1	1	t	1	Rafa ya no esta aqui, pero Omar cubre su rol	1	\N	0
+49	2	2	f	1	Yo tenia 3 perritos	1	\N	0
+50	3	1	f	1	Uno se callo en la nieve	1	\N	0
+51	2	3	f	1	Y ya nada mas me quedan nueva	1	\N	0
+52	2	2	f	1	Coca es mejor que pepsi	1	\N	0
+54	2	2	t	1	Pero pepsi junta mitades	1	\N	0
+33	1	1	t	1	el hector ceron ama javascript	1	\N	0
+34	2	2	f	1	el frances es hacker	1	\N	0
+36	3	3	f	1	extrano las carne de monterrey	1	\N	0
+37	2	3	f	1	vivir en gdl es caro	1	\N	0
+39	2	1	f	1	que buen clima	1	\N	0
+14	1	1	t	1	12345678	1	\N	0
+15	1	1	t	1	ewfvdsfzz	1	\N	0
+16	1	1	t	1	lorem ipsum	1	\N	0
+17	1	1	t	1	wesdvdv	1	\N	0
+22	1	1	t	1	ewerwerwer	1	\N	0
+18	1	1	t	1	werwerwer	1	\N	0
+24	1	1	t	1	sdfsdfg	1	\N	0
+19	1	1	t	1	eryfgfdadf	1	\N	0
+20	1	1	t	1	rterdfsdffasd	1	\N	0
+194	1	1	f	1	kjjkhj	1	\N	0
+196	2	2	f	1	ttt	1	\N	0
+4	1	1	f	1	Hola mundo observado	1	2020-04-10 00:48:43.701385-05	0
+200	1	2	f	1	sddssdsd	1	\N	0
+202	1	1	f	1	1	1	\N	0
+204	1	1	f	1	445554	1	\N	0
+206	1	2	f	1	444334	3	\N	0
+208	1	1	f	1	test 1	1	\N	0
+210	1	1	f	1	44	2	\N	0
+72	2	2	t	1	y	1	\N	0
+73	2	2	f	1	u	1	\N	0
+214	1	1	f	1	TE	1	\N	0
+2	4	1	t	1	o	1	\N	0
+3	3	1	t	1	p	1	\N	0
+13	1	1	t	1	sdfshhfghsfheargssrth	1	\N	0
+74	2	3	t	1	i	1	\N	0
+55	2	3	t	1	Los pepcilintros son de os 90s	1	\N	0
+56	3	3	t	1	Los tazos aun tiene seguidores	1	\N	0
+45	2	3	f	1	Jaime el nino tiene sed y no hay naranjas	1	\N	0
+46	1	3	f	1	Pero el gran sabor de tang le va a encantar	1	\N	0
+47	1	3	f	1	La vida es una tombola, ton ton tombola	1	\N	0
+48	1	3	f	1	Tigres versus rayados	1	\N	0
+38	2	1	t	1	chespirito se ha pelado con villagran	1	\N	0
+26	1	1	t	1	La caravina de ambrosio rules	1	\N	0
+40	2	3	f	1	carnes selectas san juan marinadas	1	\N	0
+41	2	3	f	1	Tortugas ninja quieren pizza	1	\N	0
+44	2	3	f	1	Pongale aguacate cabron	1	\N	0
+53	2	2	t	1	Busqueda binaria	1	\N	0
+27	1	1	t	1	quick sort	1	\N	0
+28	1	1	t	1	Las nenas con zapatos de tacon se ven mejor	1	\N	0
+57	2	1	f	1	bronco es el gigante de america ?	1	\N	0
+58	1	3	f	1	A como extrano ir a los tacos	1	\N	0
+59	2	2	f	1	Los hackatones estan chidos pero son extremadamente cansados	1	\N	0
+60	1	3	f	1	Esta descripciontiene que editarce	1	\N	0
+61	4	3	f	1	Las alfombras siempre estaran de moda	1	\N	0
+35	2	2	t	1	El titanic no fue el unico barco gigante	1	\N	0
+62	3	2	f	1	es dificil no cargarla con las prisas	1	\N	0
+63	4	3	f	1	Que pedo con el corona virus	1	\N	0
+66	1	1	f	1	restauran menu menu	1	\N	0
+68	1	1	f	1	a	1	\N	0
+69	2	3	f	1	b	1	\N	0
+70	1	1	f	1	d	1	\N	0
+71	1	1	f	1	t	1	\N	0
+105	3	1	f	1	esto es un bla blazo	3	\N	0
+107	1	1	f	1		1	\N	0
+42	2	3	t	1	Tomando una pepsi kick	1	\N	0
+43	2	3	t	1	De nino siempre quice unos nunchakos	1	\N	0
+109	1	1	f	1	asdf	2	\N	0
+219	1	1	t	1	Test notification¡222	1	\N	0
+115	1	1	f	1	Title!	1	\N	0
+117	1	1	f	1	asdfdd	2	\N	0
+121	1	1	f	1	zzz	1	\N	0
+215	1	2	t	1	T2	1	\N	0
+125	3	1	f	1	Amazing!2	2	\N	0
+129	2	2	f	1	test test c	4	\N	0
+133	3	2	f	1	Test NEW! 2	1	\N	0
+135	1	1	f	1	c.	2	\N	0
+139	1	1	f	1	d.	2	\N	0
+141	3	1	f	1	e.	3	\N	0
+145	3	1	f	1	f.	3	\N	0
+153	3	1	f	1	i.	3	\N	0
+155	1	1	f	1	..j	2	\N	0
+159	1	1	f	1	..kl	2	\N	0
+165	1	1	f	1	..o	2	\N	0
+167	1	1	f	1	..q	2	\N	0
+169	1	1	f	1	..s	2	\N	0
+173	1	1	f	1	..sf	2	\N	0
+177	1	1	f	1	..u	2	\N	0
+179	1	1	f	1	..w	2	\N	0
+213	1	1	f	1	333333	1	\N	0
+181	4	1	f	1	..y	2	\N	0
+229	1	2	f	1	eedede	1	\N	0
+187	1	1	f	1	Aqui va la descripcion de la observacion	2	\N	0
+193	1	1	f	1	tttesdd	1	\N	0
+199	1	1	f	1	tttdsds	1	\N	0
+201	1	1	f	1	3333	1	\N	0
+203	1	1	f	1	223	3	\N	0
+205	2	1	f	1	343434	1	\N	0
+207	1	1	f	1	33333	1	\N	0
+209	1	1	f	1	53	3	\N	0
+235	1	1	t	1	RRFFDF	1	\N	0
+237	1	1	t	1	TTTC	1	\N	0
+233	1	1	f	1	TED	1	\N	0
+241	1	1	f	1	TEDD	1	\N	0
+243	1	1	t	1	assa	1	\N	0
 \.
 
 
@@ -829,10 +1156,25 @@ COPY public.users (id, username, password, orgchart_role_id, division_id, disabl
 
 
 --
+-- Name: amounts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: knight_rider
+--
+
+SELECT pg_catalog.setval('public.amounts_id_seq', 147, true);
+
+
+--
 -- Name: observations_seq; Type: SEQUENCE SET; Schema: public; Owner: knight_rider
 --
 
-SELECT pg_catalog.setval('public.observations_seq', 101, true);
+SELECT pg_catalog.setval('public.observations_seq', 243, true);
+
+
+--
+-- Name: amounts amounts_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.amounts
+    ADD CONSTRAINT amounts_pkey PRIMARY KEY (id);
 
 
 --
@@ -1057,6 +1399,14 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_unique_username UNIQUE (username);
+
+
+--
+-- Name: amounts amounts_observations_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+--
+
+ALTER TABLE ONLY public.amounts
+    ADD CONSTRAINT amounts_observations_fkey FOREIGN KEY (observation_id) REFERENCES public.observations(id);
 
 
 --

@@ -1,7 +1,7 @@
 import math
 
 from dal.helper import run_stored_procedure, exec_steady
-from dal.entity import page_entities, count_entities
+from dal.entity import page_entities, count_entities, fetch_entity, delete_entity
 
 def _alter_observation(**kwargs):
     """Calls sp in charge of create and edit a observation"""
@@ -15,80 +15,46 @@ def _alter_observation(**kwargs):
         {}::double precision,
         {}::double precision,
         {}::double precision,
-	'{}'::text)
+	    '{}'::text)
         AS result( rc integer, msg text )""".format(
-        kwargs["id"], kwargs["observation_type_id"],  kwargs["social_program_id"],
-        kwargs["audit_id"], kwargs["fiscal_id"], kwargs["title"],
-        kwargs["observed"], kwargs["projected"], kwargs["solved"],
-        kwargs["comments"]
-    )
+            kwargs["id"], kwargs["observation_type_id"], kwargs["social_program_id"],
+            kwargs["audit_id"], kwargs["fiscal_id"], kwargs["title"],
+            kwargs["amount_observed"], kwargs["projected"], kwargs["solved"],
+            kwargs["comments"]
+        )
 
     rcode, rmsg = run_stored_procedure(sql)
-    if rcode < 0:
+    if rcode < 1:
         raise Exception(rmsg)
+    else:
+        id = rcode
+
+    ent = fetch_entity("observations", id)
+    return add_observation_amounts(ent)
 
 
 def create(**kwargs):
-    '''Creates an observation entity'''
-    sql = '''
-        INSERT INTO observations (observation_type_id, social_program_id, audit_id, title, fiscal_id)
-        VALUES ({}, {}, {}, '{}', {})
-        RETURNING id, observation_type_id, social_program_id, audit_id, title, fiscal_id;
-    '''.format(
-        kwargs['observation_type_id'], kwargs['social_program_id'], kwargs['audit_id'],
-        kwargs['title'], kwargs['fiscal_id']
-    )
-
-    rows = exec_steady(sql)
-    return dict(rows.pop())
+    ''' Creates an observation entity '''
+    kwargs['id'] = 0
+    return _alter_observation(**kwargs)
 
 
 def read(id):
     ''' Fetches an observation entity '''
-    sql = '''
-        SELECT id, observation_type_id, social_program_id, audit_id, title, fiscal_id
-        FROM observations
-        WHERE id = {}
-        AND blocked = false;
-    '''.format(id)
-
-    rows = exec_steady(sql)
-    return dict(rows.pop())
+    ent = fetch_entity("observations", id)
+    return add_observation_amounts(ent)
 
 
 def update(id, **kwargs):
-    '''Updates an observation entity'''
-    sql = '''
-        UPDATE observations
-        SET observation_type_id = {},
-            social_program_id = {},
-            audit_id = {},
-            title = '{}',
-            fiscal_id = {}
-        WHERE id = {}
-        AND blocked = false
-        RETURNING id, observation_type_id, social_program_id, audit_id, title, fiscal_id;
-    '''.format(
-        kwargs['observation_type_id'], kwargs['social_program_id'], kwargs['audit_id'],
-        kwargs['title'], kwargs['fiscal_id'], id
-    )
-
-    rows = exec_steady(sql)
-    return dict(rows.pop())
+    ''' Updates an observation entity '''
+    kwargs['id'] = id
+    return _alter_observation(**kwargs)
 
 
 def delete(id):
     ''' Deletes an observation entity '''
-    sql = '''
-        UPDATE observations
-        SET blocked = true
-        WHERE id = {}
-        AND blocked = false
-        RETURNING id, observation_type_id, social_program_id, audit_id, title, fiscal_id;
-    '''.format(id)
-  
-    rows = exec_steady(sql)
-    return dict(rows.pop())
+    ent = delete_entity("observations", id)
+    return add_observation_amounts(ent)
 
 
 def read_page(offset, limit, order_by, order, search_params):
@@ -98,10 +64,30 @@ def read_page(offset, limit, order_by, order, search_params):
 
 def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
     ''' Reads a page of observations '''
+    
+    # Some validations
+    offset = int(offset)
+    if offset < 0:
+        raise Exception("Value of param 'offset' should be >= 0")
+    
     limit = int(limit)
+    if limit < 1:
+        raise Exception("Value of param 'limit' should be >= 1")
+
+    order_by_values = ('id','observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title')
+    if order_by not in order_by_values:
+        raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
+    
+    order_values = ('ASC', 'DESC', 'asc', 'desc')
+    if order not in order_values:
+        raise Exception("Value of param 'order' should be one of the folowing: " + str(order_values))
+
     per_page = int(per_page)
     page = int(page)
+    if per_page < 1 or page < 1:
+        raise Exception("Value of params 'per_page' and 'page' should be >= 1")
 
+    # Counting total number of items and fetching target page
     total_items = count_entities('observations', search_params)
     if total_items > limit:
         total_items = limit
@@ -117,7 +103,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         target_items = per_page
 
     return (
-        page_entities('observations', int(offset) + whole_pages_offset, target_items, order_by, order, search_params),
+        page_entities('observations', offset + whole_pages_offset, target_items, order_by, order, search_params),
         total_items,
         total_pages
     )
@@ -142,3 +128,24 @@ def get_catalogs(table_name_list):
         fields_d[table] = values_l
 
     return fields_d
+
+
+def add_observation_amounts(ent):
+    ent['touch_latter_time'] = ent['touch_latter_time'].__str__()
+    
+    sql = '''
+        SELECT *
+        FROM amounts
+        WHERE observation_id = {}
+        ORDER BY id DESC;
+    '''.format(ent['id'])
+    
+    rows = exec_steady(sql)
+    
+    ent['amounts'] = []
+    for row in rows:
+        row_dict = dict(row)
+        row_dict['inception_time'] = row_dict['inception_time'].__str__()
+        ent['amounts'].append(row_dict)
+
+    return ent

@@ -21,7 +21,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: amounts; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: amounts; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.amounts (
@@ -34,10 +34,10 @@ CREATE TABLE public.amounts (
 );
 
 
-ALTER TABLE public.amounts OWNER TO knight_rider;
+ALTER TABLE public.amounts OWNER TO postgres;
 
 --
--- Name: amounts_id_seq; Type: SEQUENCE; Schema: public; Owner: knight_rider
+-- Name: amounts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.amounts_id_seq
@@ -49,17 +49,17 @@ CREATE SEQUENCE public.amounts_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.amounts_id_seq OWNER TO knight_rider;
+ALTER TABLE public.amounts_id_seq OWNER TO postgres;
 
 --
--- Name: amounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: knight_rider
+-- Name: amounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.amounts_id_seq OWNED BY public.amounts.id;
 
 
 --
--- Name: apps; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: apps; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.apps (
@@ -69,17 +69,17 @@ CREATE TABLE public.apps (
 );
 
 
-ALTER TABLE public.apps OWNER TO knight_rider;
+ALTER TABLE public.apps OWNER TO postgres;
 
 --
--- Name: TABLE apps; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE apps; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.apps IS 'Relacion que alberga las aplicaciones que seran gobernadas por roles';
 
 
 --
--- Name: audits; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: audits; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.audits (
@@ -89,24 +89,24 @@ CREATE TABLE public.audits (
 );
 
 
-ALTER TABLE public.audits OWNER TO knight_rider;
+ALTER TABLE public.audits OWNER TO postgres;
 
 --
--- Name: COLUMN audits.title; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: COLUMN audits.title; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON COLUMN public.audits.title IS 'Este es el alphanumerico que identifica a una auditoria';
 
 
 --
--- Name: COLUMN audits.dependency_id; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: COLUMN audits.dependency_id; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON COLUMN public.audits.dependency_id IS 'Dependencia que ha originado la auditoria';
 
 
 --
--- Name: dependencies; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: dependencies; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.dependencies (
@@ -116,17 +116,17 @@ CREATE TABLE public.dependencies (
 );
 
 
-ALTER TABLE public.dependencies OWNER TO knight_rider;
+ALTER TABLE public.dependencies OWNER TO postgres;
 
 --
--- Name: TABLE dependencies; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE dependencies; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.dependencies IS 'Relacion que alberga las dependencias de gobierno';
 
 
 --
--- Name: divisions; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: divisions; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.divisions (
@@ -135,17 +135,17 @@ CREATE TABLE public.divisions (
 );
 
 
-ALTER TABLE public.divisions OWNER TO knight_rider;
+ALTER TABLE public.divisions OWNER TO postgres;
 
 --
--- Name: TABLE divisions; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE divisions; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.divisions IS 'Relacion que alberga las direcciones de la contraloria';
 
 
 --
--- Name: fiscals; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: fiscals; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.fiscals (
@@ -155,17 +155,17 @@ CREATE TABLE public.fiscals (
 );
 
 
-ALTER TABLE public.fiscals OWNER TO knight_rider;
+ALTER TABLE public.fiscals OWNER TO postgres;
 
 --
--- Name: TABLE fiscals; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE fiscals; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.fiscals IS 'Relacion que alberga los organos fiscalizadores';
 
 
 --
--- Name: geo_countries; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: geo_countries; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.geo_countries (
@@ -175,10 +175,10 @@ CREATE TABLE public.geo_countries (
 );
 
 
-ALTER TABLE public.geo_countries OWNER TO knight_rider;
+ALTER TABLE public.geo_countries OWNER TO postgres;
 
 --
--- Name: geo_municipalities; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: geo_municipalities; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.geo_municipalities (
@@ -188,17 +188,17 @@ CREATE TABLE public.geo_municipalities (
 );
 
 
-ALTER TABLE public.geo_municipalities OWNER TO knight_rider;
+ALTER TABLE public.geo_municipalities OWNER TO postgres;
 
 --
--- Name: TABLE geo_municipalities; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE geo_municipalities; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.geo_municipalities IS 'Tabla que alberga los municipios que pueden ser seleccionados en los aplicativos de el sistema , en base al pais y estado que se seleccione sobre el aplicativo en curso';
 
 
 --
--- Name: geo_states; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: geo_states; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.geo_states (
@@ -209,10 +209,10 @@ CREATE TABLE public.geo_states (
 );
 
 
-ALTER TABLE public.geo_states OWNER TO knight_rider;
+ALTER TABLE public.geo_states OWNER TO postgres;
 
 --
--- Name: observation_statuses; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: observation_statuses; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.observation_statuses (
@@ -221,17 +221,17 @@ CREATE TABLE public.observation_statuses (
 );
 
 
-ALTER TABLE public.observation_statuses OWNER TO knight_rider;
+ALTER TABLE public.observation_statuses OWNER TO postgres;
 
 --
--- Name: TABLE observation_statuses; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE observation_statuses; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.observation_statuses IS 'Estado transitivo de una entidad observacion';
 
 
 --
--- Name: observation_types; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: observation_types; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.observation_types (
@@ -240,17 +240,17 @@ CREATE TABLE public.observation_types (
 );
 
 
-ALTER TABLE public.observation_types OWNER TO knight_rider;
+ALTER TABLE public.observation_types OWNER TO postgres;
 
 --
--- Name: TABLE observation_types; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE observation_types; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.observation_types IS 'Alberga los tipos de observacion';
 
 
 --
--- Name: observations_seq; Type: SEQUENCE; Schema: public; Owner: knight_rider
+-- Name: observations_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.observations_seq
@@ -261,17 +261,17 @@ CREATE SEQUENCE public.observations_seq
     CACHE 1;
 
 
-ALTER TABLE public.observations_seq OWNER TO knight_rider;
+ALTER TABLE public.observations_seq OWNER TO postgres;
 
 --
--- Name: SEQUENCE observations_seq; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: SEQUENCE observations_seq; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON SEQUENCE public.observations_seq IS 'Sequence object for observations table';
 
 
 --
--- Name: observations; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: observations; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.observations (
@@ -287,31 +287,31 @@ CREATE TABLE public.observations (
 );
 
 
-ALTER TABLE public.observations OWNER TO knight_rider;
+ALTER TABLE public.observations OWNER TO postgres;
 
 --
--- Name: TABLE observations; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE observations; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.observations IS 'Alberga la entidad observacion';
 
 
 --
--- Name: COLUMN observations.title; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: COLUMN observations.title; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON COLUMN public.observations.title IS 'La descripcion de la auditoria';
 
 
 --
--- Name: COLUMN observations.fiscal_id; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: COLUMN observations.fiscal_id; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON COLUMN public.observations.fiscal_id IS 'Representa la entidad fiscalizadora que ejecuta la observacion';
 
 
 --
--- Name: orgchart_roles; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: orgchart_roles; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.orgchart_roles (
@@ -320,17 +320,17 @@ CREATE TABLE public.orgchart_roles (
 );
 
 
-ALTER TABLE public.orgchart_roles OWNER TO knight_rider;
+ALTER TABLE public.orgchart_roles OWNER TO postgres;
 
 --
--- Name: TABLE orgchart_roles; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE orgchart_roles; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.orgchart_roles IS 'Roles del diagrama organizacional';
 
 
 --
--- Name: sectors; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: sectors; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.sectors (
@@ -339,17 +339,17 @@ CREATE TABLE public.sectors (
 );
 
 
-ALTER TABLE public.sectors OWNER TO knight_rider;
+ALTER TABLE public.sectors OWNER TO postgres;
 
 --
--- Name: TABLE sectors; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE sectors; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.sectors IS 'Relacion que alberga los sectores (utilizados como attributos de agrupacion para las dependencias)';
 
 
 --
--- Name: security_app_context; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: security_app_context; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.security_app_context (
@@ -358,17 +358,17 @@ CREATE TABLE public.security_app_context (
 );
 
 
-ALTER TABLE public.security_app_context OWNER TO knight_rider;
+ALTER TABLE public.security_app_context OWNER TO postgres;
 
 --
--- Name: TABLE security_app_context; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE security_app_context; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.security_app_context IS 'Join table entre tabla apps y tabla orgchart_roles';
 
 
 --
--- Name: social_programs; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: social_programs; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.social_programs (
@@ -377,17 +377,17 @@ CREATE TABLE public.social_programs (
 );
 
 
-ALTER TABLE public.social_programs OWNER TO knight_rider;
+ALTER TABLE public.social_programs OWNER TO postgres;
 
 --
--- Name: TABLE social_programs; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE social_programs; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.social_programs IS 'Alberga los programas sociales a los que esta vinculada una observacion';
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: knight_rider
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.users (
@@ -400,17 +400,17 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO knight_rider;
+ALTER TABLE public.users OWNER TO postgres;
 
 --
--- Name: TABLE users; Type: COMMENT; Schema: public; Owner: knight_rider
+-- Name: TABLE users; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.users IS 'Relacion que alberga usuarios del sistema';
 
 
 --
--- Name: user_app_access; Type: VIEW; Schema: public; Owner: knight_rider
+-- Name: user_app_access; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.user_app_access AS
@@ -422,17 +422,17 @@ CREATE VIEW public.user_app_access AS
   ORDER BY users.id;
 
 
-ALTER TABLE public.user_app_access OWNER TO knight_rider;
+ALTER TABLE public.user_app_access OWNER TO postgres;
 
 --
--- Name: amounts id; Type: DEFAULT; Schema: public; Owner: knight_rider
+-- Name: amounts id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.amounts ALTER COLUMN id SET DEFAULT nextval('public.amounts_id_seq'::regclass);
 
 
 --
--- Data for Name: amounts; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: amounts; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.amounts (id, projected, solved, observation_id, inception_time, comments) FROM stdin;
@@ -587,7 +587,7 @@ COPY public.amounts (id, projected, solved, observation_id, inception_time, comm
 
 
 --
--- Data for Name: apps; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: apps; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.apps (id, descripcion, nombre_app) FROM stdin;
@@ -599,7 +599,7 @@ COPY public.apps (id, descripcion, nombre_app) FROM stdin;
 
 
 --
--- Data for Name: audits; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: audits; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.audits (id, title, dependency_id) FROM stdin;
@@ -608,7 +608,7 @@ COPY public.audits (id, title, dependency_id) FROM stdin;
 
 
 --
--- Data for Name: dependencies; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: dependencies; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.dependencies (id, title, description) FROM stdin;
@@ -692,7 +692,7 @@ COPY public.dependencies (id, title, description) FROM stdin;
 
 
 --
--- Data for Name: divisions; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: divisions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.divisions (id, title) FROM stdin;
@@ -703,7 +703,7 @@ COPY public.divisions (id, title) FROM stdin;
 
 
 --
--- Data for Name: fiscals; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: fiscals; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.fiscals (id, title, description) FROM stdin;
@@ -715,7 +715,7 @@ COPY public.fiscals (id, title, description) FROM stdin;
 
 
 --
--- Data for Name: geo_countries; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: geo_countries; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.geo_countries (id, title, abrev) FROM stdin;
@@ -724,7 +724,7 @@ COPY public.geo_countries (id, title, abrev) FROM stdin;
 
 
 --
--- Data for Name: geo_municipalities; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: geo_municipalities; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.geo_municipalities (id, title, geo_state_id) FROM stdin;
@@ -783,7 +783,7 @@ COPY public.geo_municipalities (id, title, geo_state_id) FROM stdin;
 
 
 --
--- Data for Name: geo_states; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: geo_states; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.geo_states (id, title, abrev, country_id) FROM stdin;
@@ -792,7 +792,7 @@ COPY public.geo_states (id, title, abrev, country_id) FROM stdin;
 
 
 --
--- Data for Name: observation_statuses; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: observation_statuses; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.observation_statuses (id, title) FROM stdin;
@@ -800,7 +800,7 @@ COPY public.observation_statuses (id, title) FROM stdin;
 
 
 --
--- Data for Name: observation_types; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: observation_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.observation_types (id, title) FROM stdin;
@@ -812,7 +812,7 @@ COPY public.observation_types (id, title) FROM stdin;
 
 
 --
--- Data for Name: observations; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: observations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.observations (id, observation_type_id, social_program_id, blocked, audit_id, title, fiscal_id, touch_latter_time, amount_observed) FROM stdin;
@@ -966,7 +966,7 @@ COPY public.observations (id, observation_type_id, social_program_id, blocked, a
 
 
 --
--- Data for Name: orgchart_roles; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: orgchart_roles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.orgchart_roles (id, title) FROM stdin;
@@ -979,7 +979,7 @@ COPY public.orgchart_roles (id, title) FROM stdin;
 
 
 --
--- Data for Name: sectors; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: sectors; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.sectors (id, title) FROM stdin;
@@ -990,7 +990,7 @@ COPY public.sectors (id, title) FROM stdin;
 
 
 --
--- Data for Name: security_app_context; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: security_app_context; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.security_app_context (orgchart_role_id, app_id) FROM stdin;
@@ -1002,7 +1002,7 @@ COPY public.security_app_context (orgchart_role_id, app_id) FROM stdin;
 
 
 --
--- Data for Name: social_programs; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: social_programs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.social_programs (id, title) FROM stdin;
@@ -1013,7 +1013,7 @@ COPY public.social_programs (id, title) FROM stdin;
 
 
 --
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: knight_rider
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.users (id, username, password, orgchart_role_id, division_id, disabled) FROM stdin;
@@ -1023,21 +1023,21 @@ COPY public.users (id, username, password, orgchart_role_id, division_id, disabl
 
 
 --
--- Name: amounts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: knight_rider
+-- Name: amounts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.amounts_id_seq', 147, true);
 
 
 --
--- Name: observations_seq; Type: SEQUENCE SET; Schema: public; Owner: knight_rider
+-- Name: observations_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.observations_seq', 243, true);
 
 
 --
--- Name: amounts amounts_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: amounts amounts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.amounts
@@ -1045,7 +1045,7 @@ ALTER TABLE ONLY public.amounts
 
 
 --
--- Name: apps app_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: apps app_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.apps
@@ -1053,7 +1053,7 @@ ALTER TABLE ONLY public.apps
 
 
 --
--- Name: apps app_titulo_key; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: apps app_titulo_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.apps
@@ -1061,7 +1061,7 @@ ALTER TABLE ONLY public.apps
 
 
 --
--- Name: audits audits_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: audits audits_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.audits
@@ -1069,7 +1069,7 @@ ALTER TABLE ONLY public.audits
 
 
 --
--- Name: geo_countries country_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: geo_countries country_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.geo_countries
@@ -1077,7 +1077,7 @@ ALTER TABLE ONLY public.geo_countries
 
 
 --
--- Name: geo_countries country_title_key; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: geo_countries country_title_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.geo_countries
@@ -1085,7 +1085,7 @@ ALTER TABLE ONLY public.geo_countries
 
 
 --
--- Name: dependencies dependency_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: dependencies dependency_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.dependencies
@@ -1093,7 +1093,7 @@ ALTER TABLE ONLY public.dependencies
 
 
 --
--- Name: dependencies dependency_unique_title; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: dependencies dependency_unique_title; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.dependencies
@@ -1101,7 +1101,7 @@ ALTER TABLE ONLY public.dependencies
 
 
 --
--- Name: divisions division_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: divisions division_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.divisions
@@ -1109,7 +1109,7 @@ ALTER TABLE ONLY public.divisions
 
 
 --
--- Name: divisions division_unique_title; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: divisions division_unique_title; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.divisions
@@ -1117,7 +1117,7 @@ ALTER TABLE ONLY public.divisions
 
 
 --
--- Name: fiscals fiscal_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: fiscals fiscal_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.fiscals
@@ -1125,7 +1125,7 @@ ALTER TABLE ONLY public.fiscals
 
 
 --
--- Name: fiscals fiscal_unique_title; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: fiscals fiscal_unique_title; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.fiscals
@@ -1133,7 +1133,7 @@ ALTER TABLE ONLY public.fiscals
 
 
 --
--- Name: geo_municipalities geo_municipality_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: geo_municipalities geo_municipality_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.geo_municipalities
@@ -1141,7 +1141,7 @@ ALTER TABLE ONLY public.geo_municipalities
 
 
 --
--- Name: observation_statuses observation_status_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: observation_statuses observation_status_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.observation_statuses
@@ -1149,7 +1149,7 @@ ALTER TABLE ONLY public.observation_statuses
 
 
 --
--- Name: observation_statuses observation_status_titulo_key; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: observation_statuses observation_status_titulo_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.observation_statuses
@@ -1157,7 +1157,7 @@ ALTER TABLE ONLY public.observation_statuses
 
 
 --
--- Name: observations observation_title_unique; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: observations observation_title_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.observations
@@ -1165,7 +1165,7 @@ ALTER TABLE ONLY public.observations
 
 
 --
--- Name: observation_types observation_type_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: observation_types observation_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.observation_types
@@ -1173,7 +1173,7 @@ ALTER TABLE ONLY public.observation_types
 
 
 --
--- Name: observation_types observation_type_unique_title; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: observation_types observation_type_unique_title; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.observation_types
@@ -1181,7 +1181,7 @@ ALTER TABLE ONLY public.observation_types
 
 
 --
--- Name: observations observations_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: observations observations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.observations
@@ -1189,7 +1189,7 @@ ALTER TABLE ONLY public.observations
 
 
 --
--- Name: orgchart_roles orgchart_role_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: orgchart_roles orgchart_role_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.orgchart_roles
@@ -1197,7 +1197,7 @@ ALTER TABLE ONLY public.orgchart_roles
 
 
 --
--- Name: orgchart_roles orgchart_role_unique_title; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: orgchart_roles orgchart_role_unique_title; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.orgchart_roles
@@ -1205,7 +1205,7 @@ ALTER TABLE ONLY public.orgchart_roles
 
 
 --
--- Name: security_app_context sec_app_ctxt_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: security_app_context sec_app_ctxt_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.security_app_context
@@ -1213,7 +1213,7 @@ ALTER TABLE ONLY public.security_app_context
 
 
 --
--- Name: sectors sector_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: sectors sector_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.sectors
@@ -1221,7 +1221,7 @@ ALTER TABLE ONLY public.sectors
 
 
 --
--- Name: sectors sector_unique_title; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: sectors sector_unique_title; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.sectors
@@ -1229,7 +1229,7 @@ ALTER TABLE ONLY public.sectors
 
 
 --
--- Name: social_programs social_programs_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: social_programs social_programs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.social_programs
@@ -1237,7 +1237,7 @@ ALTER TABLE ONLY public.social_programs
 
 
 --
--- Name: social_programs social_programs_unique_title; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: social_programs social_programs_unique_title; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.social_programs
@@ -1245,7 +1245,7 @@ ALTER TABLE ONLY public.social_programs
 
 
 --
--- Name: geo_states state_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: geo_states state_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.geo_states
@@ -1253,7 +1253,7 @@ ALTER TABLE ONLY public.geo_states
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.users
@@ -1261,7 +1261,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_unique_username; Type: CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: users users_unique_username; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.users
@@ -1269,7 +1269,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: amounts amounts_observations_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: amounts amounts_observations_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.amounts
@@ -1277,7 +1277,7 @@ ALTER TABLE ONLY public.amounts
 
 
 --
--- Name: observations audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: observations audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.observations
@@ -1285,7 +1285,7 @@ ALTER TABLE ONLY public.observations
 
 
 --
--- Name: observations observations_observation_types_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: observations observations_observation_types_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.observations
@@ -1293,7 +1293,7 @@ ALTER TABLE ONLY public.observations
 
 
 --
--- Name: observations observations_social_programs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: observations observations_social_programs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.observations
@@ -1301,7 +1301,7 @@ ALTER TABLE ONLY public.observations
 
 
 --
--- Name: security_app_context sec_app_ctxt_apps_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: security_app_context sec_app_ctxt_apps_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.security_app_context
@@ -1309,7 +1309,7 @@ ALTER TABLE ONLY public.security_app_context
 
 
 --
--- Name: security_app_context sec_app_ctxt_orgchart_roles_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: security_app_context sec_app_ctxt_orgchart_roles_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.security_app_context
@@ -1317,7 +1317,7 @@ ALTER TABLE ONLY public.security_app_context
 
 
 --
--- Name: geo_states state_country_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: geo_states state_country_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.geo_states
@@ -1325,7 +1325,7 @@ ALTER TABLE ONLY public.geo_states
 
 
 --
--- Name: users users_divisions_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: users users_divisions_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.users
@@ -1333,7 +1333,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_orgchart_roles_fkey; Type: FK CONSTRAINT; Schema: public; Owner: knight_rider
+-- Name: users users_orgchart_roles_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.users

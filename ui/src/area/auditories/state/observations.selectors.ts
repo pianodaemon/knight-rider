@@ -1,5 +1,9 @@
 import { createSelector } from 'reselect';
-import { observationsReducer, Observation } from './observations.reducer';
+import {
+  observationsReducer,
+  Observation,
+  ObservationRequest,
+} from './observations.reducer';
 
 const sliceSelector = (state: any) => state[observationsReducer.sliceName];
 
@@ -10,7 +14,23 @@ export const observationsSelector = createSelector(
 
 export const observationSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.observation
+  (slice: any): ObservationRequest | null => {
+    if (!slice.observation) {
+      return null;
+    }
+    const item = slice.observation;
+    const { amounts } = item;
+    const [lastAmount] = amounts || [];
+    const { comments, projected, solved } = lastAmount || {};
+    return item
+      ? {
+          ...item,
+          comments,
+          projected,
+          solved,
+        }
+      : null;
+  },
 );
 
 export const isLoadingSelector = createSelector(

@@ -20,8 +20,8 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
+import NoteAddIcon from '@material-ui/icons/NoteAdd';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 import { Link, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import { AppRoutesContainer } from './app-routes.container';
@@ -189,7 +189,7 @@ export function AppBarComponent() {
                 key={breadcrumbNameMap[route]}
               >
                 <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  {index % 2 === 0 ? <NoteAddIcon /> : <ListAltIcon />}
                 </ListItemIcon>
                 <ListItemText primary={breadcrumbNameMap[route]} />
               </ListItem>

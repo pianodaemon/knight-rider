@@ -8,7 +8,8 @@ export function getObservations(): Promise<any> {
     {
       method: 'get',
       headers: { accept: 'application/json' },
-    }
+    },
+    false
   );
 }
 
@@ -41,7 +42,7 @@ export function readObservation(id: number | string): Promise<any> {
 
 export function updateObservation(
   id: number | string,
-  fields: Observation
+  fields: Observation,
 ): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/observations/${id}`, {
     method: 'put',

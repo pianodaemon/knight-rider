@@ -22,7 +22,15 @@ export const loadObservationsErrorAction: ActionFunctionAny<
 function* loadObservationsWorker(): Generator<any, any, any> {
   try {
     const result = yield call(getObservations);
-    yield put(loadObservationsSuccessAction(result));
+    yield put(
+      loadObservationsSuccessAction({
+        observations: result.data,
+        paging: {
+          count: result.headers['x-soa-total-items'] || 0,
+          pages: result.headers['x-soa-total-pages'] || 0,
+        },
+      }),
+    );
   } catch (e) {
     yield put(loadObservationsErrorAction());
   }
@@ -40,10 +48,12 @@ const observationsReducerHandlers = {
     };
   },
   [LOAD_OBSERVATIONS_SUCCESS]: (state: any, action: any) => {
+    const { observations, paging } = action.payload;
     return {
       ...state,
       loading: false,
-      observations: action.payload,
+      observations,
+      paging,
     };
   },
   [LOAD_OBSERVATIONS_ERROR]: (state: any) => {

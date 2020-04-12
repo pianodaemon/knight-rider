@@ -1,5 +1,6 @@
 import { createAndMergeSliceReducer } from 'src/redux-utils/create-and-merge-slice-reducer';
 
+// Base Observation Interface
 export interface Observation {
   id: number;
   observation_type_id: number;
@@ -7,7 +8,26 @@ export interface Observation {
   audit_id: number;
   fiscal_id: number;
   title: string;
+  amount_observed: number;
+  amounts: Array<Amount>;
+  comments: string;
 }
+
+// Mutated Observation Interface to be used as a Request body on Create/Update Actions
+export interface ObservationRequest extends Observation {
+  comments: string;
+  projected: number;
+  solved: number;
+}
+
+export type Amount = {
+  id: number,
+  projected: number,
+  solved: number,
+  observation_id: number,
+  inception_time: string,
+  comments: string,
+};
 
 interface ObservationsSlice {
   observations: Array<Observation> | null;

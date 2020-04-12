@@ -11,15 +11,17 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-
-import { Catalog, Observation } from '../state/observations.reducer';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import Typography from '@material-ui/core/Typography';
+import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
+import { Catalog, ObservationRequest } from '../state/observations.reducer';
 
 type Props = {
   createObservationAction: Function,
   readObservationAction: Function,
   updateObservationAction: Function,
   catalog: Catalog | null,
-  observation: Observation | null,
+  observation: ObservationRequest | null,
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -46,6 +48,12 @@ const useStyles = makeStyles((theme: Theme) =>
       borderStyle: 'solid',
       margin: '20px 0px',
     },
+    legend: {
+      fontWeight: "bolder",
+      color: "#000",
+      letterSpacing: theme.spacing(0.15),
+      fontSize: "1.05em",
+    },
     textErrorHelper: { color: theme.palette.error.light },
     submitInput: {
       backgroundColor: '#FFFFFF',
@@ -56,7 +64,7 @@ const useStyles = makeStyles((theme: Theme) =>
         color: '#FFF',
       },
     },
-  }),
+  })
 );
 
 export const ObservationsForm = (props: Props) => {
@@ -75,6 +83,10 @@ export const ObservationsForm = (props: Props) => {
     audit_id: '',
     fiscal_id: '',
     title: '',
+    amount_observed: '',
+    projected: '',
+    solved: '',
+    comments: '',
   };
   useEffect(() => {
     if (id) {
@@ -107,6 +119,22 @@ export const ObservationsForm = (props: Props) => {
           if (!values.title) {
             errors.title = 'Required';
           }
+
+          if (!values.amount_observed) {
+            errors.amount_observed = 'Required';
+          }
+
+          if (!values.projected) {
+            errors.projected = 'Required';
+          }
+
+          if (!values.solved) {
+            errors.solved = 'Required';
+          }
+
+          if (!values.comments) {
+            errors.comments = 'Required';
+          }
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
@@ -134,21 +162,21 @@ export const ObservationsForm = (props: Props) => {
           return (
             <>
               <form onSubmit={handleSubmit}>
-                <fieldset className={classes.fieldset}>
-                  <legend>CyTG:</legend>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6}>
-                      <FormControl className={classes.formControl}>
-                        <InputLabel id="observation-type">
-                          Tipo de observación
-                        </InputLabel>
-                        <Select
-                          labelId="observation-type"
-                          id="observation-type-select"
-                          value={values.observation_type_id || ''}
-                          onChange={handleChange('observation_type_id')}
-                        >
-                          {catalog &&
+                {/* <fieldset className={classes.fieldset}> */}
+                {/* <legend>CyTG:</legend> */}
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel id="observation-type">
+                        Tipo de observación
+                      </InputLabel>
+                      <Select
+                        labelId="observation-type"
+                        id="observation-type-select"
+                        value={values.observation_type_id || ''}
+                        onChange={handleChange('observation_type_id')}
+                      >
+                        {catalog &&
                             catalog.observation_types &&
                             catalog.observation_types.map((item) => {
                               return (
@@ -160,8 +188,8 @@ export const ObservationsForm = (props: Props) => {
                                 </MenuItem>
                               );
                             })}
-                        </Select>
-                        {errors.observation_type_id &&
+                      </Select>
+                      {errors.observation_type_id &&
                           touched.observation_type_id &&
                           errors.observation_type_id && (
                             <FormHelperText
@@ -171,18 +199,18 @@ export const ObservationsForm = (props: Props) => {
                               Seleccione un tipo de Auditoría
                             </FormHelperText>
                           )}
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <FormControl className={classes.formControl}>
-                        <InputLabel id="social-program-id">Programa</InputLabel>
-                        <Select
-                          labelId="social-program-id"
-                          id="social-program-id-select"
-                          value={values.social_program_id || ''}
-                          onChange={handleChange('social_program_id')}
-                        >
-                          {catalog &&
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel id="social-program-id">Programa</InputLabel>
+                      <Select
+                        labelId="social-program-id"
+                        id="social-program-id-select"
+                        value={values.social_program_id || ''}
+                        onChange={handleChange('social_program_id')}
+                      >
+                        {catalog &&
                             catalog.social_programs &&
                             catalog.social_programs.map((item) => {
                               return (
@@ -194,8 +222,8 @@ export const ObservationsForm = (props: Props) => {
                                 </MenuItem>
                               );
                             })}
-                        </Select>
-                        {errors.social_program_id &&
+                      </Select>
+                      {errors.social_program_id &&
                           touched.social_program_id &&
                           errors.social_program_id && (
                             <FormHelperText
@@ -205,20 +233,20 @@ export const ObservationsForm = (props: Props) => {
                               Elige un programa
                             </FormHelperText>
                           )}
-                      </FormControl>
-                    </Grid>
+                    </FormControl>
                   </Grid>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6}>
-                      <FormControl className={classes.formControl}>
-                        <InputLabel id="audit">Auditor&iacute;a no.</InputLabel>
-                        <Select
-                          labelId="audit"
-                          id="audit-select"
-                          value={values.audit_id || ''}
-                          onChange={handleChange('audit_id')}
-                        >
-                          {catalog &&
+                </Grid>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel id="audit">Auditor&iacute;a no.</InputLabel>
+                      <Select
+                        labelId="audit"
+                        id="audit-select"
+                        value={values.audit_id || ''}
+                        onChange={handleChange('audit_id')}
+                      >
+                        {catalog &&
                             catalog.audits &&
                             catalog.audits.map((item) => {
                               return (
@@ -230,8 +258,8 @@ export const ObservationsForm = (props: Props) => {
                                 </MenuItem>
                               );
                             })}
-                        </Select>
-                        {errors.audit_id &&
+                      </Select>
+                      {errors.audit_id &&
                           touched.audit_id &&
                           errors.audit_id && (
                             <FormHelperText
@@ -241,18 +269,18 @@ export const ObservationsForm = (props: Props) => {
                               Seleccione una Auditoría
                             </FormHelperText>
                           )}
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <FormControl className={classes.formControl}>
-                        <InputLabel id="fiscal">Auditor</InputLabel>
-                        <Select
-                          labelId="fiscal"
-                          id="fiscal-select"
-                          value={values.fiscal_id || ''}
-                          onChange={handleChange('fiscal_id')}
-                        >
-                          {catalog &&
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel id="fiscal">Auditor</InputLabel>
+                      <Select
+                        labelId="fiscal"
+                        id="fiscal-select"
+                        value={values.fiscal_id || ''}
+                        onChange={handleChange('fiscal_id')}
+                      >
+                        {catalog &&
                             catalog.fiscals &&
                             catalog.fiscals.map((item) => {
                               return (
@@ -264,8 +292,8 @@ export const ObservationsForm = (props: Props) => {
                                 </MenuItem>
                               );
                             })}
-                        </Select>
-                        {errors.fiscal_id &&
+                      </Select>
+                      {errors.fiscal_id &&
                           touched.fiscal_id &&
                           errors.fiscal_id && (
                             <FormHelperText
@@ -275,27 +303,134 @@ export const ObservationsForm = (props: Props) => {
                               Seleccione una Auditor
                             </FormHelperText>
                           )}
-                      </FormControl>
-                    </Grid>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        id="title"
+                        label="Descripción"
+                        value={values.title || ''}
+                        onChange={handleChange('title')}
+                      />
+                      {errors.title && touched.title && errors.title && (
+                      <FormHelperText
+                        error
+                        classes={{ error: classes.textErrorHelper }}
+                      >
+                        Ingrese una descripción
+                      </FormHelperText>
+                        )}
+                    </FormControl>
                   </Grid>
 
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        id="comments"
+                        label="Comentarios"
+                        value={values.comments || ''}
+                        onChange={handleChange('comments')}
+                        multiline
+                        rows={3}
+                        rowsMax={3}
+                      />
+                      {errors.comments && touched.comments && errors.comments && (
+                      <FormHelperText
+                        error
+                        classes={{ error: classes.textErrorHelper }}
+                      >
+                        Ingrese comentarios
+                      </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                </Grid>
+                {/* </fieldset> */}
+
+                <fieldset className={classes.fieldset}>
+                  <legend>
+                    <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                      MONTOS
+                    </Typography>
+                  </legend>
                   <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
-                          id="title"
-                          label="Descripción"
-                          value={values.title || ''}
-                          onChange={handleChange('title')}
+                          label="Observado"
+                          value={values.amount_observed}
+                          onChange={handleChange('amount_observed')}
+                          name="amount_observed"
+                          id="amount_observed"
+                          InputProps={{
+                            inputComponent: NumberFormatCustom as any,
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                          }}
                         />
-                        {errors.title && touched.title && errors.title && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese una descripción
-                          </FormHelperText>
-                        )}
+                        {errors.amount_observed &&
+                          touched.amount_observed &&
+                          errors.amount_observed && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese Monto Observado
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Proyectado"
+                          value={values.projected}
+                          onChange={handleChange('projected')}
+                          name="amount_observed"
+                          id="amount_observed"
+                          InputProps={{
+                            inputComponent: NumberFormatCustom as any,
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                          }}
+                        />
+                        {errors.projected &&
+                          touched.projected &&
+                          errors.projected && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese Monto Proyectado
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Proyectado"
+                          value={values.solved}
+                          onChange={handleChange('solved')}
+                          name="solved"
+                          id="solved"
+                          InputProps={{
+                            inputComponent: NumberFormatCustom as any,
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                          }}
+                        />
+                        {errors.solved &&
+                          touched.solved &&
+                          errors.solved && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese Monto Solventado
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
                   </Grid>

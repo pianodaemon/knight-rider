@@ -40,6 +40,7 @@ const observationsReducerHandlers = {
     return {
       ...state,
       loading: true,
+      observation: null,
     };
   },
   [READ_OBSERVATION_SUCCESS]: (state: any, action: any) => {

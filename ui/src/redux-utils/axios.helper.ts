@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export function axiosApi(url: string, options: any) {
+export function axiosApi(url: string, options: any, onlyData: boolean = true) {
   const modifiedOptions = options || {};
   const headers = modifiedOptions.headers || {};
 
@@ -9,7 +9,7 @@ export function axiosApi(url: string, options: any) {
 
   return axios
     .request(modifiedOptions)
-    .then((response) => response.data)
+    .then((response) => (onlyData ? response.data : response))
     .then((data) => data)
     .catch((reason) => Promise.reject(reason));
 }

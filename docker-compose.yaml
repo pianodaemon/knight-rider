@@ -4,6 +4,8 @@ x-shared-environment: &commonEnv
     POSTGRES_USER: "postgres"
     POSTGRES_PASSWORD: "postgres"
     POSTGRES_PORT: 5432
+    POSTGRES_HOST: "rdbms_obs"
+    POSTGRES_DB: "knight_rider"
 
 services:
     ui_obs:
@@ -20,6 +22,7 @@ services:
         networks:
           - operational_network
     rdbms_obs:
+        container_name: 'rdbms_obs'
         image: 'debezium/postgres'
         ports:
           - '5432:5432'

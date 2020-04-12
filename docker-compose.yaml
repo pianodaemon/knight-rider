@@ -1,40 +1,47 @@
-version: '3.7'
+version: '3.6'
+
+x-shared-environment: &commonEnv
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "postgres"
+    POSTGRES_PORT: 5432
+
 services:
+    ui_obs:
+        container_name: 'ui_obs'
+        build: './ui'
+        ports:
+          - '3000:80'
+    api_obs:
+        container_name: 'api_obs'
+        build: './soa'
+        ports:
+          - '8080:8080'
+        environment: *commonEnv
+        networks:
+          - operational_network
+    rdbms_obs:
+        image: 'debezium/postgres'
+        ports:
+          - '5432:5432'
+        environment: *commonEnv
+        volumes:
+          - serv_obs_pg_data:/var/lib/postgresql/data
+        networks:
+          - operational_network
+    cube_render:
+        container_name: 'cube_render'
+        build: './DWH/cube_render'
+        ports:
+          - '10070:10070'
+        environment: *commonEnv
+        networks:
+          - operational_network
 
-  mysql_staging_db:
-    image: 'mariadb:10.3.22-bionic'
-    container_name: 'mysql'
-    ports:
-      - '3306:3306'
+networks:
+    operational_network:
+        name: operational_network
+        driver: bridge
 
-  mongo_staging_db:
-    image: 'mongo:latest'
-    container_name: 'mongo'
-    ports:
-      - '27100:27017'
 
-  docrender_staging_etl:
-    container_name: 'docrender'
-    build: './docrender'
-    ports:
-      - '10070:10070'
-    depends_on:
-      - 'mongo_staging_db'
-
-  api_dos:
-    container_name: 'api'
-    build: './soa'
-    ports:
-      - '8080:8080'
-
-  ui_dos:
-    container_name: 'ui'
-    build: './ui'
-    ports:
-     - '3000:80'
-
-  pg_dos:
-    image: 'postgres:12-alpine'
-    container_name: 'pgsql'
-    ports:
-      - '5432:5432'
+volumes:
+    serv_obs_pg_data:

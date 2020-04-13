@@ -83,14 +83,20 @@ export const Table = (props: Props) => {
               {...componentProps}
               count={count}
               page={page - 1 || 0}
-              // rowsPerPage={paging.per_page}
+              rowsPerPage={per_page}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
               onChangePage={(event, currentPage: number) => {
-                // console.log('Here', event);
                 loadObservationsAction({
                   per_page,
                   page: currentPage + 1,
                   order,
                   // offset: nextPage * 1,
+                });
+              }}
+              onChangeRowsPerPage={(event: any) => {
+                componentProps.onChangeRowsPerPage(event);
+                loadObservationsAction({
+                  per_page: event.target.value,
                 });
               }}
             />

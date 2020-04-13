@@ -1,4 +1,4 @@
-module agnux.com/docrender
+module agnux.com/cuberender
 
 go 1.13
 

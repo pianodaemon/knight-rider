@@ -30,7 +30,7 @@ export const observationSelector = createSelector(
           solved,
         }
       : null;
-  },
+  }
 );
 
 export const isLoadingSelector = createSelector(
@@ -74,4 +74,9 @@ export const observationsCatalogSelector = createSelector(
         audit_id_title,
       };
     })
+);
+
+export const pagingSelector = createSelector(
+  sliceSelector,
+  (slice: any) => slice.paging
 );

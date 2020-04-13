@@ -34,6 +34,14 @@ interface ObservationsSlice {
   observation: Observation | null;
   catalog: Catalog | null;
   loading: boolean;
+  paging: {
+    count: number,
+    pages: number,
+    page: number,
+    per_page: number,
+    order: string,
+    order_by: string,
+  };
 }
 
 type CatalogItem = {
@@ -65,6 +73,14 @@ const initialState: ObservationsSlice = {
   observation: null,
   catalog: null,
   loading: false,
+  paging: {
+    count: 0,
+    pages: 0,
+    page: 1,
+    per_page: 5,
+    order: 'desc',
+    order_by: 'id',
+  },
 };
 
 export const sliceName = 'observationsSlice';

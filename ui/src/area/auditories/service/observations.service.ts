@@ -2,9 +2,13 @@ import { axiosApi } from 'src/redux-utils/axios.helper';
 import { getAppSettings } from 'src/shared/utils/app-settings.util';
 import { Observation } from '../state/observations.reducer';
 
-export function getObservations(): Promise<any> {
+export function getObservations(options: any): Promise<any> {
+  const searchParams = new URLSearchParams({
+    ...options,
+    limit: Number.MAX_SAFE_INTEGER,
+  });
   return axiosApi(
-    `${getAppSettings().baseUrl}/observations/?limit=100&order=desc`,
+    `${getAppSettings().baseUrl}/observations/?${searchParams}`,
     {
       method: 'get',
       headers: { accept: 'application/json' },
@@ -42,7 +46,7 @@ export function readObservation(id: number | string): Promise<any> {
 
 export function updateObservation(
   id: number | string,
-  fields: Observation,
+  fields: Observation
 ): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/observations/${id}`, {
     method: 'put',

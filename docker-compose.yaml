@@ -5,7 +5,7 @@ x-shared-environment: &commonEnv
     POSTGRES_PASSWORD: "postgres"
     POSTGRES_PORT: 5432
     POSTGRES_HOST: "rdbms_obs"
-    POSTGRES_DB: "knight_rider"
+    POSTGRES_DB: "soa"
 
 services:
     ui_obs:

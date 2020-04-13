@@ -17,7 +17,7 @@ services:
         container_name: 'api_obs'
         build: './soa'
         ports:
-          - '8080:8080'
+          - '8080:80'
         environment: *commonEnv
         networks:
           - operational_network

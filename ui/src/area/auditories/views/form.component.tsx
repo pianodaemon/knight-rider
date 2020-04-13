@@ -373,27 +373,7 @@ export const ObservationsForm = (props: Props) => {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        id="comments"
-                        label="Comentarios"
-                        value={values.comments || ''}
-                        onChange={handleChange('comments')}
-                        multiline
-                        rows={3}
-                        rowsMax={3}
-                      />
-                      {errors.comments && touched.comments && errors.comments && (
-                      <FormHelperText
-                        error
-                        classes={{ error: classes.textErrorHelper }}
-                      >
-                        Ingrese comentarios
-                      </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
+
                 </Grid>
                 {/* </fieldset> */}
 
@@ -480,6 +460,27 @@ export const ObservationsForm = (props: Props) => {
                             >
                               Ingrese Monto Solventado
                             </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="comments"
+                          label="Comentarios"
+                          value={values.comments || ''}
+                          onChange={handleChange('comments')}
+                          multiline
+                          rows={3}
+                          rowsMax={3}
+                        />
+                        {errors.comments && touched.comments && errors.comments && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese comentarios
+                        </FormHelperText>
                           )}
                       </FormControl>
                     </Grid>

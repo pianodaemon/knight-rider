@@ -99,7 +99,8 @@ const useStyles = makeStyles((theme: Theme) =>
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
-      marginLeft: -drawerWidth,
+      // marginLeft: -drawerWidth,
+      overflowX: 'auto',
     },
     contentShift: {
       transition: theme.transitions.create('margin', {
@@ -161,12 +162,13 @@ export function AppBarComponent() {
       </AppBar>
       <Drawer
         className={classes.drawer}
-        variant="persistent"
+        // variant="temporary"
         anchor="left"
         open={open}
         classes={{
           paper: classes.drawerPaper,
         }}
+        onClose={handleDrawerClose}
       >
         <div className={classes.drawerHeader}>
           <img className={classes.imageLogo} src="/ll3.png" alt="Logo" />

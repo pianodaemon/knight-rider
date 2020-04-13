@@ -7,6 +7,7 @@ import {
   isLoadingSelector,
   observationsSelector,
   observationsCatalogSelector,
+  pagingSelector,
 } from '../state/observations.selectors';
 
 const mapDispatchToProps = {
@@ -19,6 +20,7 @@ function mapStateToProps(state: any) {
     observations: observationsSelector(state),
     mutatedObservations: observationsCatalogSelector(state),
     loading: isLoadingSelector(state),
+    paging: pagingSelector(state),
   };
 }
 

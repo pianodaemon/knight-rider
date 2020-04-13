@@ -1,6 +1,7 @@
 /* eslint-disable no-alert */
 import React, { useEffect } from 'react';
 import MaterialTable from 'material-table';
+import TablePagination from '@material-ui/core/TablePagination';
 import { Observation } from 'src/area/auditories/state/observations.reducer';
 import { useHistory } from 'react-router-dom';
 
@@ -10,6 +11,7 @@ type Props = {
   loadObservationsAction: Function,
   removeObservationAction: Function,
   loading: boolean,
+  paging: any,
 };
 
 export const Table = (props: Props) => {
@@ -18,29 +20,94 @@ export const Table = (props: Props) => {
     removeObservationAction,
     loading,
     mutatedObservations,
+    paging,
   } = props;
+  const { count, page, per_page, order } = paging;
   const history = useHistory();
+  const customSort = () => 0;
+  const draggable: boolean = false;
+  const sorting: boolean = false;
   useEffect(() => {
-    loadObservationsAction();
+    loadObservationsAction({ per_page: paging.per_page, order });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  // const options = { initialPage: 3, paging: true, pageSize: 12 };
   return (
     <MaterialTable
       title="Observaciones"
+      onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
+        loadObservationsAction({
+          ...paging,
+          order: orderDirection,
+          order_by: 'id',
+        });
+      }}
       columns={[
-        { title: 'ID', field: 'id', sorting: true, defaultSort: 'desc' },
-        { title: 'Auditoría no.', field: 'audit_id_title' },
-        { title: 'Tipo de Observación', field: 'observation_type_id_title' },
-        { title: 'Programa', field: 'social_program_id_title' },
-        { title: 'Descripción', field: 'title' },
+        {
+          title: 'ID',
+          field: 'id',
+          defaultSort: order,
+          customSort,
+          sorting: !sorting,
+        },
+        {
+          title: 'Auditoría no.',
+          field: 'audit_id_title',
+          sorting,
+        },
+        {
+          title: 'Tipo de Observación',
+          field: 'observation_type_id_title',
+          sorting,
+          customSort,
+        },
+        {
+          title: 'Programa',
+          field: 'social_program_id_title',
+          sorting,
+        },
+        { title: 'Descripción', field: 'title', sorting },
       ]}
       data={mutatedObservations || []}
+      options={{
+        draggable,
+        initialPage: 1, // @todo include this settings value in a CONSTANTS file
+        paging: true,
+        pageSize: per_page,
+        thirdSortClick: false,
+        actionsColumnIndex: 5, // @todo this shouldn't be hardcoded, calculate using columns.lenght
+      }}
+      components={{
+        Pagination: (componentProps) => {
+          return (
+            <TablePagination
+              {...componentProps}
+              count={count}
+              page={page - 1 || 0}
+              rowsPerPage={per_page}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+              onChangePage={(event, currentPage: number) => {
+                loadObservationsAction({
+                  per_page,
+                  page: currentPage + 1,
+                  order,
+                  // offset: nextPage * 1,
+                });
+              }}
+              onChangeRowsPerPage={(event: any) => {
+                componentProps.onChangeRowsPerPage(event);
+                loadObservationsAction({
+                  per_page: event.target.value,
+                });
+              }}
+            />
+          );
+        },
+      }}
       actions={[
         {
           icon: 'edit',
           tooltip: 'Editar Observación',
-          onClick: (event, rowData) =>
+          onClick: (event, rowData: any) =>
             history.push(`/observation/${rowData.id}/edit`),
         },
         {

@@ -21,13 +21,21 @@ export const observationSelector = createSelector(
     const item = slice.observation;
     const { amounts } = item;
     const [lastAmount] = amounts || [];
-    const { comments, projected, solved } = lastAmount || {};
+    const { projected, solved } = lastAmount || {};
+    const mutatedAmounts = amounts.map((amount: any) => {
+      const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+      const date = new Date().toLocaleDateString('es-MX', options);
+      const newAmount = amount;
+      newAmount.date = date;
+      return amount;
+    });
     return item
       ? {
           ...item,
-          comments,
+          comments: '',
           projected,
           solved,
+          mutatedAmounts,
         }
       : null;
   }
@@ -35,12 +43,12 @@ export const observationSelector = createSelector(
 
 export const isLoadingSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.loading
+  (slice: any) => slice.loading,
 );
 
 export const catalogSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.catalog
+  (slice: any) => slice.catalog,
 );
 
 export const observationsCatalogSelector = createSelector(
@@ -52,13 +60,13 @@ export const observationsCatalogSelector = createSelector(
     Array.isArray(slice.observations) &&
     slice.observations.map((observation: Observation) => {
       let observation_type_id_title = catalog.observation_types.find(
-        (item: any) => item.id === observation.observation_type_id,
+        (item: any) => item.id === observation.observation_type_id
       );
       let social_program_id_title = catalog.social_programs.find(
-        (item: any) => item.id === observation.social_program_id,
+        (item: any) => item.id === observation.social_program_id
       );
       let audit_id_title = catalog.audits.find(
-        (item: any) => item.id === observation.audit_id,
+        (item: any) => item.id === observation.audit_id
       );
       observation_type_id_title = observation_type_id_title
         ? observation_type_id_title.title
@@ -73,10 +81,10 @@ export const observationsCatalogSelector = createSelector(
         social_program_id_title,
         audit_id_title,
       };
-    })
+    }),
 );
 
 export const pagingSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.paging
+  (slice: any) => slice.paging,
 );

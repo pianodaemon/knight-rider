@@ -15,6 +15,8 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Typography from '@material-ui/core/Typography';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { Catalog, ObservationRequest } from '../state/observations.reducer';
+import { HistoryTable } from './history-table.component';
+import Icon from '@material-ui/core/Icon';
 
 type Props = {
   createObservationAction: Function,
@@ -30,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexGrow: 1,
     },
     paper: {
-      padding: theme.spacing(2),
+      padding: '38px',
       // textAlign: 'center',
       color: theme.palette.text.secondary,
     },
@@ -43,16 +45,25 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     fieldset: {
       borderRadius: 3,
-      borderWidth: 2,
+      borderWidth: 0,
       borderColor: '#DDD',
       borderStyle: 'solid',
       margin: '20px 0px',
     },
+    containerLegend: {
+      display: 'block',
+      verticalAlign: '-20px',
+      top: '-30px',
+      textAlign: 'center',
+      position: 'relative',
+      background: '#fff',
+      padding: '0 15px 0 30px',
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    },
     legend: {
       fontWeight: "bolder",
-      color: "#000",
-      letterSpacing: theme.spacing(0.15),
-      fontSize: "1.05em",
+      color: "#128aba",
+      fontSize: '1rem',
     },
     textErrorHelper: { color: theme.palette.error.light },
     submitInput: {
@@ -64,6 +75,28 @@ const useStyles = makeStyles((theme: Theme) =>
         color: '#FFF',
       },
     },
+    hrDivider: {
+      borderTop: 0,
+      height: '1px',
+      /*background: 'linear-gradient(to right,transparent,#dedede,transparent)',*/
+      background: 'linear-gradient(to right,transparent,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,transparent)',
+      width: '100%',
+      border: 0,
+      margin: 0,
+      padding: 0,
+      display: 'block',
+      unicodeBidi: 'isolate',
+      marginBlockStart: '0.5em',
+      marginBlockEnd: '0.5em',
+      marginInlineStart: 'auto',
+      marginInlineEnd: 'auto',
+      overflow: 'hidden',
+      marginTop: '27px',
+    },
+    hrSpacer: {
+      height: '25px',
+      border: 'none',
+    }
   })
 );
 
@@ -131,8 +164,7 @@ export const ObservationsForm = (props: Props) => {
           if (!values.solved) {
             errors.solved = 'Required';
           }
-
-          if (!values.comments) {
+          if (values.comments === '' && (observation?.projected.toString() !== values.projected || observation?.solved.toString() !== values.solved)) {
             errors.comments = 'Required';
           }
           return errors;
@@ -164,6 +196,19 @@ export const ObservationsForm = (props: Props) => {
               <form onSubmit={handleSubmit}>
                 {/* <fieldset className={classes.fieldset}> */}
                 {/* <legend>CyTG:</legend> */}
+
+                {/*
+                <hr  className={classes.hrSpacer} />
+                <hr  className={classes.hrDivider} />
+                <fieldset className={classes.fieldset}>
+                  <legend className={classes.containerLegend} >
+                    <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                      CyTG
+                    </Typography>
+                  </legend>
+                </fieldset>
+                */}
+
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
@@ -173,7 +218,7 @@ export const ObservationsForm = (props: Props) => {
                       <Select
                         labelId="observation-type"
                         id="observation-type-select"
-                        value={values.observation_type_id || ''}
+                        value={catalog ? values.observation_type_id || '' : ''}
                         onChange={handleChange('observation_type_id')}
                       >
                         {catalog &&
@@ -207,7 +252,7 @@ export const ObservationsForm = (props: Props) => {
                       <Select
                         labelId="social-program-id"
                         id="social-program-id-select"
-                        value={values.social_program_id || ''}
+                        value={catalog ? values.social_program_id || '' : ''}
                         onChange={handleChange('social_program_id')}
                       >
                         {catalog &&
@@ -243,7 +288,7 @@ export const ObservationsForm = (props: Props) => {
                       <Select
                         labelId="audit"
                         id="audit-select"
-                        value={values.audit_id || ''}
+                        value={catalog ? values.audit_id || '' : ''}
                         onChange={handleChange('audit_id')}
                       >
                         {catalog &&
@@ -277,7 +322,7 @@ export const ObservationsForm = (props: Props) => {
                       <Select
                         labelId="fiscal"
                         id="fiscal-select"
-                        value={values.fiscal_id || ''}
+                        value={catalog ? values.fiscal_id || '' : ''}
                         onChange={handleChange('fiscal_id')}
                       >
                         {catalog &&
@@ -351,9 +396,13 @@ export const ObservationsForm = (props: Props) => {
                 </Grid>
                 {/* </fieldset> */}
 
+                <hr  className={classes.hrSpacer} />
+                <hr  className={classes.hrDivider} />
+                
                 <fieldset className={classes.fieldset}>
-                  <legend>
+                  <legend className={classes.containerLegend} >
                     <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                      {/*<Icon> attach_money </Icon>*/}
                       MONTOS
                     </Typography>
                   </legend>
@@ -434,6 +483,7 @@ export const ObservationsForm = (props: Props) => {
                       </FormControl>
                     </Grid>
                   </Grid>
+                  <HistoryTable history={(observation && observation.mutatedAmounts) || []} />
                 </fieldset>
                 {/*
                   <input

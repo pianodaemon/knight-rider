@@ -18,6 +18,7 @@ export interface ObservationRequest extends Observation {
   comments: string;
   projected: number;
   solved: number;
+  mutatedAmounts: Array<any>;
 }
 
 export type Amount = {

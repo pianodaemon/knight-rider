@@ -123,3 +123,87 @@ BEGIN
 
 END;
 $$;
+
+
+CREATE OR REPLACE FUNCTION public.alter_audit(
+	_audit_id integer,
+	_title character varying,
+	_dependency_id integer,
+	_year integer)
+    RETURNS record
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE
+AS $BODY$
+
+DECLARE
+
+    current_moment timestamp with time zone = now();
+    coincidences integer := 0;
+    latter_id integer := 0;
+
+    -- dump of errors
+    rmsg text;
+
+BEGIN
+
+    CASE
+
+        WHEN _audit_id = 0 THEN
+
+            INSERT INTO audits (
+                title,
+                dependency_id,
+                year,
+                inception_time,
+                touch_latter_time
+            ) VALUES (
+                _title,
+                _dependency_id,
+                _year,
+                current_moment,
+                current_moment		
+            ) RETURNING id INTO latter_id;
+
+        WHEN _audit_id > 0 THEN
+
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- STARTS - Validates audit id
+            --
+            -- JUSTIFICATION: Because UPDATE statement does not issue
+            -- any exception if nothing was updated.
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            SELECT count(id)
+            FROM audits INTO coincidences
+            WHERE not blocked AND id = _audit_id;
+
+            IF not coincidences = 1 THEN
+                RAISE EXCEPTION 'audit identifier % does not exist', _audit_id;
+            END IF;
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- ENDS - Validate audit id
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            UPDATE audits
+            SET title  = _title, dependency_id = _dependency_id, year = _year,
+                touch_latter_time = current_moment
+            WHERE id = _audit_id;
+
+            -- Upon edition we return audit id as latter id
+            latter_id = _audit_id;
+
+        ELSE
+            RAISE EXCEPTION 'negative audit identifier % is unsupported', _audit_id;
+
+    END CASE;
+
+    return ( latter_id::integer, ''::text );
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS rmsg = MESSAGE_TEXT;
+            return ( -1::integer, rmsg::text );
+
+END;
+$BODY$;

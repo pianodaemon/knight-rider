@@ -15,6 +15,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Typography from '@material-ui/core/Typography';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { Catalog, ObservationRequest } from '../state/observations.reducer';
+import { HistoryTable } from './history-table.component';
 
 type Props = {
   createObservationAction: Function,
@@ -131,8 +132,7 @@ export const ObservationsForm = (props: Props) => {
           if (!values.solved) {
             errors.solved = 'Required';
           }
-
-          if (!values.comments) {
+          if (values.comments === '' && (observation?.projected.toString() !== values.projected || observation?.solved.toString() !== values.solved)) {
             errors.comments = 'Required';
           }
           return errors;
@@ -173,7 +173,7 @@ export const ObservationsForm = (props: Props) => {
                       <Select
                         labelId="observation-type"
                         id="observation-type-select"
-                        value={values.observation_type_id || ''}
+                        value={catalog ? values.observation_type_id || '' : ''}
                         onChange={handleChange('observation_type_id')}
                       >
                         {catalog &&
@@ -207,7 +207,7 @@ export const ObservationsForm = (props: Props) => {
                       <Select
                         labelId="social-program-id"
                         id="social-program-id-select"
-                        value={values.social_program_id || ''}
+                        value={catalog ? values.social_program_id || '' : ''}
                         onChange={handleChange('social_program_id')}
                       >
                         {catalog &&
@@ -243,7 +243,7 @@ export const ObservationsForm = (props: Props) => {
                       <Select
                         labelId="audit"
                         id="audit-select"
-                        value={values.audit_id || ''}
+                        value={catalog ? values.audit_id || '' : ''}
                         onChange={handleChange('audit_id')}
                       >
                         {catalog &&
@@ -277,7 +277,7 @@ export const ObservationsForm = (props: Props) => {
                       <Select
                         labelId="fiscal"
                         id="fiscal-select"
-                        value={values.fiscal_id || ''}
+                        value={catalog ? values.fiscal_id || '' : ''}
                         onChange={handleChange('fiscal_id')}
                       >
                         {catalog &&
@@ -434,6 +434,7 @@ export const ObservationsForm = (props: Props) => {
                       </FormControl>
                     </Grid>
                   </Grid>
+                  <HistoryTable history={(observation && observation.mutatedAmounts) || []} />
                 </fieldset>
                 {/*
                   <input

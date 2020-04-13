@@ -411,7 +411,7 @@ export const ObservationsForm = (props: Props) => {
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
-                          label="Proyectado"
+                          label="Solventado"
                           value={values.solved}
                           onChange={handleChange('solved')}
                           name="solved"

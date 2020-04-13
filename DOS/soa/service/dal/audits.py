@@ -22,7 +22,9 @@ def _alter_audit(**kwargs):
         id = rcode
 
     ent = fetch_entity("audits", id)
-    return add_audit_amounts(ent)
+    ent['inception_time'] = ent['inception_time'].__str__()
+    ent['touch_latter_time'] = ent['touch_latter_time'].__str__()
+    return ent
 
 
 def create(**kwargs):
@@ -33,8 +35,7 @@ def create(**kwargs):
 
 def read(id):
     ''' Fetches an audit entity '''
-    ent = fetch_entity("audits", id)
-    return add_audit_amounts(ent)
+    return fetch_entity("audits", id)
 
 
 def update(id, **kwargs):
@@ -45,13 +46,7 @@ def update(id, **kwargs):
 
 def delete(id):
     ''' Deletes an audit entity '''
-    ent = delete_entity("audits", id)
-    return add_audit_amounts(ent)
-
-
-def read_page(offset, limit, order_by, order, search_params):
-    ''' Reads a page of audits '''
-    return page_entities('audits', offset, limit, order_by, order, search_params)
+    return delete_entity("audits", id)
 
 
 def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
@@ -99,3 +94,24 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         total_items,
         total_pages
     )
+
+
+def get_catalogs(table_name_list):
+    ''' Fetches values and captions from a list of tables, intended for use in ui screens '''
+    fields_d = {}
+
+    for table in table_name_list:
+        values_l = []
+        sql = '''
+            SELECT *
+            FROM {}
+            ORDER BY id;
+        '''.format(table)
+
+        rows = exec_steady(sql)
+        for row in rows:
+            values_l.append(dict(row))
+        
+        fields_d[table] = values_l
+
+    return fields_d

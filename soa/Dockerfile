@@ -28,11 +28,6 @@ WORKDIR $APP_DIR
 RUN pip3 install -r requirements.txt
 
 RUN chmod 744 /app/docker-entrypoint.sh
-ENV POSTGRES_DB=soa
-ENV POSTGRES_USER=knight_rider
-ENV POSTGRES_HOST=172.17.0.2
-ENV POSTGRES_PASSWORD=knight_rider
-ENV POSTGRES_PORT=5432
 
 EXPOSE 80 443
 

@@ -10,7 +10,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	platform "agnux.com/docrender/pkg/service"
+	platform "agnux.com/cuberender/pkg/service"
 )
 
 const name = "Doc-render"

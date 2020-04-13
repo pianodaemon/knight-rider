@@ -8,7 +8,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 
-	"agnux.com/docrender/internal/rsapi"
+	"agnux.com/cuberender/internal/rsapi"
 )
 
 // Engages the RESTful API
@@ -25,7 +25,7 @@ func Engage(logger *logrus.Logger) error {
 
 		v1 := router.PathPrefix("/v1").Subrouter()
 
-		mgmt := v1.PathPrefix("/docrender").Subrouter()
+		mgmt := v1.PathPrefix("/cuberender").Subrouter()
 
 		mgmt.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Hello, you've requested: %s\n", r.URL.Path)

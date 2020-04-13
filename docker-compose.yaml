@@ -12,10 +12,10 @@ services:
         container_name: 'ui_obs'
         build: './ui'
         ports:
-          - '3000:80'
+          - '80:80'
     api_obs:
         container_name: 'api_obs'
-        build: './soa'
+        build: './DOS/soa'
         ports:
           - '8080:80'
         environment: *commonEnv

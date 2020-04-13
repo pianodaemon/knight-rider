@@ -52,18 +52,19 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     containerLegend: {
       display: 'block',
-      verticalAlign: '-20px',
       top: '-30px',
-      textAlign: 'center',
       position: 'relative',
-      background: '#fff',
-      padding: '0 15px 0 30px',
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      width: '128px',
+      margin: '0px auto',
+      textAlign: 'center',
+      background: 'transparent',
     },
     legend: {
       fontWeight: "bolder",
       color: "#128aba",
       fontSize: '1rem',
+      background: '#FFF',
     },
     textErrorHelper: { color: theme.palette.error.light },
     submitInput: {
@@ -372,27 +373,7 @@ export const ObservationsForm = (props: Props) => {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        id="comments"
-                        label="Comentarios"
-                        value={values.comments || ''}
-                        onChange={handleChange('comments')}
-                        multiline
-                        rows={3}
-                        rowsMax={3}
-                      />
-                      {errors.comments && touched.comments && errors.comments && (
-                      <FormHelperText
-                        error
-                        classes={{ error: classes.textErrorHelper }}
-                      >
-                        Ingrese comentarios
-                      </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
+
                 </Grid>
                 {/* </fieldset> */}
 
@@ -479,6 +460,27 @@ export const ObservationsForm = (props: Props) => {
                             >
                               Ingrese Monto Solventado
                             </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="comments"
+                          label="Comentarios"
+                          value={values.comments || ''}
+                          onChange={handleChange('comments')}
+                          multiline
+                          rows={3}
+                          rowsMax={3}
+                        />
+                        {errors.comments && touched.comments && errors.comments && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese comentarios
+                        </FormHelperText>
                           )}
                       </FormControl>
                     </Grid>

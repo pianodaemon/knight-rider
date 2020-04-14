@@ -29,6 +29,7 @@ BEGIN
                 title,
                 fiscal_id,
                 amount_observed,
+                inception_time,
                 touch_latter_time
             ) VALUES (
                 _type_id,
@@ -39,6 +40,7 @@ BEGIN
                 _title,
                 _fiscal_id,
                 _amount_observed,
+                current_moment,
                 current_moment
             ) RETURNING id INTO latter_id;
 
@@ -167,7 +169,7 @@ BEGIN
                 _dependency_id,
                 _year,
                 current_moment,
-                current_moment		
+                current_moment
             ) RETURNING id INTO latter_id;
 
         WHEN _audit_id > 0 THEN

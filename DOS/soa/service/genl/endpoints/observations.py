@@ -19,7 +19,8 @@ observation = api.model(
         'audit_id': fields.Integer(required=True, description='Audit identifier'),
         'fiscal_id': fields.Integer(required=True, description='Fiscal entity that audits'),
         'title': fields.String(required=True, description='Desc of observation'),
-        'amount_observed': fields.Float(required=True, description='Observed amount')
+        'amount_observed': fields.Float(required=True, description='Observed amount'),
+        'observation_code_id': fields.Integer(required=True, description='Observation code identifier'),
     }
 )
 
@@ -38,6 +39,7 @@ class ObservationList(Resource):
     @ns.param("audit_id", "An integer as audit identifier")
     @ns.param("fiscal_id", "Fiscal entity that audits")
     @ns.param("title", "Description of observation")
+    @ns.param("observation_code_id", "An integer identifying the observation codes")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -51,7 +53,7 @@ class ObservationList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title']
+            ['observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title', 'observation_code_id']
         )
 
         try:
@@ -148,7 +150,7 @@ class Catalog(Resource):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of id/title pairs) '''
         try:
             field_catalog = observations.get_catalogs(
-                ['observation_types', 'social_programs', 'audits', 'fiscals']
+                ['observation_types', 'social_programs', 'audits', 'fiscals', 'observation_codes']
             )
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))

@@ -27,8 +27,10 @@ import { createBrowserHistory } from 'history';
 import { AppRoutesContainer } from './app-routes.container';
 
 const breadcrumbNameMap: { [key: string]: string } = {
-  '/observation/create': 'Crear',
-  '/observation/list': 'Listar',
+  '/audit/create': 'Crear Auditoría',
+  '/audit/list': 'Listar Auditorías',
+  '/observation/create': 'Crear Observaciones',
+  '/observation/list': 'Listar Observaciones',
 };
 
 const customHistory = createBrowserHistory();

@@ -123,7 +123,10 @@ def get_catalogs(table_name_list):
 
         rows = exec_steady(sql)
         for row in rows:
-            values_l.append(dict(row))
+            ent = dict(row)
+            if table == 'audits':
+                transform_data(ent)
+            values_l.append(ent)
         
         fields_d[table] = values_l
 
@@ -149,3 +152,8 @@ def add_observation_amounts(ent):
         ent['amounts'].append(row_dict)
 
     return ent
+
+
+def transform_data(ent):
+    ent['inception_time'] = ent['inception_time'].__str__()
+    ent['touch_latter_time'] = ent['touch_latter_time'].__str__()

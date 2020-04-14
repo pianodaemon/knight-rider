@@ -3,24 +3,16 @@ import math
 from dal.helper import run_stored_procedure, exec_steady
 from dal.entity import page_entities, count_entities, fetch_entity, delete_entity
 
-def _alter_observation(**kwargs):
-    """Calls sp in charge of create and edit a observation"""
-    sql = """SELECT * FROM alter_observation(
+def _alter_audit(**kwargs):
+    """Calls sp in charge of create and edit a audit"""
+    sql = """SELECT * FROM alter_audit(
         {}::integer,
+        '{}'::character varying,
         {}::integer,
-        {}::integer,
-        {}::integer,
-        {}::integer,
-        '{}'::text,
-        {}::double precision,
-        {}::double precision,
-        {}::double precision,
-	    '{}'::text)
+        {}::integer)
         AS result( rc integer, msg text )""".format(
-            kwargs["id"], kwargs["observation_type_id"], kwargs["social_program_id"],
-            kwargs["audit_id"], kwargs["fiscal_id"], kwargs["title"],
-            kwargs["amount_observed"], kwargs["projected"], kwargs["solved"],
-            kwargs["comments"]
+            kwargs["id"], kwargs["title"],
+            kwargs["dependency_id"], kwargs["year"]
         )
 
     rcode, rmsg = run_stored_procedure(sql)
@@ -29,55 +21,53 @@ def _alter_observation(**kwargs):
     else:
         id = rcode
 
-    ent = fetch_entity("observations", id)
-    return add_observation_amounts(ent)
+    ent = fetch_entity("audits", id)
+    transform_data(ent)
+    return ent
 
 
 def create(**kwargs):
-    ''' Creates an observation entity '''
+    ''' Creates an audit entity '''
     kwargs['id'] = 0
-    return _alter_observation(**kwargs)
+    return _alter_audit(**kwargs)
 
 
 def read(id):
-    ''' Fetches an observation entity '''
-    ent = fetch_entity("observations", id)
-    return add_observation_amounts(ent)
+    ''' Fetches an audit entity '''
+    ent = fetch_entity("audits", id)
+    transform_data(ent)
+    return ent
 
 
 def update(id, **kwargs):
-    ''' Updates an observation entity '''
+    ''' Updates an audit entity '''
     kwargs['id'] = id
-    return _alter_observation(**kwargs)
+    return _alter_audit(**kwargs)
 
 
 def delete(id):
-    ''' Deletes an observation entity '''
-    ent = delete_entity("observations", id)
-    return add_observation_amounts(ent)
-
-
-def read_page(offset, limit, order_by, order, search_params):
-    ''' Reads a page of observations '''
-    return page_entities('observations', offset, limit, order_by, order, search_params)
+    ''' Deletes an audit entity '''
+    ent = delete_entity("audits", id)
+    transform_data(ent)
+    return ent
 
 
 def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
-    ''' Reads a page of observations '''
-    
+    ''' Reads a page of audits '''
+
     # Some validations
     offset = int(offset)
     if offset < 0:
         raise Exception("Value of param 'offset' should be >= 0")
-    
+
     limit = int(limit)
     if limit < 1:
         raise Exception("Value of param 'limit' should be >= 1")
 
-    order_by_values = ('id','observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title')
+    order_by_values = ('id','audit_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title')
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
-    
+
     order_values = ('ASC', 'DESC', 'asc', 'desc')
     if order not in order_values:
         raise Exception("Value of param 'order' should be one of the folowing: " + str(order_values))
@@ -88,29 +78,29 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         raise Exception("Value of params 'per_page' and 'page' should be >= 1")
 
     # Counting total number of items and fetching target page
-    total_items = count_entities('observations', search_params)
+    total_items = count_entities('audits', search_params)
     if total_items > limit:
         total_items = limit
-    
+
     total_pages = math.ceil(total_items / per_page)
 
     whole_pages_offset = per_page * (page - 1)
     if whole_pages_offset >= total_items:
         return [], total_items, total_pages
-    
+
     target_items = total_items - whole_pages_offset
     if target_items > per_page:
         target_items = per_page
 
     return (
-        page_entities('observations', offset + whole_pages_offset, target_items, order_by, order, search_params),
+        page_entities('audits', offset + whole_pages_offset, target_items, order_by, order, search_params),
         total_items,
         total_pages
     )
 
 
 def get_catalogs(table_name_list):
-    ''' Fetches values and captions from a list of tables. These pairs can be used on input screens '''
+    ''' Fetches values and captions from a list of tables, intended for use in ui screens '''
     fields_d = {}
 
     for table in table_name_list:
@@ -130,22 +120,6 @@ def get_catalogs(table_name_list):
     return fields_d
 
 
-def add_observation_amounts(ent):
+def transform_data(ent):
+    ent['inception_time'] = ent['inception_time'].__str__()
     ent['touch_latter_time'] = ent['touch_latter_time'].__str__()
-    
-    sql = '''
-        SELECT *
-        FROM amounts
-        WHERE observation_id = {}
-        ORDER BY id DESC;
-    '''.format(ent['id'])
-    
-    rows = exec_steady(sql)
-    
-    ent['amounts'] = []
-    for row in rows:
-        row_dict = dict(row)
-        row_dict['inception_time'] = row_dict['inception_time'].__str__()
-        ent['amounts'].append(row_dict)
-
-    return ent

@@ -20,7 +20,7 @@ export const HistoryTable = (props: Props) => {
       title={
         <span
           style={{
-            color: 'rgba(0, 0, 0, 0.87)',
+            color: '#128aba',
             fontSize: '1rem',
             fontWeight: 500,
             lineHeight: 1.6,

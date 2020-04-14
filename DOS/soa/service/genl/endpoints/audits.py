@@ -1,46 +1,38 @@
 from flask_restplus import Resource, fields
-from flask import request, make_response
+from flask import request
 import psycopg2
 
 from genl.restplus import api
-from dal import observations
+from dal import audits
 from misc.helper import get_search_params
 from misc.helperpg import get_msg_pgerror, EmptySetError
 
 
-ns = api.namespace("observations", description="Available services for an observation")
+ns = api.namespace("audits", description="Available services for an audit")
 
-observation = api.model(
-    'Observation model',
+audit = api.model(
+    'Audit model',
     {
-        'id': fields.Integer(required=False, description='Observation identifier'),
-        'observation_type_id': fields.Integer(required=True, description='Observation type identifier'),
-        'social_program_id': fields.Integer(required=True, description='Social program identifier'),
-        'audit_id': fields.Integer(required=True, description='Audit identifier'),
-        'fiscal_id': fields.Integer(required=True, description='Fiscal entity that audits'),
-        'title': fields.String(required=True, description='Desc of observation'),
-        'amount_observed': fields.Float(required=True, description='Observed amount')
+        'id': fields.Integer(required=False, description='Audit identifier'),
+        'title': fields.String(required=True, description='Alphanumeric audit\'s identifier'),
+        'dependency_id': fields.Integer(required=True, description='Dependency which originated the audit'),
+        'year': fields.Integer(required=True, description='Public account year'),
     }
 )
 
 @ns.route('/')
-class ObservationList(Resource):
+class AuditList(Resource):
 
-    @ns.marshal_list_with(observation)
+    @ns.marshal_list_with(audit)
     @ns.param("offset", "Which record to start from, default is 0")
     @ns.param("limit", "How many records will be returned at most, default is 10")
     @ns.param("order_by", "Which field to order by, default is id column")
     @ns.param("order", "ASC or DESC, which ordering to use, default is ASC")
     @ns.param("per_page", "How many items per page, default is 10")
     @ns.param("page", "Which page to fetch, default is 1")
-    @ns.param("observation_type_id", "An integer as observation type identifier")
-    @ns.param("social_program_id", "An integer as social program identifier")
-    @ns.param("audit_id", "An integer as audit identifier")
-    @ns.param("fiscal_id", "Fiscal entity that audits")
-    @ns.param("title", "Description of observation")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
-        ''' To fetch several observations. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
+        ''' To fetch several audits. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
 
         offset = request.args.get('offset', '0')
         limit = request.args.get('limit', '10')
@@ -51,11 +43,11 @@ class ObservationList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title']
+            ['title', 'dependency_id', 'year']
         )
 
         try:
-            obs_list, total_items, total_pages = observations.read_per_page(
+            audits_list, total_items, total_pages = audits.read_per_page(
                 offset, limit, order_by, order, search_params, per_page, page
             )
         except psycopg2.Error as err:
@@ -63,16 +55,16 @@ class ObservationList(Resource):
         except Exception as err:
             ns.abort(400, message=err)
         
-        return obs_list, 200, {'X-SOA-Total-Items': total_items, 'X-SOA-Total-Pages': total_pages}
+        return audits_list, 200, {'X-SOA-Total-Items': total_items, 'X-SOA-Total-Pages': total_pages}
 
 
-    @ns.expect(observation)
-    # @ns.marshal_with(observation, code=201)
+    @ns.expect(audit)
+    # @ns.marshal_with(audit, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
-        ''' To create an observation '''
+        ''' To create an audit '''
         try:
-            obs = observations.create(**api.payload)
+            aud = audits.create(**api.payload)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except KeyError as err:
@@ -80,63 +72,63 @@ class ObservationList(Resource):
         except Exception as err:
             ns.abort(400, message=err)
         
-        return obs, 201
+        return aud, 201
 
 
 
 @ns.route('/<int:id>')
-@ns.param('id', 'Observation identifier')
-@ns.response(404, 'Observation not found')
+@ns.param('id', 'Audit identifier')
+@ns.response(404, 'Audit not found')
 @ns.response(400, 'There is a problem with your request data')
-class Observation(Resource):
-    obs_not_found = 'Observation not found'
+class Audit(Resource):
+    audit_not_found = 'Audit not found'
 
-    # @ns.marshal_with(observation)
+    # @ns.marshal_with(audit)
     def get(self, id):
-        ''' To fetch an observation '''
+        ''' To fetch an audit '''
         try:
-            obs = observations.read(id)
+            aud = audits.read(id)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except EmptySetError:
-            ns.abort(404, message=Observation.obs_not_found)
+            ns.abort(404, message=Audit.audit_not_found)
         except Exception as err:
             ns.abort(400, message=err)
         
-        return obs
+        return aud
 
 
-    @ns.expect(observation)
-    # @ns.marshal_with(observation)
+    @ns.expect(audit)
+    # @ns.marshal_with(audit)
     def put(self, id):
-        ''' To update an observation '''
+        ''' To update an audit '''
         try:
-            obs = observations.update(id, **api.payload)
+            aud = audits.update(id, **api.payload)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except KeyError as err:
             ns.abort(400, message='Review the keys in your payload: {}'.format(err))
         except EmptySetError:
-            ns.abort(404, message=Observation.obs_not_found)
+            ns.abort(404, message=Audit.audit_not_found)
         except Exception as err:
             ns.abort(400, message=err)
         
-        return obs
+        return aud
 
 
-    # @ns.marshal_with(observation)
+    # @ns.marshal_with(audit)
     def delete(self, id):
-        ''' To delete an observation '''
+        ''' To delete an audit '''
         try:
-            obs = observations.delete(id)
+            aud = audits.delete(id)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except EmptySetError:
-            ns.abort(404, message=Observation.obs_not_found)
+            ns.abort(404, message=Audit.audit_not_found)
         except Exception as err:
             ns.abort(400, message=err)
         
-        return obs
+        return aud
 
 
 
@@ -145,11 +137,9 @@ class Observation(Resource):
 class Catalog(Resource):
 
     def get(self):
-        ''' To fetch an object containing data for screen fields (key: table name, value: list of id/title pairs) '''
+        ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
         try:
-            field_catalog = observations.get_catalogs(
-                ['observation_types', 'social_programs', 'audits', 'fiscals']
-            )
+            field_catalog = audits.get_catalogs(['dependencies'])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))
         except Exception as err:

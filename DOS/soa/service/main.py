@@ -2,7 +2,7 @@ import logging
 
 from flask import Blueprint, Flask
 
-from genl.endpoints import observations
+from genl.endpoints import observations, audits
 from genl.restplus import api
 
 
@@ -12,6 +12,7 @@ def setup_app(flask_app):
     api.init_app(blueprint)
     
     api.add_namespace(observations.ns)
+    api.add_namespace(audits.ns)
 
     flask_app.register_blueprint(blueprint)
 

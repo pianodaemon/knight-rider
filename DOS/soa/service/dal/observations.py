@@ -32,7 +32,7 @@ def _alter_observation(**kwargs):
     else:
         id = rcode
 
-    ent = fetch_entity("observations", id)
+    ent = fetch_entity("observations", id)    
     return add_observation_amounts(ent)
 
 
@@ -79,7 +79,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
 
     order_by_values = (
         'id','observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id',
-        'title', 'observation_code_id'
+        'title', 'observation_code_id', 'observation_bis_code_id'
     )
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
@@ -140,24 +140,28 @@ def get_catalogs(table_name_list):
 
 
 def add_observation_amounts(ent):
-    ent['touch_latter_time'] = ent['touch_latter_time'].__str__()
-    
+    attributes = set([
+        'id', 'observation_type_id', 'social_program_id', 'audit_id', 'title', 'fiscal_id', 'amount_observed',
+        'observation_code_id', 'observation_bis_code_id'
+    ])
+    mod_ent = {attr: ent[attr] for attr in attributes}
+
     sql = '''
         SELECT *
         FROM amounts
         WHERE observation_id = {}
         ORDER BY id DESC;
-    '''.format(ent['id'])
+    '''.format(mod_ent['id'])
     
     rows = exec_steady(sql)
     
-    ent['amounts'] = []
+    mod_ent['amounts'] = []
     for row in rows:
         row_dict = dict(row)
         row_dict['inception_time'] = row_dict['inception_time'].__str__()
-        ent['amounts'].append(row_dict)
+        mod_ent['amounts'].append(row_dict)
 
-    return ent
+    return mod_ent
 
 
 def transform_data(ent):

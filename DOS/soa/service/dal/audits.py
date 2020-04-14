@@ -64,7 +64,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if limit < 1:
         raise Exception("Value of param 'limit' should be >= 1")
 
-    order_by_values = ('id','audit_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title')
+    order_by_values = ('id', 'dependency_id', 'year', 'title')
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
 

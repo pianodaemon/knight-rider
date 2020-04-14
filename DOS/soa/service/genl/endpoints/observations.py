@@ -21,6 +21,7 @@ observation = api.model(
         'title': fields.String(required=True, description='Desc of observation'),
         'amount_observed': fields.Float(required=True, description='Observed amount'),
         'observation_code_id': fields.Integer(required=True, description='Observation code identifier'),
+        'observation_bis_code_id': fields.Integer(required=True, description='Observation bis code identifier'),
     }
 )
 
@@ -40,6 +41,7 @@ class ObservationList(Resource):
     @ns.param("fiscal_id", "Fiscal entity that audits")
     @ns.param("title", "Description of observation")
     @ns.param("observation_code_id", "An integer identifying the observation codes")
+    @ns.param("observation_bis_code_id", "An integer identifying the observation bis codes")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -53,7 +55,10 @@ class ObservationList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title', 'observation_code_id']
+            [
+                'observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title',
+                'observation_code_id', 'observation_bis_code_id'
+            ]
         )
 
         try:

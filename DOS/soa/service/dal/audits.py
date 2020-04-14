@@ -22,8 +22,7 @@ def _alter_audit(**kwargs):
         id = rcode
 
     ent = fetch_entity("audits", id)
-    ent['inception_time'] = ent['inception_time'].__str__()
-    ent['touch_latter_time'] = ent['touch_latter_time'].__str__()
+    transform_data(ent)
     return ent
 
 
@@ -35,7 +34,9 @@ def create(**kwargs):
 
 def read(id):
     ''' Fetches an audit entity '''
-    return fetch_entity("audits", id)
+    ent = fetch_entity("audits", id)
+    transform_data(ent)
+    return ent
 
 
 def update(id, **kwargs):
@@ -46,7 +47,9 @@ def update(id, **kwargs):
 
 def delete(id):
     ''' Deletes an audit entity '''
-    return delete_entity("audits", id)
+    ent = delete_entity("audits", id)
+    transform_data(ent)
+    return ent
 
 
 def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
@@ -115,3 +118,8 @@ def get_catalogs(table_name_list):
         fields_d[table] = values_l
 
     return fields_d
+
+
+def transform_data(ent):
+    ent['inception_time'] = ent['inception_time'].__str__()
+    ent['touch_latter_time'] = ent['touch_latter_time'].__str__()

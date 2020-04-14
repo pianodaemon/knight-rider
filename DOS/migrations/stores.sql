@@ -1,4 +1,4 @@
-CREATE FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text, _amount_observed double precision, _amount_projected double precision, _amount_solved double precision, _amount_comments text) RETURNS record
+CREATE FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _code_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text, _amount_observed double precision, _amount_projected double precision, _amount_solved double precision, _amount_comments text) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
@@ -22,6 +22,7 @@ BEGIN
 
             INSERT INTO observations (
                 observation_type_id,
+                observation_code_id,
                 social_program_id,
                 audit_id,
                 title,
@@ -30,6 +31,7 @@ BEGIN
                 touch_latter_time
             ) VALUES (
                 _type_id,
+                _code_id,
                 _social_program_id,
                 _audit_id,
                 _title,
@@ -72,7 +74,7 @@ BEGIN
             -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
             UPDATE observations
-            SET title  = _title, observation_type_id = _type_id,
+            SET title  = _title, observation_type_id = _type_id, observation_code_id = _code_id,
                 social_program_id = _social_program_id,
                 audit_id = _audit_id, fiscal_id = _fiscal_id,
                 amount_observed = _amount_observed, touch_latter_time = current_moment

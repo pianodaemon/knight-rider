@@ -17,7 +17,6 @@ import { NumberFormatCustom } from 'src/shared/components/number-format-custom.c
 import { Catalog, ObservationRequest } from '../state/observations.reducer';
 import { HistoryTable } from './history-table.component';
 import Icon from '@material-ui/core/Icon';
-import {TextInput} from 'src/shared/components/form.component.text_input';
 
 type Props = {
   createObservationAction: Function,

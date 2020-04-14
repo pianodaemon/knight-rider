@@ -17,6 +17,7 @@ import { NumberFormatCustom } from 'src/shared/components/number-format-custom.c
 import { Catalog, ObservationRequest } from '../state/observations.reducer';
 import { HistoryTable } from './history-table.component';
 import Icon from '@material-ui/core/Icon';
+import {TextInput} from 'src/shared/components/form.component.text_input';
 
 type Props = {
   createObservationAction: Function,
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     formControl: {
       margin: theme.spacing(1),
-      minWidth: 200,
+      minWidth: 350,
       [theme.breakpoints.down('sm')]: {
         display: 'flex',
       },
@@ -194,23 +195,176 @@ export const ObservationsForm = (props: Props) => {
         }) => {
           return (
             <>
+              <h1 style={{ color: '#128aba' }}>Observaciones Preliminales</h1>
+              <hr  className={classes.hrDivider} />
               <form onSubmit={handleSubmit}>
-                {/* <fieldset className={classes.fieldset}> */}
-                {/* <legend>CyTG:</legend> */}
-
-                {/*
-                <hr  className={classes.hrSpacer} />
-                <hr  className={classes.hrDivider} />
-                <fieldset className={classes.fieldset}>
-                  <legend className={classes.containerLegend} >
-                    <Typography variant="body2" align="center" classes={{root:classes.legend}}>
-                      CyTG
-                    </Typography>
-                  </legend>
-                </fieldset>
-                */}
+                
 
                 <Grid container spacing={3}>
+
+
+                  {/*******  Empty input  ********/}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel >
+                        Tipo de Auditoría
+                      </InputLabel>
+                      <Select
+                        id="inputEmpty1"
+                      >
+                                <MenuItem value='1' key='1' > Auditoria 1 </MenuItem>
+                                <MenuItem value='1' key='1' > Auditoria 2 </MenuItem>
+                                <MenuItem value='1' key='1' > Auditoria 3 </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  {/*******  End Empty input  ********/}
+
+
+                  {/*******  Empty input  ********/}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        label="Oficio No."
+                        name="inputEmpty2"
+                        id="inputEmpty2"
+                      />
+                    </FormControl>
+                  </Grid>
+                  {/*******  End Empty input  ********/}
+
+
+                    {/*******  Empty input  ********/}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel >
+                        Dirección
+                      </InputLabel>
+                      <Select
+                        id="inputEmpty3"
+                      >
+                                <MenuItem value='1' key='1' > Algo1 </MenuItem>
+                                <MenuItem value='1' key='1' > Algo2 </MenuItem>
+                                <MenuItem value='1' key='1' > Algo33 </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  {/*******  End Empty input  ********/}
+
+
+
+                  {/*******  Empty input  ********/}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        label="Recibido (Fecha)"
+                        name="inputEmpty4"
+                        id="inputEmpty4"
+                      />
+                    </FormControl>
+                  </Grid>
+                  {/*******  End Empty input  ********/}
+                  
+
+
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel id="social-program-id">Programa</InputLabel>
+                      <Select
+                        labelId="social-program-id"
+                        id="social-program-id-select"
+                        value={catalog ? values.social_program_id || '' : ''}
+                        onChange={handleChange('social_program_id')}
+                      >
+                        {catalog &&
+                            catalog.social_programs &&
+                            catalog.social_programs.map((item) => {
+                              return (
+                                <MenuItem
+                                  value={item.id}
+                                  key={`type-${item.id}`}
+                                >
+                                  {item.title}
+                                </MenuItem>
+                              );
+                            })}
+                      </Select>
+                      {errors.social_program_id &&
+                          touched.social_program_id &&
+                          errors.social_program_id && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Elige un programa
+                            </FormHelperText>
+                          )}
+                    </FormControl>
+                  </Grid>
+
+
+
+                  {/*******  Empty input  ********/}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        label="Vence (Fecha)"
+                        name="inputEmpty5"
+                        id="inputEmpty5"
+                      />
+                    </FormControl>
+                  </Grid>
+                  {/*******  End Empty input  ********/}
+
+
+
+                  {/*******  Empty input  ********/}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel >
+                        Clave Observación
+                      </InputLabel>
+                      <Select
+                        id="inputEmpty6"
+                      >
+                                <MenuItem value='1' key='1' > Algo1 </MenuItem>
+                                <MenuItem value='1' key='1' > Algo2 </MenuItem>
+                                <MenuItem value='1' key='1' > Algo33 </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  {/*******  End Empty input  ********/}
+
+
+                  
+                  {/*******  Empty input  ********/}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        label="Vence (Fecha)"
+                        name="inputEmpty7"
+                        id="inputEmpty7"
+                      />
+                    </FormControl>
+                  </Grid>
+                  {/*******  End Empty input  ********/}
+
+
+
+                  {/*******  Empty input  ********/}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        label="Observación"
+                        name="inputEmpty8"
+                        id="inputEmpty8"
+                      />
+                    </FormControl>
+                  </Grid>
+                  {/*******  End Empty input  ********/}
+
+
+
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel id="observation-type">
@@ -247,76 +401,9 @@ export const ObservationsForm = (props: Props) => {
                           )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <InputLabel id="social-program-id">Programa</InputLabel>
-                      <Select
-                        labelId="social-program-id"
-                        id="social-program-id-select"
-                        value={catalog ? values.social_program_id || '' : ''}
-                        onChange={handleChange('social_program_id')}
-                      >
-                        {catalog &&
-                            catalog.social_programs &&
-                            catalog.social_programs.map((item) => {
-                              return (
-                                <MenuItem
-                                  value={item.id}
-                                  key={`type-${item.id}`}
-                                >
-                                  {item.title}
-                                </MenuItem>
-                              );
-                            })}
-                      </Select>
-                      {errors.social_program_id &&
-                          touched.social_program_id &&
-                          errors.social_program_id && (
-                            <FormHelperText
-                              error
-                              classes={{ error: classes.textErrorHelper }}
-                            >
-                              Elige un programa
-                            </FormHelperText>
-                          )}
-                    </FormControl>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <InputLabel id="audit">Auditor&iacute;a no.</InputLabel>
-                      <Select
-                        labelId="audit"
-                        id="audit-select"
-                        value={catalog ? values.audit_id || '' : ''}
-                        onChange={handleChange('audit_id')}
-                      >
-                        {catalog &&
-                            catalog.audits &&
-                            catalog.audits.map((item) => {
-                              return (
-                                <MenuItem
-                                  value={item.id}
-                                  key={`type-${item.id}`}
-                                >
-                                  {item.title}
-                                </MenuItem>
-                              );
-                            })}
-                      </Select>
-                      {errors.audit_id &&
-                          touched.audit_id &&
-                          errors.audit_id && (
-                            <FormHelperText
-                              error
-                              classes={{ error: classes.textErrorHelper }}
-                            >
-                              Seleccione una Auditoría
-                            </FormHelperText>
-                          )}
-                    </FormControl>
-                  </Grid>
+
+
+
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel id="fiscal">Auditor</InputLabel>
@@ -351,9 +438,9 @@ export const ObservationsForm = (props: Props) => {
                           )}
                     </FormControl>
                   </Grid>
-                </Grid>
 
-                <Grid container spacing={3}>
+
+                  
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -374,8 +461,223 @@ export const ObservationsForm = (props: Props) => {
                   </Grid>
 
 
+
+
                 </Grid>
                 {/* </fieldset> */}
+
+
+
+
+                <hr  className={classes.hrSpacer} />
+                <hr  className={classes.hrDivider} />
+                
+                <fieldset className={classes.fieldset}>
+                  <legend className={classes.containerLegend} >
+                    <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                      {/*<Icon> attach_money </Icon>*/}
+                      CyTG
+                    </Typography>
+                  </legend>
+                  <Grid container spacing={3}>
+ 
+
+
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Oficio No."
+                          name="adfa"
+                          id="idalgaooo"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+
+
+
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Clasificación"
+                          name="adfa"
+                          id="idasslgooo"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+
+
+
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Fecha de Oficio"
+                          name="adfa"
+                          id="idalga"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+
+
+
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Recibido"
+                          name="adfa"
+                          id="idalgaooo"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+ 
+
+
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Vencimiento"
+                          name="adfa"
+                          id="idalgaooo"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+
+
+
+                  </Grid>
+                </fieldset>
+
+
+
+
+                <hr  className={classes.hrSpacer} />
+                <hr  className={classes.hrDivider} />
+                
+                <fieldset className={classes.fieldset}>
+                  <legend className={classes.containerLegend} style={{ width: '335px', }}>
+                    <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                      {/*<Icon> attach_money </Icon>*/}
+                      RESPUESTA DE LA DEPENDENCIA
+                    </Typography>
+                  </legend>
+                  <Grid container spacing={3}>
+ 
+                                        
+
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Oficio No."
+                          name="adfa"
+                          id="idalgaooo"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+
+                                        
+
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Respuesta"
+                          name="adfa"
+                          id="idasslgooo"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+
+                                        
+
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Fecha de Oficio"
+                          name="adfa"
+                          id="idalga"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+
+                                        
+
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Comentario"
+                          name="adfa"
+                          id="idalgaooo"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+
+
+                  </Grid>
+                </fieldset>
+
+
+
+
+                <hr  className={classes.hrSpacer} />
+                <hr  className={classes.hrDivider} />
+                
+                <fieldset className={classes.fieldset}>
+                  <legend className={classes.containerLegend} style={{ width: '335px', }}>
+                    <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                      {/*<Icon> attach_money </Icon>*/}
+                      ÓRGANO FISCALIZADOR
+                    </Typography>
+                  </legend>
+                  <Grid container spacing={3}>
+ 
+                                        
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Oficio No."
+                          name="adfa"
+                          id="idalgaooo"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+
+ 
+                                        
+                    {/*******  Empty input  ********/}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          label="Fecha Oficio"
+                          name="adfa"
+                          id="idasslgooo"
+                        />
+                      </FormControl>
+                    </Grid>
+                    {/*******  End Empty input  ********/}
+
+
+                  </Grid>
+                </fieldset>
+
+
 
                 <hr  className={classes.hrSpacer} />
                 <hr  className={classes.hrDivider} />
@@ -484,27 +786,13 @@ export const ObservationsForm = (props: Props) => {
                           )}
                       </FormControl>
                     </Grid>
+
+                    
+
                   </Grid>
                   <HistoryTable history={(observation && observation.mutatedAmounts) || []} />
                 </fieldset>
-                {/*
-                  <input
-                    type="email"
-                    name="email"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.email}
-                  />
-                  {errors.email && touched.email && errors.email}
-                  <input
-                    type="password"
-                    name="password"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.password}
-                  />
-                  {errors.password && touched.password && errors.password}
-                  */}
+
                 <Button
                   variant="contained"
                   className={classes.submitInput}
@@ -521,3 +809,5 @@ export const ObservationsForm = (props: Props) => {
     </Paper>
   );
 };
+
+

@@ -7,3 +7,10 @@ export function getCatalog(): Promise<any> {
     headers: { accept: 'application/json' },
   });
 }
+
+export function getAuditCatalog(): Promise<any> {
+  return axiosApi(`${getAppSettings().baseUrl}/audits/catalog`, {
+    method: 'get',
+    headers: { accept: 'application/json' },
+  });
+}

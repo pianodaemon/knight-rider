@@ -16,8 +16,6 @@ import Typography from '@material-ui/core/Typography';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { Catalog, ObservationRequest } from '../state/observations.reducer';
 import { HistoryTable } from './history-table.component';
-import Icon from '@material-ui/core/Icon';
-import {TextInput} from 'src/shared/components/form.component.text_input';
 
 type Props = {
   createObservationAction: Function,
@@ -80,7 +78,7 @@ const useStyles = makeStyles((theme: Theme) =>
     hrDivider: {
       borderTop: 0,
       height: '1px',
-      /*background: 'linear-gradient(to right,transparent,#dedede,transparent)',*/
+      /* background: 'linear-gradient(to right,transparent,#dedede,transparent)', */
       background: 'linear-gradient(to right,transparent,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,transparent)',
       width: '100%',
       border: 0,
@@ -195,8 +193,8 @@ export const ObservationsForm = (props: Props) => {
         }) => {
           return (
             <>
-              <h1 style={{ color: '#128aba' }}>Observaciones Preliminales</h1>
-              <hr  className={classes.hrDivider} />
+              <h1 style={{ color: '#128aba' }}>Observaciones Preliminares</h1>
+              <hr className={classes.hrDivider} />
               <form onSubmit={handleSubmit}>
                 
 
@@ -683,9 +681,9 @@ export const ObservationsForm = (props: Props) => {
                 <hr  className={classes.hrDivider} />
                 
                 <fieldset className={classes.fieldset}>
-                  <legend className={classes.containerLegend} >
+                  <legend className={classes.containerLegend}>
                     <Typography variant="body2" align="center" classes={{root:classes.legend}}>
-                      {/*<Icon> attach_money </Icon>*/}
+                      {/* <Icon> attach_money </Icon> */}
                       MONTOS
                     </Typography>
                   </legend>

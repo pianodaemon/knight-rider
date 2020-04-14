@@ -13,31 +13,31 @@ export const HistoryTable = (props: Props) => {
   const customSort = () => 0;
   const draggable: boolean = false;
   const sorting: boolean = false;
-  const paddingCell = '10px'
+  const paddingCell = '10px';
   return (
     <MaterialTable
       style={{ marginTop: '20px', display: 'grid' }}
       title={
-          <span
-            style={{ 
-              color: '#128aba', 
-              fontSize: '1rem', 
-              fontWeight: 500, 
-              lineHeight: 1.6, 
-              letterSpacing: '0.0075em' 
+        <span
+          style={{
+            color: '#128aba',
+            fontSize: '1rem',
+            fontWeight: 500,
+            lineHeight: 1.6,
+            letterSpacing: '0.0075em',
+          }}
+        >
+          <Icon
+            style={{
+              verticalAlign: '-5px',
+              margin: '0 6px 0 0',
+              fontSize: '1.3rem',
             }}
           >
-            <Icon
-              style={{
-                verticalAlign: '-5px', 
-                margin: '0 6px 0 0', 
-                fontSize: '1.3rem'
-              }}
-            >
-              history
-            </Icon>
-            Historial de Cambios
-          </span>
+            history
+          </Icon>
+          Historial de Cambios
+        </span>
       }
       data={history || []}
       columns={[
@@ -46,24 +46,24 @@ export const HistoryTable = (props: Props) => {
           field: 'date',
           sorting,
           customSort,
-          cellStyle:{ padding: paddingCell},
+          cellStyle: { padding: paddingCell },
         },
         {
           title: 'Comentarios',
           field: 'comments',
           sorting,
-          cellStyle:{ padding: paddingCell},
+          cellStyle: { padding: paddingCell },
         },
         {
           title: 'Solventado',
           field: 'solved',
           sorting,
-          cellStyle:{ padding: paddingCell},
+          cellStyle: { padding: paddingCell },
         },
         {
           title: 'Proyectado',
           field: 'projected',
-          cellStyle:{ padding: paddingCell},
+          cellStyle: { padding: paddingCell },
         },
       ]}
       options={{
@@ -77,8 +77,11 @@ export const HistoryTable = (props: Props) => {
           color: '#128aba',
           padding: '3px 10px',
         },
-        rowStyle: rowData => ({
-          backgroundColor: (rowData.tableData.id%2 === 0) ? 'rgba(0,0,0,0)' : 'rgba(200,200,200,0.1)',
+        rowStyle: (rowData) => ({
+          backgroundColor:
+            rowData.tableData.id % 2 === 0
+              ? 'rgba(0,0,0,0)'
+              : 'rgba(200,200,200,0.1)',
           color: '#888',
         }),
       }}

@@ -22,6 +22,9 @@ observation = api.model(
         'amount_observed': fields.Float(required=True, description='Observed amount'),
         'observation_code_id': fields.Integer(required=True, description='Observation code identifier'),
         'observation_bis_code_id': fields.Integer(required=True, description='Observation bis code identifier'),
+        'reception_date': fields.Date(required=True, description='Reception date'),
+        'expiration_date': fields.Date(required=True, description='Expiration date'),
+        'doc_a_date': fields.Date(required=True, description='Oficio date'),
     }
 )
 

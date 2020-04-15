@@ -1,8 +1,8 @@
 FROM mhart/alpine-node:11 AS builder
 MAINTAINER miriam.physics@gmail.com
 
-ENV NODE_ENV "production"
-ENV REACT_APP_HOST_API "http://54.251.129.178:8080/api/v1"
+ARG NODE_ENV
+ARG REACT_APP_HOST_API
 
 WORKDIR /app
 COPY . .

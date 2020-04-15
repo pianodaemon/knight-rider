@@ -115,6 +115,7 @@ export const ObservationsForm = (props: Props) => {
     social_program_id: '',
     audit_id: '',
     fiscal_id: '',
+    observation_code_id: '',
     title: '',
     amount_observed: '',
     projected: '',
@@ -196,30 +197,25 @@ export const ObservationsForm = (props: Props) => {
               <h1 style={{ color: '#128aba' }}>Observaciones Preliminares</h1>
               <hr className={classes.hrDivider} />
               <form onSubmit={handleSubmit}>
-                
-
                 <Grid container spacing={3}>
-
-
-                  {/*******  Empty input  ********/}
+                  {/*  Empty input  */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel >
+                      <InputLabel>
                         Tipo de Auditoría
                       </InputLabel>
                       <Select
                         id="inputEmpty1"
                       >
-                                <MenuItem value='1' key='1' > Auditoria 1 </MenuItem>
-                                <MenuItem value='1' key='1' > Auditoria 2 </MenuItem>
-                                <MenuItem value='1' key='1' > Auditoria 3 </MenuItem>
+                        <MenuItem value='1' key='1'> Auditoria 1 </MenuItem>
+                        <MenuItem value='1' key='1'> Auditoria 2 </MenuItem>
+                        <MenuItem value='1' key='1'> Auditoria 3 </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
-                  {/*******  End Empty input  ********/}
+                  {/*  End Empty input  */}
 
-
-                  {/*******  Empty input  ********/}
+                  {/*  Empty input  */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -229,29 +225,26 @@ export const ObservationsForm = (props: Props) => {
                       />
                     </FormControl>
                   </Grid>
-                  {/*******  End Empty input  ********/}
+                  {/* End Empty input */}
 
-
-                    {/*******  Empty input  ********/}
+                  {/*  Empty input */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel >
+                      <InputLabel>
                         Dirección
                       </InputLabel>
                       <Select
                         id="inputEmpty3"
                       >
-                                <MenuItem value='1' key='1' > Algo1 </MenuItem>
-                                <MenuItem value='1' key='1' > Algo2 </MenuItem>
-                                <MenuItem value='1' key='1' > Algo33 </MenuItem>
+                        <MenuItem value='1' key='1'> Algo1 </MenuItem>
+                        <MenuItem value='1' key='1'> Algo2 </MenuItem>
+                        <MenuItem value='1' key='1'> Algo33 </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
-                  {/*******  End Empty input  ********/}
+                  {/* End Empty input */}
 
-
-
-                  {/*******  Empty input  ********/}
+                  {/*  Empty input */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -261,10 +254,8 @@ export const ObservationsForm = (props: Props) => {
                       />
                     </FormControl>
                   </Grid>
-                  {/*******  End Empty input  ********/}
+                  {/* End Empty input */}
                   
-
-
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel id="social-program-id">Programa</InputLabel>
@@ -300,9 +291,7 @@ export const ObservationsForm = (props: Props) => {
                     </FormControl>
                   </Grid>
 
-
-
-                  {/*******  Empty input  ********/}
+                  {/*  Empty input */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -312,30 +301,36 @@ export const ObservationsForm = (props: Props) => {
                       />
                     </FormControl>
                   </Grid>
-                  {/*******  End Empty input  ********/}
+                  {/* End Empty input */}
 
-
-
-                  {/*******  Empty input  ********/}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel >
+                      <InputLabel>
                         Clave Observación
                       </InputLabel>
                       <Select
-                        id="inputEmpty6"
+                        labelId="observation_code_id"
+                        id="observation_code_id-select"
+                        value={catalog ? values.observation_code_id || '' : ''}
+                        onChange={handleChange('observation_code_id')}
                       >
-                                <MenuItem value='1' key='1' > Algo1 </MenuItem>
-                                <MenuItem value='1' key='1' > Algo2 </MenuItem>
-                                <MenuItem value='1' key='1' > Algo33 </MenuItem>
+                        {catalog &&
+                            catalog.observation_codes &&
+                            catalog.observation_codes.map((item) => {
+                              return (
+                                <MenuItem
+                                  value={item.id}
+                                  key={`type-${item.id}`}
+                                >
+                                  {item.title}
+                                </MenuItem>
+                              );
+                            })}
                       </Select>
                     </FormControl>
                   </Grid>
-                  {/*******  End Empty input  ********/}
-
-
                   
-                  {/*******  Empty input  ********/}
+                  {/*  Empty input */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -345,11 +340,9 @@ export const ObservationsForm = (props: Props) => {
                       />
                     </FormControl>
                   </Grid>
-                  {/*******  End Empty input  ********/}
+                  {/* End Empty input */}
 
-
-
-                  {/*******  Empty input  ********/}
+                  {/*  Empty input */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -359,9 +352,7 @@ export const ObservationsForm = (props: Props) => {
                       />
                     </FormControl>
                   </Grid>
-                  {/*******  End Empty input  ********/}
-
-
+                  {/* End Empty input */}
 
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
@@ -464,24 +455,18 @@ export const ObservationsForm = (props: Props) => {
                 </Grid>
                 {/* </fieldset> */}
 
-
-
-
-                <hr  className={classes.hrSpacer} />
-                <hr  className={classes.hrDivider} />
+                <hr className={classes.hrSpacer} />
+                <hr className={classes.hrDivider} />
                 
                 <fieldset className={classes.fieldset}>
-                  <legend className={classes.containerLegend} >
+                  <legend className={classes.containerLegend}>
                     <Typography variant="body2" align="center" classes={{root:classes.legend}}>
-                      {/*<Icon> attach_money </Icon>*/}
+                      {/* <Icon> attach_money </Icon> */}
                       CyTG
                     </Typography>
                   </legend>
                   <Grid container spacing={3}>
- 
-
-
-                    {/*******  Empty input  ********/}
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -491,11 +476,9 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
+                    {/* End Empty input */}
 
-
-
-                    {/*******  Empty input  ********/}
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -505,11 +488,9 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
+                    {/* End Empty input */}
 
-
-
-                    {/*******  Empty input  ********/}
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -519,11 +500,9 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
+                    {/* End Empty input */}
 
-
-
-                    {/*******  Empty input  ********/}
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -533,11 +512,9 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
+                    {/* End Empty input */}
  
-
-
-                    {/*******  Empty input  ********/}
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -547,31 +524,22 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
-
-
-
+                    {/* End Empty input */}
                   </Grid>
                 </fieldset>
 
-
-
-
-                <hr  className={classes.hrSpacer} />
-                <hr  className={classes.hrDivider} />
+                <hr className={classes.hrSpacer} />
+                <hr className={classes.hrDivider} />
                 
                 <fieldset className={classes.fieldset}>
                   <legend className={classes.containerLegend} style={{ width: '335px', }}>
                     <Typography variant="body2" align="center" classes={{root:classes.legend}}>
-                      {/*<Icon> attach_money </Icon>*/}
+                      {/* <Icon> attach_money </Icon> */}
                       RESPUESTA DE LA DEPENDENCIA
                     </Typography>
                   </legend>
                   <Grid container spacing={3}>
- 
-                                        
-
-                    {/*******  Empty input  ********/}
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -581,11 +549,9 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
+                    {/* End Empty input */}
 
-                                        
-
-                    {/*******  Empty input  ********/}
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -595,11 +561,9 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
+                    {/* End Empty input */}
 
-                                        
-
-                    {/*******  Empty input  ********/}
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -609,11 +573,9 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
+                    {/* End Empty input */}
 
-                                        
-
-                    {/*******  Empty input  ********/}
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -623,29 +585,22 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
-
-
+                    {/* End Empty input */}
                   </Grid>
                 </fieldset>
 
-
-
-
-                <hr  className={classes.hrSpacer} />
-                <hr  className={classes.hrDivider} />
+                <hr className={classes.hrSpacer} />
+                <hr className={classes.hrDivider} />
                 
                 <fieldset className={classes.fieldset}>
                   <legend className={classes.containerLegend} style={{ width: '335px', }}>
                     <Typography variant="body2" align="center" classes={{root:classes.legend}}>
-                      {/*<Icon> attach_money </Icon>*/}
+                      {/* <Icon> attach_money </Icon> */}
                       ÓRGANO FISCALIZADOR
                     </Typography>
                   </legend>
-                  <Grid container spacing={3}>
- 
-                                        
-                    {/*******  Empty input  ********/}
+                  <Grid container spacing={3}>         
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -655,11 +610,9 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
-
- 
-                                        
-                    {/*******  Empty input  ********/}
+                    {/* End Empty input */}
+       
+                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -669,16 +622,12 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/*******  End Empty input  ********/}
-
-
+                    {/* End Empty input */}
                   </Grid>
                 </fieldset>
 
-
-
-                <hr  className={classes.hrSpacer} />
-                <hr  className={classes.hrDivider} />
+                <hr className={classes.hrSpacer} />
+                <hr className={classes.hrDivider} />
                 
                 <fieldset className={classes.fieldset}>
                   <legend className={classes.containerLegend}>
@@ -807,5 +756,3 @@ export const ObservationsForm = (props: Props) => {
     </Paper>
   );
 };
-
-

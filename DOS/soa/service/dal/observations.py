@@ -17,13 +17,17 @@ def _alter_observation(**kwargs):
         {}::double precision,
         {}::double precision,
         {}::double precision,
-        '{}'::text)
+        '{}'::text,
+        '{}'::date,
+        '{}'::date,
+        '{}'::date)
         AS result( rc integer, msg text )""".format(
             kwargs["id"], kwargs["observation_type_id"], kwargs["observation_code_id"],
             kwargs["observation_bis_code_id"], kwargs["social_program_id"],
             kwargs["audit_id"], kwargs["fiscal_id"], kwargs["title"],
             kwargs["amount_observed"], kwargs["projected"], kwargs["solved"],
-            kwargs["comments"]
+            kwargs["comments"], kwargs["reception_date"], kwargs["expiration_date"],
+            kwargs["doc_a_date"]
         )
 
     rcode, rmsg = run_stored_procedure(sql)
@@ -32,7 +36,7 @@ def _alter_observation(**kwargs):
     else:
         id = rcode
 
-    ent = fetch_entity("observations", id)    
+    ent = fetch_entity("observations", id)
     return add_observation_amounts(ent)
 
 
@@ -142,9 +146,12 @@ def get_catalogs(table_name_list):
 def add_observation_amounts(ent):
     attributes = set([
         'id', 'observation_type_id', 'social_program_id', 'audit_id', 'title', 'fiscal_id', 'amount_observed',
-        'observation_code_id', 'observation_bis_code_id'
+        'observation_code_id', 'observation_bis_code_id', 'reception_date', 'expiration_date', 'doc_a_date'
     ])
     mod_ent = {attr: ent[attr] for attr in attributes}
+    mod_ent['reception_date'] = mod_ent['reception_date'].__str__()
+    mod_ent['expiration_date'] = mod_ent['expiration_date'].__str__()
+    mod_ent['doc_a_date'] = mod_ent['doc_a_date'].__str__()
 
     sql = '''
         SELECT *

@@ -21,10 +21,17 @@ observation = api.model(
         'title': fields.String(required=True, description='Desc of observation'),
         'amount_observed': fields.Float(required=True, description='Observed amount'),
         'observation_code_id': fields.Integer(required=True, description='Observation code identifier'),
-        'observation_bis_code_id': fields.Integer(required=True, description='Observation bis code identifier'),
-        'reception_date': fields.Date(required=True, description='Reception date'),
-        'expiration_date': fields.Date(required=True, description='Expiration date'),
-        'doc_a_date': fields.Date(required=True, description='Oficio date'),
+        'observation_bis_code_id': fields.Integer(required=True, description='Observation bis code identifier (CyTG->Clasif)'),
+        'reception_date': fields.String(required=True, description='Reception date (CyTG)'),
+        'expiration_date': fields.String(required=True, description='Expiration date (CyTG)'),
+        'doc_a_date': fields.String(required=True, description='Oficio date (CyTG)'),
+        'doc_b_date': fields.String(required=True, description='Oficio date (Dependencia)'),
+        'doc_c_date': fields.String(required=True, description='Oficio date (Organo Fiscalizador)'),
+        'doc_a': fields.String(required=True, description='Oficio No. (CyTG)'),
+        'doc_b': fields.String(required=True, description='Oficio No. (Dependencia)'),
+        'doc_c': fields.String(required=True, description='Oficio No. (Organo Fiscalizador)'),
+        'dep_response': fields.String(required=True, description='Dependency response (Dependencia)'),
+        'dep_resp_comments': fields.String(required=True, description='Dependency response comments (Dependencia)'),
     }
 )
 
@@ -45,6 +52,16 @@ class ObservationList(Resource):
     @ns.param("title", "Description of observation")
     @ns.param("observation_code_id", "An integer identifying the observation codes")
     @ns.param("observation_bis_code_id", "An integer identifying the observation bis codes")
+    @ns.param("reception_date", "Reception date (CyTG)")
+    @ns.param("expiration_date", "Expiration date (CyTG)")
+    @ns.param("doc_a_date", "Oficio date (CyTG)")
+    @ns.param("doc_b_date", "Oficio date (Dependencia)")
+    @ns.param("doc_c_date", "Oficio date (Organo Fiscalizador)")
+    @ns.param("doc_a", "Oficio No. (CyTG)")
+    @ns.param("doc_b", "Oficio No. (Dependencia)")
+    @ns.param("doc_c", "Oficio No. (Organo Fiscalizador)")
+    @ns.param("dep_response", "Dependency response (Dependencia)")
+    @ns.param("dep_resp_comments", "Dependency response comments (Dependencia)")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -60,7 +77,8 @@ class ObservationList(Resource):
             request.args,
             [
                 'observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title',
-                'observation_code_id', 'observation_bis_code_id'
+                'observation_code_id', 'observation_bis_code_id', 'doc_a', 'doc_b', 'doc_c',
+                'dep_response', 'dep_resp_comments'
             ]
         )
 

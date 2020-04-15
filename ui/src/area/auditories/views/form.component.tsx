@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { Formik } from 'formik';
+import { Formik, Field } from 'formik';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -13,6 +13,10 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Typography from '@material-ui/core/Typography';
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import mxLocale from "date-fns/locale/es";
+import DateFnsUtils from '@date-io/date-fns';
+import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picker.component'
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { Catalog, ObservationRequest } from '../state/observations.reducer';
 import { HistoryTable } from './history-table.component';
@@ -116,11 +120,15 @@ export const ObservationsForm = (props: Props) => {
     audit_id: '',
     fiscal_id: '',
     observation_code_id: '',
+    observation_bis_code_id: '',
     title: '',
     amount_observed: '',
     projected: '',
     solved: '',
     comments: '',
+    doc_a_date: null,
+    reception_date: null,
+    expiration_date: null,
   };
   useEffect(() => {
     if (id) {
@@ -168,6 +176,12 @@ export const ObservationsForm = (props: Props) => {
           if (values.comments === '' && (observation?.projected.toString() !== values.projected || observation?.solved.toString() !== values.solved)) {
             errors.comments = 'Required';
           }
+          if (!values.doc_a_date) {
+            errors.doc_a_date = 'Required';
+          }
+          if (!values.reception_date) {
+            errors.reception_date = 'Required';
+          }
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
@@ -193,7 +207,7 @@ export const ObservationsForm = (props: Props) => {
           /* and other goodies */
         }) => {
           return (
-            <>
+            <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Observaciones Preliminares</h1>
               <hr className={classes.hrDivider} />
               <form onSubmit={handleSubmit}>
@@ -201,16 +215,36 @@ export const ObservationsForm = (props: Props) => {
                   {/*  Empty input  */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel>
-                        Tipo de Auditoría
-                      </InputLabel>
+                      <InputLabel id="audit">Auditor&iacute;a no.</InputLabel>
                       <Select
-                        id="inputEmpty1"
+                        labelId="audit"
+                        id="audit-select"
+                        value={values.audit_id || ''}
+                        onChange={handleChange('audit_id')}
                       >
-                        <MenuItem value='1' key='1'> Auditoria 1 </MenuItem>
-                        <MenuItem value='1' key='1'> Auditoria 2 </MenuItem>
-                        <MenuItem value='1' key='1'> Auditoria 3 </MenuItem>
+                        {catalog &&
+                          catalog.audits &&
+                          catalog.audits.map((item) => {
+                            return (
+                              <MenuItem
+                                value={item.id}
+                                key={`type-${item.id}`}
+                              >
+                                {item.title}
+                              </MenuItem>
+                            );
+                          })}
                       </Select>
+                      {errors.audit_id &&
+                        touched.audit_id &&
+                        errors.audit_id && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Seleccione una Auditoría
+                          </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
                   {/*  End Empty input  */}
@@ -237,8 +271,8 @@ export const ObservationsForm = (props: Props) => {
                         id="inputEmpty3"
                       >
                         <MenuItem value='1' key='1'> Algo1 </MenuItem>
-                        <MenuItem value='1' key='1'> Algo2 </MenuItem>
-                        <MenuItem value='1' key='1'> Algo33 </MenuItem>
+                        <MenuItem value='2' key='2'> Algo2 </MenuItem>
+                        <MenuItem value='3' key='3'> Algo33 </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -390,9 +424,6 @@ export const ObservationsForm = (props: Props) => {
                           )}
                     </FormControl>
                   </Grid>
-
-
-
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel id="fiscal">Auditor</InputLabel>
@@ -427,9 +458,6 @@ export const ObservationsForm = (props: Props) => {
                           )}
                     </FormControl>
                   </Grid>
-
-
-                  
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -448,10 +476,6 @@ export const ObservationsForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-
-
-
-
                 </Grid>
                 {/* </fieldset> */}
 
@@ -481,50 +505,86 @@ export const ObservationsForm = (props: Props) => {
                     {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
-                        <TextField
-                          label="Clasificación"
-                          name="adfa"
-                          id="idasslgooo"
-                        />
+                        <InputLabel>
+                          Clave Observación
+                        </InputLabel>
+                        <Select
+                          labelId="observation_bis_code_id"
+                          id="observation_bis_code_id-select"
+                          value={catalog ? values.observation_bis_code_id || '' : ''}
+                          onChange={handleChange('observation_bis_code_id')}
+                        >
+                          {catalog &&
+                              catalog.observation_codes &&
+                              catalog.observation_codes.map((item) => {
+                                return (
+                                  <MenuItem
+                                    value={item.id}
+                                    key={`type-${item.id}`}
+                                  >
+                                    {item.title}
+                                  </MenuItem>
+                                );
+                              })}
+                        </Select>
                       </FormControl>
                     </Grid>
                     {/* End Empty input */}
 
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
-                        <TextField
+                        <Field
+                          component={FormikDatePicker}
                           label="Fecha de Oficio"
-                          name="adfa"
-                          id="idalga"
+                          name="doc_a_date"
                         />
+                        {errors.doc_a_date &&
+                          touched.doc_a_date && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese una fecha de oficio
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
-
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
-                        <TextField
+                        <Field
+                          component={FormikDatePicker}
                           label="Recibido"
-                          name="adfa"
-                          id="idalgaooo"
+                          name="reception_date"
                         />
+                        {errors.reception_date &&
+                          touched.reception_date && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese una fecha de recibido
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
- 
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
-                        <TextField
+                        <Field
+                          component={FormikDatePicker}
                           label="Vencimiento"
-                          name="adfa"
-                          id="idalgaooo"
+                          name="expiration_date"
                         />
+                        {errors.expiration_date &&
+                          touched.expiration_date && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese una fecha de vencimiento
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
                   </Grid>
                 </fieldset>
 
@@ -749,7 +809,7 @@ export const ObservationsForm = (props: Props) => {
                   {!id ? 'Crear' : 'Actualizar'}
                 </Button>
               </form>
-            </>
+            </MuiPickersUtilsProvider>
           );
         }}
       </Formik>

@@ -13,6 +13,9 @@ export interface Observation {
   amount_observed: number;
   amounts: Array<Amount>;
   comments: string;
+  reception_date: string;
+  expiration_date: string;
+  doc_a_date: string;
 }
 
 // Mutated Observation Interface to be used as a Request body on Create/Update Actions

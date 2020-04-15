@@ -7,10 +7,15 @@ export interface Observation {
   social_program_id: number;
   audit_id: number;
   fiscal_id: number;
+  observation_code_id: number;
+  observation_bis_code_id: number;
   title: string;
   amount_observed: number;
   amounts: Array<Amount>;
   comments: string;
+  reception_date: string;
+  expiration_date: string;
+  doc_a_date: string;
 }
 
 // Mutated Observation Interface to be used as a Request body on Create/Update Actions
@@ -62,11 +67,17 @@ type Fiscal = {
   description: string,
 };
 
+type ObservationCode = {
+  id: number,
+  title: string,
+};
+
 export type Catalog = {
   observation_types: Array<CatalogItem> | null,
   social_programs: Array<CatalogItem> | null,
   audits: Array<Audit> | null,
   fiscals: Array<Fiscal> | null,
+  observation_codes: Array<ObservationCode> | null,
 };
 
 const initialState: ObservationsSlice = {

@@ -85,8 +85,7 @@ BEGIN
             SET title  = _title, observation_type_id = _type_id, observation_code_id = _code_id,
                 observation_bis_code_id = _bis_code_id, social_program_id = _social_program_id,
                 audit_id = _audit_id, fiscal_id = _fiscal_id, reception_date = _reception_date,
-                expiration_date = _expiration_date
-
+                expiration_date = _expiration_date,
                 amount_observed = _amount_observed, touch_latter_time = current_moment
             WHERE id = _observation_id;
 

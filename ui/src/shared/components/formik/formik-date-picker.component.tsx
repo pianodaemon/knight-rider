@@ -8,6 +8,10 @@ export const FormikDatePicker = ({
   ...rest
 }: any) => {
   const [selectedDate, handleDateChange] = useState(new Date());
+  const date: Date | null =
+    value instanceof Date
+      ? null
+      : new Date(value ? value.replace(/-/g, '/') : value);
   return (
     <DatePicker
       animateYearScrolling={false}
@@ -19,7 +23,7 @@ export const FormikDatePicker = ({
         setFieldValue(name, val ? format(val, 'yyyy-MM-dd') : selectedDate);
         return handleDateChange(val);
       }}
-      value={new Date(value ? value.replace(/-/g, '/') : value)}
+      value={date}
       views={['date', 'month']}
       {...rest}
       // autoOk

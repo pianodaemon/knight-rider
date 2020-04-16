@@ -20,14 +20,23 @@ def _alter_observation(**kwargs):
         '{}'::text,
         '{}'::date,
         '{}'::date,
-        '{}'::date)
+        '{}'::date,
+        '{}'::date,
+        '{}'::date,
+        '{}'::text,
+        '{}'::text,
+        '{}'::text,
+        '{}'::text,
+        '{}'::text)
         AS result( rc integer, msg text )""".format(
             kwargs["id"], kwargs["observation_type_id"], kwargs["observation_code_id"],
             kwargs["observation_bis_code_id"], kwargs["social_program_id"],
             kwargs["audit_id"], kwargs["fiscal_id"], kwargs["title"],
             kwargs["amount_observed"], kwargs["projected"], kwargs["solved"],
             kwargs["comments"], kwargs["reception_date"], kwargs["expiration_date"],
-            kwargs["doc_a_date"]
+            kwargs["doc_a_date"], kwargs["doc_b_date"], kwargs["doc_c_date"],
+            kwargs["doc_a"], kwargs["doc_b"], kwargs["doc_c"], kwargs['dep_response'],
+            kwargs['dep_resp_comments']
         )
 
     rcode, rmsg = run_stored_procedure(sql)
@@ -83,7 +92,8 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
 
     order_by_values = (
         'id','observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id',
-        'title', 'observation_code_id', 'observation_bis_code_id'
+        'title', 'observation_code_id', 'observation_bis_code_id', 'doc_a', 'doc_b', 'doc_c',
+        'dep_response', 'dep_resp_comments'
     )
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
@@ -146,12 +156,15 @@ def get_catalogs(table_name_list):
 def add_observation_amounts(ent):
     attributes = set([
         'id', 'observation_type_id', 'social_program_id', 'audit_id', 'title', 'fiscal_id', 'amount_observed',
-        'observation_code_id', 'observation_bis_code_id', 'reception_date', 'expiration_date', 'doc_a_date'
+        'observation_code_id', 'observation_bis_code_id', 'reception_date', 'expiration_date', 'doc_a_date',
+        'doc_b_date', 'doc_c_date', 'doc_a', 'doc_b', 'doc_c', 'dep_response', 'dep_resp_comments'
     ])
     mod_ent = {attr: ent[attr] for attr in attributes}
     mod_ent['reception_date'] = mod_ent['reception_date'].__str__()
     mod_ent['expiration_date'] = mod_ent['expiration_date'].__str__()
     mod_ent['doc_a_date'] = mod_ent['doc_a_date'].__str__()
+    mod_ent['doc_b_date'] = mod_ent['doc_b_date'].__str__()
+    mod_ent['doc_c_date'] = mod_ent['doc_c_date'].__str__()
 
     sql = '''
         SELECT *

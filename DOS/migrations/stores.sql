@@ -1,6 +1,32 @@
-CREATE FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _code_id integer, _bis_code_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text, _amount_observed double precision, _amount_projected double precision, _amount_solved double precision, _amount_comments text, _reception_date date, _expiration_date date) RETURNS record
-    LANGUAGE plpgsql
-    AS $$
+CREATE OR REPLACE FUNCTION public.alter_observation(
+	_observation_id integer,
+	_type_id integer,
+	_code_id integer,
+	_bis_code_id integer,
+	_social_program_id integer,
+	_audit_id integer,
+	_fiscal_id integer,
+	_title text,
+	_amount_observed double precision,
+	_amount_projected double precision,
+	_amount_solved double precision,
+	_amount_comments text,
+	_reception_date date,
+	_expiration_date date,
+	_doc_a_date date,
+	_doc_b_date date,
+	_doc_c_date date,
+	_doc_a text,
+	_doc_b text,
+	_doc_c text,
+	_dep_response text,
+	_dep_resp_comments text)
+    RETURNS record
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
 
 DECLARE
 
@@ -31,6 +57,14 @@ BEGIN
                 amount_observed,
                 reception_date,
                 expiration_date,
+                doc_a_date,
+                doc_b_date,
+                doc_c_date,
+                doc_a,
+                doc_b,
+                doc_c,
+                dep_response,
+                dep_resp_comments,
                 inception_time,
                 touch_latter_time
             ) VALUES (
@@ -44,6 +78,14 @@ BEGIN
                 _amount_observed,
                 _reception_date,
                 _expiration_date,
+                _doc_a_date,
+                _doc_b_date,
+                _doc_c_date,
+                _doc_a,
+                _doc_b,
+                _doc_c,
+                _dep_response,
+                _dep_resp_comments,
                 current_moment,
                 current_moment
             ) RETURNING id INTO latter_id;
@@ -85,7 +127,9 @@ BEGIN
             SET title  = _title, observation_type_id = _type_id, observation_code_id = _code_id,
                 observation_bis_code_id = _bis_code_id, social_program_id = _social_program_id,
                 audit_id = _audit_id, fiscal_id = _fiscal_id, reception_date = _reception_date,
-                expiration_date = _expiration_date,
+                expiration_date = _expiration_date, doc_a_date = _doc_a_date,
+                doc_b_date = _doc_b_date, doc_c_date = _doc_c_date, doc_a = _doc_a, doc_b = _doc_b,
+                doc_c = _doc_c, dep_response = _dep_response, dep_resp_comments = _dep_resp_comments,
                 amount_observed = _amount_observed, touch_latter_time = current_moment
             WHERE id = _observation_id;
 
@@ -133,7 +177,7 @@ BEGIN
             return ( -1::integer, rmsg::text );
 
 END;
-$$;
+$BODY$;
 
 
 CREATE OR REPLACE FUNCTION public.alter_audit(

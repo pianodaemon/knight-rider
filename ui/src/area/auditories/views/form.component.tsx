@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1),
       minWidth: 350,
       [theme.breakpoints.down('sm')]: {
+        minWidth: '100%',
         display: 'flex',
       },
     },
@@ -62,6 +63,10 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: '0px auto',
       textAlign: 'center',
       background: 'transparent',
+      [theme.breakpoints.down('sm')]: {
+        margin: '0 auto',
+        width: 'auto !important',
+      },
     },
     legend: {
       fontWeight: "bolder",

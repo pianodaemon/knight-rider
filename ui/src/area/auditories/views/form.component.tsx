@@ -865,8 +865,8 @@ export const ObservationsForm = (props: Props) => {
                           label="Proyectado"
                           value={values.projected}
                           onChange={handleChange('projected')}
-                          name="amount_observed"
-                          id="amount_observed"
+                          name="projected"
+                          id="projected"
                           InputProps={{
                             inputComponent: NumberFormatCustom as any,
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,

@@ -9,6 +9,8 @@ import {
   observationSelector,
 } from '../state/observations.selectors';
 
+import { catalogSelector as auditsCatalogSelector } from '../state/audits.selectors';
+
 const mapDispatchToProps = {
   createObservationAction,
   readObservationAction,
@@ -17,6 +19,7 @@ const mapDispatchToProps = {
 
 function mapStateToProps(state: any) {
   return {
+    auditsCatalog: auditsCatalogSelector(state),
     catalog: catalogSelector(state),
     observation: observationSelector(state),
   };

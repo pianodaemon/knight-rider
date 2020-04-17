@@ -16,11 +16,18 @@ export interface Observation {
   reception_date: string;
   expiration_date: string;
   doc_a_date: string;
+  doc_b_date: string;
+  doc_c_date: string;
+  doc_a: string;
+  doc_b: string;
+  doc_c: string;
+  dep_response: string;
+  dep_resp_comments: string;
 }
 
 // Mutated Observation Interface to be used as a Request body on Create/Update Actions
 export interface ObservationRequest extends Observation {
-  comments: string;
+  // comments: string;
   projected: number;
   solved: number;
   mutatedAmounts: Array<any>;
@@ -59,6 +66,7 @@ type Audit = {
   id: number,
   title: string,
   dependency_id: number,
+  year: number,
 };
 
 type Fiscal = {

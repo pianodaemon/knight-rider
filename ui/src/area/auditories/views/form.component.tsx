@@ -19,6 +19,7 @@ import DateFnsUtils from '@date-io/date-fns';
 import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picker.component'
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { Catalog, ObservationRequest } from '../state/observations.reducer';
+import { Catalog as AuditCatalog } from '../state/audits.reducer';
 import { HistoryTable } from './history-table.component';
 
 type Props = {
@@ -26,6 +27,7 @@ type Props = {
   readObservationAction: Function,
   updateObservationAction: Function,
   catalog: Catalog | null,
+  auditsCatalog: AuditCatalog | null,
   observation: ObservationRequest | null,
 };
 
@@ -43,6 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1),
       minWidth: 350,
       [theme.breakpoints.down('sm')]: {
+        minWidth: '100%',
         display: 'flex',
       },
     },
@@ -62,6 +65,10 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: '0px auto',
       textAlign: 'center',
       background: 'transparent',
+      [theme.breakpoints.down('sm')]: {
+        margin: '0 auto',
+        width: 'auto !important',
+      },
     },
     legend: {
       fontWeight: "bolder",
@@ -106,6 +113,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const ObservationsForm = (props: Props) => {
   const {
+    auditsCatalog,
     catalog,
     createObservationAction,
     observation,
@@ -126,7 +134,14 @@ export const ObservationsForm = (props: Props) => {
     projected: '',
     solved: '',
     comments: '',
+    doc_a: '',
+    doc_b: '',
+    doc_c: '',
     doc_a_date: null,
+    doc_b_date: null,
+    doc_c_date: null,
+    dep_response: '',
+    dep_resp_comments: '',
     reception_date: null,
     expiration_date: null,
   };
@@ -179,8 +194,26 @@ export const ObservationsForm = (props: Props) => {
           if (!values.doc_a_date) {
             errors.doc_a_date = 'Required';
           }
+          if (!values.doc_b_date) {
+            errors.doc_b_date = 'Required';
+          }
+          if (!values.doc_c_date) {
+            errors.doc_c_date = 'Required';
+          }
+          if (!values.expiration_date) {
+            errors.expiration_date = 'Required';
+          }
+          if (!values.observation_code_id) {
+            errors.observation_code_id = 'Required';
+          }
+          if (!values.observation_bis_code_id) {
+            errors.observation_bis_code_id = 'Required';
+          }
           if (!values.reception_date) {
             errors.reception_date = 'Required';
+          }
+          if (!values.doc_a) {
+            errors.doc_a = 'Required';
           }
           return errors;
         }}
@@ -212,7 +245,6 @@ export const ObservationsForm = (props: Props) => {
               <hr className={classes.hrDivider} />
               <form onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
-                  {/*  Empty input  */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel id="audit">Auditor&iacute;a no.</InputLabel>
@@ -247,7 +279,78 @@ export const ObservationsForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  {/*  End Empty input  */}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel id="fiscal">Órgano Fiscalizador</InputLabel>
+                      <Select
+                        labelId="fiscal"
+                        id="fiscal-select"
+                        value={catalog ? values.fiscal_id || '' : ''}
+                        onChange={handleChange('fiscal_id')}
+                      >
+                        {catalog &&
+                            catalog.fiscals &&
+                            catalog.fiscals.map((item) => {
+                              return (
+                                <MenuItem
+                                  value={item.id}
+                                  key={`type-${item.id}`}
+                                >
+                                  {item.title}
+                                </MenuItem>
+                              );
+                            })}
+                      </Select>
+                      {errors.fiscal_id &&
+                          touched.fiscal_id &&
+                          errors.fiscal_id && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Seleccione un Órgano Fiscalizador
+                            </FormHelperText>
+                          )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        id="audit_date"
+                        label="Año de la cuenta pública"
+                        value={catalog && catalog.audits && values.audit_id && catalog.audits.find(item => item.id === values.audit_id) ? (catalog.audits.find(item => item.id === values.audit_id) || {}).year : ''}
+                        variant="filled"
+                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }} 
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        id="dependency"
+                        label="Dependencia"
+                        value={
+                          catalog &&
+                          auditsCatalog &&
+                          catalog.audits &&
+                          values.audit_id &&
+                          auditsCatalog.dependencies && 
+                          catalog.audits.find(item => item.id === values.audit_id)
+                          // eslint-disable-next-line
+                          ? auditsCatalog.dependencies.find(dependency => dependency.id === ((catalog && catalog.audits && catalog.audits.find(item => item.id === values.audit_id) || {}).dependency_id))?.title
+                          : '<N/A>'
+                        }
+                        variant="filled"
+                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }} 
+                      />
+                    </FormControl>
+                  </Grid>
 
                   {/*  Empty input  */}
                   <Grid item xs={12} sm={6}>
@@ -270,9 +373,9 @@ export const ObservationsForm = (props: Props) => {
                       <Select
                         id="inputEmpty3"
                       >
-                        <MenuItem value='1' key='1'> Algo1 </MenuItem>
-                        <MenuItem value='2' key='2'> Algo2 </MenuItem>
-                        <MenuItem value='3' key='3'> Algo33 </MenuItem>
+                        <MenuItem value='1' key='1'>CENTRAL</MenuItem>
+                        <MenuItem value='2' key='2'>PARAESTATAL</MenuItem>
+                        <MenuItem value='3' key='3'>OBRA</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -282,7 +385,7 @@ export const ObservationsForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Recibido (Fecha)"
+                        label="Registro (Fecha)"
                         name="inputEmpty4"
                         id="inputEmpty4"
                       />
@@ -329,7 +432,7 @@ export const ObservationsForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Vence (Fecha)"
+                        label="Recibido (Fecha)"
                         name="inputEmpty5"
                         id="inputEmpty5"
                       />
@@ -361,6 +464,15 @@ export const ObservationsForm = (props: Props) => {
                               );
                             })}
                       </Select>
+                      {errors.observation_code_id &&
+                          touched.observation_code_id && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Seleccione una clave de observación
+                            </FormHelperText>
+                          )}
                     </FormControl>
                   </Grid>
                   
@@ -426,40 +538,6 @@ export const ObservationsForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel id="fiscal">Auditor</InputLabel>
-                      <Select
-                        labelId="fiscal"
-                        id="fiscal-select"
-                        value={catalog ? values.fiscal_id || '' : ''}
-                        onChange={handleChange('fiscal_id')}
-                      >
-                        {catalog &&
-                            catalog.fiscals &&
-                            catalog.fiscals.map((item) => {
-                              return (
-                                <MenuItem
-                                  value={item.id}
-                                  key={`type-${item.id}`}
-                                >
-                                  {item.title}
-                                </MenuItem>
-                              );
-                            })}
-                      </Select>
-                      {errors.fiscal_id &&
-                          touched.fiscal_id &&
-                          errors.fiscal_id && (
-                            <FormHelperText
-                              error
-                              classes={{ error: classes.textErrorHelper }}
-                            >
-                              Seleccione una Auditor
-                            </FormHelperText>
-                          )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
                       <TextField
                         id="title"
                         label="Descripción"
@@ -494,10 +572,20 @@ export const ObservationsForm = (props: Props) => {
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
+                          id="doc_a"
                           label="Oficio No."
-                          name="adfa"
-                          id="idalgaooo"
+                          value={values.doc_a || ''}
+                          onChange={handleChange('doc_a')}
                         />
+                        {errors.doc_a &&
+                          touched.doc_a && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese un No. de Oficio
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
                     {/* End Empty input */}
@@ -527,6 +615,15 @@ export const ObservationsForm = (props: Props) => {
                                 );
                               })}
                         </Select>
+                        {errors.observation_bis_code_id &&
+                          touched.observation_bis_code_id && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Seleccione una clave de observación
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
                     {/* End Empty input */}
@@ -603,10 +700,20 @@ export const ObservationsForm = (props: Props) => {
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
+                          id="doc_b"
                           label="Oficio No."
-                          name="adfa"
-                          id="idalgaooo"
+                          value={values.doc_b || ''}
+                          onChange={handleChange('doc_b')}
                         />
+                        {errors.doc_b &&
+                          touched.doc_b && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese un No. de Oficio
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
                     {/* End Empty input */}
@@ -615,10 +722,20 @@ export const ObservationsForm = (props: Props) => {
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
+                          id="dep_response"
                           label="Respuesta"
-                          name="adfa"
-                          id="idasslgooo"
+                          value={values.dep_response || ''}
+                          onChange={handleChange('dep_response')}
                         />
+                        {errors.dep_response &&
+                          touched.dep_response && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese una respuesta
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
                     {/* End Empty input */}
@@ -626,11 +743,20 @@ export const ObservationsForm = (props: Props) => {
                     {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
-                        <TextField
+                        <Field
+                          component={FormikDatePicker}
                           label="Fecha de Oficio"
-                          name="adfa"
-                          id="idalga"
+                          name="doc_b_date"
                         />
+                        {errors.doc_b_date &&
+                          touched.doc_b_date && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese una fecha de oficio
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
                     {/* End Empty input */}
@@ -639,9 +765,10 @@ export const ObservationsForm = (props: Props) => {
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
+                          id="dep_resp_comments"
                           label="Comentario"
-                          name="adfa"
-                          id="idalgaooo"
+                          value={values.dep_resp_comments || ''}
+                          onChange={handleChange('dep_resp_comments')}
                         />
                       </FormControl>
                     </Grid>
@@ -664,9 +791,10 @@ export const ObservationsForm = (props: Props) => {
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
+                          id="doc_c"
                           label="Oficio No."
-                          name="adfa"
-                          id="idalgaooo"
+                          value={values.doc_c || ''}
+                          onChange={handleChange('doc_c')}
                         />
                       </FormControl>
                     </Grid>
@@ -675,11 +803,20 @@ export const ObservationsForm = (props: Props) => {
                     {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
-                        <TextField
-                          label="Fecha Oficio"
-                          name="adfa"
-                          id="idasslgooo"
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de Oficio"
+                          name="doc_c_date"
                         />
+                        {errors.doc_c_date &&
+                            touched.doc_c_date && (
+                              <FormHelperText
+                                error
+                                classes={{ error: classes.textErrorHelper }}
+                              >
+                                Ingrese una fecha de oficio
+                              </FormHelperText>
+                            )}
                       </FormControl>
                     </Grid>
                     {/* End Empty input */}
@@ -793,13 +930,10 @@ export const ObservationsForm = (props: Props) => {
                           )}
                       </FormControl>
                     </Grid>
-
-                    
-
                   </Grid>
-                  <HistoryTable history={(observation && observation.mutatedAmounts) || []} />
+                  {id &&
+                  <HistoryTable history={(observation && observation.mutatedAmounts) || []} />}
                 </fieldset>
-
                 <Button
                   variant="contained"
                   className={classes.submitInput}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DatePicker } from '@material-ui/pickers';
 import format from 'date-fns/format';
 
@@ -7,6 +7,11 @@ export const FormikDatePicker = ({
   field: { value, name, label },
   ...rest
 }: any) => {
+  const [selectedDate, handleDateChange] = useState(new Date());
+  const date: Date | null =
+    value instanceof Date
+      ? null
+      : new Date(value ? value.replace(/-/g, '/') : value);
   return (
     <DatePicker
       animateYearScrolling={false}
@@ -15,10 +20,11 @@ export const FormikDatePicker = ({
       label={label}
       name={name}
       onChange={(val: Date) => {
-        setFieldValue(name, val ? format(val, 'yyyy-MM-dd') : '');
+        setFieldValue(name, val ? format(val, 'yyyy-MM-dd') : selectedDate);
+        return handleDateChange(val);
       }}
-      value={value ? value.replace('-', '/') : null}
-      views={['year', 'date', 'month']}
+      value={date}
+      views={['date', 'month']}
       {...rest}
       // autoOk
       // disableOpenOnEnter

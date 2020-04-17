@@ -1,9 +1,9 @@
 // @flow
-import enTranslationMessages from './en.json';
-import esTranslationMessages from './es.json';
+import enTranslationMessages from './en';
+import esTranslationMessages from './es';
 
 // should take locale as param and return the correct config.
-const locale = 'en';
+const locale = 'es';
 
 const languages = {
   en: enTranslationMessages,

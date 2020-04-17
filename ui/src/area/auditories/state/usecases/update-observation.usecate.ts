@@ -2,6 +2,7 @@ import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
+import { translations } from 'src/shared/translations/translations.util';
 import { updateObservation } from '../../service/observations.service';
 import { observationsReducer } from '../observations.reducer';
 import { loadObservationsAction } from './load-observations.usecase';
@@ -35,10 +36,15 @@ function* updateObservationWorker(action: any): Generator<any, any, any> {
     );
   } catch (e) {
     const { releaseForm } = action.payload;
-    const message =
+    let message: string =
       e.response && e.response.data && e.response.data.message
         ? e.response.data.message
         : '¡Error de inesperado! Por favor contacte al Administrador.';
+    message = message.includes(
+      translations.observation.error_responses.unique_constraint
+    )
+      ? translations.observation.error_responses.unique_error
+      : message;
     yield releaseForm();
     yield put(updateObservationActionErrorAction());
     yield put(

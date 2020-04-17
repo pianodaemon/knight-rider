@@ -554,6 +554,9 @@ export const ObservationsForm = (props: Props) => {
                         id="title"
                         label="Observación"
                         value={values.title || ''}
+                        multiline
+                        rows={3}
+                        rowsMax={3}
                         onChange={handleChange('title')}
                       />
                       {errors.title && touched.title && errors.title && (
@@ -782,6 +785,9 @@ export const ObservationsForm = (props: Props) => {
                         <TextField
                           id="dep_response"
                           label="Respuesta"
+                          multiline
+                          rows={3}
+                          rowsMax={3}
                           value={values.dep_response || ''}
                           onChange={handleChange('dep_response')}
                         />
@@ -819,6 +825,9 @@ export const ObservationsForm = (props: Props) => {
                         <TextField
                           id="dep_resp_comments"
                           label="Comentario"
+                          multiline
+                          rows={3}
+                          rowsMax={3}
                           value={values.dep_resp_comments || ''}
                           onChange={handleChange('dep_resp_comments')}
                         />

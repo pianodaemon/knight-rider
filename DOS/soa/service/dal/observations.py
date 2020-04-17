@@ -2,6 +2,7 @@ import math
 
 from dal.helper import run_stored_procedure, exec_steady
 from dal.entity import page_entities, count_entities, fetch_entity, delete_entity
+from misc.helperpg import EmptySetError
 
 def _alter_observation(**kwargs):
     """Calls sp in charge of create and edit a observation"""
@@ -27,7 +28,12 @@ def _alter_observation(**kwargs):
         '{}'::text,
         '{}'::text,
         '{}'::text,
-        '{}'::text)
+        '{}'::text,
+        {}::integer,
+        '{}'::text,
+        '{}'::date,
+        '{}'::date,
+        '{}'::date)
         AS result( rc integer, msg text )""".format(
             kwargs["id"], kwargs["observation_type_id"], kwargs["observation_code_id"],
             kwargs["observation_bis_code_id"], kwargs["social_program_id"],
@@ -36,12 +42,16 @@ def _alter_observation(**kwargs):
             kwargs["comments"], kwargs["reception_date"], kwargs["expiration_date"],
             kwargs["doc_a_date"], kwargs["doc_b_date"], kwargs["doc_c_date"],
             kwargs["doc_a"], kwargs["doc_b"], kwargs["doc_c"], kwargs['dep_response'],
-            kwargs['dep_resp_comments']
+            kwargs['dep_resp_comments'], kwargs['division_id'], kwargs['hdr_doc'],
+            kwargs['hdr_reception_date'], kwargs['hdr_expiration1_date'], kwargs['hdr_expiration2_date']
         )
 
     rcode, rmsg = run_stored_procedure(sql)
     if rcode < 1:
-        raise Exception(rmsg)
+        if kwargs['id'] != 0:
+            raise EmptySetError(rmsg)
+        else:
+            raise Exception(rmsg)
     else:
         id = rcode
 
@@ -93,7 +103,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     order_by_values = (
         'id','observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id',
         'title', 'observation_code_id', 'observation_bis_code_id', 'doc_a', 'doc_b', 'doc_c',
-        'dep_response', 'dep_resp_comments'
+        'division_id', 'hdr_doc', 'hdr_reception_date', 'hdr_expiration1_date', 'hdr_expiration2_date'
     )
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
@@ -135,13 +145,23 @@ def get_catalogs(table_name_list):
 
     for table in table_name_list:
         values_l = []
-        sql = '''
-            SELECT *
-            FROM {}
-            ORDER BY id;
-        '''.format(table)
+        
+        if table == 'audits':
+            sql = '''
+                SELECT *
+                FROM {}
+                WHERE NOT blocked
+                ORDER BY id;
+            '''.format(table)
+        else:
+            sql = '''
+                SELECT *
+                FROM {}
+                ORDER BY id;
+            '''.format(table)
 
         rows = exec_steady(sql)
+        
         for row in rows:
             ent = dict(row)
             if table == 'audits':
@@ -157,7 +177,8 @@ def add_observation_amounts(ent):
     attributes = set([
         'id', 'observation_type_id', 'social_program_id', 'audit_id', 'title', 'fiscal_id', 'amount_observed',
         'observation_code_id', 'observation_bis_code_id', 'reception_date', 'expiration_date', 'doc_a_date',
-        'doc_b_date', 'doc_c_date', 'doc_a', 'doc_b', 'doc_c', 'dep_response', 'dep_resp_comments'
+        'doc_b_date', 'doc_c_date', 'doc_a', 'doc_b', 'doc_c', 'dep_response', 'dep_resp_comments',
+        'division_id', 'hdr_doc', 'hdr_reception_date', 'hdr_expiration1_date', 'hdr_expiration2_date'
     ])
     mod_ent = {attr: ent[attr] for attr in attributes}
     mod_ent['reception_date'] = mod_ent['reception_date'].__str__()
@@ -165,6 +186,9 @@ def add_observation_amounts(ent):
     mod_ent['doc_a_date'] = mod_ent['doc_a_date'].__str__()
     mod_ent['doc_b_date'] = mod_ent['doc_b_date'].__str__()
     mod_ent['doc_c_date'] = mod_ent['doc_c_date'].__str__()
+    mod_ent['hdr_reception_date'] = mod_ent['hdr_reception_date'].__str__()
+    mod_ent['hdr_expiration1_date'] = mod_ent['hdr_expiration1_date'].__str__()
+    mod_ent['hdr_expiration2_date'] = mod_ent['hdr_expiration2_date'].__str__()
 
     sql = '''
         SELECT *

@@ -9,6 +9,7 @@ export interface Observation {
   fiscal_id: number;
   observation_code_id: number;
   observation_bis_code_id: number;
+  division_id: number;
   title: string;
   amount_observed: number;
   amounts: Array<Amount>;
@@ -23,6 +24,10 @@ export interface Observation {
   doc_c: string;
   dep_response: string;
   dep_resp_comments: string;
+  hdr_doc: string;
+  hdr_reception_date: string;
+  hdr_expiration1_date: string;
+  hdr_expiration2_date: string;
 }
 
 // Mutated Observation Interface to be used as a Request body on Create/Update Actions
@@ -80,12 +85,15 @@ type ObservationCode = {
   title: string,
 };
 
+type Division = CatalogItem;
+
 export type Catalog = {
   observation_types: Array<CatalogItem> | null,
   social_programs: Array<CatalogItem> | null,
   audits: Array<Audit> | null,
   fiscals: Array<Fiscal> | null,
   observation_codes: Array<ObservationCode> | null,
+  divisions: Array<Division> | null,
 };
 
 const initialState: ObservationsSlice = {

@@ -129,6 +129,7 @@ export const ObservationsForm = (props: Props) => {
     fiscal_id: '',
     observation_code_id: '',
     observation_bis_code_id: '',
+    division_id: '',
     title: '',
     amount_observed: '',
     projected: '',
@@ -144,6 +145,10 @@ export const ObservationsForm = (props: Props) => {
     dep_resp_comments: '',
     reception_date: null,
     expiration_date: null,
+    hdr_doc: '',
+    hdr_reception_date: null,
+    hdr_expiration1_date: null,
+    hdr_expiration2_date: null,
   };
   useEffect(() => {
     if (id) {
@@ -214,6 +219,21 @@ export const ObservationsForm = (props: Props) => {
           }
           if (!values.doc_a) {
             errors.doc_a = 'Required';
+          }
+          if (!values.division_id) {
+            errors.division_id = 'Required';
+          }
+          if (!values.hdr_doc) {
+            errors.hdr_doc = 'Required';
+          }
+          if (!values.hdr_reception_date) {
+            errors.hdr_reception_date = 'Required';
+          }
+          if (!values.hdr_expiration1_date) {
+            errors.hdr_expiration1_date = 'Required';
+          }
+          if (!values.hdr_expiration2_date) {
+            errors.hdr_expiration2_date = 'Required';
           }
           return errors;
         }}
@@ -351,48 +371,78 @@ export const ObservationsForm = (props: Props) => {
                       />
                     </FormControl>
                   </Grid>
-
-                  {/*  Empty input  */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        id="hdr_doc"
                         label="Oficio No."
-                        name="inputEmpty2"
-                        id="inputEmpty2"
+                        value={values.hdr_doc || ''}
+                        onChange={handleChange('hdr_doc')}
                       />
+                      {errors.hdr_doc &&
+                        touched.hdr_doc && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese un No. de Oficio
+                          </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
-                  {/* End Empty input */}
-
-                  {/*  Empty input */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel>
                         Dirección
                       </InputLabel>
                       <Select
-                        id="inputEmpty3"
+                        labelId="division-id"
+                        id="division-id-select"
+                        value={catalog ? values.division_id || '' : ''}
+                        onChange={handleChange('division_id')}
                       >
-                        <MenuItem value='1' key='1'>CENTRAL</MenuItem>
-                        <MenuItem value='2' key='2'>PARAESTATAL</MenuItem>
-                        <MenuItem value='3' key='3'>OBRA</MenuItem>
+                        {catalog &&
+                            catalog.divisions &&
+                            catalog.divisions.map((item) => {
+                              return (
+                                <MenuItem
+                                  value={item.id}
+                                  key={`type-${item.id}`}
+                                >
+                                  {item.title}
+                                </MenuItem>
+                              );
+                            })}
                       </Select>
+                      {errors.division_id &&
+                        touched.division_id && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese una Dirección
+                          </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
-                  {/* End Empty input */}
-
-                  {/*  Empty input */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <TextField
+                      <Field
+                        component={FormikDatePicker}
                         label="Registro (Fecha)"
-                        name="inputEmpty4"
-                        id="inputEmpty4"
+                        name="hdr_expiration2_date"
                       />
+                      {errors.hdr_expiration2_date &&
+                        touched.hdr_expiration2_date && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese una fecha de registro
+                          </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
-                  {/* End Empty input */}
-                  
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel id="social-program-id">Programa</InputLabel>
@@ -427,19 +477,24 @@ export const ObservationsForm = (props: Props) => {
                           )}
                     </FormControl>
                   </Grid>
-
-                  {/*  Empty input */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <TextField
+                      <Field
+                        component={FormikDatePicker}
                         label="Recibido (Fecha)"
-                        name="inputEmpty5"
-                        id="inputEmpty5"
+                        name="hdr_reception_date"
                       />
+                      {errors.hdr_reception_date &&
+                        touched.hdr_reception_date && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese una fecha de recibido
+                          </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
-                  {/* End Empty input */}
-
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel>
@@ -475,31 +530,42 @@ export const ObservationsForm = (props: Props) => {
                           )}
                     </FormControl>
                   </Grid>
-                  
-                  {/*  Empty input */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <TextField
+                      <Field
+                        component={FormikDatePicker}
                         label="Vence (Fecha)"
-                        name="inputEmpty7"
-                        id="inputEmpty7"
+                        name="hdr_expiration1_date"
                       />
+                      {errors.hdr_expiration1_date &&
+                        touched.hdr_expiration1_date && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese una fecha de vencimiento
+                          </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
-                  {/* End Empty input */}
-
-                  {/*  Empty input */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        id="title"
                         label="Observación"
-                        name="inputEmpty8"
-                        id="inputEmpty8"
+                        value={values.title || ''}
+                        onChange={handleChange('title')}
                       />
+                      {errors.title && touched.title && errors.title && (
+                      <FormHelperText
+                        error
+                        classes={{ error: classes.textErrorHelper }}
+                      >
+                        Ingrese una observación
+                      </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
-                  {/* End Empty input */}
-
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel id="observation-type">
@@ -536,6 +602,7 @@ export const ObservationsForm = (props: Props) => {
                           )}
                     </FormControl>
                   </Grid>
+                  {/*
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -554,6 +621,7 @@ export const ObservationsForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
+                  */}
                 </Grid>
                 {/* </fieldset> */}
 
@@ -568,7 +636,6 @@ export const ObservationsForm = (props: Props) => {
                     </Typography>
                   </legend>
                   <Grid container spacing={3}>
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -588,9 +655,6 @@ export const ObservationsForm = (props: Props) => {
                           )}
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
-
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <InputLabel>
@@ -626,8 +690,6 @@ export const ObservationsForm = (props: Props) => {
                           )}
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
-
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <Field
@@ -696,7 +758,6 @@ export const ObservationsForm = (props: Props) => {
                     </Typography>
                   </legend>
                   <Grid container spacing={3}>
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -716,9 +777,6 @@ export const ObservationsForm = (props: Props) => {
                           )}
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
-
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -738,9 +796,6 @@ export const ObservationsForm = (props: Props) => {
                           )}
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
-
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <Field
@@ -759,9 +814,6 @@ export const ObservationsForm = (props: Props) => {
                           )}
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
-
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -772,7 +824,6 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
                   </Grid>
                 </fieldset>
 
@@ -787,7 +838,6 @@ export const ObservationsForm = (props: Props) => {
                     </Typography>
                   </legend>
                   <Grid container spacing={3}>         
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -798,9 +848,6 @@ export const ObservationsForm = (props: Props) => {
                         />
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
-       
-                    {/*  Empty input */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <Field
@@ -819,7 +866,6 @@ export const ObservationsForm = (props: Props) => {
                             )}
                       </FormControl>
                     </Grid>
-                    {/* End Empty input */}
                   </Grid>
                 </fieldset>
 

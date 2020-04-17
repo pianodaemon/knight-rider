@@ -4,12 +4,13 @@ import {
   Observation,
   ObservationRequest,
 } from './observations.reducer';
+import { Audit } from './audits.reducer';
 
 const sliceSelector = (state: any) => state[observationsReducer.sliceName];
 
 export const observationsSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.observations
+  (slice: any) => slice.observations,
 );
 
 export const observationSelector = createSelector(
@@ -43,13 +44,19 @@ export const observationSelector = createSelector(
 
 export const isLoadingSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.loading,
+  (slice: any) => slice.loading
 );
 
-export const catalogSelector = createSelector(
-  sliceSelector,
-  (slice: any) => slice.catalog,
-);
+export const catalogSelector = createSelector(sliceSelector, (slice: any) => {
+  const audits =
+    slice && slice.catalog && slice.catalog.audits
+      ? slice.catalog.audits.sort((a: Audit, b: Audit) => b.id - a.id)
+      : [];
+  return {
+    ...slice.catalog,
+    audits,
+  };
+});
 
 export const observationsCatalogSelector = createSelector(
   sliceSelector,
@@ -81,10 +88,10 @@ export const observationsCatalogSelector = createSelector(
         social_program_id_title,
         audit_id_title,
       };
-    }),
+    })
 );
 
 export const pagingSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.paging,
+  (slice: any) => slice.paging
 );

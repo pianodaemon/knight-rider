@@ -194,6 +194,21 @@ export const ObservationsForm = (props: Props) => {
           if (!values.doc_a_date) {
             errors.doc_a_date = 'Required';
           }
+          if (!values.doc_b_date) {
+            errors.doc_b_date = 'Required';
+          }
+          if (!values.doc_c_date) {
+            errors.doc_c_date = 'Required';
+          }
+          if (!values.expiration_date) {
+            errors.expiration_date = 'Required';
+          }
+          if (!values.observation_code_id) {
+            errors.observation_code_id = 'Required';
+          }
+          if (!values.observation_bis_code_id) {
+            errors.observation_bis_code_id = 'Required';
+          }
           if (!values.reception_date) {
             errors.reception_date = 'Required';
           }
@@ -266,7 +281,7 @@ export const ObservationsForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel id="fiscal">Órganos Fiscalizadores</InputLabel>
+                      <InputLabel id="fiscal">Órgano Fiscalizador</InputLabel>
                       <Select
                         labelId="fiscal"
                         id="fiscal-select"
@@ -370,7 +385,7 @@ export const ObservationsForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Recibido (Fecha)"
+                        label="Registro (Fecha)"
                         name="inputEmpty4"
                         id="inputEmpty4"
                       />
@@ -417,7 +432,7 @@ export const ObservationsForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Vence (Fecha)"
+                        label="Recibido (Fecha)"
                         name="inputEmpty5"
                         id="inputEmpty5"
                       />
@@ -449,6 +464,15 @@ export const ObservationsForm = (props: Props) => {
                               );
                             })}
                       </Select>
+                      {errors.observation_code_id &&
+                          touched.observation_code_id && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Seleccione una clave de observación
+                            </FormHelperText>
+                          )}
                     </FormControl>
                   </Grid>
                   
@@ -591,6 +615,15 @@ export const ObservationsForm = (props: Props) => {
                                 );
                               })}
                         </Select>
+                        {errors.observation_bis_code_id &&
+                          touched.observation_bis_code_id && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Seleccione una clave de observación
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
                     {/* End Empty input */}
@@ -898,7 +931,8 @@ export const ObservationsForm = (props: Props) => {
                       </FormControl>
                     </Grid>
                   </Grid>
-                  <HistoryTable history={(observation && observation.mutatedAmounts) || []} />
+                  {id &&
+                  <HistoryTable history={(observation && observation.mutatedAmounts) || []} />}
                 </fieldset>
                 <Button
                   variant="contained"

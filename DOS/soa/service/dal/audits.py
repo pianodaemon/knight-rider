@@ -2,6 +2,7 @@ import math
 
 from dal.helper import run_stored_procedure, exec_steady
 from dal.entity import page_entities, count_entities, fetch_entity, delete_entity
+from misc.helperpg import EmptySetError
 
 def _alter_audit(**kwargs):
     """Calls sp in charge of create and edit a audit"""
@@ -17,7 +18,10 @@ def _alter_audit(**kwargs):
 
     rcode, rmsg = run_stored_procedure(sql)
     if rcode < 1:
-        raise Exception(rmsg)
+        if kwargs['id'] != 0:
+            raise EmptySetError(rmsg)
+        else:
+            raise Exception(rmsg)
     else:
         id = rcode
 
@@ -64,7 +68,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if limit < 1:
         raise Exception("Value of param 'limit' should be >= 1")
 
-    order_by_values = ('id', 'dependency_id', 'year', 'title')
+    order_by_values = ('id', 'title', 'dependency_id', 'year')
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
 

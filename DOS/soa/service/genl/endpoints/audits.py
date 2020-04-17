@@ -10,15 +10,12 @@ from misc.helperpg import get_msg_pgerror, EmptySetError
 
 ns = api.namespace("audits", description="Available services for an audit")
 
-audit = api.model(
-    'Audit model',
-    {
-        'id': fields.Integer(required=False, description='Audit identifier'),
-        'title': fields.String(required=True, description='Alphanumeric audit\'s identifier'),
-        'dependency_id': fields.Integer(required=True, description='Dependency which originated the audit'),
-        'year': fields.Integer(required=True, description='Public account year'),
-    }
-)
+audit = api.model('Audit', {
+    'id': fields.Integer(description='Audit identifier'),
+    'title': fields.String(description='Alphanumeric audit\'s identifier'),
+    'dependency_id': fields.Integer(description='Dependency which originated the audit'),
+    'year': fields.Integer(description='Public account year'),
+})
 
 @ns.route('/')
 class AuditList(Resource):
@@ -30,6 +27,9 @@ class AuditList(Resource):
     @ns.param("order", "ASC or DESC, which ordering to use, default is ASC")
     @ns.param("per_page", "How many items per page, default is 10")
     @ns.param("page", "Which page to fetch, default is 1")
+    @ns.param("title", "Alphanumeric audit's identifier")
+    @ns.param("dependency_id", "Dependency which originated the audit")
+    @ns.param("year", "Public account year")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several audits. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -59,7 +59,7 @@ class AuditList(Resource):
 
 
     @ns.expect(audit)
-    # @ns.marshal_with(audit, code=201)
+    @ns.marshal_with(audit, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
         ''' To create an audit '''
@@ -83,7 +83,7 @@ class AuditList(Resource):
 class Audit(Resource):
     audit_not_found = 'Audit not found'
 
-    # @ns.marshal_with(audit)
+    @ns.marshal_with(audit)
     def get(self, id):
         ''' To fetch an audit '''
         try:
@@ -99,7 +99,7 @@ class Audit(Resource):
 
 
     @ns.expect(audit)
-    # @ns.marshal_with(audit)
+    @ns.marshal_with(audit)
     def put(self, id):
         ''' To update an audit '''
         try:
@@ -108,15 +108,15 @@ class Audit(Resource):
             ns.abort(400, message=get_msg_pgerror(err))
         except KeyError as err:
             ns.abort(400, message='Review the keys in your payload: {}'.format(err))
-        except EmptySetError:
-            ns.abort(404, message=Audit.audit_not_found)
+        except EmptySetError as err:
+            ns.abort(404, message=Audit.audit_not_found + '. ' + str(err))
         except Exception as err:
             ns.abort(400, message=err)
         
         return aud
 
 
-    # @ns.marshal_with(audit)
+    @ns.marshal_with(audit)
     def delete(self, id):
         ''' To delete an audit '''
         try:

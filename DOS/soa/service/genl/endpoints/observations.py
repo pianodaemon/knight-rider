@@ -10,30 +10,50 @@ from misc.helperpg import get_msg_pgerror, EmptySetError
 
 ns = api.namespace("observations", description="Available services for an observation")
 
-observation = api.model(
-    'Observation model',
-    {
-        'id': fields.Integer(required=False, description='Observation identifier'),
-        'observation_type_id': fields.Integer(required=True, description='Observation type identifier'),
-        'social_program_id': fields.Integer(required=True, description='Social program identifier'),
-        'audit_id': fields.Integer(required=True, description='Audit identifier'),
-        'fiscal_id': fields.Integer(required=True, description='Fiscal entity that audits'),
-        'title': fields.String(required=True, description='Desc of observation'),
-        'amount_observed': fields.Float(required=True, description='Observed amount'),
-        'observation_code_id': fields.Integer(required=True, description='Observation code identifier'),
-        'observation_bis_code_id': fields.Integer(required=True, description='Observation bis code identifier (CyTG->Clasif)'),
-        'reception_date': fields.String(required=True, description='Reception date (CyTG)'),
-        'expiration_date': fields.String(required=True, description='Expiration date (CyTG)'),
-        'doc_a_date': fields.String(required=True, description='Oficio date (CyTG)'),
-        'doc_b_date': fields.String(required=True, description='Oficio date (Dependencia)'),
-        'doc_c_date': fields.String(required=True, description='Oficio date (Organo Fiscalizador)'),
-        'doc_a': fields.String(required=True, description='Oficio No. (CyTG)'),
-        'doc_b': fields.String(required=True, description='Oficio No. (Dependencia)'),
-        'doc_c': fields.String(required=True, description='Oficio No. (Organo Fiscalizador)'),
-        'dep_response': fields.String(required=True, description='Dependency response (Dependencia)'),
-        'dep_resp_comments': fields.String(required=True, description='Dependency response comments (Dependencia)'),
-    }
+obs_fields = {
+    'id': fields.Integer(description='Observation identifier'),
+    'observation_type_id': fields.Integer(description='Observation type identifier'),
+    'social_program_id': fields.Integer(description='Social program identifier'),
+    'audit_id': fields.Integer(description='Audit identifier'),
+    'fiscal_id': fields.Integer(description='Fiscal entity that audits'),
+    'title': fields.String(description='Desc of observation'),
+    'amount_observed': fields.Float(description='Observed amount'),
+    'observation_code_id': fields.Integer(description='Observation code identifier'),
+    'observation_bis_code_id': fields.Integer(description='Observation bis code identifier (CyTG->Clasif)'),
+    'reception_date': fields.String(description='Reception date (CyTG)'),
+    'expiration_date': fields.String(description='Expiration date (CyTG)'),
+    'doc_a_date': fields.String(description='Oficio date (CyTG)'),
+    'doc_b_date': fields.String(description='Oficio date (Dependencia)'),
+    'doc_c_date': fields.String(description='Oficio date (Organo Fiscalizador)'),
+    'doc_a': fields.String(description='Oficio No. (CyTG)'),
+    'doc_b': fields.String(description='Oficio No. (Dependencia)'),
+    'doc_c': fields.String(description='Oficio No. (Organo Fiscalizador)'),
+    'dep_response': fields.String(description='Dependency response (Dependencia)'),
+    'dep_resp_comments': fields.String(description='Dependency response comments (Dependencia)'),
+    'division_id': fields.Integer(description='Division identifier'),
+    'hdr_doc': fields.String(description='Oficio No. (header)'),
+    'hdr_reception_date': fields.String(description='Reception date (header)'),
+    'hdr_expiration1_date': fields.String(description='Expiration 1 date (header)'),
+    'hdr_expiration2_date': fields.String(description='Expiration 2 date (header)'),
+}
+observation = api.model('Observation', obs_fields)
+
+obs_ext_fields = dict(obs_fields)
+amounts = api.model('Amount entry', {
+    'id': fields.Integer(description='An integer as entry identifier'),
+    'projected': fields.Float(description='Amount projected'),
+    'solved': fields.Float(description='Amount solved'),
+    'observation_id': fields.Integer(description='An integer as observation id'),
+    'inception_time': fields.String(description='Inception time'),
+    'comments': fields.String(description='Comments'),
+})
+obs_ext_fields['amounts'] = fields.List(
+    fields.Nested(amounts),
+    description='list containing all amount entries in history'
 )
+
+observation_ext = api.model('Extended Observation (includes amounts history)', obs_ext_fields)
+
 
 @ns.route('/')
 class ObservationList(Resource):
@@ -60,8 +80,11 @@ class ObservationList(Resource):
     @ns.param("doc_a", "Oficio No. (CyTG)")
     @ns.param("doc_b", "Oficio No. (Dependencia)")
     @ns.param("doc_c", "Oficio No. (Organo Fiscalizador)")
-    @ns.param("dep_response", "Dependency response (Dependencia)")
-    @ns.param("dep_resp_comments", "Dependency response comments (Dependencia)")
+    @ns.param("division_id", "Division identifier")
+    @ns.param("hdr_doc", "Oficio No. (header)")
+    @ns.param("hdr_reception_date", "Reception date (header)")
+    @ns.param("hdr_expiration1_date", "Expiration 1 date (header)")
+    @ns.param("hdr_expiration2_date", "Expiration 2 date (header)")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -78,7 +101,7 @@ class ObservationList(Resource):
             [
                 'observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title',
                 'observation_code_id', 'observation_bis_code_id', 'doc_a', 'doc_b', 'doc_c',
-                'dep_response', 'dep_resp_comments'
+                'division_id', 'hdr_doc', 'hdr_reception_date', 'hdr_expiration1_date', 'hdr_expiration2_date'
             ]
         )
 
@@ -90,12 +113,12 @@ class ObservationList(Resource):
             ns.abort(400, message=get_msg_pgerror(err))
         except Exception as err:
             ns.abort(400, message=err)
-        
+
         return obs_list, 200, {'X-SOA-Total-Items': total_items, 'X-SOA-Total-Pages': total_pages}
 
 
     @ns.expect(observation)
-    # @ns.marshal_with(observation, code=201)
+    @ns.marshal_with(observation_ext, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
         ''' To create an observation '''
@@ -119,7 +142,7 @@ class ObservationList(Resource):
 class Observation(Resource):
     obs_not_found = 'Observation not found'
 
-    # @ns.marshal_with(observation)
+    @ns.marshal_with(observation_ext)
     def get(self, id):
         ''' To fetch an observation '''
         try:
@@ -135,7 +158,7 @@ class Observation(Resource):
 
 
     @ns.expect(observation)
-    # @ns.marshal_with(observation)
+    @ns.marshal_with(observation_ext)
     def put(self, id):
         ''' To update an observation '''
         try:
@@ -144,15 +167,15 @@ class Observation(Resource):
             ns.abort(400, message=get_msg_pgerror(err))
         except KeyError as err:
             ns.abort(400, message='Review the keys in your payload: {}'.format(err))
-        except EmptySetError:
-            ns.abort(404, message=Observation.obs_not_found)
+        except EmptySetError as err:
+            ns.abort(404, message=Observation.obs_not_found + '. ' + str(err))
         except Exception as err:
             ns.abort(400, message=err)
         
         return obs
 
 
-    # @ns.marshal_with(observation)
+    @ns.marshal_with(observation_ext)
     def delete(self, id):
         ''' To delete an observation '''
         try:
@@ -176,7 +199,7 @@ class Catalog(Resource):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of id/title pairs) '''
         try:
             field_catalog = observations.get_catalogs(
-                ['observation_types', 'social_programs', 'audits', 'fiscals', 'observation_codes']
+                ['observation_types', 'social_programs', 'audits', 'fiscals', 'observation_codes', 'divisions']
             )
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))

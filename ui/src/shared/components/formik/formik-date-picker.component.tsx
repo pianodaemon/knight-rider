@@ -9,7 +9,7 @@ export const FormikDatePicker = ({
 }: any) => {
   const [selectedDate, handleDateChange] = useState(new Date());
   const date: Date | null =
-    value instanceof Date
+    value instanceof Date || value === null
       ? null
       : new Date(value ? value.replace(/-/g, '/') : value);
   return (

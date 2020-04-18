@@ -63,6 +63,7 @@ export const observationsCatalogSelector = createSelector(
   catalogSelector,
   (slice: any, catalog: any) =>
     catalog &&
+    catalog.observation_types &&
     slice.observations &&
     Array.isArray(slice.observations) &&
     slice.observations.map((observation: Observation) => {

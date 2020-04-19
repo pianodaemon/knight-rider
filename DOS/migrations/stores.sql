@@ -1,3 +1,92 @@
+CREATE OR REPLACE FUNCTION public.alter_user(
+	_user_id integer,
+	_username character varying,
+	_passwd character varying,
+	_orgchart_role_id integer,
+	_division_role_id integer,
+    _disabled boolean)
+    RETURNS record
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE
+AS $BODY$
+
+DECLARE
+
+    current_moment timestamp with time zone = now();
+    coincidences integer := 0;
+    latter_id integer := 0;
+
+    -- dump of errors
+    rmsg text;
+
+BEGIN
+
+    CASE
+
+        WHEN _user_id = 0 THEN
+
+            INSERT INTO users (
+                username,
+                passwd,
+                orgchart_role_id,
+                division_id,
+                inception_time,
+                touch_latter_time
+            ) VALUES (
+                _username,
+                _passwd,
+                _orgchart_role_id,
+                _division_id,
+                current_moment,
+                current_moment
+            ) RETURNING id INTO latter_id;
+
+        WHEN _user_id > 0 THEN
+
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- STARTS - Validates user id
+            --
+            -- JUSTIFICATION: Because UPDATE statement does not issue
+            -- any exception if nothing was updated.
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            SELECT count(id)
+            FROM users INTO coincidences
+            WHERE not blocked AND id = _user_id;
+
+            IF not coincidences = 1 THEN
+                RAISE EXCEPTION 'user identifier % does not exist', _user_id;
+            END IF;
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- ENDS - Validate user id
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            UPDATE users
+            SET username  = _username, passwd = _passwd, disabled = _disabled,
+                orgchart_role_id = _orgchart_role_id, division_id = _division_id,
+                touch_latter_time = current_moment
+            WHERE id = _user_id;
+
+            -- Upon edition we return user id as latter id
+            latter_id = _user_id;
+
+        ELSE
+            RAISE EXCEPTION 'negative user identifier % is unsupported', _user_id;
+
+    END CASE;
+
+    return ( latter_id::integer, ''::text );
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS rmsg = MESSAGE_TEXT;
+            return ( -1::integer, rmsg::text );
+
+END;
+$BODY$;
+
+
 CREATE OR REPLACE FUNCTION public.alter_observation(
 	_observation_id integer,
 	_type_id integer,

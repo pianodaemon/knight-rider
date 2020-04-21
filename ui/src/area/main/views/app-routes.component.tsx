@@ -5,6 +5,7 @@ import { AuditTableContainer } from '../../auditories/views/audit-table.containe
 import { TableContainer } from '../../auditories/views/table.container';
 import { FormContainer } from '../../auditories/views/form.container';
 import { AuditContainer } from '../../auditories/views/audit-form.container';
+import { UsersFormContainer } from '../../auditories/views/users-form.container';
 import { NotFound } from './not-found.component';
 
 type Props = {
@@ -33,6 +34,9 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route exact path={['/observation/create', '/observation/:id/edit']}>
           <FormContainer />
+        </Route>
+        <Route exact path={['/user/create']}>
+          <UsersFormContainer />
         </Route>
         <Route path="*">
           <NotFound />

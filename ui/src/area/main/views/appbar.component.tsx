@@ -22,6 +22,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import ListAltIcon from '@material-ui/icons/ListAlt';
+import PersonIcon from '@material-ui/icons/Person';
 import { Link, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import { AppRoutesContainer } from './app-routes.container';
@@ -31,6 +32,7 @@ const breadcrumbNameMap: { [key: string]: string } = {
   '/audit/list': 'Listar Auditorías',
   '/observation/create': 'Crear Observaciones',
   '/observation/list': 'Listar Observaciones',
+  '/user/create': 'Crear Usuario',
 };
 
 const customHistory = createBrowserHistory();

@@ -23,17 +23,16 @@ import ListItemText from '@material-ui/core/ListItemText';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import PersonIcon from '@material-ui/icons/Person';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import { Link, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import { AppRoutesContainer } from './app-routes.container';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import Collapse from '@material-ui/core/Collapse';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 
-const breadcrumbNameMap: { [key: string]: string } = {
-  '/audit/create': 'Crear Auditoría',
-  '/audit/list': 'Listar Auditorías',
-  '/observation/create': 'Crear Observaciones',
-  '/observation/list': 'Listar Observaciones',
-  '/user/create': 'Crear Usuario',
-};
 
 const customHistory = createBrowserHistory();
 const drawerWidth = 240;
@@ -121,6 +120,9 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '2.2em',
       width: 'auto',
     },
+    nested: {
+      paddingLeft: theme.spacing(4),
+    },
   }),
 );
 
@@ -128,6 +130,35 @@ export function AppBarComponent() {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+
+  const breadcrumbNameMap: { [key: string]: {  [key: string]: any  } } = {
+    'audit': {
+      'url': '/audit/list',
+      'text': 'Auditorías',
+      'icon': <AccountBalanceIcon />,
+      'open': true,
+      'childrenList': [{'url': '/audit/create', 'text': 'Crear', 'icon': <NoteAddIcon /> }],
+    },
+    'observation': {
+      'url': '/observation/list',
+      'text': 'Observaciones',
+      'icon': <ImageSearchIcon />,
+      'open': true,
+      'childrenList': [{'url': '/audit/create', 'text': 'Crear', 'icon': <NoteAddIcon /> }],
+    },
+    'user': {
+      'url': '/user/create',
+      'text': 'Crear Usuario',
+      'icon': <PersonIcon />,
+      'open': true,
+      'childrenList': [],
+    },
+  };
+
+  const [openn, setOpenn] = React.useState(false);
+  const handleClickItemDrawer = (index : string)  => {
+    ;
+  }
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -187,19 +218,43 @@ export function AppBarComponent() {
         <Divider />
         <Router history={customHistory}>
           <List>
+     
             {Object.keys(breadcrumbNameMap).map((route, index) => (
+              <>
               <ListItem
                 button
                 component={Link}
-                to={route}
-                key={breadcrumbNameMap[route]}
+                to={breadcrumbNameMap[route].url}
+                key={route}
               >
                 <ListItemIcon>
-                  {index % 2 === 0 ? <NoteAddIcon /> : <ListAltIcon />}
+                  {breadcrumbNameMap[route].icon}
                 </ListItemIcon>
-                <ListItemText primary={breadcrumbNameMap[route]} />
+                <ListItemText primary={breadcrumbNameMap[route].text} />
               </ListItem>
+
+              { (breadcrumbNameMap[route].childrenList.length>0) &&
+
+                <Collapse in={true} timeout="auto" unmountOnExit>
+                  <>
+                    {Object.keys(breadcrumbNameMap[route].childrenList).map((route2, index2) => (
+                      <List component="div" disablePadding>
+                        <ListItem button className={classes.nested}>
+                          <ListItemIcon>
+                             {breadcrumbNameMap[route].childrenList[index2].icon}
+                          </ListItemIcon>
+                          <ListItemText primary={breadcrumbNameMap[route].childrenList[index2].text} />
+                        </ListItem>
+                      </List>
+                    ))}
+                  </>
+                </Collapse>
+              }
+            
+              </>
+              
             ))}
+            
           </List>
         </Router>
         <Divider />

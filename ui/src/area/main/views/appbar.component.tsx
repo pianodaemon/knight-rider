@@ -144,7 +144,7 @@ export function AppBarComponent() {
       'text': 'Observaciones',
       'icon': <ImageSearchIcon />,
       'open': true,
-      'childrenList': [{'url': '/audit/create', 'text': 'Crear', 'icon': <NoteAddIcon /> }],
+      'childrenList': [{'url': '/observation/create', 'text': 'Crear', 'icon': <NoteAddIcon /> }],
     },
     'user': {
       'url': '/user/create',
@@ -239,7 +239,12 @@ export function AppBarComponent() {
                   <>
                     {Object.keys(breadcrumbNameMap[route].childrenList).map((route2, index2) => (
                       <List component="div" disablePadding>
-                        <ListItem button className={classes.nested}>
+                        <ListItem 
+                          button 
+                          className={classes.nested} 
+                          component={Link}
+                          to={breadcrumbNameMap[route].childrenList[index2].url}
+                        >
                           <ListItemIcon>
                              {breadcrumbNameMap[route].childrenList[index2].icon}
                           </ListItemIcon>

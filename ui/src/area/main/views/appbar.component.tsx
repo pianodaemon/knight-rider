@@ -21,18 +21,17 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
-import ListAltIcon from '@material-ui/icons/ListAlt';
+// import ListAltIcon from '@material-ui/icons/ListAlt';
 import PersonIcon from '@material-ui/icons/Person';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import { Link, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
-import { AppRoutesContainer } from './app-routes.container';
-import ListSubheader from '@material-ui/core/ListSubheader';
+// import ListSubheader from '@material-ui/core/ListSubheader';
 import Collapse from '@material-ui/core/Collapse';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-
+// import ExpandLess from '@material-ui/icons/ExpandLess';
+// import ExpandMore from '@material-ui/icons/ExpandMore';
+import { AppRoutesContainer } from './app-routes.container';
 
 const customHistory = createBrowserHistory();
 const drawerWidth = 240;
@@ -131,34 +130,38 @@ export function AppBarComponent() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
-  const breadcrumbNameMap: { [key: string]: {  [key: string]: any  } } = {
-    'audit': {
-      'url': '/audit/list',
-      'text': 'Auditorías',
-      'icon': <AccountBalanceIcon />,
-      'open': true,
-      'childrenList': [{'url': '/audit/create', 'text': 'Crear', 'icon': <NoteAddIcon /> }],
+  const breadcrumbNameMap: { [key: string]: { [key: string]: any } } = {
+    audit: {
+      url: '/audit/list',
+      text: 'Auditorías',
+      icon: <AccountBalanceIcon />,
+      open: true,
+      childrenList: [
+        { url: '/audit/create', text: 'Crear', icon: <NoteAddIcon /> },
+      ],
     },
-    'observation': {
-      'url': '/observation/list',
-      'text': 'Observaciones',
-      'icon': <ImageSearchIcon />,
-      'open': true,
-      'childrenList': [{'url': '/observation/create', 'text': 'Crear', 'icon': <NoteAddIcon /> }],
+    observation: {
+      url: '/observation/list',
+      text: 'Observaciones',
+      icon: <ImageSearchIcon />,
+      open: true,
+      childrenList: [
+        { url: '/observation/create', text: 'Crear', icon: <NoteAddIcon /> },
+      ],
     },
-    'user': {
-      'url': '/user/create',
-      'text': 'Crear Usuario',
-      'icon': <PersonIcon />,
-      'open': true,
-      'childrenList': [],
+    user: {
+      url: '/user/list',
+      text: 'Usuarios',
+      icon: <PersonIcon />,
+      open: true,
+      childrenList: [
+        { url: '/user/create', text: 'Crear', icon: <NoteAddIcon /> },
+      ],
     },
   };
 
-  const [openn, setOpenn] = React.useState(false);
-  const handleClickItemDrawer = (index : string)  => {
-    ;
-  }
+  // const [openn, setOpenn] = React.useState(false);
+  // const handleClickItemDrawer = (index: string) => {};
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -218,48 +221,54 @@ export function AppBarComponent() {
         <Divider />
         <Router history={customHistory}>
           <List>
-     
             {Object.keys(breadcrumbNameMap).map((route, index) => (
               <>
-              <ListItem
-                button
-                component={Link}
-                to={breadcrumbNameMap[route].url}
-                key={route}
-              >
-                <ListItemIcon>
-                  {breadcrumbNameMap[route].icon}
-                </ListItemIcon>
-                <ListItemText primary={breadcrumbNameMap[route].text} />
-              </ListItem>
+                <ListItem
+                  button
+                  component={Link}
+                  to={breadcrumbNameMap[route].url}
+                  key={route}
+                >
+                  <ListItemIcon>{breadcrumbNameMap[route].icon}</ListItemIcon>
+                  <ListItemText primary={breadcrumbNameMap[route].text} />
+                </ListItem>
 
-              { (breadcrumbNameMap[route].childrenList.length>0) &&
-
-                <Collapse in={true} timeout="auto" unmountOnExit>
-                  <>
-                    {Object.keys(breadcrumbNameMap[route].childrenList).map((route2, index2) => (
-                      <List component="div" disablePadding>
-                        <ListItem 
-                          button 
-                          className={classes.nested} 
-                          component={Link}
-                          to={breadcrumbNameMap[route].childrenList[index2].url}
-                        >
-                          <ListItemIcon>
-                             {breadcrumbNameMap[route].childrenList[index2].icon}
-                          </ListItemIcon>
-                          <ListItemText primary={breadcrumbNameMap[route].childrenList[index2].text} />
-                        </ListItem>
-                      </List>
-                    ))}
-                  </>
-                </Collapse>
-              }
-            
+                {breadcrumbNameMap[route].childrenList.length > 0 && (
+                  <Collapse in timeout="auto" unmountOnExit>
+                    <>
+                      {Object.keys(breadcrumbNameMap[route].childrenList).map(
+                        (route2, index2) => (
+                          <List component="div" disablePadding>
+                            <ListItem
+                              button
+                              className={classes.nested}
+                              component={Link}
+                              to={
+                                breadcrumbNameMap[route].childrenList[index2]
+                                  .url
+                              }
+                            >
+                              <ListItemIcon>
+                                {
+                                  breadcrumbNameMap[route].childrenList[index2]
+                                    .icon
+                                }
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={
+                                  breadcrumbNameMap[route].childrenList[index2]
+                                    .text
+                                }
+                              />
+                            </ListItem>
+                          </List>
+                        ),
+                      )}
+                    </>
+                  </Collapse>
+                )}
               </>
-              
             ))}
-            
           </List>
         </Router>
         <Divider />

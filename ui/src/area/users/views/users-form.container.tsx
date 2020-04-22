@@ -1,31 +1,27 @@
 import { connect } from 'react-redux';
 import { UserForm } from './user-form.component';
-import { createObservationAction } from '../../auditories/state/usecases/create-observation.usecase';
-import { readObservationAction } from '../../auditories/state/usecases/read-observation.usecase';
-import { updateObservationAction } from '../../auditories/state/usecases/update-observation.usecate';
-
+import { createUserAction } from '../../users/state/usecases/create-user.usecase';
+import { readUserAction } from '../../users/state/usecases/read-user.usecase';
+import { updateUserAction } from '../../users/state/usecases/update-user.usecate';
 import {
   catalogSelector,
-  observationSelector,
-} from '../../auditories/state/observations.selectors';
-
-import { catalogSelector as auditsCatalogSelector } from '../../auditories/state/audits.selectors';
+  userSelector,
+} from '../../users/state/users.selectors';
 
 const mapDispatchToProps = {
-  createObservationAction,
-  readObservationAction,
-  updateObservationAction,
+  createUserAction,
+  readUserAction,
+  updateUserAction,
 };
 
 function mapStateToProps(state: any) {
   return {
-    auditsCatalog: auditsCatalogSelector(state),
+    user: userSelector(state),
     catalog: catalogSelector(state),
-    observation: observationSelector(state),
   };
 }
 
 export const UsersFormContainer = connect(
   mapStateToProps,
-  mapDispatchToProps,
+  mapDispatchToProps
 )(UserForm);

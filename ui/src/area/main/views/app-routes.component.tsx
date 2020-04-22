@@ -3,6 +3,7 @@ import { History } from 'history';
 import { Router, Switch, Route } from 'react-router-dom';
 import { AuditTableContainer } from '../../auditories/views/audit-table.container';
 import { TableContainer } from '../../auditories/views/table.container';
+import { UsersTableContainer } from '../../users/views/users-table.container';
 import { FormContainer } from '../../auditories/views/form.container';
 import { AuditContainer } from '../../auditories/views/audit-form.container';
 import { UsersFormContainer } from '../../users/views/users-form.container';
@@ -12,12 +13,14 @@ type Props = {
   history: History,
   loadCatalogAction: Function,
   loadAuditCatalogAction: Function,
+  loadUsersCatalogAction: Function,
 };
 
 export const AppRoutes = (props: Props) => {
   useEffect(() => {
     props.loadCatalogAction();
     props.loadAuditCatalogAction();
+    props.loadUsersCatalogAction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -35,8 +38,11 @@ export const AppRoutes = (props: Props) => {
         <Route exact path={['/observation/create', '/observation/:id/edit']}>
           <FormContainer />
         </Route>
-        <Route exact path={['/user/create']}>
+        <Route exact path={['/user/create', '/user/:id/edit']}>
           <UsersFormContainer />
+        </Route>
+        <Route exact path={['/', '/user/list']}>
+          <UsersTableContainer />
         </Route>
         <Route path="*">
           <NotFound />

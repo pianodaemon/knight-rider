@@ -33,8 +33,8 @@ obs_fields = {
     'division_id': fields.Integer(description='Division identifier'),
     'hdr_doc': fields.String(description='Oficio No. (header)'),
     'hdr_reception_date': fields.String(description='Reception date (header)'),
-    'hdr_expiration1_date': fields.String(description='Expiration 1 date (header)'),
-    'hdr_expiration2_date': fields.String(description='Expiration 2 date (header)'),
+    'hdr_expiration1_date': fields.String(description='Expiration date (header)'),
+    'hdr_expiration2_date': fields.String(description='Registration date (header)'),
 }
 observation = api.model('Observation', obs_fields)
 
@@ -83,8 +83,8 @@ class ObservationList(Resource):
     @ns.param("division_id", "Division identifier")
     @ns.param("hdr_doc", "Oficio No. (header)")
     @ns.param("hdr_reception_date", "Reception date (header)")
-    @ns.param("hdr_expiration1_date", "Expiration 1 date (header)")
-    @ns.param("hdr_expiration2_date", "Expiration 2 date (header)")
+    @ns.param("hdr_expiration1_date", "Expiration date (header)")
+    @ns.param("hdr_expiration2_date", "Registration date (header)")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''

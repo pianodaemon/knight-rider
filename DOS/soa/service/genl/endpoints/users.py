@@ -25,7 +25,17 @@ user = api.model('User', {
     'passwd': fields.String(description=user_ns_captions['passwd'], required=True),
     'orgchart_role_id': fields.Integer(description=user_ns_captions['orgchart_role_id'], required=True),
     'division_id': fields.Integer(description=user_ns_captions['division_id'], required=True),
-    'disabled': fields.Boolean(description=user_ns_captions['disabled'], required=True),
+    'disabled': fields.Boolean(description=user_ns_captions['disabled']),
+})
+
+pair = api.model('id-title pair', {
+    'id': fields.Integer(description='An integer as entry identifier'),
+    'title': fields.String(description='Entry\'s title or description'),
+})
+
+catalog = api.model('Users screen data (id-title pairs catalog for screen fields)', {
+    'divisions': fields.List(fields.Nested(pair)),
+    'orgchart_roles': fields.List(fields.Nested(pair)),
 })
 
 @ns.route('/')
@@ -74,7 +84,7 @@ class UserList(Resource):
     @ns.marshal_with(user, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
-        ''' To create a user. Key \'disabled\' is ignored as this is automatically set to false '''
+        ''' To create a user. Key \'disabled\' is ignored as this is automatically set to false at creation '''
         try:
             usr = users.create(**api.payload)
         except psycopg2.Error as err:
@@ -148,6 +158,7 @@ class User(Resource):
 @ns.response(500, 'Server error')
 class Catalog(Resource):
 
+    @ns.marshal_with(catalog)
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
         try:

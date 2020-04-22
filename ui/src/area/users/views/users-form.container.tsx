@@ -1,15 +1,15 @@
 import { connect } from 'react-redux';
 import { UserForm } from './user-form.component';
-import { createObservationAction } from '../state/usecases/create-observation.usecase';
-import { readObservationAction } from '../state/usecases/read-observation.usecase';
-import { updateObservationAction } from '../state/usecases/update-observation.usecate';
+import { createObservationAction } from '../../auditories/state/usecases/create-observation.usecase';
+import { readObservationAction } from '../../auditories/state/usecases/read-observation.usecase';
+import { updateObservationAction } from '../../auditories/state/usecases/update-observation.usecate';
 
 import {
   catalogSelector,
   observationSelector,
-} from '../state/observations.selectors';
+} from '../../auditories/state/observations.selectors';
 
-import { catalogSelector as auditsCatalogSelector } from '../state/audits.selectors';
+import { catalogSelector as auditsCatalogSelector } from '../../auditories/state/audits.selectors';
 
 const mapDispatchToProps = {
   createObservationAction,

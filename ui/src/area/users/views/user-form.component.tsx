@@ -20,9 +20,9 @@ import mxLocale from "date-fns/locale/es";
 import DateFnsUtils from '@date-io/date-fns';
 import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picker.component'
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
-import { Catalog, ObservationRequest } from '../state/observations.reducer';
-import { Catalog as AuditCatalog } from '../state/audits.reducer';
-import { HistoryTable } from './history-table.component';
+import { Catalog, ObservationRequest } from '../../auditories/state/observations.reducer';
+import { Catalog as AuditCatalog } from '../../auditories/state/audits.reducer';
+import { HistoryTable } from '../../auditories/views/history-table.component';
 
 type Props = {
   createObservationAction: Function,

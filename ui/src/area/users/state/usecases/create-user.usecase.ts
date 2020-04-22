@@ -4,7 +4,7 @@ import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
 import { translations } from 'src/shared/translations/translations.util';
 import { createUser } from '../../service/user.service';
-import { observationsReducer } from '../observations.reducer';
+import { userReducer } from '../users.reducer';
 // import { loadObservationsAction } from './load-observations.usecase';
 
 const postfix = '/app';
@@ -62,21 +62,21 @@ function* createUserWatcher(): Generator<any, any, any> {
   yield takeLatest(CREATE_USER, createUserWorker);
 }
 
-const observationsReducerHandlers = {
+const userReducerHandlers = {
   [CREATE_USER]: (state: any) => {
     return {
       ...state,
       loading: true,
     };
   },
-  [CREATE_OBSERVATION_SUCCESS]: (state: any) => {
+  [CREATE_USER_SUCCESS]: (state: any) => {
     return {
       ...state,
       loading: false,
       user: null,
     };
   },
-  [CREATE_OBSERVATION_ERROR]: (state: any) => {
+  [CREATE_USER_ERROR]: (state: any) => {
     return {
       ...state,
       error: true,
@@ -86,4 +86,4 @@ const observationsReducerHandlers = {
 };
 
 mergeSaga(createUserWatcher);
-observationsReducer.addHandlers(observationsReducerHandlers);
+userReducer.addHandlers(userReducerHandlers);

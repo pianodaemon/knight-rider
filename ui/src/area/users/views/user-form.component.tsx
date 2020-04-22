@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { Formik, Field } from 'formik';
+import { Formik } from 'formik';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -13,24 +13,17 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Typography from '@material-ui/core/Typography';
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import mxLocale from "date-fns/locale/es";
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import mxLocale from 'date-fns/locale/es';
 import DateFnsUtils from '@date-io/date-fns';
-import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picker.component'
-import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
-import { Catalog, ObservationRequest } from '../state/observations.reducer';
-import { Catalog as AuditCatalog } from '../state/audits.reducer';
-import { HistoryTable } from './history-table.component';
+import { Catalog, User } from '../state/users.reducer';
 
 type Props = {
-  createObservationAction: Function,
-  readObservationAction: Function,
-  updateObservationAction: Function,
+  createUserAction: Function,
+  readUserAction: Function,
+  updateUserAction: Function,
   catalog: Catalog | null,
-  auditsCatalog: AuditCatalog | null,
-  observation: ObservationRequest | null,
+  user: User | null,
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -73,8 +66,8 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     legend: {
-      fontWeight: "bolder",
-      color: "#128aba",
+      fontWeight: 'bolder',
+      color: '#128aba',
       fontSize: '1rem',
       background: '#FFF',
     },
@@ -92,7 +85,8 @@ const useStyles = makeStyles((theme: Theme) =>
       borderTop: 0,
       height: '1px',
       /* background: 'linear-gradient(to right,transparent,#dedede,transparent)', */
-      background: 'linear-gradient(to right,transparent,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,transparent)',
+      background:
+        'linear-gradient(to right,transparent,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,#aaa,transparent)',
       width: '100%',
       border: 0,
       margin: 0,
@@ -109,17 +103,17 @@ const useStyles = makeStyles((theme: Theme) =>
     hrSpacer: {
       height: '25px',
       border: 'none',
-    }
-  })
+    },
+  }),
 );
 
 export const UserForm = (props: Props) => {
   const {
-    auditsCatalog,
     catalog,
-    createObservationAction,
-    observation,
-    updateObservationAction,
+    createUserAction,
+    readUserAction,
+    updateUserAction,
+    user,
   } = props;
   const classes = useStyles();
   const history = useHistory();
@@ -128,18 +122,19 @@ export const UserForm = (props: Props) => {
     username: '',
     passwd: '',
     orgchart_role_id: '',
-    division_role_id: '',
+    division_id: '',
+    disabled: false,
   };
   useEffect(() => {
     if (id) {
-      props.readObservationAction({ id, history });
+      readUserAction({ id, history });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <Paper className={classes.paper}>
       <Formik
-        initialValues={initialValues}
+        initialValues={id ? user || initialValues : initialValues}
         validate={(values: any) => {
           const errors: any = {};
           if (!values.username) {
@@ -154,10 +149,10 @@ export const UserForm = (props: Props) => {
             errors.orgchart_role_id = 'Required';
           }
 
-          if (!values.division_role_id) {
-            errors.division_role_id = 'Required';
+          if (!values.division_id) {
+            errors.division_id = 'Required';
           }
-          
+
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
@@ -165,9 +160,9 @@ export const UserForm = (props: Props) => {
           const fields: any = values;
           if (id) {
             delete fields.id;
-            updateObservationAction({ id, fields, history, releaseForm });
+            updateUserAction({ id, fields, history, releaseForm });
           } else {
-            createObservationAction({ fields, history, releaseForm });
+            createUserAction({ fields, history, releaseForm });
           }
         }}
         enableReinitialize
@@ -180,7 +175,6 @@ export const UserForm = (props: Props) => {
           // handleBlur,
           handleSubmit,
           isSubmitting,
-          /* and other goodies */
         }) => {
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
@@ -188,9 +182,6 @@ export const UserForm = (props: Props) => {
               <hr className={classes.hrDivider} />
               <form onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
-
-
-
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -199,18 +190,16 @@ export const UserForm = (props: Props) => {
                         value={values.username ? values.username || '' : ''}
                         onChange={handleChange('username')}
                       />
-                      {errors.username &&
-                        touched.username && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese un Nombre de Usuario
-                          </FormHelperText>
-                        )}
+                      {errors.username && touched.username && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese un Nombre de Usuario
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
-
 
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
@@ -220,143 +209,94 @@ export const UserForm = (props: Props) => {
                         value={values.passwd ? values.passwd || '' : ''}
                         onChange={handleChange('passwd')}
                       />
-                      {errors.passwd &&
-                        touched.passwd && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese una Contraseña
-                          </FormHelperText>
-                        )}
+                      {errors.passwd && touched.passwd && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese una Contraseña
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
 
-             
-                  
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel>
-                        Puesto
-                      </InputLabel>
+                      <InputLabel>Puesto</InputLabel>
                       <Select
                         labelId="orgchart_role_id"
                         id="orgchart_role_id"
-                        value={values.orgchart_role_id ? values.orgchart_role_id || '' : ''}
+                        value={catalog ? values.orgchart_role_id || '' : ''}
                         onChange={handleChange('orgchart_role_id')}
                       >
-                        {/*catalog &&
-                            catalog.observation_codes &&
-                            catalog.observation_codes.map((item) => {
-                              return (
-                                <MenuItem
-                                  value={item.id}
-                                  key={`type-${item.id}`}
-                                >
-                                  {item.title}
-                                </MenuItem>
-                              );
-                            })*/}
-                                <MenuItem
-                                  value="1"
-                                  key="1"
-                                >
-                                  Puesto 1
-                                </MenuItem>
-                                <MenuItem
-                                  value="2"
-                                  key="2"
-                                >
-                                  Puesto 2
-                                </MenuItem>
-                                <MenuItem
-                                  value="3"
-                                  key="3"
-                                >
-                                  Puesto 3
-                                </MenuItem>
+                        {catalog &&
+                          catalog.orgchart_roles &&
+                          catalog.orgchart_roles.map((item) => {
+                            return (
+                              <MenuItem value={item.id} key={`type-${item.id}`}>
+                                {item.title}
+                              </MenuItem>
+                            );
+                          })}
                       </Select>
-                      {errors.orgchart_role_id &&
-                          touched.orgchart_role_id && (
-                            <FormHelperText
-                              error
-                              classes={{ error: classes.textErrorHelper }}
-                            >
-                              Seleccione un Puesto
-                            </FormHelperText>
-                          )}
-                    </FormControl>
-                  </Grid>
-              
- 
- 
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <InputLabel>
-                        División
-                      </InputLabel>
-                      <Select
-                        labelId="division_role_id"
-                        id="division_role_id"
-                        value={values.division_role_id ? values.division_role_id || '' : ''}
-                        onChange={handleChange('division_role_id')}
-                      >
-                        {/*catalog &&
-                            catalog.observation_codes &&
-                            catalog.observation_codes.map((item) => {
-                              return (
-                                <MenuItem
-                                  value={item.id}
-                                  key={`type-${item.id}`}
-                                >
-                                  {item.title}
-                                </MenuItem>
-                              );
-                            })*/}
-                                <MenuItem
-                                  value="1"
-                                  key="1"
-                                >
-                                  Division 1
-                                </MenuItem>
-                                <MenuItem
-                                  value="2"
-                                  key="2"
-                                >
-                                  Division 2
-                                </MenuItem>
-                      </Select>
-                      {errors.division_role_id &&
-                          touched.division_role_id && (
-                            <FormHelperText
-                              error
-                              classes={{ error: classes.textErrorHelper }}
-                            >
-                              Seleccione una División
-                            </FormHelperText>
-                          )}
+                      {errors.orgchart_role_id && touched.orgchart_role_id && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Seleccione un Puesto
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
 
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel>División</InputLabel>
+                      <Select
+                        labelId="division_id"
+                        id="division_id"
+                        value={catalog ? values.division_id || '' : ''}
+                        onChange={handleChange('division_id')}
+                      >
+                        {catalog &&
+                          catalog.divisions &&
+                          catalog.divisions.map((item) => {
+                            return (
+                              <MenuItem value={item.id} key={`type-${item.id}`}>
+                                {item.title}
+                              </MenuItem>
+                            );
+                          })}
+                      </Select>
+                      {errors.division_id && touched.division_id && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Seleccione una División
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
 
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <FormControlLabel
                         control={
                           <Checkbox
-                            name="checkedF"
                             color="primary"
+                            checked={values.disabled}
+                            name="disabled"
+                            onChange={handleChange('disabled')}
                           />
                         }
                         label="Desactivar"
                       />
                     </FormControl>
                   </Grid>
-
-
-
                 </Grid>
-                  
+
                 <Button
                   variant="contained"
                   className={classes.submitInput}

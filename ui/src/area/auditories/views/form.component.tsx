@@ -76,7 +76,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: '1rem',
       background: '#FFF',
     },
-    textErrorHelper: { color: theme.palette.error.light },
+    textErrorHelper: { color: theme.palette.error.light, maxWidth: 350, },
     submitInput: {
       backgroundColor: '#FFFFFF',
       color: '#008aba',
@@ -107,7 +107,12 @@ const useStyles = makeStyles((theme: Theme) =>
     hrSpacer: {
       height: '25px',
       border: 'none',
-    }
+    },
+    select: {
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'pre'
+    },
   })
 );
 
@@ -156,87 +161,78 @@ export const ObservationsForm = (props: Props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const validate = (values: any) => {
+    const errors: any = {};
+    const auditYear: any = catalog && catalog.audits && values.audit_id && catalog.audits.find(item => item.id === values.audit_id) ? (catalog.audits.find(item => item.id === values.audit_id) || {}).year : '';
+    const dateFields: Array<string> = [
+      'doc_a_date',
+      'doc_b_date',
+      'doc_c_date',
+      'reception_date',
+      'expiration_date',
+      'hdr_reception_date',
+      'hdr_expiration1_date',
+      'hdr_expiration2_date',
+    ];
+    const noMandatoryFields: Array<string> = [
+      'comments',
+      'doc_a',
+      'doc_b',
+      'doc_c',
+      'dep_response',
+      'dep_resp_comments',
+    ];
+    // Mandatory fields (not empty)
+    Object.keys(initialValues).filter(field => !noMandatoryFields.includes(field)).forEach((field: string) => {
+      if (!values[field] || values[field] instanceof Date) {
+        errors[field] = 'Required';
+
+        if (dateFields.includes(field)) {
+          errors[field] = 'Ingrese una fecha válida';
+        }
+      }
+    });
+    // Fechas (año en específico) de la observación no pueden ser menores al año de la auditoría
+    dateFields.forEach(field => {
+      if ((!values[field] && !errors[field]) ||
+        values[field] instanceof Date ||
+        (values[field] && new Date(values[field].replace(/-/g, '/')).getFullYear() < auditYear)
+      ) {
+        errors[field] = errors[field] || 'Revise que el año de la fecha que ingresó sea posterior al Año de la Auditoría';
+      }
+    });
+
+    // Las fechas de recibido y vencimiento no pueden ser menores a la fecha registro
+    ['hdr_reception_date', 'hdr_expiration1_date'].forEach(field => {
+      const registerDate: number = values.hdr_expiration2_date ? new Date(values.hdr_expiration2_date.replace(/-/g, '/')).getTime() : 0;
+      const fieldDate: number = values[field] ? new Date(values[field].replace(/-/g, '/')).getTime() : 0;
+      if (!errors[field] && fieldDate < registerDate) {
+        const type: any = {"hdr_reception_date": "Recibido", "hdr_expiration1_date": "Vencimiento"};
+        errors[field] = errors[field] || `La fecha de ${type[field]} no puede ser menor a la de Registro.`;
+      }
+    });
+
+    ['expiration_date', 'reception_date'].forEach(field => {
+      const registerDate: number = values.doc_a_date ? new Date(values.doc_a_date.replace(/-/g, '/')).getTime() : 0;
+      const fieldDate: number = values[field] && !(values[field] instanceof Date) ? new Date(values[field].replace(/-/g, '/')).getTime() : 0;
+      if (!errors[field] && fieldDate < registerDate) {
+        const type: any = {"expiration_date": "Vencimiento", "reception_date": "Recibido"};
+        errors[field] = errors[field] || `La fecha de ${type[field]} no puede ser menor a la de Registro.`;
+      }
+    });
+
+    // Other Custom Validations
+    if (values.comments === '' && (observation?.projected.toString() !== values.projected || observation?.solved.toString() !== values.solved)) {
+      errors.comments = 'Required';
+    }
+
+    return errors;
+  };
   return (
     <Paper className={classes.paper}>
       <Formik
         initialValues={id ? observation || initialValues : initialValues}
-        validate={(values: any) => {
-          const errors: any = {};
-          if (!values.observation_type_id) {
-            errors.observation_type_id = 'Required';
-          }
-
-          if (!values.social_program_id) {
-            errors.social_program_id = 'Required';
-          }
-
-          if (!values.audit_id) {
-            errors.audit_id = 'Required';
-          }
-
-          if (!values.fiscal_id) {
-            errors.fiscal_id = 'Required';
-          }
-
-          if (!values.title) {
-            errors.title = 'Required';
-          }
-
-          if (!values.amount_observed) {
-            errors.amount_observed = 'Required';
-          }
-
-          if (!values.projected) {
-            errors.projected = 'Required';
-          }
-
-          if (!values.solved) {
-            errors.solved = 'Required';
-          }
-          if (values.comments === '' && (observation?.projected.toString() !== values.projected || observation?.solved.toString() !== values.solved)) {
-            errors.comments = 'Required';
-          }
-          if (!values.doc_a_date) {
-            errors.doc_a_date = 'Required';
-          }
-          if (!values.doc_b_date) {
-            errors.doc_b_date = 'Required';
-          }
-          if (!values.doc_c_date) {
-            errors.doc_c_date = 'Required';
-          }
-          if (!values.expiration_date) {
-            errors.expiration_date = 'Required';
-          }
-          if (!values.observation_code_id) {
-            errors.observation_code_id = 'Required';
-          }
-          if (!values.observation_bis_code_id) {
-            errors.observation_bis_code_id = 'Required';
-          }
-          if (!values.reception_date) {
-            errors.reception_date = 'Required';
-          }
-          if (!values.doc_a) {
-            errors.doc_a = 'Required';
-          }
-          if (!values.division_id) {
-            errors.division_id = 'Required';
-          }
-          if (!values.hdr_doc) {
-            errors.hdr_doc = 'Required';
-          }
-          if (!values.hdr_reception_date) {
-            errors.hdr_reception_date = 'Required';
-          }
-          if (!values.hdr_expiration1_date) {
-            errors.hdr_expiration1_date = 'Required';
-          }
-          if (!values.hdr_expiration2_date) {
-            errors.hdr_expiration2_date = 'Required';
-          }
-          return errors;
-        }}
+        validate={validate}
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = values;
@@ -438,7 +434,7 @@ export const ObservationsForm = (props: Props) => {
                             error
                             classes={{ error: classes.textErrorHelper }}
                           >
-                            Ingrese una fecha de registro
+                            {errors.hdr_expiration2_date}
                           </FormHelperText>
                         )}
                     </FormControl>
@@ -490,7 +486,7 @@ export const ObservationsForm = (props: Props) => {
                             error
                             classes={{ error: classes.textErrorHelper }}
                           >
-                            Ingrese una fecha de recibido
+                            {errors.hdr_reception_date}
                           </FormHelperText>
                         )}
                     </FormControl>
@@ -543,7 +539,7 @@ export const ObservationsForm = (props: Props) => {
                             error
                             classes={{ error: classes.textErrorHelper }}
                           >
-                            Ingrese una fecha de vencimiento
+                            {errors.hdr_expiration1_date}
                           </FormHelperText>
                         )}
                     </FormControl>
@@ -706,7 +702,7 @@ export const ObservationsForm = (props: Props) => {
                               error
                               classes={{ error: classes.textErrorHelper }}
                             >
-                              Ingrese una fecha de oficio
+                              {errors.doc_a_date}
                             </FormHelperText>
                           )}
                       </FormControl>
@@ -724,7 +720,7 @@ export const ObservationsForm = (props: Props) => {
                               error
                               classes={{ error: classes.textErrorHelper }}
                             >
-                              Ingrese una fecha de recibido
+                              {errors.reception_date}
                             </FormHelperText>
                           )}
                       </FormControl>
@@ -742,7 +738,7 @@ export const ObservationsForm = (props: Props) => {
                               error
                               classes={{ error: classes.textErrorHelper }}
                             >
-                              Ingrese una fecha de vencimiento
+                              {errors.expiration_date}
                             </FormHelperText>
                           )}
                       </FormControl>
@@ -815,7 +811,7 @@ export const ObservationsForm = (props: Props) => {
                               error
                               classes={{ error: classes.textErrorHelper }}
                             >
-                              Ingrese una fecha de oficio
+                              {errors.doc_b_date}
                             </FormHelperText>
                           )}
                       </FormControl>
@@ -870,7 +866,7 @@ export const ObservationsForm = (props: Props) => {
                                 error
                                 classes={{ error: classes.textErrorHelper }}
                               >
-                                Ingrese una fecha de oficio
+                                {errors.doc_c_date}
                               </FormHelperText>
                             )}
                       </FormControl>

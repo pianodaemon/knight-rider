@@ -38,7 +38,6 @@ obs_fields = {
 }
 observation = api.model('Observation', obs_fields)
 
-obs_ext_fields = dict(obs_fields)
 amounts = api.model('Amount entry', {
     'id': fields.Integer(description='An integer as entry identifier'),
     'projected': fields.Float(description='Amount projected'),
@@ -47,11 +46,9 @@ amounts = api.model('Amount entry', {
     'inception_time': fields.String(description='Inception time'),
     'comments': fields.String(description='Comments'),
 })
-obs_ext_fields['amounts'] = fields.List(
-    fields.Nested(amounts),
-    description='list containing all amount entries in history'
-)
 
+obs_ext_fields = dict(obs_fields)
+obs_ext_fields['amounts'] = fields.List(fields.Nested(amounts))
 observation_ext = api.model('Extended Observation (includes amounts history)', obs_ext_fields)
 
 

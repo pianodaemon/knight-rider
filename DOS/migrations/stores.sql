@@ -258,15 +258,29 @@ ALTER FUNCTION public.alter_observation(_observation_id integer, _type_id intege
 -- Name: alter_user(integer, character varying, character varying, integer, integer, boolean); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE OR REPLACE FUNCTION public.alter_user(_user_id integer, _username character varying, _passwd character varying, _orgchart_role_id integer, _division_id integer, _disabled boolean) RETURNS record
-    LANGUAGE plpgsql
-    AS $$
+CREATE OR REPLACE FUNCTION public.alter_user(
+    _user_id integer,
+    _username character varying,
+    _passwd character varying,
+    _orgchart_role_id integer,
+    _division_id integer,
+    _access_vector integer[],
+    _disabled boolean)
+    RETURNS record
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE
+AS $BODY$
 
 DECLARE
 
     current_moment timestamp with time zone = now();
     coincidences integer := 0;
     latter_id integer := 0;
+
+    row_counter integer := 1;
+    av_len integer := array_length(_access_vector, 1);
 
     -- dump of errors
     rmsg text;
@@ -293,6 +307,18 @@ BEGIN
                 current_moment
             ) RETURNING id INTO latter_id;
 
+            FOR row_counter IN 1 .. av_len LOOP
+
+                INSERT INTO user_authority(
+                    user_id,
+                    authority_id
+                ) VALUES (
+                    latter_id,
+                    _access_vector[row_counter]
+                );
+
+            END LOOP;
+
         WHEN _user_id > 0 THEN
 
             -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -318,6 +344,20 @@ BEGIN
                 touch_latter_time = current_moment
             WHERE id = _user_id;
 
+            DELETE FROM user_authority where user_id = _user_id;
+
+            FOR row_counter IN 1 .. av_len LOOP
+
+                INSERT INTO user_authority(
+                    user_id,
+                    authority_id
+                ) VALUES (
+                    _user_id,
+                    _access_vector[row_counter]
+                );
+
+            END LOOP;
+
             -- Upon edition we return user id as latter id
             latter_id = _user_id;
 
@@ -334,7 +374,7 @@ BEGIN
             return ( -1::integer, rmsg::text );
 
 END;
-$$;
+$BODY$;
 
 
-ALTER FUNCTION public.alter_user(_user_id integer, _username character varying, _passwd character varying, _orgchart_role_id integer, _division_id integer, _disabled boolean) OWNER TO postgres;
+ALTER FUNCTION public.alter_user(_user_id integer, _username character varying, _passwd character varying, _orgchart_role_id integer, _division_id integer, _access_vector integer[], _disabled boolean) OWNER TO postgres;

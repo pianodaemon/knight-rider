@@ -12,10 +12,12 @@ def _alter_user(**kwargs):
         '{}'::text,
         {}::integer,
         {}::integer,
-        '{}'::boolean)
+        '{}'::integer[],
+        {}::boolean)
         AS result( rc integer, msg text )""".format(
             kwargs["id"], kwargs["username"], kwargs["passwd"],
-            kwargs["orgchart_role_id"], kwargs["division_id"], kwargs["disabled"]
+            kwargs["orgchart_role_id"], kwargs["division_id"], str(set(kwargs["access_vector"])),
+            kwargs["disabled"]
         )
 
     rcode, rmsg = run_stored_procedure(sql)
@@ -28,7 +30,7 @@ def _alter_user(**kwargs):
         id = rcode
 
     ent = fetch_entity("users", id)
-    return transform_data(ent)
+    return add_user_permissions(ent)
 
 
 def create(**kwargs):
@@ -41,7 +43,7 @@ def create(**kwargs):
 def read(id):
     ''' Fetches a user entity '''
     ent = fetch_entity("users", id)
-    return transform_data(ent)
+    return add_user_permissions(ent)
 
 
 def update(id, **kwargs):
@@ -53,7 +55,7 @@ def update(id, **kwargs):
 def delete(id):
     ''' Deletes a user entity '''
     ent = delete_entity("users", id)
-    return transform_data(ent)
+    return add_user_permissions(ent)
 
 
 def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
@@ -69,7 +71,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         raise Exception("Value of param 'limit' should be >= 1")
 
     order_by_values = (
-        'id','username', 'orgchart_role_id', 'division_id', 'disabled'
+        'id', 'username', 'orgchart_role_id', 'division_id', 'disabled'
     )
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
@@ -129,10 +131,26 @@ def get_catalogs(table_name_list):
     return fields_d
 
 
-def transform_data(ent):
+def add_user_permissions(ent):
     attributes = set([
         'id', 'username', 'passwd', 'orgchart_role_id', 'division_id', 'disabled'
     ])
     mod_ent = {attr: ent[attr] for attr in attributes}
+    mod_ent['access_vector'] = []
+
+    sql = '''
+        SELECT authority_id
+        FROM user_authority
+        WHERE user_id = {}
+        ORDER BY authority_id;
+    '''.format(mod_ent['id'])
     
+    try:
+        rows = exec_steady(sql)
+    except Exception as err:
+        return mod_ent
+    
+    for row in rows:
+        mod_ent['access_vector'].append(row[0])
+
     return mod_ent

@@ -7,6 +7,7 @@ export interface User {
   orgchart_role_id: number;
   division_id: number;
   disabled: boolean;
+  access_vector: Array<any>;
 }
 
 interface UserSlice {
@@ -27,6 +28,7 @@ interface UserSlice {
 export type Catalog = {
   divisions: Array<Division>,
   orgchart_roles: Array<OrgchartRoles>,
+  authorities: Array<{ id: number, description: string }>,
 };
 
 type CatalogItem = {

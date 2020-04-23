@@ -16,6 +16,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import mxLocale from 'date-fns/locale/es';
 import DateFnsUtils from '@date-io/date-fns';
+import { CheckboxesGroup } from 'src/shared/components/select-multiple.component';
 import { Catalog, User } from '../state/users.reducer';
 
 type Props = {
@@ -124,6 +125,7 @@ export const UserForm = (props: Props) => {
     orgchart_role_id: '',
     division_id: '',
     disabled: false,
+    access_vector: [],
   };
   useEffect(() => {
     if (id) {
@@ -153,11 +155,18 @@ export const UserForm = (props: Props) => {
             errors.division_id = 'Required';
           }
 
+          if (!values.access_vector.length) {
+            errors.access_vector = 'Elija al menos un rol de usuario';
+          }
+
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = values;
+          fields.access_vector = fields.access_vector.map((authId: string) =>
+            Number(authId)
+          );
           if (id) {
             delete fields.id;
             updateUserAction({ id, fields, history, releaseForm });
@@ -286,7 +295,7 @@ export const UserForm = (props: Props) => {
                         control={
                           <Checkbox
                             color="primary"
-                            checked={values.disabled}
+                            checked={values.disabled || false}
                             name="disabled"
                             onChange={handleChange('disabled')}
                           />
@@ -294,6 +303,23 @@ export const UserForm = (props: Props) => {
                         label="Desactivar"
                       />
                     </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <CheckboxesGroup
+                      title="Roles Disponibles"
+                      options={(catalog && catalog.authorities) || []}
+                      onChange={handleChange}
+                      items={values.access_vector}
+                      name="access_vector"
+                    />
+                    {errors.access_vector && touched.access_vector && (
+                      <FormHelperText
+                        error
+                        classes={{ error: classes.textErrorHelper }}
+                      >
+                        {errors.access_vector}
+                      </FormHelperText>
+                    )}
                   </Grid>
                 </Grid>
 

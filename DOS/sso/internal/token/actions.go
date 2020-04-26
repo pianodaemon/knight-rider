@@ -2,11 +2,12 @@ package token
 
 import (
 	"crypto/rsa"
+    "time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-func generateToken(pk *rsa.PrivateKey, userUUID string, expirationDelta int) (string, error) {
+func Generate(privateKey *rsa.PrivateKey, expirationDelta int, userUUID string) (string, error) {
 
 	token := jwt.New(jwt.SigningMethodRS512)
 
@@ -16,7 +17,8 @@ func generateToken(pk *rsa.PrivateKey, userUUID string, expirationDelta int) (st
 		"sub": userUUID,
 	}
 
-	tokenString, err := token.SignedString(pk)
+	tokenString, err := token.SignedString(privateKey)
+
 	if err != nil {
 
 		return "", err

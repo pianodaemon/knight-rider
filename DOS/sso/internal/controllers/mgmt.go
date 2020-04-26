@@ -29,7 +29,7 @@ func SignOn(logIn LogInHandler) func(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 
-			w.WriteHeader(http.StatusNotFound)
+			w.WriteHeader(http.StatusUnauthorized)
 
 			jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
 				Code:   strconv.Itoa(int(EndPointFailedLogIn)),

@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func getPrivateKey(fpath string) *rsa.PrivateKey {
+func GetPrivateKey(fpath string) *rsa.PrivateKey {
 
 	privateKeyFile, err := os.Open(fpath)
 
@@ -37,7 +37,7 @@ func getPrivateKey(fpath string) *rsa.PrivateKey {
 	return privateKeyImported
 }
 
-func getPublicKey(fpath string) *rsa.PublicKey {
+func GetPublicKey(fpath string) *rsa.PublicKey {
 
 	publicKeyFile, err := os.Open(fpath)
 	if err != nil {

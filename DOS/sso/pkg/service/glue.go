@@ -7,6 +7,7 @@ import (
 
 	co "immortalcrab.com/sso/internal/controllers"
 	"immortalcrab.com/sso/internal/rsapi"
+	ton "immortalcrab.com/sso/internal/token"
 	aut "immortalcrab.com/sso/pkg/authentication"
 )
 
@@ -16,7 +17,7 @@ func Engage(logger *logrus.Logger) error {
 	var apiSettings rsapi.RestAPISettings
 	envconfig.Process("rsapi", &apiSettings)
 
-	tcSettings := &aut.TokenClerkSettings{"", ""}
+	tcSettings := &aut.TokenClerkSettings{ton.GetPrivateKey(""), ton.GetPublicKey(""), 0}
 	clerk := aut.NewTokenClerk(logger, tcSettings)
 
 	/* The connection of both components occurs through

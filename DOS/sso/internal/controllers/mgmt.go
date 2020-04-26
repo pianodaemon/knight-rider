@@ -8,9 +8,9 @@ import (
 	"github.com/google/jsonapi"
 )
 
-type LoginHandler func(username string, password string) ([]byte, error)
+type LogInHandler func(username string, password string) ([]byte, error)
 
-func SignOn(login LoginHandler) func(w http.ResponseWriter, r *http.Request) {
+func SignOn(logIn LogInHandler) func(w http.ResponseWriter, r *http.Request) {
 
 	type Credentials struct {
 		Username string `json:"username" form:"username"`
@@ -25,15 +25,15 @@ func SignOn(login LoginHandler) func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
 		decoder.Decode(&credentials)
 
-		token, err := login(credentials.Username, credentials.Password)
+		token, err := logIn(credentials.Username, credentials.Password)
 
 		if err != nil {
 
 			w.WriteHeader(http.StatusNotFound)
 
 			jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
-				Code:   strconv.Itoa(int(EndPointFailedLogin)),
-				Title:  "Failed Login",
+				Code:   strconv.Itoa(int(EndPointFailedLogIn)),
+				Title:  "Failed Log in",
 				Detail: err.Error(),
 			}})
 
@@ -43,5 +43,33 @@ func SignOn(login LoginHandler) func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 
 		w.Write(token)
+	}
+}
+
+type LogOutHandler func(req *http.Request) error
+
+func SingOff(logOut LogOutHandler) func(w http.ResponseWriter, r *http.Request) {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		err := logOut(r)
+
+		w.Header().Set("Content-Type", "application/json")
+
+		if err != nil {
+
+			w.WriteHeader(http.StatusNotFound)
+
+			jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
+				Code:   strconv.Itoa(int(EndPointFailedLogOut)),
+				Title:  "Failed Log out",
+				Detail: err.Error(),
+			}})
+
+			return
+
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
 }

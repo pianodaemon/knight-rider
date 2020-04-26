@@ -1,0 +1,74 @@
+package token
+
+import (
+	"bufio"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"os"
+)
+
+func getPrivateKey(fpath string) *rsa.PrivateKey {
+
+	privateKeyFile, err := os.Open(fpath)
+
+	if err != nil {
+		panic(err)
+	}
+
+	pemfileinfo, _ := privateKeyFile.Stat()
+	var size int64 = pemfileinfo.Size()
+	pembytes := make([]byte, size)
+
+	buffer := bufio.NewReader(privateKeyFile)
+	_, err = buffer.Read(pembytes)
+
+	data, _ := pem.Decode([]byte(pembytes))
+
+	privateKeyFile.Close()
+
+	privateKeyImported, err := x509.ParsePKCS1PrivateKey(data.Bytes)
+
+	if err != nil {
+
+		panic(err)
+	}
+
+	return privateKeyImported
+}
+
+func getPublicKey(fpath string) *rsa.PublicKey {
+
+	publicKeyFile, err := os.Open(fpath)
+	if err != nil {
+
+		panic(err)
+	}
+
+	pemfileinfo, _ := publicKeyFile.Stat()
+	var size int64 = pemfileinfo.Size()
+	pembytes := make([]byte, size)
+
+	buffer := bufio.NewReader(publicKeyFile)
+	_, err = buffer.Read(pembytes)
+
+	data, _ := pem.Decode([]byte(pembytes))
+
+	publicKeyFile.Close()
+
+	publicKeyImported, err := x509.ParsePKIXPublicKey(data.Bytes)
+
+	if err != nil {
+
+		panic(err)
+	}
+
+	rsaPub, ok := publicKeyImported.(*rsa.PublicKey)
+
+	if !ok {
+
+		panic(err)
+	}
+
+	return rsaPub
+}

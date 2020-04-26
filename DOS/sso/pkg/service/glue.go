@@ -1,14 +1,13 @@
 package service
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 
+	co "immortalcrab.com/sso/internal/controllers"
 	"immortalcrab.com/sso/internal/rsapi"
+	aut "immortalcrab.com/sso/pkg/authentication"
 )
 
 // Engages the RESTful API
@@ -16,6 +15,9 @@ func Engage(logger *logrus.Logger) error {
 
 	var apiSettings rsapi.RestAPISettings
 	envconfig.Process("rsapi", &apiSettings)
+
+	tcSettings := &aut.TokenClerkSettings{"", ""}
+	clerk := aut.NewTokenClerk(logger, tcSettings)
 
 	/* The connection of both components occurs through
 	   the router glue and its adaptive functions */
@@ -27,9 +29,8 @@ func Engage(logger *logrus.Logger) error {
 
 		mgmt := v1.PathPrefix("/sso").Subrouter()
 
-		mgmt.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintf(w, "Hello, you've requested: %s\n", r.URL.Path)
-		})
+		mgmt.HandleFunc("/token-auth", co.SignOn(clerk.IssueToken)).Methods("POST")
+
 		return router
 	}
 

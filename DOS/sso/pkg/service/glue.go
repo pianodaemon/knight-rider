@@ -21,9 +21,11 @@ func init() {
 func getExpDelta() int {
 
 	ref := struct {
-		Delta int
+		Delta int `default:"72"`
 	}{0}
 
+	/* It stands for
+	   TOKEN_CLERK_EXP_DELTA */
 	envconfig.Process("token_clerk_exp", &ref)
 
 	return ref.Delta

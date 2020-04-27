@@ -30,8 +30,6 @@ COPY --from=builder /sso $APP_DIR
 COPY scripts/run_service.sh $APP_DIR
 WORKDIR $APP_DIR
 
-ENV SLACK_SSO_HTTP_PORT=10070
-
-EXPOSE $SLACK_SSO_HTTP_PORT
+EXPOSE 10090
 
 CMD ["/run_service.sh"]

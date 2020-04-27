@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"os"
 )
 
@@ -13,7 +14,7 @@ func GetPrivateKey(fpath string) *rsa.PrivateKey {
 	privateKeyFile, err := os.Open(fpath)
 
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("Private key file not found"))
 	}
 
 	pemfileinfo, _ := privateKeyFile.Stat()
@@ -40,9 +41,9 @@ func GetPrivateKey(fpath string) *rsa.PrivateKey {
 func GetPublicKey(fpath string) *rsa.PublicKey {
 
 	publicKeyFile, err := os.Open(fpath)
-	if err != nil {
 
-		panic(err)
+	if err != nil {
+		panic(fmt.Errorf("Public key file not found"))
 	}
 
 	pemfileinfo, _ := publicKeyFile.Stat()

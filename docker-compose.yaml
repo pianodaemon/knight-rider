@@ -37,11 +37,11 @@ services:
           - serv_obs_pg_data:/var/lib/postgresql/data
         networks:
           - operational_network
-    cube_render:
-        container_name: 'cube_render'
-        build: './DWH/cube_render'
+    sso_obs:
+        container_name: 'sso_obs'
+        build: './DOS/sso'
         ports:
-          - '10070:10070'
+          - '10090:10090'
         environment: *commonEnv
         networks:
           - operational_network

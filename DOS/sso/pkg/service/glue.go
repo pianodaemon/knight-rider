@@ -11,13 +11,28 @@ import (
 	aut "immortalcrab.com/sso/pkg/authentication"
 )
 
+var apiSettings rsapi.RestAPISettings
+
+func init() {
+
+	envconfig.Process("rsapi", &apiSettings)
+}
+
+func getExpDelta() int {
+
+	ref := struct {
+		Delta int
+	}{0}
+
+	envconfig.Process("token_clerk_exp", &ref)
+
+	return ref.Delta
+}
+
 // Engages the RESTful API
 func Engage(logger *logrus.Logger) error {
 
-	var apiSettings rsapi.RestAPISettings
-	envconfig.Process("rsapi", &apiSettings)
-
-	tcSettings := &aut.TokenClerkSettings{ton.GetPrivateKey(""), ton.GetPublicKey(""), 0}
+	tcSettings := &aut.TokenClerkSettings{ton.GetPrivateKey(""), ton.GetPublicKey(""), getExpDelta()}
 	clerk := aut.NewTokenClerk(logger, tcSettings)
 
 	/* The connection of both components occurs through

@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"fmt"
+
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -17,7 +19,7 @@ type (
 		Db       string `default:"soa"`
 		User     string `default:"postgres"`
 		Password string `default:"postgres"`
-		port     int    `default:"5432"`
+		Port     int    `default:"5432"`
 	}
 )
 
@@ -26,6 +28,17 @@ var pgSettings PgSqlSettings
 func init() {
 
 	envconfig.Process("postgres", &pgSettings)
+}
+
+func shapeConnStr() string {
+
+	// SSL mode disable to use in containers
+	return fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=disable",
+		pgSettings.User,
+		pgSettings.Password,
+		pgSettings.Host,
+		pgSettings.Port,
+		pgSettings.Db)
 }
 
 func Authenticate(username, password string) (*User, error) {

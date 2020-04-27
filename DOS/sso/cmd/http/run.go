@@ -58,7 +58,7 @@ func main() {
 	logger.Level = logrus.InfoLevel
 
 	if err := platform.Engage(logger); err != nil {
-		logger.Fatalf("%s service struggles with (%v)\n", name, err)
+		logger.Fatalf("%s service struggles with (%v)", name, err)
 	}
 
 	if err := syscall.Unlink(pidFile); err != nil {

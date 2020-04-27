@@ -1,6 +1,8 @@
 package service
 
 import (
+	"crypto/rsa"
+
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
@@ -31,30 +33,62 @@ func getExpDelta() int {
 	return ref.Delta
 }
 
+func getKeys() (*rsa.PrivateKey, *rsa.PublicKey, error) {
+
+	ref := struct {
+		Private string
+		Public  string
+	}{"", ""}
+
+	/* It stands for
+	   TOKEN_CLERK_RSA_PRIVATE and  TOKEN_CLERK_RSA_PUBLIC */
+	envconfig.Process("token_clerk_rsa", &ref)
+
+	return ton.GetPrivateKey(ref.Private), ton.GetPublicKey(ref.Public), nil
+}
+
 // Engages the RESTful API
-func Engage(logger *logrus.Logger) error {
+func Engage(logger *logrus.Logger) (merr error) {
 
-	tcSettings := &aut.TokenClerkSettings{ton.GetPrivateKey(""), ton.GetPublicKey(""), getExpDelta()}
-	clerk := aut.NewTokenClerk(logger, tcSettings)
+	defer func() {
 
-	/* The connection of both components occurs through
-	   the router glue and its adaptive functions */
-	glue := func(api *rsapi.RestAPI) *mux.Router {
+		if r := recover(); r != nil {
+			merr = r.(error)
+		}
+	}()
 
-		router := mux.NewRouter()
+	priv, pub, err := getKeys()
 
-		v1 := router.PathPrefix("/v1").Subrouter()
+	if err != nil {
 
-		mgmt := v1.PathPrefix("/sso").Subrouter()
-
-		mgmt.HandleFunc("/token-auth", co.SignOn(clerk.IssueToken)).Methods("POST")
-
-		return router
+		goto culminate
 	}
 
-	api := rsapi.NewRestAPI(logger, &apiSettings, glue)
+	{
+		tcSettings := &aut.TokenClerkSettings{priv, pub, getExpDelta()}
+		clerk := aut.NewTokenClerk(logger, tcSettings)
 
-	api.PowerOn()
+		/* The connection of both components occurs through
+		   the router glue and its adaptive functions */
+		glue := func(api *rsapi.RestAPI) *mux.Router {
 
-	return nil
+			router := mux.NewRouter()
+
+			v1 := router.PathPrefix("/v1").Subrouter()
+
+			mgmt := v1.PathPrefix("/sso").Subrouter()
+
+			mgmt.HandleFunc("/token-auth", co.SignOn(clerk.IssueToken)).Methods("POST")
+
+			return router
+		}
+
+		api := rsapi.NewRestAPI(logger, &apiSettings, glue)
+
+		api.PowerOn()
+	}
+
+culminate:
+
+	return err
 }

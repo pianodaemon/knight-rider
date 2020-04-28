@@ -35,6 +35,7 @@ obs_fields = {
     'hdr_reception_date': fields.String(description='Reception date (header)'),
     'hdr_expiration1_date': fields.String(description='Expiration date (header)'),
     'hdr_expiration2_date': fields.String(description='Registration date (header)'),
+    'observation_stage_id': fields.Integer(description='Observation stage id'),
 }
 observation = api.model('Observation', obs_fields)
 
@@ -195,9 +196,9 @@ class Catalog(Resource):
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of id/title pairs) '''
         try:
-            field_catalog = observations.get_catalogs(
-                ['observation_types', 'social_programs', 'audits', 'fiscals', 'observation_codes', 'divisions']
-            )
+            field_catalog = observations.get_catalogs([
+                'observation_types', 'social_programs', 'audits', 'fiscals', 'observation_codes', 'divisions',
+            ])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))
         except Exception as err:

@@ -2,7 +2,7 @@
 -- Name: alter_audit(integer, character varying, integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE OR REPLACE FUNCTION public.alter_audit(_audit_id integer, _title character varying, _dependency_id integer, _year integer) RETURNS record
+CREATE FUNCTION public.alter_audit(_audit_id integer, _title character varying, _dependency_id integer, _year integer) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
@@ -80,11 +80,12 @@ $$;
 
 ALTER FUNCTION public.alter_audit(_audit_id integer, _title character varying, _dependency_id integer, _year integer) OWNER TO postgres;
 
+
 --
--- Name: alter_observation(integer, integer, integer, integer, integer, integer, integer, text, double precision, double precision, double precision, text, date, date, date, date, date, text, text, text, text, text, integer, text, date, date, date); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: alter_observation_preliminar(integer, integer, integer, integer, integer, integer, integer, text, double precision, double precision, double precision, text, date, date, date, date, date, text, text, text, text, text, integer, text, date, date, date); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE OR REPLACE FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _code_id integer, _bis_code_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text, _amount_observed double precision, _amount_projected double precision, _amount_solved double precision, _amount_comments text, _reception_date date, _expiration_date date, _doc_a_date date, _doc_b_date date, _doc_c_date date, _doc_a text, _doc_b text, _doc_c text, _dep_response text, _dep_resp_comments text, _division_id integer, _hdr_doc text, _hdr_reception_date date, _hdr_expiration1_date date, _hdr_expiration2_date date) RETURNS record
+CREATE FUNCTION public.alter_observation_preliminar(_observation_id integer, _type_id integer, _code_id integer, _bis_code_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text, _amount_observed double precision, _amount_projected double precision, _amount_solved double precision, _amount_comments text, _reception_date date, _expiration_date date, _doc_a_date date, _doc_b_date date, _doc_c_date date, _doc_a text, _doc_b text, _doc_c text, _dep_response text, _dep_resp_comments text, _division_id integer, _hdr_doc text, _hdr_reception_date date, _hdr_expiration1_date date, _hdr_expiration2_date date) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
@@ -96,6 +97,11 @@ DECLARE
     current_moment timestamp with time zone = now();
     coincidences integer := 0;
     latter_id integer := 0;
+	
+	-- get the default observation stage's id value (new observations only):
+	default_obs_stage_id integer := 0;
+	default_obs_stage_title text := 'PRELIMINAR';
+	prelim_counter integer := 0;
 
     -- dump of errors
     rmsg text;
@@ -106,6 +112,18 @@ BEGIN
 
         WHEN _observation_id = 0 THEN
 
+            SELECT count(id)
+			FROM observation_stages INTO prelim_counter
+			WHERE title = default_obs_stage_title;
+
+			IF NOT prelim_counter = 1 THEN
+				RAISE EXCEPTION 'Value % does not exist', default_obs_stage_title;
+			END IF;
+
+			SELECT id
+			FROM observation_stages INTO default_obs_stage_id
+			WHERE title = default_obs_stage_title;
+			
             INSERT INTO observations (
                 observation_type_id,
                 observation_code_id,
@@ -131,7 +149,8 @@ BEGIN
                 hdr_expiration1_date,
                 hdr_expiration2_date,
                 inception_time,
-                touch_latter_time
+                touch_latter_time,
+				observation_stage_id
             ) VALUES (
                 _type_id,
                 _code_id,
@@ -157,7 +176,8 @@ BEGIN
                 _hdr_expiration1_date,
                 _hdr_expiration2_date,
                 current_moment,
-                current_moment
+                current_moment,
+				default_obs_stage_id
             ) RETURNING id INTO latter_id;
 
             INSERT INTO amounts (
@@ -252,26 +272,16 @@ END;
 $$;
 
 
-ALTER FUNCTION public.alter_observation(_observation_id integer, _type_id integer, _code_id integer, _bis_code_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text, _amount_observed double precision, _amount_projected double precision, _amount_solved double precision, _amount_comments text, _reception_date date, _expiration_date date, _doc_a_date date, _doc_b_date date, _doc_c_date date, _doc_a text, _doc_b text, _doc_c text, _dep_response text, _dep_resp_comments text, _division_id integer, _hdr_doc text, _hdr_reception_date date, _hdr_expiration1_date date, _hdr_expiration2_date date) OWNER TO postgres;
+ALTER FUNCTION public.alter_observation_preliminar(_observation_id integer, _type_id integer, _code_id integer, _bis_code_id integer, _social_program_id integer, _audit_id integer, _fiscal_id integer, _title text, _amount_observed double precision, _amount_projected double precision, _amount_solved double precision, _amount_comments text, _reception_date date, _expiration_date date, _doc_a_date date, _doc_b_date date, _doc_c_date date, _doc_a text, _doc_b text, _doc_c text, _dep_response text, _dep_resp_comments text, _division_id integer, _hdr_doc text, _hdr_reception_date date, _hdr_expiration1_date date, _hdr_expiration2_date date) OWNER TO postgres;
+
 
 --
--- Name: alter_user(integer, character varying, character varying, integer, integer, boolean); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: alter_user(integer, character varying, character varying, integer, integer, integer[], boolean); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE OR REPLACE FUNCTION public.alter_user(
-    _user_id integer,
-    _username character varying,
-    _passwd character varying,
-    _orgchart_role_id integer,
-    _division_id integer,
-    _access_vector integer[],
-    _disabled boolean)
-    RETURNS record
-    LANGUAGE 'plpgsql'
-
-    COST 100
-    VOLATILE
-AS $BODY$
+CREATE FUNCTION public.alter_user(_user_id integer, _username character varying, _passwd character varying, _orgchart_role_id integer, _division_id integer, _access_vector integer[], _disabled boolean) RETURNS record
+    LANGUAGE plpgsql
+    AS $$
 
 DECLARE
 
@@ -374,7 +384,9 @@ BEGIN
             return ( -1::integer, rmsg::text );
 
 END;
-$BODY$;
+$$;
 
 
 ALTER FUNCTION public.alter_user(_user_id integer, _username character varying, _passwd character varying, _orgchart_role_id integer, _division_id integer, _access_vector integer[], _disabled boolean) OWNER TO postgres;
+
+

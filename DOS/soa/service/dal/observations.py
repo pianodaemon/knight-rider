@@ -6,7 +6,7 @@ from misc.helperpg import EmptySetError
 
 def _alter_observation(**kwargs):
     """Calls sp in charge of create and edit a observation"""
-    sql = """SELECT * FROM alter_observation(
+    sql = """SELECT * FROM alter_observation_preliminar(
         {}::integer,
         {}::integer,
         {}::integer,
@@ -153,6 +153,15 @@ def get_catalogs(table_name_list):
                 WHERE NOT blocked
                 ORDER BY id;
             '''.format(table)
+        elif table == 'fiscals':
+            sql = '''
+                SELECT fiscals.id, fiscals.title, fiscals.description
+                FROM observation_stages AS stages
+                JOIN observation_stages_conf AS conf ON stages.id = conf.observation_stage_id
+                JOIN fiscals ON conf.fiscal_id = fiscals.id
+                WHERE stages.title = 'PRELIMINAR'
+                ORDER BY conf.fiscal_id;
+            '''
         else:
             sql = '''
                 SELECT *
@@ -178,7 +187,8 @@ def add_observation_amounts(ent):
         'id', 'observation_type_id', 'social_program_id', 'audit_id', 'title', 'fiscal_id', 'amount_observed',
         'observation_code_id', 'observation_bis_code_id', 'reception_date', 'expiration_date', 'doc_a_date',
         'doc_b_date', 'doc_c_date', 'doc_a', 'doc_b', 'doc_c', 'dep_response', 'dep_resp_comments',
-        'division_id', 'hdr_doc', 'hdr_reception_date', 'hdr_expiration1_date', 'hdr_expiration2_date'
+        'division_id', 'hdr_doc', 'hdr_reception_date', 'hdr_expiration1_date', 'hdr_expiration2_date',
+        'observation_stage_id',
     ])
     mod_ent = {attr: ent[attr] for attr in attributes}
     mod_ent['reception_date'] = mod_ent['reception_date'].__str__()

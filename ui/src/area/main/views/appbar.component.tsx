@@ -158,6 +158,14 @@ export function AppBarComponent() {
         { url: '/user/create', text: 'Crear', icon: <NoteAddIcon /> },
       ],
     },
+    preliminary: {
+      url: '/preliminary/create',
+      text: 'Crear Observación Preliminar',
+      icon: <ImageSearchIcon />,
+      open: true,
+      childrenList: [
+      ],
+    },
   };
 
   // const [openn, setOpenn] = React.useState(false);

@@ -159,8 +159,8 @@ export function AppBarComponent() {
       ],
     },
     preliminary: {
-      url: '/preliminary/create',
-      text: 'Crear Observación Preliminar',
+      url: '/results_report/create',
+      text: 'Crear Reporte de Resultados',
       icon: <ImageSearchIcon />,
       open: true,
       childrenList: [

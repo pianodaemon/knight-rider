@@ -116,7 +116,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const PreliminaryObservationForm = (props: Props) => {
+export const ResultsReportForm = (props: Props) => {
   const {
     auditsCatalog,
     catalog,

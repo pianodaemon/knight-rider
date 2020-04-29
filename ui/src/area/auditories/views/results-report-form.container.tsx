@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { PreliminaryObservationForm } from './preliminary-form.component';
+import { ResultsReportForm } from './results-report-form.component';
 import { createObservationAction } from '../state/usecases/create-observation.usecase';
 import { readObservationAction } from '../state/usecases/read-observation.usecase';
 import { updateObservationAction } from '../state/usecases/update-observation.usecate';
@@ -25,7 +25,7 @@ function mapStateToProps(state: any) {
   };
 }
 
-export const PreliminaryObservationFormContainer = connect(
+export const ResultsReportFormContainer = connect(
   mapStateToProps,
   mapDispatchToProps,
-)(PreliminaryObservationForm);
+)(ResultsReportForm);

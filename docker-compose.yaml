@@ -43,6 +43,8 @@ services:
         ports:
           - '10090:10090'
         environment: *commonEnv
+        volumes:
+          - ~/dev/keys:/root
         networks:
           - operational_network
 

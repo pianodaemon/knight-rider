@@ -44,7 +44,7 @@ services:
           - '10090:10090'
         environment: *commonEnv
         volumes:
-          - ~/dev/keys:/root
+          - ~/dev/keys:/pem
         networks:
           - operational_network
 

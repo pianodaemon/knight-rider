@@ -36,9 +36,9 @@ func getExpDelta() int {
 func getKeys() (*rsa.PrivateKey, *rsa.PublicKey, error) {
 
 	ref := struct {
-		Private string
-		Public  string
-	}{"/root/private_key", "/root/public_key.pub"}
+		Private string `default:"/pem/private_key"`
+		Public  string `default:"/pem/public_key.pub"`
+	}{"", ""}
 
 	/* It stands for
 	   TOKEN_CLERK_RSA_PRIVATE and  TOKEN_CLERK_RSA_PUBLIC */

@@ -6,8 +6,6 @@ x-shared-environment: &commonEnv
     POSTGRES_PORT: 5432
     POSTGRES_HOST: "rdbms_obs"
     POSTGRES_DB: "soa"
-    TOKEN_CLERK_RSA_PRIVATE: "/pem/private_key"
-    TOKEN_CLERK_RSA_PUBLIC: "/pem/public_key.pub"
 
 services:
     ui_obs:

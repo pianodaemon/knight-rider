@@ -950,6 +950,183 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: amounts_result_report; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.amounts_result_report (
+    id integer NOT NULL,
+    result_report_id integer NOT NULL,
+    projected double precision NOT NULL,
+    solved double precision NOT NULL,
+    inception_time timestamp with time zone NOT NULL,
+    comments text
+);
+
+
+ALTER TABLE public.amounts_result_report OWNER TO postgres;
+
+--
+-- Name: amounts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.amounts_result_report_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.amounts_result_report_id_seq OWNER TO postgres;
+
+--
+-- Name: amounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.amounts_result_report_id_seq OWNED BY public.amounts_result_report.id;
+
+--
+-- Name: amounts_result_report id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.amounts_result_report ALTER COLUMN id SET DEFAULT nextval('public.amounts_result_report_id_seq'::regclass);
+
+--
+-- Name: amounts amounts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.amounts_result_report
+    ADD CONSTRAINT amounts_result_report_pkey PRIMARY KEY (id);
+
+--
+-- Name: results_report_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+CREATE SEQUENCE public.results_report_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.results_report_seq OWNER TO postgres;
+
+--
+-- Name: SEQUENCE observations_seq; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON SEQUENCE public.results_report_seq IS 'Secuencia de la tabla results_report_seq (Informe de resultados)';
+
+
+--
+-- Name: results_report; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.results_report (
+    id integer DEFAULT nextval('public.results_report_seq'::regclass) NOT NULL,
+    observation_type_id integer NOT NULL,
+    social_program_id integer NOT NULL,
+    blocked boolean DEFAULT false NOT NULL,
+    audit_id integer NOT NULL,
+    observation_title text NOT NULL,
+    fiscal_id integer NOT NULL,
+    touch_latter_time timestamp with time zone NOT NULL,
+    amount_observed double precision DEFAULT 0 NOT NULL,
+    observation_code_id integer NOT NULL,
+    observation_bis_code_id integer NOT NULL,
+    inception_time timestamp with time zone NOT NULL,
+    expiration_date date NOT NULL,
+    reception_date date NOT NULL,
+    doc_a_date date NOT NULL,
+    doc_b_date date NOT NULL,
+    doc_c_date date NOT NULL,
+    doc_a character varying NOT NULL,
+    doc_b character varying NOT NULL,
+    doc_c character varying NOT NULL,
+    dep_response character varying NOT NULL,
+    dep_resp_comments character varying NOT NULL,
+    division_id integer NOT NULL,
+    hdr_doc character varying NOT NULL,
+    hdr_reception_date date NOT NULL,
+    hdr_expiration1_date date NOT NULL,
+    hdr_expiration2_date date NOT NULL,
+    observation_stage_id integer NOT NULL
+);
+
+
+ALTER TABLE public.results_report OWNER TO postgres;
+
+--
+-- Name: TABLE observations; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.results_report IS 'Alberga la entidad Informe de Resultado';
+
+--
+-- Name: amounts amounts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.results_report
+    ADD CONSTRAINT results_report_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: amounts amounts_observations_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.amounts_result_report
+    ADD CONSTRAINT amounts_result_report_fkey FOREIGN KEY (result_report_id) REFERENCES public.results_report(id);
+
+
+--
+-- Name: results_report audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.results_report
+    ADD CONSTRAINT audits_fkey FOREIGN KEY (audit_id) REFERENCES public.audits(id) NOT VALID;
+
+
+--
+-- Name: results_report results_report_divisions_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.results_report 
+    ADD CONSTRAINT results_report_divisions_fkey FOREIGN KEY (division_id) REFERENCES public.divisions(id) NOT VALID;
+
+
+--
+-- Name: results_report results_report_observation_codes_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.results_report 
+    ADD CONSTRAINT results_report_observation_codes_fkey FOREIGN KEY (observation_code_id) REFERENCES public.observation_codes(id);
+
+
+--
+-- Name: results_report results_report_observation_stages_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.results_report 
+    ADD CONSTRAINT results_report_observation_stages_fkey FOREIGN KEY (observation_stage_id) REFERENCES public.observation_stages(id) NOT VALID;
+
+
+--
+-- Name: results_report results_report_observation_types_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.results_report 
+    ADD CONSTRAINT results_report_observation_types_fkey FOREIGN KEY (observation_type_id) REFERENCES public.observation_types(id);
+
+
+--
+-- Name: results_report results_report_social_programs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.results_report 
+    ADD CONSTRAINT results_report_social_programs_fkey FOREIGN KEY (social_program_id) REFERENCES public.social_programs(id) NOT VALID;
+
+
+--
 -- PostgreSQL database dump complete
 --
 

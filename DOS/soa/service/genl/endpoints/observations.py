@@ -103,6 +103,11 @@ class ObservationList(Resource):
             ]
         )
 
+        """ Add observation stage search param """
+        if not search_params: 
+            search_params = {} 
+        search_params['observation_stage_id'] = 1
+
         try:
             obs_list, total_items, total_pages = observations.read_per_page(
                 offset, limit, order_by, order, search_params, per_page, page

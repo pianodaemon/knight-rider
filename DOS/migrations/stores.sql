@@ -400,14 +400,14 @@ ALTER FUNCTION public.alter_user(_user_id integer, _username character varying, 
 --
 
 CREATE FUNCTION public.alter_result_report(
-        _results_report_id integer,
+        _observation_id integer,
         _type_id integer, 
         _code_id integer, 
         _bis_code_id integer, 
         _social_program_id integer, 
         _audit_id integer, 
         _fiscal_id integer, 
-        _observation_title text, 
+        _title text, 
         _amount_observed double precision, 
         _amount_projected double precision, 
         _amount_solved double precision, 
@@ -435,7 +435,7 @@ CREATE FUNCTION public.alter_result_report(
 DECLARE
 
     -- latter amount to be compared with the newer one
-    latter_amount amounts_result_report;
+    latter_amount amounts;
 
     current_moment timestamp with time zone = now();
     coincidences integer := 0;
@@ -443,7 +443,7 @@ DECLARE
 	
 	-- get the default observation stage's id value (new observations only):
 	default_obs_stage_id integer := 0;
-	default_obs_stage_title text := 'PRELIMINAR';
+	default_obs_stage_title text := 'RESULT_REPORT';
 	prelim_counter integer := 0;
 
     -- dump of errors
@@ -453,7 +453,7 @@ BEGIN
 
     CASE
 
-        WHEN _results_report_id = 0 THEN
+        WHEN _observation_id = 0 THEN
 
             SELECT count(id)
 			FROM observation_stages INTO prelim_counter
@@ -468,13 +468,13 @@ BEGIN
 			WHERE title = default_obs_stage_title;
 
 			
-            INSERT INTO results_report (
+            INSERT INTO observations (
                 observation_type_id,
                 observation_code_id,
                 observation_bis_code_id,
                 social_program_id,
                 audit_id,
-                observation_title,
+                title,
                 fiscal_id,
                 amount_observed,
                 reception_date,
@@ -501,7 +501,7 @@ BEGIN
                 _bis_code_id,
                 _social_program_id,
                 _audit_id,
-                _observation_title,
+                _title,
                 _fiscal_id,
                 _amount_observed,
                 _reception_date,
@@ -524,11 +524,11 @@ BEGIN
 				default_obs_stage_id
             ) RETURNING id INTO latter_id;
 
-            INSERT INTO amounts_result_report (
+            INSERT INTO amounts (
                 comments,
                 projected,
                 solved,
-                result_report_id,
+                observation_id,
                 inception_time
             ) VALUES (
                 _amount_comments,
@@ -539,7 +539,7 @@ BEGIN
             );
             
 
-        WHEN _results_report_id > 0 THEN
+        WHEN _observation_id > 0 THEN
 
             -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             -- STARTS - Validates result_report id
@@ -548,18 +548,18 @@ BEGIN
             -- any exception if nothing was updated.
             -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             SELECT count(id)
-            FROM results_report INTO coincidences
-            WHERE NOT blocked AND id = _results_report_id;
+            FROM observations INTO coincidences
+            WHERE NOT blocked AND id = _observation_id;
 
             IF NOT coincidences = 1 THEN
-                RAISE EXCEPTION 'result report identifier % does not exist', _results_report_id;
+                RAISE EXCEPTION 'result report identifier % does not exist', _observation_id;
             END IF;
             -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             -- ENDS - Validate observation id
             -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            UPDATE results_report
-            SET observation_title  = _observation_title, observation_type_id = _type_id, observation_code_id = _code_id,
+            UPDATE observations
+            SET title  = _title, observation_type_id = _type_id, observation_code_id = _code_id,
                 observation_bis_code_id = _bis_code_id, social_program_id = _social_program_id,
                 audit_id = _audit_id, fiscal_id = _fiscal_id, reception_date = _reception_date,
                 expiration_date = _expiration_date, doc_a_date = _doc_a_date,
@@ -568,10 +568,10 @@ BEGIN
                 division_id = _division_id, hdr_doc = _hdr_doc, hdr_reception_date = _hdr_reception_date,
                 hdr_expiration1_date = _hdr_expiration1_date, hdr_expiration2_date = _hdr_expiration2_date,
                 amount_observed = _amount_observed, touch_latter_time = current_moment
-            WHERE id = _results_report_id;
+            WHERE id = _observation_id;
 
-            SELECT * FROM amounts_result_report
-            WHERE amounts_result_report.result_report_id = _results_report_id
+            SELECT * FROM amounts
+            WHERE amounts.observation_id = _observation_id
             ORDER BY inception_time DESC LIMIT 1
             INTO latter_amount;
 
@@ -582,27 +582,27 @@ BEGIN
             -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             IF latter_amount.solved != _amount_solved OR latter_amount.projected != _amount_projected THEN
 
-                INSERT INTO amounts_result_report (
+                INSERT INTO amounts (
                     comments,
                     projected,
                     solved,
-                    result_report_id,
+                    observation_id,
                     inception_time
                 ) VALUES (
                     _amount_comments,
                     _amount_projected,
                     _amount_solved,
-                    _results_report_id,
+                    _observation_id,
                     current_moment
                 );
 
             END IF;
 
             -- Upon edition we return observation id as latter id
-            latter_id = _results_report_id;
+            latter_id = _observation_id;
 
         ELSE
-            RAISE EXCEPTION 'negative result resport identifier % is unsupported', result_report_id;
+            RAISE EXCEPTION 'negative result resport identifier % is unsupported', _observation_id;
 
     END CASE;
 
@@ -618,14 +618,14 @@ $$;
 
 
 ALTER FUNCTION public.alter_result_report(
-    _results_report_id integer, 
+    _observation_id integer, 
     _type_id integer, 
     _code_id integer, 
     _bis_code_id integer, 
     _social_program_id integer, 
     _audit_id integer, 
     _fiscal_id integer, 
-    _observation_title text, 
+    _title text, 
     _amount_observed double precision, 
     _amount_projected double precision, 
     _amount_solved double precision, 

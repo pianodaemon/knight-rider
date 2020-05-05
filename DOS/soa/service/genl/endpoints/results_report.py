@@ -16,7 +16,7 @@ results_report_fields = {
     'social_program_id': fields.Integer(description='Social program identifier'),
     'audit_id': fields.Integer(description='Audit identifier'),
     'fiscal_id': fields.Integer(description='Fiscal entity that audits'),
-    'observation_title': fields.String(description='Desc of observation'),
+    'title': fields.String(description='Desc of observation'),
     'amount_observed': fields.Float(description='Observed amount'),
     'observation_code_id': fields.Integer(description='Observation code identifier'),
     'observation_bis_code_id': fields.Integer(description='Observation bis code identifier (CyTG->Clasif)'),
@@ -39,17 +39,17 @@ results_report_fields = {
 }
 result_report = api.model('Result_report', results_report_fields)
 
-amounts_result_report = api.model('Amount result report entry', {
+amounts= api.model('Amount result report entry', {
     'id': fields.Integer(description='An integer as entry identifier'),
     'projected': fields.Float(description='Amount projected'),
     'solved': fields.Float(description='Amount solved'),
-    'result_report_id': fields.Integer(description='An integer as result report id'),
+    'observation_id': fields.Integer(description='An integer as result report id'),
     'inception_time': fields.String(description='Inception time'),
     'comments': fields.String(description='Comments'),
 })
 
 results_report_ext_fields = dict(results_report_fields)
-results_report_ext_fields['amounts_result_report'] = fields.List(fields.Nested(amounts_result_report))
+results_report_ext_fields['amounts'] = fields.List(fields.Nested(amounts))
 results_report_ext = api.model('Extended Result Report (includes amounts result report history)', results_report_ext_fields)
 
 @ns.route('/')
@@ -66,7 +66,7 @@ class ResultReportList(Resource):
     @ns.param("social_program_id", "An integer as social program identifier")
     @ns.param("audit_id", "An integer as audit identifier")
     @ns.param("fiscal_id", "Fiscal entity that audits")
-    @ns.param("observation_title", "Description of observation")
+    @ns.param("title", "Description of observation")
     @ns.param("observation_code_id", "An integer identifying the observation codes")
     @ns.param("observation_bis_code_id", "An integer identifying the observation bis codes")
     @ns.param("reception_date", "Reception date (CyTG)")
@@ -96,11 +96,16 @@ class ResultReportList(Resource):
         search_params = get_search_params(
             request.args,
             [
-                'observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'observation_title',
+                'observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id', 'title',
                 'observation_code_id', 'observation_bis_code_id', 'doc_a', 'doc_b', 'doc_c',
                 'division_id', 'hdr_doc', 'hdr_reception_date', 'hdr_expiration1_date', 'hdr_expiration2_date'
             ]
         )
+
+        """ Add observation stage search param """
+        if not search_params: 
+            search_params = {} 
+        search_params['observation_stage_id'] = 2
 
         try:
             rs_r_list, total_items, total_pages = results_report.read_per_page(
@@ -118,7 +123,6 @@ class ResultReportList(Resource):
     @ns.marshal_with(results_report_ext, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
-        print("CREATE: restult_resport" )
         ''' To create an result report '''
         try:
             rs_r = results_report.create(**api.payload)

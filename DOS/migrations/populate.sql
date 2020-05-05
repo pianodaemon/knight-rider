@@ -63,6 +63,7 @@ INSERT INTO public.observation_codes VALUES (2, 'B-DOCUMENTOS');
 --
 
 INSERT INTO public.observation_stages VALUES (1, 'PRELIMINAR');
+INSERT INTO public.observation_stages VALUES (2, 'RESULT_REPORT');
 
 
 --

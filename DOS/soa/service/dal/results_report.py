@@ -42,7 +42,7 @@ def _alter_result_report(**kwargs):
             kwargs["social_program_id"],
             kwargs["audit_id"], 
             kwargs["fiscal_id"], 
-            kwargs["observation_title"],
+            kwargs["title"],
             kwargs["amount_observed"], 
             kwargs["projected"], 
             kwargs["solved"],
@@ -73,7 +73,7 @@ def _alter_result_report(**kwargs):
     else:
         id = rcode
 
-    ent = fetch_entity("results_report", id)
+    ent = fetch_entity("observations", id)
     return add_result_report_amounts(ent)
 
 
@@ -85,25 +85,25 @@ def create(**kwargs):
 
 def read(id):
     ''' Fetches an results report entity '''
-    ent = fetch_entity("results_report", id)
+    ent = fetch_entity("observations", id)
     return add_result_report_amounts(ent)
 
 
 def update(id, **kwargs):
-    ''' Updates an observation entity '''
+    ''' Updates an result report entity '''
     kwargs['id'] = id
     return _alter_result_report(**kwargs)
 
 
 def delete(id):
     ''' Deletes an result report entity '''
-    ent = delete_entity("results_report", id)
+    ent = delete_entity("observations", id)
     return add_result_report_amounts(ent)
 
 
 def read_page(offset, limit, order_by, order, search_params):
     ''' Reads a page of results report '''
-    return page_entities('results_report', offset, limit, order_by, order, search_params)
+    return page_entities('observations', offset, limit, order_by, order, search_params)
 
 
 def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
@@ -120,7 +120,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
 
     order_by_values = (
         'id','observation_type_id', 'social_program_id', 'audit_id', 'fiscal_id',
-        'observation_title', 'observation_code_id', 'observation_bis_code_id', 'doc_a', 'doc_b', 'doc_c',
+        'title', 'observation_code_id', 'observation_bis_code_id', 'doc_a', 'doc_b', 'doc_c',
         'division_id', 'hdr_doc', 'hdr_reception_date', 'hdr_expiration1_date', 'hdr_expiration2_date'
     )
     if order_by not in order_by_values:
@@ -136,7 +136,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         raise Exception("Value of params 'per_page' and 'page' should be >= 1")
 
     # Counting total number of items and fetching target page
-    total_items = count_entities('results_report', search_params)
+    total_items = count_entities('observations', search_params)
     if total_items > limit:
         total_items = limit
     
@@ -149,9 +149,9 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     target_items = total_items - whole_pages_offset
     if target_items > per_page:
         target_items = per_page
-
+    
     return (
-        page_entities('results_report', offset + whole_pages_offset, target_items, order_by, order, search_params),
+        page_entities('observations', offset + whole_pages_offset, target_items, order_by, order, search_params),
         total_items,
         total_pages
     )
@@ -171,15 +171,15 @@ def get_catalogs(table_name_list):
                 WHERE NOT blocked
                 ORDER BY id;
             '''.format(table)
-        elif table == 'fiscals':
-            sql = '''
-                SELECT fiscals.id, fiscals.title, fiscals.description
-                FROM observation_stages AS stages
-                JOIN observation_stages_conf AS conf ON stages.id = conf.observation_stage_id
-                JOIN fiscals ON conf.fiscal_id = fiscals.id
-                WHERE stages.title = 'PRELIMINAR'
-                ORDER BY conf.fiscal_id;
-            '''
+        # elif table == 'fiscals':
+        #     sql = '''
+        #         SELECT fiscals.id, fiscals.title, fiscals.description
+        #         FROM observation_stages AS stages
+        #         JOIN observation_stages_conf AS conf ON stages.id = conf.observation_stage_id
+        #         JOIN fiscals ON conf.fiscal_id = fiscals.id
+        #         WHERE stages.title = 'RESULT_REPORT'
+        #         ORDER BY conf.fiscal_id;
+        #     '''
         else:
             sql = '''
                 SELECT *
@@ -202,7 +202,7 @@ def get_catalogs(table_name_list):
 
 def add_result_report_amounts(ent):
     attributes = set([
-        'id', 'observation_type_id', 'social_program_id', 'audit_id', 'observation_title', 'fiscal_id', 'amount_observed',
+        'id', 'observation_type_id', 'social_program_id', 'audit_id', 'title', 'fiscal_id', 'amount_observed',
         'observation_code_id', 'observation_bis_code_id', 'reception_date', 'expiration_date', 'doc_a_date',
         'doc_b_date', 'doc_c_date', 'doc_a', 'doc_b', 'doc_c', 'dep_response', 'dep_resp_comments',
         'division_id', 'hdr_doc', 'hdr_reception_date', 'hdr_expiration1_date', 'hdr_expiration2_date',
@@ -220,18 +220,18 @@ def add_result_report_amounts(ent):
 
     sql = '''
         SELECT *
-        FROM amounts_result_report
-        WHERE result_report_id = {}
+        FROM amounts
+        WHERE observation_id = {}
         ORDER BY id DESC;
     '''.format(mod_ent['id'])
     
     rows = exec_steady(sql)
     
-    mod_ent['amounts_result_report'] = []
+    mod_ent['amounts'] = []
     for row in rows:
         row_dict = dict(row)
         row_dict['inception_time'] = row_dict['inception_time'].__str__()
-        mod_ent['amounts_result_report'].append(row_dict)
+        mod_ent['amounts'].append(row_dict)
 
     return mod_ent
 

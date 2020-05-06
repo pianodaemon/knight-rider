@@ -171,15 +171,15 @@ def get_catalogs(table_name_list):
                 WHERE NOT blocked
                 ORDER BY id;
             '''.format(table)
-        # elif table == 'fiscals':
-        #     sql = '''
-        #         SELECT fiscals.id, fiscals.title, fiscals.description
-        #         FROM observation_stages AS stages
-        #         JOIN observation_stages_conf AS conf ON stages.id = conf.observation_stage_id
-        #         JOIN fiscals ON conf.fiscal_id = fiscals.id
-        #         WHERE stages.title = 'RESULT_REPORT'
-        #         ORDER BY conf.fiscal_id;
-        #     '''
+        elif table == 'fiscals':
+            sql = '''
+                SELECT fiscals.id, fiscals.title, fiscals.description
+                FROM observation_stages AS stages
+                JOIN observation_stages_conf AS conf ON stages.id = conf.observation_stage_id
+                JOIN fiscals ON conf.fiscal_id = fiscals.id
+                WHERE stages.title = 'RESULT_REPORT'
+                ORDER BY conf.fiscal_id;
+            '''
         else:
             sql = '''
                 SELECT *

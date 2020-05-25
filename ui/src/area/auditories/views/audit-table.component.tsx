@@ -1,8 +1,10 @@
 /* eslint-disable no-alert */
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import MaterialTable from 'material-table';
+import MaterialTable, { MTableToolbar } from 'material-table';
 import TablePagination from '@material-ui/core/TablePagination';
+import Button from '@material-ui/core/Button';
+import PostAddIcon from '@material-ui/icons/PostAdd';
 import { Audit } from '../state/audits.reducer';
 
 type Props = {
@@ -49,7 +51,7 @@ export const AuditTable = (props: Props) => {
           sorting: !sorting,
         },
         {
-          title: 'Descripción',
+          title: 'Clave de Auditoría',
           field: 'title',
           sorting,
         },
@@ -98,6 +100,24 @@ export const AuditTable = (props: Props) => {
                 });
               }}
             />
+          );
+        },
+        Toolbar: (componentProps) => {
+          return (
+            <div>
+              <MTableToolbar {...componentProps} />
+              <div style={{ padding: '0px 10px', textAlign: 'right' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<PostAddIcon />}
+                  size="medium"
+                  onClick={() => history.push('/audit/create')}
+                >
+                  Agregar Auditoría
+                </Button>
+              </div>
+            </div>
           );
         },
       }}

@@ -1,9 +1,11 @@
 /* eslint-disable no-alert */
 import React, { useEffect } from 'react';
-import MaterialTable from 'material-table';
-import TablePagination from '@material-ui/core/TablePagination';
-import { Observation } from 'src/area/auditories/state/observations.reducer';
 import { useHistory } from 'react-router-dom';
+import MaterialTable, { MTableToolbar } from 'material-table';
+import { Observation } from 'src/area/auditories/state/observations.reducer';
+import TablePagination from '@material-ui/core/TablePagination';
+import Button from '@material-ui/core/Button';
+import PostAddIcon from '@material-ui/icons/PostAdd';
 
 type Props = {
   observations: Array<Observation>,
@@ -75,6 +77,8 @@ export const Table = (props: Props) => {
         pageSize: per_page,
         thirdSortClick: false,
         actionsColumnIndex: 5, // @todo this shouldn't be hardcoded, calculate using columns.lenght
+        toolbar: true,
+        toolbarButtonAlignment: 'right',
       }}
       components={{
         Pagination: (componentProps) => {
@@ -102,6 +106,24 @@ export const Table = (props: Props) => {
             />
           );
         },
+        Toolbar: (componentProps) => {
+          return (
+            <div>
+              <MTableToolbar {...componentProps} />
+              <div style={{ padding: '0px 10px', textAlign: 'right' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<PostAddIcon />}
+                  size="medium"
+                  onClick={() => history.push('/observation/create')}
+                >
+                  Agregar Observación
+                </Button>
+              </div>
+            </div>
+          );
+        },
       }}
       actions={[
         {
@@ -117,7 +139,7 @@ export const Table = (props: Props) => {
             if (
               // eslint-disable-next-line no-restricted-globals
               confirm(
-                `¿Realmente quieres eliminar la Observación ${rowData.id}?\n Esta acción es irreversible`,
+                `¿Realmente quieres eliminar la Observación ${rowData.id}?\n Esta acción es irreversible`
               )
             ) {
               removeObservationAction(rowData.id);

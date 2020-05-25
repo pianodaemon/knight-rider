@@ -1,9 +1,11 @@
 /* eslint-disable no-alert */
 import React, { useEffect } from 'react';
-import MaterialTable from 'material-table';
-import TablePagination from '@material-ui/core/TablePagination';
-import { User } from 'src/area/users/state/users.reducer';
 import { useHistory } from 'react-router-dom';
+import { User } from 'src/area/users/state/users.reducer';
+import MaterialTable, { MTableToolbar } from 'material-table';
+import TablePagination from '@material-ui/core/TablePagination';
+import Button from '@material-ui/core/Button';
+import PostAddIcon from '@material-ui/icons/PostAdd';
 
 type Props = {
   users: Array<User>,
@@ -93,6 +95,24 @@ export const UsersTable = (props: Props) => {
                 });
               }}
             />
+          );
+        },
+        Toolbar: (componentProps) => {
+          return (
+            <div>
+              <MTableToolbar {...componentProps} />
+              <div style={{ padding: '0px 10px', textAlign: 'right' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<PostAddIcon />}
+                  size="medium"
+                  onClick={() => history.push('/user/create')}
+                >
+                  Agregar Usuario
+                </Button>
+              </div>
+            </div>
           );
         },
       }}

@@ -176,7 +176,7 @@ export const AuditsForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel id="dependency_id">Programa</InputLabel>
+                      <InputLabel id="dependency_id">Dependencia</InputLabel>
                       <Select
                         labelId="dependency_id"
                         id="dependency_id-select"

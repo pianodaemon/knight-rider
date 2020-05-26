@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 9.6.17
--- Dumped by pg_dump version 12.2 (Ubuntu 12.2-2.pgdg18.04+1)
+-- Dumped by pg_dump version 12.3 (Ubuntu 12.3-1.pgdg18.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -17,9 +17,36 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 
-
-
 SET default_tablespace = '';
+
+--
+-- Name: seguimientos_obs_sfp; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.seguimientos_obs_sfp (
+    observacion_id integer NOT NULL,
+    seguimiento_id integer DEFAULT 0 NOT NULL,
+    num_oficio_cytg_oic character varying NOT NULL,
+    fecha_oficio_cytg_oic date NOT NULL,
+    fecha_recibido_dependencia date NOT NULL,
+    fecha_vencimiento_cytg date NOT NULL,
+    num_oficio_resp_dependencia character varying NOT NULL,
+    fecha_recibido_oficio_resp date NOT NULL,
+    resp_dependencia text NOT NULL,
+    comentarios text NOT NULL,
+    clasif_final_interna_cytg integer NOT NULL,
+    num_oficio_org_fiscalizador character varying NOT NULL,
+    fecha_oficio_org_fiscalizador date NOT NULL,
+    estatus_id integer NOT NULL,
+    monto_solventado double precision DEFAULT 0 NOT NULL,
+    monto_pendiente_solventar double precision DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.seguimientos_obs_sfp OWNER TO postgres;
+
+
+
 
 --
 -- Name: amounts; Type: TABLE; Schema: public; Owner: postgres
@@ -57,6 +84,18 @@ ALTER TABLE public.amounts_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE public.amounts_id_seq OWNED BY public.amounts.id;
 
+
+--
+-- Name: anios_cuenta_publica_obs_sfp; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.anios_cuenta_publica_obs_sfp (
+    observacion_id integer NOT NULL,
+    anio_cuenta_publica integer DEFAULT 2012 NOT NULL
+);
+
+
+ALTER TABLE public.anios_cuenta_publica_obs_sfp OWNER TO postgres;
 
 --
 -- Name: apps; Type: TABLE; Schema: public; Owner: postgres
@@ -145,6 +184,18 @@ CREATE TABLE public.authorities (
 ALTER TABLE public.authorities OWNER TO postgres;
 
 --
+-- Name: autoridades_invest; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.autoridades_invest (
+    id integer NOT NULL,
+    titulo character varying NOT NULL
+);
+
+
+ALTER TABLE public.autoridades_invest OWNER TO postgres;
+
+--
 -- Name: dependencies; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -182,6 +233,18 @@ ALTER TABLE public.divisions OWNER TO postgres;
 
 COMMENT ON TABLE public.divisions IS 'Relacion que alberga las direcciones de la contraloria';
 
+
+--
+-- Name: estatus_sfp; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.estatus_sfp (
+    id integer NOT NULL,
+    titulo character varying NOT NULL
+);
+
+
+ALTER TABLE public.estatus_sfp OWNER TO postgres;
 
 --
 -- Name: fiscals; Type: TABLE; Schema: public; Owner: postgres
@@ -283,6 +346,65 @@ ALTER TABLE public.gral_user_authority_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE public.gral_user_authority_id_seq OWNED BY public.user_authority.id;
 
+
+--
+-- Name: observaciones_sfp_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.observaciones_sfp_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.observaciones_sfp_seq OWNER TO postgres;
+
+--
+-- Name: observaciones_sfp; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.observaciones_sfp (
+    id integer DEFAULT nextval('public.observaciones_sfp_seq'::regclass) NOT NULL,
+    direccion_id integer NOT NULL,
+    dependencia_id integer NOT NULL,
+    fecha_captura date NOT NULL,
+    programa_social_id integer NOT NULL,
+    auditoria_id integer NOT NULL,
+    acta_cierre character varying NOT NULL,
+    fecha_firma_acta_cierre date NOT NULL,
+    fecha_compromiso date NOT NULL,
+    clave_observacion_id integer NOT NULL,
+    observacion text NOT NULL,
+    acciones_correctivas character varying NOT NULL,
+    acciones_preventivas character varying NOT NULL,
+    tipo_observacion_id integer NOT NULL,
+    monto_observado double precision DEFAULT 0 NOT NULL,
+    monto_a_reintegrar double precision DEFAULT 0 NOT NULL,
+    monto_reintegrado double precision DEFAULT 0 NOT NULL,
+    fecha_reintegro date NOT NULL,
+    monto_por_reintegrar double precision DEFAULT 0 NOT NULL,
+    num_oficio_of_vista_cytg character varying NOT NULL,
+    fecha_oficio_of_vista_cytg date NOT NULL,
+    num_oficio_cytg_aut_invest character varying NOT NULL,
+    fecha_oficio_cytg_aut_invest date NOT NULL,
+    num_carpeta_investigacion character varying NOT NULL,
+    num_oficio_vai_municipio character varying NOT NULL,
+    fecha_oficio_vai_municipio date NOT NULL,
+    autoridad_invest_id integer NOT NULL,
+    num_oficio_pras_of character varying NOT NULL,
+    fecha_oficio_pras_of date NOT NULL,
+    num_oficio_pras_cytg_dependencia character varying NOT NULL,
+    num_oficio_resp_dependencia character varying NOT NULL,
+    fecha_oficio_resp_dependencia date NOT NULL,
+    blocked boolean DEFAULT false NOT NULL,
+    hora_ult_cambio timestamp with time zone NOT NULL,
+    hora_creacion timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.observaciones_sfp OWNER TO postgres;
 
 --
 -- Name: observation_codes; Type: TABLE; Schema: public; Owner: postgres
@@ -575,6 +697,14 @@ ALTER TABLE ONLY public.amounts
 
 
 --
+-- Name: anios_cuenta_publica_obs_sfp anios_cuenta_publica_obs_sfp_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.anios_cuenta_publica_obs_sfp
+    ADD CONSTRAINT anios_cuenta_publica_obs_sfp_pkey PRIMARY KEY (observacion_id, anio_cuenta_publica);
+
+
+--
 -- Name: apps app_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -612,6 +742,22 @@ ALTER TABLE ONLY public.authorities
 
 ALTER TABLE ONLY public.authorities
     ADD CONSTRAINT authorities_title_key UNIQUE (title);
+
+
+--
+-- Name: autoridades_invest autoridades_invest_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.autoridades_invest
+    ADD CONSTRAINT autoridades_invest_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: autoridades_invest autoridades_invest_titulo_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.autoridades_invest
+    ADD CONSTRAINT autoridades_invest_titulo_unique UNIQUE (titulo);
 
 
 --
@@ -663,6 +809,22 @@ ALTER TABLE ONLY public.divisions
 
 
 --
+-- Name: estatus_sfp estatus_sfp_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estatus_sfp
+    ADD CONSTRAINT estatus_sfp_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: estatus_sfp estatus_sfp_titulo_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estatus_sfp
+    ADD CONSTRAINT estatus_sfp_titulo_unique UNIQUE (titulo);
+
+
+--
 -- Name: fiscals fiscal_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -684,6 +846,14 @@ ALTER TABLE ONLY public.fiscals
 
 ALTER TABLE ONLY public.geo_municipalities
     ADD CONSTRAINT geo_municipality_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: observaciones_sfp observaciones_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_sfp
+    ADD CONSTRAINT observaciones_pkey PRIMARY KEY (id);
 
 
 --
@@ -791,6 +961,14 @@ ALTER TABLE ONLY public.sectors
 
 
 --
+-- Name: seguimientos_obs_sfp seguimientos_obs_sfp_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_sfp
+    ADD CONSTRAINT seguimientos_obs_sfp_pkey PRIMARY KEY (observacion_id, seguimiento_id);
+
+
+--
 -- Name: social_programs social_programs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -854,6 +1032,14 @@ ALTER TABLE ONLY public.amounts
 
 
 --
+-- Name: anios_cuenta_publica_obs_sfp anios_cuenta_publica_obs_sfp_observaciones_sfp_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.anios_cuenta_publica_obs_sfp
+    ADD CONSTRAINT anios_cuenta_publica_obs_sfp_observaciones_sfp_fkey FOREIGN KEY (observacion_id) REFERENCES public.observaciones_sfp(id);
+
+
+--
 -- Name: observations audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -867,6 +1053,62 @@ ALTER TABLE ONLY public.observations
 
 ALTER TABLE ONLY public.authorities
     ADD CONSTRAINT authorities_app_id_fkey FOREIGN KEY (app_id) REFERENCES public.apps(id);
+
+
+--
+-- Name: observaciones_sfp observaciones_audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_sfp
+    ADD CONSTRAINT observaciones_audits_fkey FOREIGN KEY (auditoria_id) REFERENCES public.audits(id);
+
+
+--
+-- Name: observaciones_sfp observaciones_autoridades_invest_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_sfp
+    ADD CONSTRAINT observaciones_autoridades_invest_fkey FOREIGN KEY (autoridad_invest_id) REFERENCES public.autoridades_invest(id);
+
+
+--
+-- Name: observaciones_sfp observaciones_dependencies_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_sfp
+    ADD CONSTRAINT observaciones_dependencies_fkey FOREIGN KEY (dependencia_id) REFERENCES public.dependencies(id);
+
+
+--
+-- Name: observaciones_sfp observaciones_divisions_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_sfp
+    ADD CONSTRAINT observaciones_divisions_fkey FOREIGN KEY (direccion_id) REFERENCES public.divisions(id);
+
+
+--
+-- Name: observaciones_sfp observaciones_observation_codes_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_sfp
+    ADD CONSTRAINT observaciones_observation_codes_fkey FOREIGN KEY (clave_observacion_id) REFERENCES public.observation_codes(id);
+
+
+--
+-- Name: observaciones_sfp observaciones_observation_types_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_sfp
+    ADD CONSTRAINT observaciones_observation_types_fkey FOREIGN KEY (tipo_observacion_id) REFERENCES public.observation_types(id);
+
+
+--
+-- Name: observaciones_sfp observaciones_social_programs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_sfp
+    ADD CONSTRAINT observaciones_social_programs_fkey FOREIGN KEY (programa_social_id) REFERENCES public.social_programs(id);
 
 
 --
@@ -907,6 +1149,30 @@ ALTER TABLE ONLY public.observations
 
 ALTER TABLE ONLY public.observations
     ADD CONSTRAINT observations_social_programs_fkey FOREIGN KEY (social_program_id) REFERENCES public.social_programs(id) NOT VALID;
+
+
+--
+-- Name: seguimientos_obs_sfp seguimientos_obs_sfp_estatus_sfp_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_sfp
+    ADD CONSTRAINT seguimientos_obs_sfp_estatus_sfp_fkey FOREIGN KEY (estatus_id) REFERENCES public.estatus_sfp(id);
+
+
+--
+-- Name: seguimientos_obs_sfp seguimientos_obs_sfp_observaciones_sfp_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_sfp
+    ADD CONSTRAINT seguimientos_obs_sfp_observaciones_sfp_fkey FOREIGN KEY (observacion_id) REFERENCES public.observaciones_sfp(id);
+
+
+--
+-- Name: seguimientos_obs_sfp seguimientos_obs_sfp_observation_codes_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_sfp
+    ADD CONSTRAINT seguimientos_obs_sfp_observation_codes_fkey FOREIGN KEY (clasif_final_interna_cytg) REFERENCES public.observation_codes(id);
 
 
 --

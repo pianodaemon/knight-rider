@@ -4,13 +4,11 @@ import { Formik } from 'formik';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdown.component';
 import { Catalog, Audit } from '../state/audits.reducer';
 
 type Props = {
@@ -151,6 +149,7 @@ export const AuditsForm = (props: Props) => {
           handleChange,
           handleSubmit,
           isSubmitting,
+          setFieldValue,
         }) => {
           return (
             <>
@@ -176,23 +175,21 @@ export const AuditsForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel id="dependency_id">Dependencia</InputLabel>
-                      <Select
-                        labelId="dependency_id"
-                        id="dependency_id-select"
+                      <AutoCompleteDropdown
+                        fieldLabel="title"
+                        fieldValue="id"
+                        label="Dependencia"
+                        name="dependencia"
+                        onChange={(value: any) => {
+                          return setFieldValue('dependency_id', value);
+                        }}
+                        options={
+                          catalog && catalog.dependencies
+                            ? catalog.dependencies
+                            : []
+                        }
                         value={catalog ? values.dependency_id || '' : ''}
-                        onChange={handleChange('dependency_id')}
-                      >
-                        {catalog &&
-                          catalog.dependencies &&
-                          catalog.dependencies.map((item) => {
-                            return (
-                              <MenuItem value={item.id} key={`type-${item.id}`}>
-                                {item.title}
-                              </MenuItem>
-                            );
-                          })}
-                      </Select>
+                      />
                       {errors.dependency_id &&
                         touched.dependency_id &&
                         errors.dependency_id && (

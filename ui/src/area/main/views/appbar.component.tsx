@@ -236,6 +236,7 @@ export function AppBarComponent() {
                   component={Link}
                   to={breadcrumbNameMap[route].url}
                   key={route}
+                  onClick={handleDrawerClose}
                 >
                   <ListItemIcon>{breadcrumbNameMap[route].icon}</ListItemIcon>
                   <ListItemText primary={breadcrumbNameMap[route].text} />
@@ -255,6 +256,7 @@ export function AppBarComponent() {
                                 breadcrumbNameMap[route].childrenList[index2]
                                   .url
                               }
+                              onClick={handleDrawerClose}
                             >
                               <ListItemIcon>
                                 {

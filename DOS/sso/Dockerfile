@@ -1,5 +1,4 @@
 # Building stage
-# FROM golang:1.14-buster as builder
 FROM golang:1.14-alpine as builder
 
 LABEL MAINTAINER="Edward Nygma <j4nusx@yahoo.com>"
@@ -22,7 +21,7 @@ RUN CGO_ENABLED=0 \
     go build -ldflags="-w -s" -o /sso cmd/http/run.go
 
 # Final image
-FROM golang:1.14-alpine
+FROM alpine:latest
 
 LABEL MAINTAINER="Edward Nygma <j4nusx@yahoo.com>"
 

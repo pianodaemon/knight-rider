@@ -34,7 +34,28 @@ export interface ObservationSFP {
   num_oficio_pras_cytg_dependencia: number;
   num_oficio_resp_dependencia: number;
   fecha_oficio_resp_dependencia: number;
+  seguimientos: Array<Seguimiento> | null;
+  anios_cuenta_publica: Array<number> | null;
 }
+
+type Seguimiento = {
+  observacion_id: number,
+  seguimiento_id: number,
+  num_oficio_cytg_oic: string,
+  fecha_oficio_cytg_oic: string,
+  fecha_recibido_dependencia: string,
+  fecha_vencimiento_cytg: string,
+  num_oficio_resp_dependencia: string,
+  fecha_recibido_oficio_resp: string,
+  resp_dependencia: string,
+  comentarios: string,
+  clasif_final_interna_cytg: number,
+  num_oficio_org_fiscalizador: string,
+  fecha_oficio_org_fiscalizador: string,
+  estatus_id: number,
+  monto_solventado: number,
+  monto_pendiente_solventar: number,
+};
 
 interface ObservationsSFPSlice {
   observations: Array<ObservationSFP> | null;

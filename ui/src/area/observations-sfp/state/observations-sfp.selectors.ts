@@ -24,6 +24,8 @@ export const observationSFPSelector = createSelector(
     if (!slice.observation) {
       return null;
     }
+    return slice.observation;
+    /*
     const item = slice.observation;
     const { amounts } = item;
     const [lastAmount] = amounts || [];
@@ -44,7 +46,8 @@ export const observationSFPSelector = createSelector(
           mutatedAmounts,
         }
       : null;
-  },
+      */
+  }
 );
 
 export const isLoadingSelector = createSelector(

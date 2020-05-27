@@ -5,6 +5,7 @@ import { AuditTableContainer } from '../../auditories/views/audit-table.containe
 import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
 import { FormContainer } from '../../auditories/views/form.container';
+import { ObservationsSFPFormContainer } from '../../observations-sfp/views/observation-sfp-form.container';
 import { AuditContainer } from '../../auditories/views/audit-form.container';
 import { UsersFormContainer } from '../../users/views/users-form.container';
 import { ResultsReportFormContainer } from '../../auditories/views/results-report-form.container';
@@ -42,6 +43,12 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route exact path={['/', '/observation-sfp/list']}>
           <ObservationSFPTableContainer />
+        </Route>
+        <Route
+          exact
+          path={['/observation-sfp/create', '/observation-sfp/:id/edit']}
+        >
+          <ObservationsSFPFormContainer />
         </Route>
         <Route exact path={['/user/create', '/user/:id/edit']}>
           <UsersFormContainer />

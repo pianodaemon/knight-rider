@@ -10,10 +10,10 @@ type Props = {
   fieldValue: string,
   label: string,
   name: string,
-  value: string,
+  value: any,
 };
 
-export function AutoCompleteDropdown(props: any) {
+export function AutoCompleteDropdown(props: Props) {
   const {
     fieldLabel,
     fieldValue,

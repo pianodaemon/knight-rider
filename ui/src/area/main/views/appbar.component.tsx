@@ -149,6 +149,19 @@ export function AppBarComponent() {
         { url: '/observation/create', text: 'Crear', icon: <NoteAddIcon /> },
       ],
     },
+    observationSfp: {
+      url: '/observation-sfp/list',
+      text: 'Observaciones SFP',
+      icon: <ImageSearchIcon />,
+      open: true,
+      childrenList: [
+        {
+          url: '/observation-sfp/create',
+          text: 'Crear',
+          icon: <NoteAddIcon />,
+        },
+      ],
+    },
     user: {
       url: '/user/list',
       text: 'Usuarios',
@@ -163,8 +176,7 @@ export function AppBarComponent() {
       text: 'Crear Reporte de Resultados',
       icon: <ImageSearchIcon />,
       open: true,
-      childrenList: [
-      ],
+      childrenList: [],
     },
   };
 

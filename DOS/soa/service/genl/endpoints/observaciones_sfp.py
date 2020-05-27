@@ -41,9 +41,30 @@ obs_sfp_ns_captions = {
     'num_oficio_pras_cytg_dependencia': 'Num. de Oficio PRAS de la CyTG para la Dependencia',
     'num_oficio_resp_dependencia': 'Num. de Oficio de respuesta de la Dependencia',
     'fecha_oficio_resp_dependencia': 'Fecha de Oficio de respuesta de la Dependencia',
+    'seguimientos': 'Seguimientos (lista de cédulas)',
+    'anios_cuenta_publica': 'Años de la cuenta pública',
 }
 
 ns = api.namespace("obs_sfp", description="Servicios disponibles para observaciones de la SFP (Informe de Resultados)")
+
+seguimiento = api.model('Seguimiento de una observacion SFP', {
+    'observacion_id': fields.Integer(description='Observacion a la que pertenece el seguimiento'),
+    'seguimiento_id': fields.Integer(description='Id del seguimiento'),
+    'num_oficio_cytg_oic': fields.String(description='Num. de Oficio CyTG u OIC'),
+    'fecha_oficio_cytg_oic': fields.Date(description='Fecha de Oficio CyTG u OIC'),
+    'fecha_recibido_dependencia': fields.Date(description='Fecha de recibido de la Dependencia (ACUSE)'),
+    'fecha_vencimiento_cytg': fields.Date(description='Fecha de vencimiento (CyTG)'),
+    'num_oficio_resp_dependencia': fields.String(description='Num. de Oficio de respuesta de la Dependencia'),
+    'fecha_recibido_oficio_resp': fields.Date(description='Fecha de recibido del Oficio de respuesta de la Dependencia'),
+    'resp_dependencia': fields.String(description='Respuesta de la Dependencia'),
+    'comentarios': fields.String(description='Comentarios'),
+    'clasif_final_interna_cytg': fields.Integer(description='Clasificacion final Interna CyTG'),
+    'num_oficio_org_fiscalizador': fields.String(description='Num. de Oficio para Organo Fiscalizador'),
+    'fecha_oficio_org_fiscalizador': fields.Date(description='Fecha de Oficio para Organo Fiscalizador'),
+    'estatus_id': fields.Integer(description='Estatus'),
+    'monto_solventado': fields.Float(description='Monto Solventado'),
+    'monto_pendiente_solventar': fields.Float(description='Monto Pendiente de solventar'),
+})
 
 obs_sfp_fields = {
     'id': fields.Integer(description=obs_sfp_ns_captions['id']),
@@ -78,12 +99,11 @@ obs_sfp_fields = {
     'num_oficio_pras_cytg_dependencia': fields.String(description=obs_sfp_ns_captions['num_oficio_pras_cytg_dependencia']),
     'num_oficio_resp_dependencia': fields.String(description=obs_sfp_ns_captions['num_oficio_resp_dependencia']),
     'fecha_oficio_resp_dependencia': fields.Date(description=obs_sfp_ns_captions['fecha_oficio_resp_dependencia']),
+    'seguimientos': fields.List(fields.Nested(seguimiento), description=obs_sfp_ns_captions['seguimientos']),
+    'anios_cuenta_publica': fields.List(fields.Integer(), description=obs_sfp_ns_captions['anios_cuenta_publica']),
 }
 obs_sfp = api.model('Observacion SFP', obs_sfp_fields)
 
-usr_fields_ext = dict(obs_sfp_fields)
-usr_fields_ext['access_vector'] = fields.List(fields.Integer(description='Authority id'), required=True)
-user_ext = api.model('Extended User', usr_fields_ext)
 
 pair = api.model('Id-Title pair', {
     'id': fields.Integer(description='An integer as entry identifier'),
@@ -145,8 +165,8 @@ class ObservacionSfpList(Resource):
         return obs_sfp_list, 200, {'X-SOA-Total-Items': total_items, 'X-SOA-Total-Pages': total_pages}
 
 
-    @ns.expect(user_ext)
-    @ns.marshal_with(user_ext, code=201)
+    @ns.expect(obs_sfp)
+    @ns.marshal_with(obs_sfp, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
         ''' Not available yet. To create a user. Key \'disabled\' is ignored as this is automatically set to false at creation '''
@@ -164,17 +184,17 @@ class ObservacionSfpList(Resource):
 
 
 @ns.route('/<int:id>')
-@ns.param('id', 'User identifier')
-@ns.response(404, 'User not found')
+@ns.param('id', 'Id de una observacion (SFP)')
+@ns.response(404, 'Observation not found')
 @ns.response(400, 'There is a problem with your request data')
 class ObservacionSfp(Resource):
     obs_not_found = 'Observacion no encontrada'
 
-    @ns.marshal_with(user_ext)
+    @ns.marshal_with(obs_sfp)
     def get(self, id):
-        ''' Not available yet. To fetch a user '''
+        ''' To fetch an observation (SFP) '''
         try:
-            usr = observaciones_sfp.read(id)
+            obs = observaciones_sfp.read(id)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except EmptySetError:
@@ -182,11 +202,11 @@ class ObservacionSfp(Resource):
         except Exception as err:
             ns.abort(400, message=err)
         
-        return usr
+        return obs
 
 
-    @ns.expect(user_ext)
-    @ns.marshal_with(user_ext)
+    @ns.expect(obs_sfp)
+    @ns.marshal_with(obs_sfp)
     def put(self, id):
         ''' Not available yet. To update a user '''
         try:
@@ -203,7 +223,7 @@ class ObservacionSfp(Resource):
         return usr
 
 
-    @ns.marshal_with(user_ext)
+    @ns.marshal_with(obs_sfp)
     def delete(self, id):
         ''' Not available yet. To delete a user '''
         try:

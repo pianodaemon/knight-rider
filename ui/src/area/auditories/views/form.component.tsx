@@ -181,6 +181,13 @@ export const ObservationsForm = (props: Props) => {
       'doc_c',
       'dep_response',
       'dep_resp_comments',
+      'observation_bis_code_id',
+      'doc_a_date',
+      'reception_date',
+      'expiration_date',
+      'hdr_reception_date',
+      'hdr_expiration1_date',
+      'hdr_expiration2_date',
     ];
     // Mandatory fields (not empty)
     Object.keys(initialValues).filter(field => !noMandatoryFields.includes(field)).forEach((field: string) => {
@@ -194,8 +201,7 @@ export const ObservationsForm = (props: Props) => {
     });
     // Fechas (año en específico) de la observación no pueden ser menores al año de la auditoría
     dateFields.forEach(field => {
-      if ((!values[field] && !errors[field]) ||
-        values[field] instanceof Date ||
+      if (values[field] instanceof Date ||
         (values[field] && new Date(values[field].replace(/-/g, '/')).getFullYear() < auditYear)
       ) {
         errors[field] = errors[field] || 'Revise que el año de la fecha que ingresó sea posterior al Año de la Auditoría';
@@ -427,6 +433,7 @@ export const ObservationsForm = (props: Props) => {
                         component={FormikDatePicker}
                         label="Registro (Fecha)"
                         name="hdr_expiration2_date"
+                        defaultValue="2099-12-31"
                       />
                       {errors.hdr_expiration2_date &&
                         touched.hdr_expiration2_date && (
@@ -893,6 +900,7 @@ export const ObservationsForm = (props: Props) => {
                           onChange={handleChange('amount_observed')}
                           name="amount_observed"
                           id="amount_observed"
+                          placeholder="0"
                           InputProps={{
                             inputComponent: NumberFormatCustom as any,
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -918,6 +926,7 @@ export const ObservationsForm = (props: Props) => {
                           onChange={handleChange('projected')}
                           name="projected"
                           id="projected"
+                          placeholder="0"
                           InputProps={{
                             inputComponent: NumberFormatCustom as any,
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -943,6 +952,7 @@ export const ObservationsForm = (props: Props) => {
                           onChange={handleChange('solved')}
                           name="solved"
                           id="solved"
+                          placeholder="0"
                           InputProps={{
                             inputComponent: NumberFormatCustom as any,
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,

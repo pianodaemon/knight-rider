@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DatePicker } from '@material-ui/pickers';
 import format from 'date-fns/format';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 export const FormikDatePicker = ({
   form: { setFieldValue },
@@ -25,6 +26,10 @@ export const FormikDatePicker = ({
       }}
       value={date}
       views={['date', 'month']}
+      placeholder="2099-12-31"
+      InputProps={{
+        startAdornment: <InputAdornment position="start" />,
+      }}
       {...rest}
       // autoOk
       // disableOpenOnEnter

@@ -9,6 +9,7 @@ import { AuditContainer } from '../../auditories/views/audit-form.container';
 import { UsersFormContainer } from '../../users/views/users-form.container';
 import { ResultsReportFormContainer } from '../../auditories/views/results-report-form.container';
 import { NotFound } from './not-found.component';
+import { ObservationSFPTableContainer } from '../../observations-sfp/views/observation-sfp-table.container';
 
 type Props = {
   history: History,
@@ -38,6 +39,9 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route exact path={['/observation/create', '/observation/:id/edit']}>
           <FormContainer />
+        </Route>
+        <Route exact path={['/', '/observation-sfp/list']}>
+          <ObservationSFPTableContainer />
         </Route>
         <Route exact path={['/user/create', '/user/:id/edit']}>
           <UsersFormContainer />

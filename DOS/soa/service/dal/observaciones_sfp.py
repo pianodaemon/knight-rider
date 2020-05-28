@@ -142,20 +142,11 @@ def get_catalogs(table_name_list):
         
         if table == 'audits':
             sql = '''
-                SELECT *
+                SELECT id, title, dependency_id, year
                 FROM {}
                 WHERE NOT blocked
-                ORDER BY id;
+                ORDER BY title;
             '''.format(table)
-        elif table == 'fiscals':
-            sql = '''
-                SELECT fiscals.id, fiscals.title, fiscals.description
-                FROM observation_stages AS stages
-                JOIN observation_stages_conf AS conf ON stages.id = conf.observation_stage_id
-                JOIN fiscals ON conf.fiscal_id = fiscals.id
-                WHERE stages.title = 'PRELIMINAR'
-                ORDER BY conf.fiscal_id;
-            '''
         else:
             sql = '''
                 SELECT *
@@ -166,10 +157,7 @@ def get_catalogs(table_name_list):
         rows = exec_steady(sql)
         
         for row in rows:
-            ent = dict(row)
-            if table == 'audits':
-                transform_data(ent)
-            values_l.append(ent)
+            values_l.append(dict(row))
         
         fields_d[table] = values_l
 
@@ -216,8 +204,3 @@ def add_observacion_data(ent):
         mod_ent['anios_cuenta_publica'].append(row[0])
 
     return mod_ent
-
-
-def transform_data(ent):
-    ent['inception_time'] = ent['inception_time'].__str__()
-    ent['touch_latter_time'] = ent['touch_latter_time'].__str__()

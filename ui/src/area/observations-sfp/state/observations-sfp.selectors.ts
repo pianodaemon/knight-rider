@@ -1,11 +1,5 @@
 import { createSelector } from 'reselect';
 import {
-  AUDITS,
-  PROGRAMS,
-  DEPENDENCIES,
-  DIVISIONS,
-} from 'src/shared/constants/mocks/observations-sfp.constants';
-import {
   observationsSFPReducer,
   ObservationSFP,
 } from './observations-sfp.reducer';
@@ -47,7 +41,7 @@ export const observationSFPSelector = createSelector(
         }
       : null;
       */
-  }
+  },
 );
 
 export const isLoadingSelector = createSelector(
@@ -71,25 +65,24 @@ export const observationsCatalogSelector = createSelector(
   catalogSelector,
   (slice: any, catalog: any) =>
     catalog &&
-    // catalog.observation_types &&
     slice.observations &&
     Array.isArray(slice.observations) &&
     slice.observations.map((observation: ObservationSFP) => {
-      let direccion_id_title: any = DIVISIONS.find(
+      let direccion_id_title: any = catalog.divisions.find(
         (item: any) => item.id === observation.direccion_id
       );
-      let auditoria_id_title: any = AUDITS.find(
+      let auditoria_id_title: any = catalog.audits.find(
         (item: any) => item.id === observation.auditoria_id
       );
-      let dependencia_id_title: any = DEPENDENCIES.find(
-        (item: any) => item.id === parseInt(observation.dependencia_id.toString(), 10)
-      );
-      let programa_social_id_title: any = PROGRAMS.find(
+      let dependencia_id_title: any = catalog.dependencies.find(
         (item: any) =>
-          item.programa_social_id === observation.programa_social_id
+          item.id === parseInt(observation.dependencia_id.toString(), 10)
       );
-      direccion_id_title = direccion_id_title ? direccion_id_title.desc : null;
-      auditoria_id_title = auditoria_id_title ? auditoria_id_title.desc : null;
+      let programa_social_id_title: any = catalog.social_programs.find(
+        (item: any) => item.id === observation.programa_social_id
+      );
+      direccion_id_title = direccion_id_title ? direccion_id_title.title : null;
+      auditoria_id_title = auditoria_id_title ? auditoria_id_title.title : null;
       dependencia_id_title = dependencia_id_title
         ? dependencia_id_title.title
         : null;
@@ -103,10 +96,10 @@ export const observationsCatalogSelector = createSelector(
         dependencia_id_title,
         programa_social_id_title,
       };
-    })
+    }),
 );
 
 export const pagingSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.paging
+  (slice: any) => slice.paging,
 );

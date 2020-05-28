@@ -31,8 +31,11 @@ export function AutoCompleteDropdown(props: Props) {
     };
   });
   const itemSelected =
-    opts && opts.find((item: any) => item[fieldValue] === value)
-      ? opts.find((item: any) => item[fieldValue] === value)
+    opts &&
+    opts.find((item: any) => item[fieldValue].toString() === value.toString())
+      ? opts.find(
+          (item: any) => item[fieldValue].toString() === value.toString()
+        )
       : undefined;
   return (
     <Autocomplete

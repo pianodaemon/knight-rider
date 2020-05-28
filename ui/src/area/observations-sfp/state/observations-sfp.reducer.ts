@@ -72,11 +72,6 @@ interface ObservationsSFPSlice {
   };
 }
 
-type CatalogItem = {
-  id: number,
-  title: string,
-};
-
 type Audit = {
   id: number,
   title: string,
@@ -84,26 +79,22 @@ type Audit = {
   year: number,
 };
 
-type Fiscal = {
-  id: number,
-  title: string,
-  description: string,
-};
-
-type ObservationCode = {
+type CatalogItem = {
   id: number,
   title: string,
 };
 
 type Division = CatalogItem;
+type Dependency = CatalogItem;
+type SocialProgram = CatalogItem;
+type AutoridadesInvest = CatalogItem;
 
 export type Catalog = {
-  observation_types: Array<CatalogItem> | null,
-  social_programs: Array<CatalogItem> | null,
   audits: Array<Audit> | null,
-  fiscals: Array<Fiscal> | null,
-  observation_codes: Array<ObservationCode> | null,
+  autoridades_invest: Array<AutoridadesInvest> | null,
+  dependencies: Array<Dependency> | null,
   divisions: Array<Division> | null,
+  social_programs: Array<SocialProgram> | null,
 };
 
 const initialState: ObservationsSFPSlice = {

@@ -15,12 +15,14 @@ import { ObservationSFPTableContainer } from '../../observations-sfp/views/obser
 type Props = {
   history: History,
   loadCatalogAction: Function,
+  loadCatalogObsSFPAction: Function,
   loadAuditCatalogAction: Function,
   loadUsersCatalogAction: Function,
 };
 
 export const AppRoutes = (props: Props) => {
   useEffect(() => {
+    props.loadCatalogObsSFPAction();
     props.loadCatalogAction();
     props.loadAuditCatalogAction();
     props.loadUsersCatalogAction();

@@ -5,19 +5,19 @@ import { getCatalog } from '../../service/catalog.service';
 import { observationsSFPReducer } from '../observations-sfp.reducer';
 
 const postfix = '/app';
-const LOAD_CATALOG = `LOAD_CATALOGS${postfix}`;
-const LOAD_CATALOG_SUCCESS = `LOAD_CATALOGS_SUCCESS${postfix}`;
-const LOAD_CATALOG_ERROR = `LOAD_CATALOGS_ERROR${postfix}`;
+const LOAD_CATALOG_SFP = `LOAD_CATALOG_SFP${postfix}`;
+const LOAD_CATALOG_SUCCESS_SFP = `LOAD_CATALOG_SUCCESS_SFP${postfix}`;
+const LOAD_CATALOG_ERROR_SFP = `LOAD_CATALOG_ERROR_SFP${postfix}`;
 
 export const loadCatalogAction: ActionFunctionAny<Action<any>> = createAction(
-  LOAD_CATALOG
+  LOAD_CATALOG_SFP
 );
 export const loadCatalogSuccessAction: ActionFunctionAny<
   Action<any>
-> = createAction(LOAD_CATALOG_SUCCESS);
+> = createAction(LOAD_CATALOG_SUCCESS_SFP);
 export const loadCatalogErrorAction: ActionFunctionAny<
   Action<any>
-> = createAction(LOAD_CATALOG_ERROR);
+> = createAction(LOAD_CATALOG_ERROR_SFP);
 
 function* loadCatalogsWorker(): Generator<any, any, any> {
   try {
@@ -30,24 +30,24 @@ function* loadCatalogsWorker(): Generator<any, any, any> {
 }
 
 function* loadCatalogWatcher(): Generator<any, any, any> {
-  yield takeLatest(LOAD_CATALOG, loadCatalogsWorker);
+  yield takeLatest(LOAD_CATALOG_SFP, loadCatalogsWorker);
 }
 
 const observationsReducerHandlers = {
-  [LOAD_CATALOG]: (state: any) => {
+  [LOAD_CATALOG_SFP]: (state: any) => {
     return {
       ...state,
       loading: true,
     };
   },
-  [LOAD_CATALOG_SUCCESS]: (state: any, action: any) => {
+  [LOAD_CATALOG_SUCCESS_SFP]: (state: any, action: any) => {
     return {
       ...state,
       catalog: action.payload,
       loading: false,
     };
   },
-  [LOAD_CATALOG_ERROR]: (state: any) => {
+  [LOAD_CATALOG_ERROR_SFP]: (state: any) => {
     return {
       ...state,
       loading: false,

@@ -123,6 +123,8 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones SFP', {
     'dependencies': fields.List(fields.Nested(pair)),
     'social_programs': fields.List(fields.Nested(pair)),
     'autoridades_invest': fields.List(fields.Nested(pair)),
+    'observation_codes': fields.List(fields.Nested(pair)),
+    'observation_types': fields.List(fields.Nested(pair)),
 })
 
 @ns.route('/')
@@ -251,7 +253,10 @@ class Catalog(Resource):
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
         try:
-            field_catalog = observaciones_sfp.get_catalogs(['divisions', 'audits', 'dependencies', 'social_programs', 'autoridades_invest'])
+            field_catalog = observaciones_sfp.get_catalogs([
+                'divisions', 'audits', 'dependencies', 'social_programs', 'autoridades_invest',
+                'observation_codes', 'observation_types'
+            ])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))
         except Exception as err:

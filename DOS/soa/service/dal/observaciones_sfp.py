@@ -57,7 +57,7 @@ def _alter_observation(**kwargs):
         id = rcode
 
     ent = fetch_entity("observaciones_sfp", id)
-    return add_observation_amounts(ent)
+    return add_observacion_data(ent)
 
 
 def create(**kwargs):
@@ -69,7 +69,7 @@ def create(**kwargs):
 def read(id):
     ''' Fetches an observation entity '''
     ent = fetch_entity("observaciones_sfp", id)
-    return add_observation_amounts(ent)
+    return add_observacion_data(ent)
 
 
 def update(id, **kwargs):
@@ -81,12 +81,7 @@ def update(id, **kwargs):
 def delete(id):
     ''' Deletes an observation entity '''
     ent = delete_entity("observaciones_sfp", id)
-    return add_observation_amounts(ent)
-
-
-def read_page(offset, limit, order_by, order, search_params):
-    ''' Reads a page of observations '''
-    return page_entities('observaciones_sfp', offset, limit, order_by, order, search_params)
+    return add_observacion_data(ent)
 
 
 def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
@@ -147,20 +142,11 @@ def get_catalogs(table_name_list):
         
         if table == 'audits':
             sql = '''
-                SELECT *
+                SELECT id, title, dependency_id, year
                 FROM {}
                 WHERE NOT blocked
-                ORDER BY id;
+                ORDER BY title;
             '''.format(table)
-        elif table == 'fiscals':
-            sql = '''
-                SELECT fiscals.id, fiscals.title, fiscals.description
-                FROM observation_stages AS stages
-                JOIN observation_stages_conf AS conf ON stages.id = conf.observation_stage_id
-                JOIN fiscals ON conf.fiscal_id = fiscals.id
-                WHERE stages.title = 'PRELIMINAR'
-                ORDER BY conf.fiscal_id;
-            '''
         else:
             sql = '''
                 SELECT *
@@ -171,52 +157,50 @@ def get_catalogs(table_name_list):
         rows = exec_steady(sql)
         
         for row in rows:
-            ent = dict(row)
-            if table == 'audits':
-                transform_data(ent)
-            values_l.append(ent)
+            values_l.append(dict(row))
         
         fields_d[table] = values_l
 
     return fields_d
 
 
-def add_observation_amounts(ent):
+def add_observacion_data(ent):
     attributes = set([
-        'id', 'observation_type_id', 'social_program_id', 'audit_id', 'title', 'fiscal_id', 'amount_observed',
-        'observation_code_id', 'observation_bis_code_id', 'reception_date', 'expiration_date', 'doc_a_date',
-        'doc_b_date', 'doc_c_date', 'doc_a', 'doc_b', 'doc_c', 'dep_response', 'dep_resp_comments',
-        'division_id', 'hdr_doc', 'hdr_reception_date', 'hdr_expiration1_date', 'hdr_expiration2_date',
-        'observation_stage_id',
+        'id', 'direccion_id', 'dependencia_id', 'fecha_captura', 'programa_social_id', 'auditoria_id',
+        'acta_cierre', 'fecha_firma_acta_cierre', 'fecha_compromiso', 'clave_observacion_id', 'observacion',
+        'acciones_correctivas', 'acciones_preventivas', 'tipo_observacion_id', 'monto_observado',
+        'monto_a_reintegrar', 'monto_reintegrado', 'fecha_reintegro', 'monto_por_reintegrar',
+        'num_oficio_of_vista_cytg', 'fecha_oficio_of_vista_cytg', 'num_oficio_cytg_aut_invest',
+        'fecha_oficio_cytg_aut_invest', 'num_carpeta_investigacion', 'num_oficio_vai_municipio',
+        'fecha_oficio_vai_municipio', 'autoridad_invest_id', 'num_oficio_pras_of', 'fecha_oficio_pras_of',
+        'num_oficio_pras_cytg_dependencia', 'num_oficio_resp_dependencia', 'fecha_oficio_resp_dependencia',
     ])
     mod_ent = {attr: ent[attr] for attr in attributes}
-    mod_ent['reception_date'] = mod_ent['reception_date'].__str__()
-    mod_ent['expiration_date'] = mod_ent['expiration_date'].__str__()
-    mod_ent['doc_a_date'] = mod_ent['doc_a_date'].__str__()
-    mod_ent['doc_b_date'] = mod_ent['doc_b_date'].__str__()
-    mod_ent['doc_c_date'] = mod_ent['doc_c_date'].__str__()
-    mod_ent['hdr_reception_date'] = mod_ent['hdr_reception_date'].__str__()
-    mod_ent['hdr_expiration1_date'] = mod_ent['hdr_expiration1_date'].__str__()
-    mod_ent['hdr_expiration2_date'] = mod_ent['hdr_expiration2_date'].__str__()
 
     sql = '''
         SELECT *
-        FROM amounts
-        WHERE observation_id = {}
-        ORDER BY id DESC;
+        FROM seguimientos_obs_sfp
+        WHERE observacion_id = {}
+        ORDER BY seguimiento_id ASC;
     '''.format(mod_ent['id'])
     
     rows = exec_steady(sql)
     
-    mod_ent['amounts'] = []
+    mod_ent['seguimientos'] = []
     for row in rows:
-        row_dict = dict(row)
-        row_dict['inception_time'] = row_dict['inception_time'].__str__()
-        mod_ent['amounts'].append(row_dict)
+        mod_ent['seguimientos'].append(dict(row))
+
+    sql = '''
+        SELECT anio_cuenta_publica
+        FROM anios_cuenta_publica_obs_sfp
+        WHERE observacion_id = {}
+        ORDER BY anio_cuenta_publica;
+    '''.format(mod_ent['id'])
+
+    rows = exec_steady(sql)
+
+    mod_ent['anios_cuenta_publica'] = []
+    for row in rows:
+        mod_ent['anios_cuenta_publica'].append(row[0])
 
     return mod_ent
-
-
-def transform_data(ent):
-    ent['inception_time'] = ent['inception_time'].__str__()
-    ent['touch_latter_time'] = ent['touch_latter_time'].__str__()

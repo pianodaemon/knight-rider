@@ -117,9 +117,9 @@ export const ObservationSFPTable = (props: Props) => {
                   color="primary"
                   startIcon={<PostAddIcon />}
                   size="medium"
-                  onClick={() => history.push('/observation/create')}
+                  onClick={() => history.push('/observation-sfp/create')}
                 >
-                  Agregar Observación
+                  Agregar Observación SFP
                 </Button>
               </div>
             </div>
@@ -131,7 +131,7 @@ export const ObservationSFPTable = (props: Props) => {
           icon: 'edit',
           tooltip: 'Editar Observación',
           onClick: (event, rowData: any) =>
-            history.push(`/observation/${rowData.id}/edit`),
+            history.push(`/observation-sfp/${rowData.id}/edit`),
         },
         {
           icon: 'delete',
@@ -143,7 +143,7 @@ export const ObservationSFPTable = (props: Props) => {
                 `¿Realmente quieres eliminar la Observación ${rowData.id}?\n Esta acción es irreversible`,
               )
             ) {
-              removeObservationAction(rowData.id);
+             // removeObservationAction(rowData.id);
             }
           },
         },

@@ -45,9 +45,9 @@ obs_sfp_ns_captions = {
     'anios_cuenta_publica': 'Años de la cuenta pública',
 }
 
-ns = api.namespace("obs_sfp", description="Servicios disponibles para observaciones de la SFP (Informe de Resultados)")
+ns = api.namespace("obs_sfp", description="Servicios disponibles para Observaciones de la SFP (Informe de Resultados)")
 
-seguimiento = api.model('Seguimiento de una observacion SFP', {
+seguimiento = api.model('Seguimiento de una Observación SFP', {
     'observacion_id': fields.Integer(description='Observacion a la que pertenece el seguimiento'),
     'seguimiento_id': fields.Integer(description='Id del seguimiento'),
     'num_oficio_cytg_oic': fields.String(description='Num. de Oficio CyTG u OIC'),
@@ -102,7 +102,7 @@ obs_sfp_fields = {
     'seguimientos': fields.List(fields.Nested(seguimiento), description=obs_sfp_ns_captions['seguimientos']),
     'anios_cuenta_publica': fields.List(fields.Integer(), description=obs_sfp_ns_captions['anios_cuenta_publica']),
 }
-obs_sfp = api.model('Observacion SFP', obs_sfp_fields)
+obs_sfp = api.model('Observación SFP', obs_sfp_fields)
 
 
 pair = api.model('Id-Title pair', {
@@ -110,15 +110,19 @@ pair = api.model('Id-Title pair', {
     'title': fields.String(description='Entry title'),
 })
 
-pair2 = api.model('Id-Description pair', {
-    'id': fields.Integer(description='An integer as entry identifier'),
-    'description': fields.String(description='Entry description'),
+auditData = api.model('Datos de una auditoría', {
+    'id': fields.Integer(description='Id de la auditoría'),
+    'title': fields.String(description='Título de la auditoría'),
+    'dependency_id': fields.Integer(description='Id de la Dependencia'),
+    'year': fields.Integer(description='Año'),
 })
 
-catalog = api.model('Users screen data (catalog of Id-Title pairs for screen fields)', {
+catalog = api.model('Leyendas y datos para la UI de Observaciones SFP', {
     'divisions': fields.List(fields.Nested(pair)),
-    'orgchart_roles': fields.List(fields.Nested(pair)),
-    'authorities': fields.List(fields.Nested(pair2)),
+    'audits': fields.List(fields.Nested(auditData)),
+    'dependencies': fields.List(fields.Nested(pair)),
+    'social_programs': fields.List(fields.Nested(pair)),
+    'autoridades_invest': fields.List(fields.Nested(pair)),
 })
 
 @ns.route('/')
@@ -245,9 +249,9 @@ class Catalog(Resource):
 
     @ns.marshal_with(catalog)
     def get(self):
-        ''' Not available yet. To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
+        ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
         try:
-            field_catalog = observaciones_sfp.get_catalogs(['divisions', 'orgchart_roles', 'authorities'])
+            field_catalog = observaciones_sfp.get_catalogs(['divisions', 'audits', 'dependencies', 'social_programs', 'autoridades_invest'])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))
         except Exception as err:

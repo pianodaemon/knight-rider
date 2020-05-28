@@ -9,8 +9,6 @@ import {
   observationSFPSelector,
 } from '../state/observations-sfp.selectors';
 
-import { catalogSelector as auditsCatalogSelector } from '../state/audits.selectors';
-
 const mapDispatchToProps = {
   createObservationAction,
   readObservationSFPAction,
@@ -19,7 +17,6 @@ const mapDispatchToProps = {
 
 function mapStateToProps(state: any) {
   return {
-    auditsCatalog: auditsCatalogSelector(state),
     catalog: catalogSelector(state),
     observation: observationSFPSelector(state),
   };

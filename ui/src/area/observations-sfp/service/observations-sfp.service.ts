@@ -34,7 +34,7 @@ export function createObservation(fields: ObservationSFP): Promise<any> {
   });
 }
 
-export function readObservation(id: number | string): Promise<any> {
+export function readObservationSFP(id: number | string): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/obs_sfp/${id}`, {
     method: 'get',
     headers: {

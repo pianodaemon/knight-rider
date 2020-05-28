@@ -1,6 +1,7 @@
 /* eslint-disable no-alert */
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import MaterialTable, { MTableToolbar } from 'material-table';
 import { Observation } from 'src/area/auditories/state/observations.reducer';
 import TablePagination from '@material-ui/core/TablePagination';
@@ -15,6 +16,19 @@ type Props = {
   paging: any,
 };
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    truncate: {
+      overflow: 'hidden',
+      paddingRight: '1em',
+      maxHeight: '7.5em',
+      maxWidth: '30em',
+      textOverflow: 'ellipsis',
+      width: '30em',
+    },
+  })
+);
+
 export const ObservationSFPTable = (props: Props) => {
   const {
     loading,
@@ -28,6 +42,7 @@ export const ObservationSFPTable = (props: Props) => {
   const customSort = () => 0;
   const draggable: boolean = false;
   const sorting: boolean = false;
+  const classes = useStyles();
   useEffect(() => {
     loadObservationsAction({ per_page: paging.per_page, order });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,7 +72,16 @@ export const ObservationSFPTable = (props: Props) => {
       sorting,
     },
     { title: 'Programa', field: 'programa_social_id_title', sorting },
-    { title: 'Observación', field: 'observacion', sorting },
+    {
+      title: 'Observación',
+      field: 'observacion',
+      sorting,
+      render: (rowData: any) => (
+        <div>
+          <p className={classes.truncate}>{rowData.observacion}</p>
+        </div>
+      ),
+    },
   ];
   return (
     <MaterialTable
@@ -140,10 +164,10 @@ export const ObservationSFPTable = (props: Props) => {
             if (
               // eslint-disable-next-line no-restricted-globals
               confirm(
-                `¿Realmente quieres eliminar la Observación ${rowData.id}?\n Esta acción es irreversible`,
+                `¿Realmente quieres eliminar la Observación ${rowData.id}?\n Esta acción es irreversible`
               )
             ) {
-             // removeObservationAction(rowData.id);
+              // removeObservationAction(rowData.id);
             }
           },
         },

@@ -17,17 +17,15 @@ import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import mxLocale from "date-fns/locale/es";
 import DateFnsUtils from '@date-io/date-fns';
 import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picker.component';
+import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { Catalog, ObservationSFP } from '../state/observations-sfp.reducer';
-import { Catalog as AuditCatalog } from '../state/audits.reducer';
-import { HistoryTable } from './history-table.component';
 
 type Props = {
   createObservationAction: Function,
   readObservationSFPAction: Function,
   updateObservationAction: Function,
   catalog: Catalog | null,
-  auditsCatalog: AuditCatalog | null,
   observation: any | null,
 };
 
@@ -123,7 +121,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const ObservationsSFPForm = (props: Props) => {
   const {
-    auditsCatalog,
     catalog,
     createObservationAction,
     observation,
@@ -299,6 +296,7 @@ export const ObservationsSFPForm = (props: Props) => {
           handleChange,
           handleSubmit,
           isSubmitting,
+          setFieldValue,
         }) => {
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
@@ -322,28 +320,23 @@ export const ObservationsSFPForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel>
-                        Dependencia
-                      </InputLabel>
-                      <Select
-                        labelId="dependencia_id"
-                        id="dependencia_id-select"
+                      <AutoCompleteDropdown
+                        fieldLabel="title"
+                        fieldValue="id"
+                        label="Dependencia"
+                        name="dependencia"
+                        onChange={(value: any) => {
+                          return setFieldValue('dependency_id', value);
+                        }}
+                        options={
+                          catalog && catalog.dependencies
+                            ? catalog.dependencies
+                            : []
+                        }
                         value={catalog ? values.dependencia_id || '' : ''}
-                        onChange={handleChange('dependencia_id')}
-                      >
-                        {catalog &&
-                            catalog.dependencies &&
-                            catalog.dependencies.map((item) => {
-                              return (
-                                <MenuItem
-                                  value={item.id}
-                                  key={`type-${item.id}`}
-                                >
-                                  {item.title}
-                                </MenuItem>
-                              );
-                            })}
-                      </Select>
+                      />
+
+                      
                       {errors.dependencia_id &&
                         touched.dependencia_id && (
                           <FormHelperText
@@ -544,14 +537,12 @@ export const ObservationsSFPForm = (props: Props) => {
                       <Select
                         labelId="clave_observacion_id"
                         id="clave_observacion_id-select"
-                        // value={catalog ? values.clave_observacion_id || '' : ''}
-                        value={null}
+                        value={catalog ? values.clave_observacion_id || '' : ''}
                         onChange={handleChange('clave_observacion_id')}
-                        disabled
                       >
                         {catalog &&
-                            catalog.audits &&
-                            catalog.audits.map((item) => {
+                            catalog.observation_codes &&
+                            catalog.observation_codes.map((item) => {
                               return (
                                 <MenuItem
                                   value={item.id}
@@ -653,14 +644,12 @@ export const ObservationsSFPForm = (props: Props) => {
                       <Select
                         labelId="tipo_observacion_id"
                         id="tipo_observacion_id-select"
-                        // value={catalog ? values.tipo_observacion_id || '' : ''}
-                        value={null}
-                        disabled
+                        value={catalog ? values.tipo_observacion_id || '' : ''}
                         onChange={handleChange('tipo_observacion_id')}
                       >
                         {catalog &&
-                            catalog.audits &&
-                            catalog.audits.map((item) => {
+                            catalog.observation_types &&
+                            catalog.observation_types.map((item) => {
                               return (
                                 <MenuItem
                                   value={item.id}

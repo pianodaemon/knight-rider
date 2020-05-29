@@ -20,15 +20,12 @@ import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picke
 import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { Catalog, ObservationSFP } from '../state/observations-sfp.reducer';
-import { Catalog as AuditCatalog } from '../state/audits.reducer';
-import { HistoryTable } from './history-table.component';
 
 type Props = {
   createObservationAction: Function,
   readObservationSFPAction: Function,
   updateObservationAction: Function,
   catalog: Catalog | null,
-  auditsCatalog: AuditCatalog | null,
   observation: any | null,
 };
 
@@ -124,7 +121,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const ObservationsSFPForm = (props: Props) => {
   const {
-    auditsCatalog,
     catalog,
     createObservationAction,
     observation,

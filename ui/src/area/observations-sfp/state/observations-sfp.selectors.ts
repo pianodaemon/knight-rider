@@ -3,7 +3,6 @@ import {
   observationsSFPReducer,
   ObservationSFP,
 } from './observations-sfp.reducer';
-import { Audit } from './audits.reducer';
 
 const sliceSelector = (state: any) => state[observationsSFPReducer.sliceName];
 
@@ -46,13 +45,13 @@ export const observationSFPSelector = createSelector(
 
 export const isLoadingSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.loading,
+  (slice: any) => slice.loading
 );
 
 export const catalogSelector = createSelector(sliceSelector, (slice: any) => {
   const audits =
     slice && slice.catalog && slice.catalog.audits
-      ? slice.catalog.audits.sort((a: Audit, b: Audit) => b.id - a.id)
+      ? slice.catalog.audits.sort((a: any, b: any) => b.id - a.id)
       : [];
   return {
     ...slice.catalog,

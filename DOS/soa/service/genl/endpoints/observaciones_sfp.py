@@ -175,9 +175,9 @@ class ObservacionSfpList(Resource):
     @ns.marshal_with(obs_sfp, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
-        ''' To create an observation SFP. '''
+        ''' To create an observation (SFP). '''
         try:
-            usr = observaciones_sfp.create(**api.payload)
+            obs = observaciones_sfp.create(**api.payload)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except KeyError as err:
@@ -185,7 +185,7 @@ class ObservacionSfpList(Resource):
         except Exception as err:
             ns.abort(400, message=err)
         
-        return usr, 201
+        return obs, 201
 
 
 
@@ -214,9 +214,9 @@ class ObservacionSfp(Resource):
     @ns.expect(obs_sfp)
     @ns.marshal_with(obs_sfp)
     def put(self, id):
-        ''' Not available yet. To update a user '''
+        ''' To update an observation (SFP) '''
         try:
-            usr = observaciones_sfp.update(id, **api.payload)
+            obs = observaciones_sfp.update(id, **api.payload)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except KeyError as err:
@@ -226,14 +226,14 @@ class ObservacionSfp(Resource):
         except Exception as err:
             ns.abort(400, message=err)
         
-        return usr
+        return obs
 
 
     @ns.marshal_with(obs_sfp)
     def delete(self, id):
-        ''' Not available yet. To delete a user '''
+        ''' To delete an observation (SFP) '''
         try:
-            usr = observaciones_sfp.delete(id)
+            obs = observaciones_sfp.delete(id)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except EmptySetError:
@@ -241,7 +241,7 @@ class ObservacionSfp(Resource):
         except Exception as err:
             ns.abort(400, message=err)
         
-        return usr
+        return obs
 
 
 

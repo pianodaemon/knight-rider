@@ -5,46 +5,80 @@ from dal.entity import page_entities, count_entities, fetch_entity, delete_entit
 from misc.helperpg import EmptySetError
 
 def _alter_observation(**kwargs):
+    anios_cta_publica_str = str(set(kwargs['anios_cuenta_publica']))
+    seguimientos_str = seguimientos_to_comp_type_arr_lit(kwargs['seguimientos'])
+
     """Calls database function in charge of creation and edition of an observation (sfp)"""
     sql = """SELECT * FROM alter_observacion_sfp(
         {}::integer,
         '{}'::integer[],
         {}::integer,
         {}::integer,
+        '{}'::date,
         {}::integer,
         {}::integer,
-        {}::integer,
+        '{}'::character varying,
+        '{}'::date,
+        '{}'::date,
         {}::integer,
         '{}'::text,
+        '{}'::character varying,
+        '{}'::character varying,
+        {}::integer,
+        {}::double precision,
+        {}::seguimientos_obs_sfp[],
         {}::double precision,
         {}::double precision,
+        '{}'::date,
         {}::double precision,
-        '{}'::text,
+        '{}'::character varying,
         '{}'::date,
+        '{}'::character varying,
         '{}'::date,
+        '{}'::character varying,
+        '{}'::character varying,
         '{}'::date,
-        '{}'::date,
-        '{}'::date,
-        '{}'::text,
-        '{}'::text,
-        '{}'::text,
-        '{}'::text,
-        '{}'::text,
         {}::integer,
-        '{}'::text,
+        '{}'::character varying,
         '{}'::date,
-        '{}'::date,
+        '{}'::character varying,
+        '{}'::character varying,
         '{}'::date)
         AS result( rc integer, msg text )""".format(
-            kwargs["id"], str(set(kwargs["anios_cta_publica"])), kwargs["observation_type_id"], kwargs["observation_code_id"],
-            kwargs["observation_bis_code_id"], kwargs["social_program_id"],
-            kwargs["audit_id"], kwargs["fiscal_id"], kwargs["title"],
-            kwargs["amount_observed"], kwargs["projected"], kwargs["solved"],
-            kwargs["comments"], kwargs["reception_date"], kwargs["expiration_date"],
-            kwargs["doc_a_date"], kwargs["doc_b_date"], kwargs["doc_c_date"],
-            kwargs["doc_a"], kwargs["doc_b"], kwargs["doc_c"], kwargs['dep_response'],
-            kwargs['dep_resp_comments'], kwargs['division_id'], kwargs['hdr_doc'],
-            kwargs['hdr_reception_date'], kwargs['hdr_expiration1_date'], kwargs['hdr_expiration2_date']
+            kwargs['id'],
+            anios_cta_publica_str,
+            kwargs['direccion_id'],
+            kwargs['dependencia_id'],
+            kwargs['fecha_captura'],
+            kwargs['programa_social_id'],
+            kwargs['auditoria_id'],
+            kwargs['acta_cierre'],
+            kwargs['fecha_firma_acta_cierre'],
+            kwargs['fecha_compromiso'],
+            kwargs['clave_observacion_id'],
+            kwargs['observacion'],
+            kwargs['acciones_correctivas'],
+            kwargs['acciones_preventivas'],
+            kwargs['tipo_observacion_id'],
+            kwargs['monto_observado'],
+            seguimientos_str,
+            kwargs['monto_a_reintegrar'],
+            kwargs['monto_reintegrado'],
+            kwargs['fecha_reintegro'],
+            kwargs['monto_por_reintegrar'],
+            kwargs['num_oficio_of_vista_cytg'],
+            kwargs['fecha_oficio_of_vista_cytg'],
+            kwargs['num_oficio_cytg_aut_invest'],
+            kwargs['fecha_oficio_cytg_aut_invest'],
+            kwargs['num_carpeta_investigacion'],
+            kwargs['num_oficio_vai_municipio'],
+            kwargs['fecha_oficio_vai_municipio'],
+            kwargs['autoridad_invest_id'],
+            kwargs['num_oficio_pras_of'],
+            kwargs['fecha_oficio_pras_of'],
+            kwargs['num_oficio_pras_cytg_dependencia'],
+            kwargs['num_oficio_resp_dependencia'],
+            kwargs['fecha_oficio_resp_dependencia'],
         )
 
     rcode, rmsg = run_stored_procedure(sql)
@@ -204,3 +238,37 @@ def add_observacion_data(ent):
         mod_ent['anios_cuenta_publica'].append(row[0])
 
     return mod_ent
+
+
+def seguimientos_to_comp_type_arr_lit(seguimientos):
+    segs_str = "array["
+    first = True
+    
+    for s in seguimientos:
+        if not first:
+            segs_str += ", "
+        
+        l = []
+        l.append(s['observacion_id'])
+        l.append(s['seguimiento_id'])
+        l.append(s['num_oficio_cytg_oic'])
+        l.append(s['fecha_oficio_cytg_oic'])
+        l.append(s['fecha_recibido_dependencia'])
+        l.append(s['fecha_vencimiento_cytg'])
+        l.append(s['num_oficio_resp_dependencia'])
+        l.append(s['fecha_recibido_oficio_resp'])
+        l.append(s['resp_dependencia'])
+        l.append(s['comentarios'])
+        l.append(s['clasif_final_interna_cytg'])
+        l.append(s['num_oficio_org_fiscalizador'])
+        l.append(s['fecha_oficio_org_fiscalizador'])
+        l.append(s['estatus_id'])
+        l.append(s['monto_solventado'])
+        l.append(s['monto_pendiente_solventar'])
+        m = str(l)
+        segs_str += "(" + m[1:-1] + ")"
+        first = False
+    
+    segs_str += "]"
+
+    return segs_str

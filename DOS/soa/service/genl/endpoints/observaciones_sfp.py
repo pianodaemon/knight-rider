@@ -175,7 +175,7 @@ class ObservacionSfpList(Resource):
     @ns.marshal_with(obs_sfp, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
-        ''' Not available yet. To create a user. Key \'disabled\' is ignored as this is automatically set to false at creation '''
+        ''' To create an observation SFP. '''
         try:
             usr = observaciones_sfp.create(**api.payload)
         except psycopg2.Error as err:

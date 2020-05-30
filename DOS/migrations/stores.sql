@@ -210,8 +210,6 @@ BEGIN
 					_seguimientos[idx].seguimiento_id,
 					_seguimientos[idx].num_oficio_cytg_oic,
 					_seguimientos[idx].fecha_oficio_cytg_oic,
-					_seguimientos[idx].num_oficio_cytg_oic,
-					_seguimientos[idx].fecha_oficio_cytg_oic,
 					_seguimientos[idx].fecha_recibido_dependencia,
 					_seguimientos[idx].fecha_vencimiento_cytg,
 					_seguimientos[idx].num_oficio_resp_dependencia,
@@ -277,10 +275,10 @@ DECLARE
     coincidences integer := 0;
     latter_id integer := 0;
 	
-	-- get the default observation stage's id value (new observations only):
-	default_obs_stage_id integer := 0;
-	default_obs_stage_title text := 'PRELIMINAR';
-	prelim_counter integer := 0;
+    -- get the default observation stage's id value (new observations only):
+    default_obs_stage_id integer := 0;
+    default_obs_stage_title text := 'PRELIMINAR';
+    prelim_counter integer := 0;
 
     -- dump of errors
     rmsg text;
@@ -292,17 +290,17 @@ BEGIN
         WHEN _observation_id = 0 THEN
 
             SELECT count(id)
-			FROM observation_stages INTO prelim_counter
-			WHERE title = default_obs_stage_title;
+            FROM observation_stages INTO prelim_counter
+            WHERE title = default_obs_stage_title;
 
-			IF NOT prelim_counter = 1 THEN
-				RAISE EXCEPTION 'Value % does not exist', default_obs_stage_title;
-			END IF;
+            IF NOT prelim_counter = 1 THEN
+                RAISE EXCEPTION 'Value % does not exist', default_obs_stage_title;
+            END IF;
 
-			SELECT id
-			FROM observation_stages INTO default_obs_stage_id
-			WHERE title = default_obs_stage_title;
-			
+            SELECT id
+            FROM observation_stages INTO default_obs_stage_id
+            WHERE title = default_obs_stage_title;
+
             INSERT INTO observations (
                 observation_type_id,
                 observation_code_id,
@@ -329,7 +327,7 @@ BEGIN
                 hdr_expiration2_date,
                 inception_time,
                 touch_latter_time,
-				observation_stage_id
+                observation_stage_id
             ) VALUES (
                 _type_id,
                 _code_id,
@@ -356,7 +354,7 @@ BEGIN
                 _hdr_expiration2_date,
                 current_moment,
                 current_moment,
-				default_obs_stage_id
+                default_obs_stage_id
             ) RETURNING id INTO latter_id;
 
             INSERT INTO amounts (

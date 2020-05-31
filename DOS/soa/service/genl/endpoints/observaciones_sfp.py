@@ -125,6 +125,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones SFP', {
     'autoridades_invest': fields.List(fields.Nested(pair)),
     'observation_codes': fields.List(fields.Nested(pair)),
     'observation_types': fields.List(fields.Nested(pair)),
+    'estatus_sfp': fields.List(fields.Nested(pair)),
 })
 
 @ns.route('/')
@@ -255,7 +256,7 @@ class Catalog(Resource):
         try:
             field_catalog = observaciones_sfp.get_catalogs([
                 'divisions', 'audits', 'dependencies', 'social_programs', 'autoridades_invest',
-                'observation_codes', 'observation_types'
+                'observation_codes', 'observation_types', 'estatus_sfp'
             ])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))

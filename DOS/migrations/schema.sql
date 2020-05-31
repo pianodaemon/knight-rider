@@ -189,7 +189,7 @@ ALTER TABLE public.authorities OWNER TO postgres;
 
 CREATE TABLE public.autoridades_invest (
     id integer NOT NULL,
-    titulo character varying NOT NULL
+    title character varying NOT NULL
 );
 
 
@@ -757,7 +757,7 @@ ALTER TABLE ONLY public.autoridades_invest
 --
 
 ALTER TABLE ONLY public.autoridades_invest
-    ADD CONSTRAINT autoridades_invest_titulo_unique UNIQUE (titulo);
+    ADD CONSTRAINT autoridades_invest_titulo_unique UNIQUE (title);
 
 
 --

@@ -91,22 +91,14 @@ CREATE FUNCTION public.alter_observacion_sfp(_observacion_id integer, _anios_cta
 
 DECLARE
 
-    -- latter amount to be compared with the newer one
-    --latter_amount amounts;
-
     current_moment timestamp with time zone = now();
-    --coincidences integer := 0;
+    coincidences integer := 0;
     ult_obs_id integer := 0;
 	seguimientos_arr_len integer := array_length(_seguimientos, 1);
 	anios_cta_publica_arr_len integer := array_length(_anios_cta_publica, 1);
 	anios_aux_arr integer[];
 	idx integer := 0;
 	
-	-- get the default observation stage's id value (new observations only):
-	--default_obs_stage_id integer := 0;
-	--default_obs_stage_title text := 'PRELIMINAR';
-	--prelim_counter integer := 0;
-
     -- dump of errors
     rmsg text;
 
@@ -210,8 +202,6 @@ BEGIN
 					_seguimientos[idx].seguimiento_id,
 					_seguimientos[idx].num_oficio_cytg_oic,
 					_seguimientos[idx].fecha_oficio_cytg_oic,
-					_seguimientos[idx].num_oficio_cytg_oic,
-					_seguimientos[idx].fecha_oficio_cytg_oic,
 					_seguimientos[idx].fecha_recibido_dependencia,
 					_seguimientos[idx].fecha_vencimiento_cytg,
 					_seguimientos[idx].num_oficio_resp_dependencia,
@@ -239,10 +229,114 @@ BEGIN
 
         WHEN _observacion_id > 0 THEN
 
-            
+			-- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- STARTS - Validates observacion SFP id
+            --
+            -- JUSTIFICATION: Because UPDATE statement does not issue
+            -- any exception if nothing was updated.
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            SELECT count(id)
+            FROM observaciones_sfp INTO coincidences
+            WHERE NOT blocked AND id = _observacion_id;
 
+            IF NOT coincidences = 1 THEN
+                RAISE EXCEPTION 'observation SFP identifier % does not exist', _observacion_id;
+            END IF;
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- ENDS - Validates observacion SFP id
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            UPDATE observaciones_sfp
+            SET direccion_id = _direccion_id,
+				dependencia_id = _dependencia_id,
+				fecha_captura = _fecha_captura,
+				programa_social_id = _programa_social_id,
+				auditoria_id = _auditoria_id,
+				acta_cierre = _acta_cierre,
+				fecha_firma_acta_cierre = _fecha_firma_acta_cierre,
+				fecha_compromiso = _fecha_compromiso,
+				clave_observacion_id = _clave_observacion_id,
+				observacion = _observacion,
+				acciones_correctivas = _acciones_correctivas,
+				acciones_preventivas = _acciones_preventivas,
+				tipo_observacion_id = _tipo_observacion_id,
+				monto_observado = _monto_observado,
+				monto_a_reintegrar = _monto_a_reintegrar,
+				monto_reintegrado = _monto_reintegrado,
+				fecha_reintegro = _fecha_reintegro,
+				monto_por_reintegrar = _monto_por_reintegrar,
+				num_oficio_of_vista_cytg = _num_oficio_of_vista_cytg,
+				fecha_oficio_of_vista_cytg = _fecha_oficio_of_vista_cytg,
+				num_oficio_cytg_aut_invest = _num_oficio_cytg_aut_invest,
+				fecha_oficio_cytg_aut_invest = _fecha_oficio_cytg_aut_invest,
+				num_carpeta_investigacion = _num_carpeta_investigacion,
+				num_oficio_vai_municipio = _num_oficio_vai_municipio,
+				fecha_oficio_vai_municipio = _fecha_oficio_vai_municipio,
+				autoridad_invest_id = _autoridad_invest_id,
+				num_oficio_pras_of = _num_oficio_pras_of,
+				fecha_oficio_pras_of = _fecha_oficio_pras_of,
+				num_oficio_pras_cytg_dependencia = _num_oficio_pras_cytg_dependencia,
+				num_oficio_resp_dependencia = _num_oficio_resp_dependencia,
+				fecha_oficio_resp_dependencia = _fecha_oficio_resp_dependencia,
+				hora_ult_cambio = current_moment
+            WHERE id = _observacion_id;
+
+            delete from seguimientos_obs_sfp where observacion_id = _observacion_id;
+			
+			FOR idx IN 1 .. seguimientos_arr_len LOOP
+
+                INSERT INTO seguimientos_obs_sfp(
+                    observacion_id,
+					seguimiento_id,
+					num_oficio_cytg_oic,
+					fecha_oficio_cytg_oic,
+					fecha_recibido_dependencia,
+					fecha_vencimiento_cytg,
+					num_oficio_resp_dependencia,
+					fecha_recibido_oficio_resp,
+					resp_dependencia,
+					comentarios,
+					clasif_final_interna_cytg,
+					num_oficio_org_fiscalizador,
+					fecha_oficio_org_fiscalizador,
+					estatus_id,
+					monto_solventado,
+					monto_pendiente_solventar
+                ) VALUES (
+                    _observacion_id,
+					_seguimientos[idx].seguimiento_id,
+					_seguimientos[idx].num_oficio_cytg_oic,
+					_seguimientos[idx].fecha_oficio_cytg_oic,
+					_seguimientos[idx].fecha_recibido_dependencia,
+					_seguimientos[idx].fecha_vencimiento_cytg,
+					_seguimientos[idx].num_oficio_resp_dependencia,
+					_seguimientos[idx].fecha_recibido_oficio_resp,
+					_seguimientos[idx].resp_dependencia,
+					_seguimientos[idx].comentarios,
+					_seguimientos[idx].clasif_final_interna_cytg,
+					_seguimientos[idx].num_oficio_org_fiscalizador,
+					_seguimientos[idx].fecha_oficio_org_fiscalizador,
+					_seguimientos[idx].estatus_id,
+					_seguimientos[idx].monto_solventado,
+					_seguimientos[idx].monto_pendiente_solventar
+                );
+            
+			END LOOP;
+			
+			delete from anios_cuenta_publica_obs_sfp where observacion_id = _observacion_id;
+			
+			for idx in 1 .. anios_cta_publica_arr_len loop
+				anios_aux_arr[idx] = _observacion_id;
+			end loop;
+			
+			INSERT INTO anios_cuenta_publica_obs_sfp
+			select *
+			from unnest(anios_aux_arr, _anios_cta_publica);
+
+			ult_obs_id = _observacion_id;
+			
         ELSE
-            RAISE EXCEPTION 'negative observation identifier % is unsupported', _observacion_id;
+            RAISE EXCEPTION 'negative observation SFP identifier % is unsupported', _observacion_id;
 
     END CASE;
 
@@ -277,10 +371,10 @@ DECLARE
     coincidences integer := 0;
     latter_id integer := 0;
 	
-	-- get the default observation stage's id value (new observations only):
-	default_obs_stage_id integer := 0;
-	default_obs_stage_title text := 'PRELIMINAR';
-	prelim_counter integer := 0;
+    -- get the default observation stage's id value (new observations only):
+    default_obs_stage_id integer := 0;
+    default_obs_stage_title text := 'PRELIMINAR';
+    prelim_counter integer := 0;
 
     -- dump of errors
     rmsg text;
@@ -292,17 +386,17 @@ BEGIN
         WHEN _observation_id = 0 THEN
 
             SELECT count(id)
-			FROM observation_stages INTO prelim_counter
-			WHERE title = default_obs_stage_title;
+            FROM observation_stages INTO prelim_counter
+            WHERE title = default_obs_stage_title;
 
-			IF NOT prelim_counter = 1 THEN
-				RAISE EXCEPTION 'Value % does not exist', default_obs_stage_title;
-			END IF;
+            IF NOT prelim_counter = 1 THEN
+                RAISE EXCEPTION 'Value % does not exist', default_obs_stage_title;
+            END IF;
 
-			SELECT id
-			FROM observation_stages INTO default_obs_stage_id
-			WHERE title = default_obs_stage_title;
-			
+            SELECT id
+            FROM observation_stages INTO default_obs_stage_id
+            WHERE title = default_obs_stage_title;
+
             INSERT INTO observations (
                 observation_type_id,
                 observation_code_id,
@@ -329,7 +423,7 @@ BEGIN
                 hdr_expiration2_date,
                 inception_time,
                 touch_latter_time,
-				observation_stage_id
+                observation_stage_id
             ) VALUES (
                 _type_id,
                 _code_id,
@@ -356,7 +450,7 @@ BEGIN
                 _hdr_expiration2_date,
                 current_moment,
                 current_moment,
-				default_obs_stage_id
+                default_obs_stage_id
             ) RETURNING id INTO latter_id;
 
             INSERT INTO amounts (

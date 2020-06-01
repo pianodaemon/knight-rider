@@ -235,7 +235,8 @@ export const ObservationsSFPForm = (props: Props) => {
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = values;
-          fields.anios_cuenta_publica = [values.anio_auditoria];
+          const anio_auditoria = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).year : '';
+          fields.anios_cuenta_publica = [anio_auditoria];
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
             return { ...item, seguimiento_id: index };
           });
@@ -257,6 +258,8 @@ export const ObservationsSFPForm = (props: Props) => {
           isSubmitting,
           setFieldValue,
         }) => {
+          const anio_auditoria = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).year : '';
+          const dependencia = catalog && catalog.dependencies && values.dependencia_id && catalog.dependencies.find((item) => item.id === parseInt(values.dependencia_id, 10)) ? (catalog.dependencies.find((item) => item.id === parseInt(values.dependencia_id, 10)) || {}).title : '';
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Observaciones SFP</h1>
@@ -268,7 +271,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       <TextField
                         id="audit_date"
                         label="Año de la cuenta pública"
-                        value={values.anio_auditoria || ''}
+                        value={anio_auditoria || ''}
                         variant="filled"
                         disabled
                         InputProps={{
@@ -282,7 +285,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       <TextField
                         id="dependencia_id"
                         label="Dependencia"
-                        value={values.dependencia || ''}
+                        value={dependencia || ''}
                         variant="filled"
                         disabled
                         InputProps={{

@@ -215,18 +215,27 @@ export const ObservationsSFPForm = (props: Props) => {
         errors[field] = errors[field] || 'Revise que el año de la fecha que ingresó sea posterior al Año de la Auditoría';
       }
     });
-    // console.log('errors', errors);
+    /* @todo use scroll to view
+    const element = document.getElementById(Object.keys(errors)[0]);
+    if (element) {
+      console.log(element);
+      // @todo Replace this for a useRef hook. Since this is a functional component, we cannot use componentWillRecieveProps (and since it's also, deprecated)
+      // https://stackoverflow.com/questions/45077004/react-using-refs-to-scrollintoview-doent-work-on-componentdidupdate#comment109689911_52860557
+      setTimeout(() => element.scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"}), 0);
+    }
+    */
     return errors;
   };
   return (
     <Paper className={classes.paper}>
       <Formik
+        // validateOnChange={false}
         initialValues={id ? observation || initialValues : initialValues}
         validate={validate}
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = values;
-          fields.anios_cuenta_publica = [catalog && catalog.audits && values.auditoria_id && catalog.audits.find(item => item.id === values.auditoria_id) ? (catalog.audits.find(item => item.id === values.auditoria_id) || {}).year : ''];
+          fields.anios_cuenta_publica = [values.anio_auditoria];
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
             return { ...item, seguimiento_id: index };
           });
@@ -259,7 +268,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       <TextField
                         id="audit_date"
                         label="Año de la cuenta pública"
-                        value={catalog && catalog.audits && values.auditoria_id && catalog.audits.find(item => item.id === values.auditoria_id) ? (catalog.audits.find(item => item.id === values.auditoria_id) || {}).year : ''}
+                        value={values.anio_auditoria || ''}
                         variant="filled"
                         disabled
                         InputProps={{
@@ -270,30 +279,16 @@ export const ObservationsSFPForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <AutoCompleteDropdown
-                        fieldLabel="title"
-                        fieldValue="id"
+                      <TextField
+                        id="dependencia_id"
                         label="Dependencia"
-                        name="dependencia"
-                        onChange={(value: any) => {
-                          return setFieldValue('dependencia_id', value);
-                        }}
-                        options={
-                          catalog && catalog.dependencies
-                            ? catalog.dependencies
-                            : []
-                        }
-                        value={catalog ? values.dependencia_id || '' : ''}
+                        value={values.dependencia || ''}
+                        variant="filled"
+                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }} 
                       />
-                      {errors.dependencia_id &&
-                        touched.dependencia_id && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese una Dependencia
-                          </FormHelperText>
-                        )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -393,6 +388,7 @@ export const ObservationsSFPForm = (props: Props) => {
                         component={FormikDatePicker}
                         label="Fecha de Captura"
                         name="fecha_captura"
+                        id="fecha_captura"
                       />
                       {errors.fecha_captura &&
                         touched.fecha_captura && (

@@ -64,6 +64,7 @@ export const observationsCatalogSelector = createSelector(
   catalogSelector,
   (slice: any, catalog: any) =>
     catalog &&
+    catalog.divisions &&
     slice.observations &&
     Array.isArray(slice.observations) &&
     slice.observations.map((observation: ObservationSFP) => {

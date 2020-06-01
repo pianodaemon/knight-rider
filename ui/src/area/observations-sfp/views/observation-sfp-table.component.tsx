@@ -1,7 +1,7 @@
 /* eslint-disable no-alert */
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import MaterialTable, { MTableToolbar } from 'material-table';
 import { Observation } from 'src/area/auditories/state/observations.reducer';
 import TablePagination from '@material-ui/core/TablePagination';
@@ -10,13 +10,13 @@ import PostAddIcon from '@material-ui/icons/PostAdd';
 
 type Props = {
   observations: Array<Observation>,
-  loadObservationsAction: Function,
-  removeObservationAction: Function,
+  loadObservationsSFPAction: Function,
+  removeObservationSFPAction: Function,
   loading: boolean,
   paging: any,
 };
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     truncate: {
       overflow: 'hidden',
@@ -32,10 +32,10 @@ const useStyles = makeStyles((theme: Theme) =>
 export const ObservationSFPTable = (props: Props) => {
   const {
     loading,
-    loadObservationsAction,
+    loadObservationsSFPAction,
     observations,
     paging,
-    removeObservationAction,
+    removeObservationSFPAction,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -44,7 +44,7 @@ export const ObservationSFPTable = (props: Props) => {
   const sorting: boolean = false;
   const classes = useStyles();
   useEffect(() => {
-    loadObservationsAction({ per_page: paging.per_page, order });
+    loadObservationsSFPAction({ per_page: paging.per_page, order });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const columns = [
@@ -87,7 +87,7 @@ export const ObservationSFPTable = (props: Props) => {
     <MaterialTable
       title="Observaciones SFP"
       onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
-        loadObservationsAction({
+        loadObservationsSFPAction({
           ...paging,
           order: orderDirection,
           order_by: 'id',
@@ -115,7 +115,7 @@ export const ObservationSFPTable = (props: Props) => {
               rowsPerPage={per_page}
               rowsPerPageOptions={[5, 10, 25, 50, 100]}
               onChangePage={(event, currentPage: number) => {
-                loadObservationsAction({
+                loadObservationsSFPAction({
                   per_page,
                   page: currentPage + 1,
                   order,
@@ -124,7 +124,7 @@ export const ObservationSFPTable = (props: Props) => {
               }}
               onChangeRowsPerPage={(event: any) => {
                 componentProps.onChangeRowsPerPage(event);
-                loadObservationsAction({
+                loadObservationsSFPAction({
                   per_page: event.target.value,
                 });
               }}
@@ -164,10 +164,10 @@ export const ObservationSFPTable = (props: Props) => {
             if (
               // eslint-disable-next-line no-restricted-globals
               confirm(
-                `¿Realmente quieres eliminar la Observación ${rowData.id}?\n Esta acción es irreversible`
+                `¿Realmente quieres eliminar la Observación SFP ${rowData.id}?\n Esta acción es irreversible`
               )
             ) {
-              // removeObservationAction(rowData.id);
+              removeObservationSFPAction(rowData.id);
             }
           },
         },

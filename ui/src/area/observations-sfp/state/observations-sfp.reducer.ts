@@ -90,12 +90,14 @@ type SocialProgram = CatalogItem;
 type AutoridadesInvest = CatalogItem;
 type ObservationCodes = CatalogItem;
 type ObservationTypes = CatalogItem;
+type Estatus = CatalogItem;
 
 export type Catalog = {
   audits: Array<Audit> | null,
   autoridades_invest: Array<AutoridadesInvest> | null,
   dependencies: Array<Dependency> | null,
   divisions: Array<Division> | null,
+  estatus_sfp: Array<Estatus> | null,
   observation_codes: Array<ObservationCodes> | null,
   observation_types: Array<ObservationTypes> | null,
   social_programs: Array<SocialProgram> | null,

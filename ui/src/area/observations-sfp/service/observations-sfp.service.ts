@@ -17,13 +17,7 @@ export function getObservations(options: any): Promise<any> {
   );
 }
 
-export function removeObservation(id: number | string): Promise<any> {
-  return axiosApi(`${getAppSettings().baseUrl}/obs_sfp/${id}`, {
-    method: 'delete',
-  });
-}
-
-export function createObservation(fields: ObservationSFP): Promise<any> {
+export function createObservationSFP(fields: ObservationSFP): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/obs_sfp/`, {
     method: 'post',
     headers: {
@@ -44,7 +38,7 @@ export function readObservationSFP(id: number | string): Promise<any> {
   });
 }
 
-export function updateObservation(
+export function updateObservationSFP(
   id: number | string,
   fields: ObservationSFP
 ): Promise<any> {
@@ -55,5 +49,11 @@ export function updateObservation(
       'Content-Type': 'application/json',
     },
     data: fields,
+  });
+}
+
+export function deleteObservationSFP(id: number | string): Promise<any> {
+  return axiosApi(`${getAppSettings().baseUrl}/obs_sfp/${id}`, {
+    method: 'delete',
   });
 }

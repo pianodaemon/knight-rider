@@ -2,30 +2,30 @@ import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
-import { removeObservation } from '../../service/observations-sfp.service';
+import { deleteObservationSFP } from '../../service/observations-sfp.service';
 import { observationsSFPReducer } from '../observations-sfp.reducer';
-import { loadObservationsAction } from './load-observations-sfp.usecase';
+import { loadObservationsSFPAction } from './load-observations-sfp.usecase';
 
 const postfix = '/app';
-const REMOVE_OBSERVATION = `REMOVE_OBSERVATION${postfix}`;
-const REMOVE_OBSERVATION_SUCCESS = `REMOVE_OBSERVATION_SUCCESS${postfix}`;
-const REMOVE_OBSERVATION_ERROR = `REMOVE_OBSERVATION_ERROR${postfix}`;
+const REMOVE_OBSERVATION_SFP = `REMOVE_OBSERVATION_SFP${postfix}`;
+const REMOVE_OBSERVATION_SUCCESS_SFP = `REMOVE_OBSERVATION_SUCCESS_SFP${postfix}`;
+const REMOVE_OBSERVATION_ERROR_SFP = `REMOVE_OBSERVATION_ERROR_SFP${postfix}`;
 
-export const removeObservationAction: ActionFunctionAny<
+export const removeObservationSFPAction: ActionFunctionAny<
   Action<any>
-> = createAction(REMOVE_OBSERVATION);
-export const removeObservationActionSuccessAction: ActionFunctionAny<
+> = createAction(REMOVE_OBSERVATION_SFP);
+export const removeObservationSFPSuccessAction: ActionFunctionAny<
   Action<any>
-> = createAction(REMOVE_OBSERVATION_SUCCESS);
-export const removeObservationActionErrorAction: ActionFunctionAny<
+> = createAction(REMOVE_OBSERVATION_SUCCESS_SFP);
+export const removeObservationSFPErrorAction: ActionFunctionAny<
   Action<any>
-> = createAction(REMOVE_OBSERVATION_ERROR);
+> = createAction(REMOVE_OBSERVATION_ERROR_SFP);
 
-function* removeObservationWorker(action: any): Generator<any, any, any> {
+function* removeObservationSFPWorker(action: any): Generator<any, any, any> {
   try {
-    const result = yield call(removeObservation, action.payload);
-    yield put(removeObservationActionSuccessAction(result));
-    yield put(loadObservationsAction());
+    const result = yield call(deleteObservationSFP, action.payload);
+    yield put(removeObservationSFPSuccessAction(result));
+    yield put(loadObservationsSFPAction());
     yield put(
       notificationAction({
         message: `¡Observación ${result.id} ha sido eliminada!`,
@@ -36,7 +36,7 @@ function* removeObservationWorker(action: any): Generator<any, any, any> {
       e.response && e.response.data && e.response.data.message
         ? e.response.data.message
         : '¡Error de inesperado! Por favor contacte al Administrador.';
-    yield put(removeObservationActionErrorAction());
+    yield put(removeObservationSFPErrorAction());
     yield put(
       notificationAction({
         message,
@@ -47,24 +47,24 @@ function* removeObservationWorker(action: any): Generator<any, any, any> {
   }
 }
 
-function* removeObservationWatcher(): Generator<any, any, any> {
-  yield takeLatest(REMOVE_OBSERVATION, removeObservationWorker);
+function* removeObservationSFPWatcher(): Generator<any, any, any> {
+  yield takeLatest(REMOVE_OBSERVATION_SFP, removeObservationSFPWorker);
 }
 
-const observationsReducerHandlers = {
-  [REMOVE_OBSERVATION]: (state: any) => {
+const observationsSFPReducerHandlers = {
+  [REMOVE_OBSERVATION_SFP]: (state: any) => {
     return {
       ...state,
       loading: true,
     };
   },
-  [REMOVE_OBSERVATION_SUCCESS]: (state: any) => {
+  [REMOVE_OBSERVATION_SUCCESS_SFP]: (state: any) => {
     return {
       ...state,
       loading: false,
     };
   },
-  [REMOVE_OBSERVATION_ERROR]: (state: any) => {
+  [REMOVE_OBSERVATION_ERROR_SFP]: (state: any) => {
     return {
       ...state,
       error: true,
@@ -73,5 +73,5 @@ const observationsReducerHandlers = {
   },
 };
 
-mergeSaga(removeObservationWatcher);
-observationsSFPReducer.addHandlers(observationsReducerHandlers);
+mergeSaga(removeObservationSFPWatcher);
+observationsSFPReducer.addHandlers(observationsSFPReducerHandlers);

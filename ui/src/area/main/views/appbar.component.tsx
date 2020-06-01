@@ -242,12 +242,12 @@ export function AppBarComponent() {
         <Router history={customHistory}>
           <List>
             {Object.keys(breadcrumbNameMap).map((route, index) => (
-              <>
+              <React.Fragment key={`${index + 1}`}>
                 <ListItem
                   button
                   component={Link}
                   to={breadcrumbNameMap[route].url}
-                  key={route}
+                  // key={route}
                   onClick={handleDrawerClose}
                 >
                   <ListItemIcon>{breadcrumbNameMap[route].icon}</ListItemIcon>
@@ -259,7 +259,11 @@ export function AppBarComponent() {
                     <>
                       {Object.keys(breadcrumbNameMap[route].childrenList).map(
                         (route2, index2) => (
-                          <List component="div" disablePadding>
+                          <List
+                            component="div"
+                            disablePadding
+                            key={`${index2 + 1}`}
+                          >
                             <ListItem
                               button
                               className={classes.nested}
@@ -289,7 +293,7 @@ export function AppBarComponent() {
                     </>
                   </Collapse>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </List>
         </Router>

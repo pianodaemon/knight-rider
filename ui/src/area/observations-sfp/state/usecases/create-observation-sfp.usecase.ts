@@ -3,32 +3,32 @@ import { call, put, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
 import { translations } from 'src/shared/translations/translations.util';
-import { createObservation } from '../../service/observations-sfp.service';
+import { createObservationSFP } from '../../service/observations-sfp.service';
 import { observationsSFPReducer } from '../observations-sfp.reducer';
-import { loadObservationsAction } from './load-observations-sfp.usecase';
+import { loadObservationsSFPAction } from './load-observations-sfp.usecase';
 
 const postfix = '/app';
-const CREATE_OBSERVATION = `CREATE_OBSERVATION${postfix}`;
-const CREATE_OBSERVATION_SUCCESS = `CREATE_OBSERVATION_SUCCESS${postfix}`;
-const CREATE_OBSERVATION_ERROR = `CREATE_OBSERVATION_ERROR${postfix}`;
+const CREATE_OBSERVATION_SFP = `CREATE_OBSERVATION_SFP${postfix}`;
+const CREATE_OBSERVATION_SUCCESS_SFP = `CREATE_OBSERVATION_SUCCESS_SFP${postfix}`;
+const CREATE_OBSERVATION_ERROR_SFP = `CREATE_OBSERVATION_ERROR_SFP${postfix}`;
 
-export const createObservationAction: ActionFunctionAny<
+export const createObservationSFPAction: ActionFunctionAny<
   Action<any>
-> = createAction(CREATE_OBSERVATION);
-export const createObservationActionSuccessAction: ActionFunctionAny<
+> = createAction(CREATE_OBSERVATION_SFP);
+export const createObservationSFPSuccessAction: ActionFunctionAny<
   Action<any>
-> = createAction(CREATE_OBSERVATION_SUCCESS);
-export const createObservationActionErrorAction: ActionFunctionAny<
+> = createAction(CREATE_OBSERVATION_SUCCESS_SFP);
+export const createObservationSFPErrorAction: ActionFunctionAny<
   Action<any>
-> = createAction(CREATE_OBSERVATION_ERROR);
+> = createAction(CREATE_OBSERVATION_ERROR_SFP);
 
-function* createObservationWorker(action: any): Generator<any, any, any> {
+function* createObservationSFPWorker(action: any): Generator<any, any, any> {
   try {
     const { fields, history } = action.payload;
-    const result = yield call(createObservation, fields);
-    yield put(createObservationActionSuccessAction(result));
-    yield history.push('/observation/list');
-    yield put(loadObservationsAction());
+    const result = yield call(createObservationSFP, fields);
+    yield put(createObservationSFPSuccessAction(result));
+    yield history.push('/observation-sfp/list');
+    yield put(loadObservationsSFPAction());
     yield put(
       notificationAction({
         message: `¡Observación ${result.id} ha sido creada!`,
@@ -47,7 +47,7 @@ function* createObservationWorker(action: any): Generator<any, any, any> {
       ? translations.observation.error_responses.unique_error
       : message;
     yield releaseForm();
-    yield put(createObservationActionErrorAction());
+    yield put(createObservationSFPErrorAction());
     yield put(
       notificationAction({
         message,
@@ -58,25 +58,25 @@ function* createObservationWorker(action: any): Generator<any, any, any> {
   }
 }
 
-function* createObservationWatcher(): Generator<any, any, any> {
-  yield takeLatest(CREATE_OBSERVATION, createObservationWorker);
+function* createObservationSFPWatcher(): Generator<any, any, any> {
+  yield takeLatest(CREATE_OBSERVATION_SFP, createObservationSFPWorker);
 }
 
 const observationsReducerHandlers = {
-  [CREATE_OBSERVATION]: (state: any) => {
+  [CREATE_OBSERVATION_SFP]: (state: any) => {
     return {
       ...state,
       loading: true,
     };
   },
-  [CREATE_OBSERVATION_SUCCESS]: (state: any) => {
+  [CREATE_OBSERVATION_SUCCESS_SFP]: (state: any) => {
     return {
       ...state,
       loading: false,
       observation: null,
     };
   },
-  [CREATE_OBSERVATION_ERROR]: (state: any) => {
+  [CREATE_OBSERVATION_ERROR_SFP]: (state: any) => {
     return {
       ...state,
       error: true,
@@ -85,5 +85,5 @@ const observationsReducerHandlers = {
   },
 };
 
-mergeSaga(createObservationWatcher);
+mergeSaga(createObservationSFPWatcher);
 observationsSFPReducer.addHandlers(observationsReducerHandlers);

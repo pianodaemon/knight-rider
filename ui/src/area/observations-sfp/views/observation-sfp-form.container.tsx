@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
 import { ObservationsSFPForm } from './observation-sfp-form.component';
-import { createObservationAction } from '../state/usecases/create-observation.usecase';
+import { createObservationSFPAction } from '../state/usecases/create-observation-sfp.usecase';
 import { readObservationSFPAction } from '../state/usecases/read-observation-sfp.usecase';
-import { updateObservationAction } from '../state/usecases/update-observation.usecate';
+import { updateObservationSFPAction } from '../state/usecases/update-observation-sfp.usecate';
 
 import {
   catalogSelector,
@@ -10,9 +10,9 @@ import {
 } from '../state/observations-sfp.selectors';
 
 const mapDispatchToProps = {
-  createObservationAction,
+  createObservationSFPAction,
   readObservationSFPAction,
-  updateObservationAction,
+  updateObservationSFPAction,
 };
 
 function mapStateToProps(state: any) {

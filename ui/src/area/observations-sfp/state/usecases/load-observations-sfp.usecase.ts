@@ -10,13 +10,13 @@ const LOAD_OBSERVATIONS_SFP = `LOAD_OBSLOAD_OBSERVATIONS_SFPERVATIONS${postfix}`
 const LOAD_OBSERVATIONS_SFP_SUCCESS = `LOAD_OBSERVATIONS_SFP_SUCCESS${postfix}`;
 const LOAD_OBSERVATIONS_SFP_ERROR = `LOAD_OBSERVATIONS_SFP_ERROR${postfix}`;
 
-export const loadObservationsAction: ActionFunctionAny<
+export const loadObservationsSFPAction: ActionFunctionAny<
   Action<any>
 > = createAction(LOAD_OBSERVATIONS_SFP);
-export const loadObservationsSuccessAction: ActionFunctionAny<
+export const loadObservationsSFPSuccessAction: ActionFunctionAny<
   Action<any>
 > = createAction(LOAD_OBSERVATIONS_SFP_SUCCESS);
-export const loadObservationsErrorAction: ActionFunctionAny<
+export const loadObservationsSFPErrorAction: ActionFunctionAny<
   Action<any>
 > = createAction(LOAD_OBSERVATIONS_SFP_ERROR);
 
@@ -33,7 +33,7 @@ function* loadObservationsSFPWorker(action?: any): Generator<any, any, any> {
     };
     const result = yield call(getObservations, options);
     yield put(
-      loadObservationsSuccessAction({
+      loadObservationsSFPSuccessAction({
         observations: result.data,
         paging: {
           count: parseInt(result.headers['x-soa-total-items'], 10) || 0,
@@ -46,7 +46,7 @@ function* loadObservationsSFPWorker(action?: any): Generator<any, any, any> {
       })
     );
   } catch (e) {
-    yield put(loadObservationsErrorAction());
+    yield put(loadObservationsSFPErrorAction());
   }
 }
 

@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
+// import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -128,14 +128,14 @@ export const ResultsReportForm = (props: Props) => {
   const history = useHistory();
   const { id } = useParams();
   const initialValues = {
-    observation_type_id: '',        //Tipo de Observacion
-    division_id: '',                //Direccion
-    fiscal_id: '',                  //Organo Fiscalizador
-    audit_id: '',                   //Auditoria Num
-    social_program_id: '',          //Programa
-    observation_code_id: '',        //Nuevo # o Clave de Observacion
+    observation_type_id: '',        // Tipo de Observacion
+    division_id: '',                // Direccion
+    fiscal_id: '',                  // Organo Fiscalizador
+    audit_id: '',                   // Auditoria Num
+    social_program_id: '',          // Programa
+    observation_code_id: '',        // Nuevo # o Clave de Observacion
     observation_bis_code_id: '',
-    title: '',                      //Observacion / Accion
+    title: '',                      // Observacion / Accion
     amount_observed: '',
     projected: '',
     solved: '',
@@ -150,10 +150,10 @@ export const ResultsReportForm = (props: Props) => {
     dep_resp_comments: '',
     reception_date: null,           
     expiration_date: null,
-    hdr_doc: '',                    //# Oficio
-    hdr_reception_date: null,       //Fecha recibido
-    hdr_expiration1_date: null,     //Fecha de Vencimiento
-    hdr_expiration2_date: null,     //Fecha Captura
+    hdr_doc: '',                    // # Oficio
+    hdr_reception_date: null,       // Fecha recibido
+    hdr_expiration1_date: null,     // Fecha de Vencimiento
+    hdr_expiration2_date: null,     // Fecha Captura
   };
   useEffect(() => {
     if (id) {
@@ -283,7 +283,7 @@ export const ResultsReportForm = (props: Props) => {
                             );
                           })}
                       </Select>
-                      {/*errors.audit_id &&
+                      {/* errors.audit_id &&
                         touched.audit_id &&
                         errors.audit_id && (
                           <FormHelperText
@@ -292,7 +292,7 @@ export const ResultsReportForm = (props: Props) => {
                           >
                             Seleccione una Auditoría
                           </FormHelperText>
-                        )*/}
+                        ) */}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -317,7 +317,7 @@ export const ResultsReportForm = (props: Props) => {
                               );
                             })}
                       </Select>
-                      {/*errors.fiscal_id &&
+                      {/* errors.fiscal_id &&
                           touched.fiscal_id &&
                           errors.fiscal_id && (
                             <FormHelperText
@@ -326,7 +326,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Seleccione un Órgano Fiscalizador
                             </FormHelperText>
-                          )*/}
+                          ) */}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -356,7 +356,7 @@ export const ResultsReportForm = (props: Props) => {
                         value={values.hdr_doc || ''}
                         onChange={handleChange('hdr_doc')}
                       />
-                      {/*errors.hdr_doc &&
+                      {/* errors.hdr_doc &&
                         touched.hdr_doc && (
                           <FormHelperText
                             error
@@ -364,7 +364,7 @@ export const ResultsReportForm = (props: Props) => {
                           >
                             Ingrese un No. de Oficio
                           </FormHelperText>
-                        )*/}
+                        ) */}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -391,7 +391,7 @@ export const ResultsReportForm = (props: Props) => {
                               );
                             })}
                       </Select>
-                      {/*errors.division_id &&
+                      {/* errors.division_id &&
                         touched.division_id && (
                           <FormHelperText
                             error
@@ -399,7 +399,7 @@ export const ResultsReportForm = (props: Props) => {
                           >
                             Ingrese una Dirección
                           </FormHelperText>
-                        )*/}
+                        ) */}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -409,7 +409,7 @@ export const ResultsReportForm = (props: Props) => {
                         label="Registro (Fecha)"
                         name="hdr_expiration2_date"
                       />
-                      {/*errors.hdr_expiration2_date &&
+                      {/* errors.hdr_expiration2_date &&
                         touched.hdr_expiration2_date && (
                           <FormHelperText
                             error
@@ -417,7 +417,7 @@ export const ResultsReportForm = (props: Props) => {
                           >
                             {errors.hdr_expiration2_date}
                           </FormHelperText>
-                        )*/}
+                        ) */}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -442,7 +442,7 @@ export const ResultsReportForm = (props: Props) => {
                               );
                             })}
                       </Select>
-                      {/*errors.social_program_id &&
+                      {/* errors.social_program_id &&
                           touched.social_program_id &&
                           errors.social_program_id && (
                             <FormHelperText
@@ -451,7 +451,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Elige un programa
                             </FormHelperText>
-                          )*/}
+                          ) */}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -461,7 +461,7 @@ export const ResultsReportForm = (props: Props) => {
                         label="Recibido (Fecha)"
                         name="hdr_reception_date"
                       />
-                      {/*errors.hdr_reception_date &&
+                      {/* errors.hdr_reception_date &&
                         touched.hdr_reception_date && (
                           <FormHelperText
                             error
@@ -469,7 +469,7 @@ export const ResultsReportForm = (props: Props) => {
                           >
                             {errors.hdr_reception_date}
                           </FormHelperText>
-                        )*/}
+                        ) */}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -496,7 +496,7 @@ export const ResultsReportForm = (props: Props) => {
                               );
                             })}
                       </Select>
-                      {/*errors.observation_code_id &&
+                      {/* errors.observation_code_id &&
                           touched.observation_code_id && (
                             <FormHelperText
                               error
@@ -504,7 +504,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Seleccione una clave de observación
                             </FormHelperText>
-                          )*/}
+                          ) */}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -514,7 +514,7 @@ export const ResultsReportForm = (props: Props) => {
                         label="Vence (Fecha)"
                         name="hdr_expiration1_date"
                       />
-                      {/*errors.hdr_expiration1_date &&
+                      {/* errors.hdr_expiration1_date &&
                         touched.hdr_expiration1_date && (
                           <FormHelperText
                             error
@@ -522,7 +522,7 @@ export const ResultsReportForm = (props: Props) => {
                           >
                             {errors.hdr_expiration1_date}
                           </FormHelperText>
-                        )*/}
+                        ) */}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -536,14 +536,14 @@ export const ResultsReportForm = (props: Props) => {
                         rowsMax={3}
                         onChange={handleChange('title')}
                       />
-                      {/*errors.title && touched.title && errors.title && (
+                      {/* errors.title && touched.title && errors.title && (
                       <FormHelperText
                         error
                         classes={{ error: classes.textErrorHelper }}
                       >
                         Ingrese una observación
                       </FormHelperText>
-                        )*/}
+                        ) */}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -570,7 +570,7 @@ export const ResultsReportForm = (props: Props) => {
                               );
                             })}
                       </Select>
-                      {/*errors.observation_type_id &&
+                      {/* errors.observation_type_id &&
                           touched.observation_type_id &&
                           errors.observation_type_id && (
                             <FormHelperText
@@ -579,7 +579,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Seleccione un tipo de Auditoría
                             </FormHelperText>
-                          )*/}
+                          ) */}
                     </FormControl>
                   </Grid>
                   {/*
@@ -624,7 +624,7 @@ export const ResultsReportForm = (props: Props) => {
                           value={values.doc_a || ''}
                           onChange={handleChange('doc_a')}
                         />
-                        {/*errors.doc_a &&
+                        {/* errors.doc_a &&
                           touched.doc_a && (
                             <FormHelperText
                               error
@@ -632,10 +632,10 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Ingrese un No. de Oficio
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
-                    {/*<Grid item xs={12} sm={6}>
+                    {/* <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <InputLabel>
                           Clave Observación
@@ -669,7 +669,7 @@ export const ResultsReportForm = (props: Props) => {
                             </FormHelperText>
                           )}
                       </FormControl>
-                    </Grid>*/}
+                    </Grid> */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <Field
@@ -677,7 +677,7 @@ export const ResultsReportForm = (props: Props) => {
                           label="Fecha de Oficio CyTG"
                           name="doc_a_date"
                         />
-                        {/*errors.doc_a_date &&
+                        {/* errors.doc_a_date &&
                           touched.doc_a_date && (
                             <FormHelperText
                               error
@@ -685,7 +685,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               {errors.doc_a_date}
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -695,7 +695,7 @@ export const ResultsReportForm = (props: Props) => {
                           label="Fecha de Recibido de la Dependencia"
                           name="reception_date"
                         />
-                        {/*errors.reception_date &&
+                        {/* errors.reception_date &&
                           touched.reception_date && (
                             <FormHelperText
                               error
@@ -703,7 +703,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               {errors.reception_date}
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -713,7 +713,7 @@ export const ResultsReportForm = (props: Props) => {
                           label="Fecha Vencimiento"
                           name="expiration_date"
                         />
-                        {/*errors.expiration_date &&
+                        {/* errors.expiration_date &&
                           touched.expiration_date && (
                             <FormHelperText
                               error
@@ -721,7 +721,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               {errors.expiration_date}
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
                   </Grid>
@@ -746,7 +746,7 @@ export const ResultsReportForm = (props: Props) => {
                           value={values.doc_b || ''}
                           onChange={handleChange('doc_b')}
                         />
-                        {/*errors.doc_b &&
+                        {/* errors.doc_b &&
                           touched.doc_b && (
                             <FormHelperText
                               error
@@ -754,10 +754,10 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Ingrese un No. de Oficio
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
-                    {<Grid item xs={12} sm={6}>
+                    <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
                           id="dep_response"
@@ -768,7 +768,7 @@ export const ResultsReportForm = (props: Props) => {
                           value={values.dep_response || ''}
                           onChange={handleChange('dep_response')}
                         />
-                        {/*errors.dep_response &&
+                        {/* errors.dep_response &&
                           touched.dep_response && (
                             <FormHelperText
                               error
@@ -776,9 +776,9 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Ingrese una respuesta
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
-                    </Grid>}
+                    </Grid>
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <Field
@@ -786,7 +786,7 @@ export const ResultsReportForm = (props: Props) => {
                           label="Fecha de Oficio de la Respuesta"
                           name="doc_b_date"
                         />
-                        {/*errors.doc_b_date &&
+                        {/* errors.doc_b_date &&
                           touched.doc_b_date && (
                             <FormHelperText
                               error
@@ -794,7 +794,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               {errors.doc_b_date}
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -841,7 +841,7 @@ export const ResultsReportForm = (props: Props) => {
                           label="Fecha de Oficio para Organo Fiscalizador"
                           name="doc_c_date"
                         />
-                        {/*errors.doc_c_date &&
+                        {/* errors.doc_c_date &&
                             touched.doc_c_date && (
                               <FormHelperText
                                 error
@@ -849,7 +849,7 @@ export const ResultsReportForm = (props: Props) => {
                               >
                                 {errors.doc_c_date}
                               </FormHelperText>
-                            )*/}
+                            ) */}
                       </FormControl>
                     </Grid>
                   </Grid>
@@ -879,7 +879,7 @@ export const ResultsReportForm = (props: Props) => {
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                           }}
                         />
-                        {/*errors.amount_observed &&
+                        {/* errors.amount_observed &&
                           touched.amount_observed &&
                           errors.amount_observed && (
                             <FormHelperText
@@ -888,10 +888,10 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Ingrese Monto Observado
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
-                    {/*<Grid item xs={12} sm={6}>
+                    {/* <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
                           label="Proyectado"
@@ -915,7 +915,7 @@ export const ResultsReportForm = (props: Props) => {
                             </FormHelperText>
                           )}
                       </FormControl>
-                    </Grid>*/}
+                    </Grid> */}
                     <Grid item xs={12} sm={6}>
                       <FormControl className={classes.formControl}>
                         <TextField
@@ -929,7 +929,7 @@ export const ResultsReportForm = (props: Props) => {
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                           }}
                         />
-                        {/*errors.solved &&
+                        {/* errors.solved &&
                           touched.solved &&
                           errors.solved && (
                             <FormHelperText
@@ -938,7 +938,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Ingrese Monto Solventado
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -954,7 +954,7 @@ export const ResultsReportForm = (props: Props) => {
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                           }}
                         />
-                        {/*errors.solved &&
+                        {/* errors.solved &&
                           touched.solved &&
                           errors.solved && (
                             <FormHelperText
@@ -963,7 +963,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Ingrese Monto Solventado
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -979,7 +979,7 @@ export const ResultsReportForm = (props: Props) => {
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                           }}
                         />
-                        {/*errors.solved &&
+                        {/* errors.solved &&
                           touched.solved &&
                           errors.solved && (
                             <FormHelperText
@@ -988,7 +988,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Ingrese Monto Solventado
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -998,7 +998,7 @@ export const ResultsReportForm = (props: Props) => {
                           label="Fecha del Reintegro"
                           name="hdr_expiration2_date"
                         />
-                        {/*errors.hdr_expiration2_date &&
+                        {/* errors.hdr_expiration2_date &&
                           touched.hdr_expiration2_date && (
                             <FormHelperText
                               error
@@ -1006,7 +1006,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               {errors.hdr_expiration2_date}
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -1022,7 +1022,7 @@ export const ResultsReportForm = (props: Props) => {
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                           }}
                         />
-                        {/*errors.solved &&
+                        {/* errors.solved &&
                           touched.solved &&
                           errors.solved && (
                             <FormHelperText
@@ -1031,7 +1031,7 @@ export const ResultsReportForm = (props: Props) => {
                             >
                               Ingrese Monto Solventado
                             </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -1045,14 +1045,14 @@ export const ResultsReportForm = (props: Props) => {
                           rows={3}
                           rowsMax={3}
                         />
-                        {/*errors.comments && touched.comments && errors.comments && (
+                        {/* errors.comments && touched.comments && errors.comments && (
                         <FormHelperText
                           error
                           classes={{ error: classes.textErrorHelper }}
                         >
                           Ingrese comentarios
                         </FormHelperText>
-                          )*/}
+                          ) */}
                       </FormControl>
                     </Grid>
                   </Grid>

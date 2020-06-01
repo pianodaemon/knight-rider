@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { ObservationSFPTable } from './observation-sfp-table.component';
-import { loadObservationsAction } from '../state/usecases/load-observations-sfp.usecase';
-import { removeObservationAction } from '../state/usecases/remove-observation.usecase';
+import { loadObservationsSFPAction } from '../state/usecases/load-observations-sfp.usecase';
+import { removeObservationSFPAction } from '../state/usecases/remove-observation.usecase';
 
 import {
   isLoadingSelector,
@@ -10,8 +10,8 @@ import {
 } from '../state/observations-sfp.selectors';
 
 const mapDispatchToProps = {
-  loadObservationsAction,
-  removeObservationAction,
+  loadObservationsSFPAction,
+  removeObservationSFPAction,
 };
 
 function mapStateToProps(state: any) {

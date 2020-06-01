@@ -28,7 +28,9 @@ export const FormikDatePicker = ({
       views={['date', 'month']}
       placeholder="2099-12-31"
       InputProps={{
-        startAdornment: <InputAdornment position="start" />,
+        startAdornment: (
+          <InputAdornment position="start"> {null} </InputAdornment>
+        ),
       }}
       {...rest}
       // autoOk

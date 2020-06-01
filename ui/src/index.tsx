@@ -18,7 +18,10 @@ const appSettings = {
       : 'http://54.251.129.178:8080/api/v1', // @todo this should be fetch from docker image container env vars
 };
 
-console.log(process.env);
+if (process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line no-console
+  console.log(process.env);
+}
 
 setAppSettings(Object.freeze(appSettings));
 

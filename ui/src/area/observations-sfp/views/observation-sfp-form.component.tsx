@@ -259,7 +259,8 @@ export const ObservationsSFPForm = (props: Props) => {
           setFieldValue,
         }) => {
           const anio_auditoria = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).year : '';
-          const dependencia = catalog && catalog.dependencies && values.dependencia_id && catalog.dependencies.find((item) => item.id === parseInt(values.dependencia_id, 10)) ? (catalog.dependencies.find((item) => item.id === parseInt(values.dependencia_id, 10)) || {}).title : '';
+          const dependencia_id = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).dependency_id : '';
+          const dependencia = catalog && catalog.dependencies && dependencia_id && catalog.dependencies.find((item) => item.id === dependencia_id) ? (catalog.dependencies.find((item) => item.id === dependencia_id) || {}).title : '';
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Observaciones SFP</h1>

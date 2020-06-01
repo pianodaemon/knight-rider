@@ -2,14 +2,13 @@ import { createSelector } from 'reselect';
 import {
   observationsSFPReducer,
   ObservationSFP,
-  Catalog,
 } from './observations-sfp.reducer';
 
 const sliceSelector = (state: any) => state[observationsSFPReducer.sliceName];
 
 export const observationsSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.observations
+  (slice: any) => slice.observations,
 );
 
 export const catalogSelector = createSelector(sliceSelector, (slice: any) => {
@@ -26,40 +25,12 @@ export const catalogSelector = createSelector(sliceSelector, (slice: any) => {
 export const observationSFPSelector = createSelector(
   sliceSelector,
   catalogSelector,
-  (slice: any, catalog: Catalog): ObservationSFP | null => {
+  (slice: any): ObservationSFP | null => {
     const { observation } = slice;
     if (!observation) {
       return null;
     }
-    return {
-      ...observation,
-      anio_auditoria:
-        catalog &&
-        catalog.audits &&
-        observation.auditoria_id &&
-        catalog.audits.find((item) => item.id === observation.auditoria_id)
-          ? (
-              catalog.audits.find(
-                (item) => item.id === observation.auditoria_id
-              ) || {}
-            ).year
-          : '',
-      dependencia:
-        catalog &&
-        catalog.dependencies &&
-        observation.dependencia_id &&
-        catalog.dependencies.find(
-          (item) => item.id === parseInt(observation.dependencia_id, 10),
-          10
-        )
-          ? (
-              catalog.dependencies.find(
-                (item) => item.id === parseInt(observation.dependencia_id, 10),
-                10
-              ) || {}
-            ).title
-          : '',
-    };
+    return observation;
   }
 );
 

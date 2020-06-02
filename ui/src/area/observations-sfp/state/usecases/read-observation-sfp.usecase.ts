@@ -26,8 +26,12 @@ function* readObservationSFPWorker(action: any): Generator<any, any, any> {
     yield put(readObservationSFPSuccessAction(result));
   } catch (e) {
     const { history } = action.payload;
+    yield put(readObservationSFPErrorAction(e));
+    if (e && e.response && e.response.status === 404) {
+      yield history.push('/404');
+      return;
+    }
     yield history.push('/observation-sfp/list');
-    yield put(readObservationSFPErrorAction());
   }
 }
 
@@ -50,11 +54,11 @@ const observationsReducerHandlers = {
       observation: action.payload,
     };
   },
-  [READ_OBSERVATION_SFP_ERROR]: (state: any) => {
+  [READ_OBSERVATION_SFP_ERROR]: (state: any, action: any) => {
     return {
       ...state,
       loading: false,
-      error: true,
+      error: action.payload,
     };
   },
 };

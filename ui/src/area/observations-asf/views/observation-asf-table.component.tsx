@@ -80,7 +80,7 @@ export const ObservationASFTable = (props: Props) => {
   ];
   return (
     <MaterialTable
-      title="Observaciones ASF"
+      title="Observaciones Preliminares ASF"
       onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
         loadObservationsASFAction({
           ...paging,
@@ -138,7 +138,7 @@ export const ObservationASFTable = (props: Props) => {
                   size="medium"
                   onClick={() => history.push('/observation-asf/create')}
                 >
-                  Agregar Observación ASF
+                  Agregar Observaciones Preliminares ASF
                 </Button>
               </div>
             </div>
@@ -159,7 +159,7 @@ export const ObservationASFTable = (props: Props) => {
             if (
               // eslint-disable-next-line no-restricted-globals
               confirm(
-                `¿Realmente quieres eliminar la Observación ASF ${rowData.id}?\n Esta acción es irreversible`
+                `¿Realmente quieres eliminar la Observación Preliminar ASF ${rowData.id}?\n Esta acción es irreversible`
               )
             ) {
               // removeObservationSFPAction(rowData.id);

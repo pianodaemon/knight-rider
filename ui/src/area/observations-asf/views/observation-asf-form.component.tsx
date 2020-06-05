@@ -250,7 +250,7 @@ export const ObservationsASFForm = (props: Props) => {
           const dependencia = catalog && catalog.dependencies && dependencia_id && catalog.dependencies.find((item) => item.id === dependencia_id) ? (catalog.dependencies.find((item) => item.id === dependencia_id) || {}).title : '';
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
-              <h1 style={{ color: '#128aba' }}>Observaciones ASF</h1>
+              <h1 style={{ color: '#128aba' }}>Observaciones Preliminares ASF</h1>
               <hr className={classes.hrDivider} />
               <form onSubmit={handleSubmit}>
                 <Grid container spacing={3}>

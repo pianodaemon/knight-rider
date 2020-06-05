@@ -6,16 +6,19 @@ import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
 import { FormContainer } from '../../auditories/views/form.container';
 import { ObservationsSFPFormContainer } from '../../observations-sfp/views/observation-sfp-form.container';
+import { ObservationsASFFormContainer } from '../../observations-asf/views/observation-asf-form.container';
 import { AuditContainer } from '../../auditories/views/audit-form.container';
 import { UsersFormContainer } from '../../users/views/users-form.container';
 import { ResultsReportFormContainer } from '../../auditories/views/results-report-form.container';
 import { NotFound } from './not-found.component';
 import { ObservationSFPTableContainer } from '../../observations-sfp/views/observation-sfp-table.container';
+import { ObservationASFTableContainer } from '../../observations-asf/views/observation-asf-table.container';
 
 type Props = {
   history: History,
   loadCatalogAction: Function,
   loadCatalogObsSFPAction: Function,
+  loadCatalogObsASFAction: Function,
   loadAuditCatalogAction: Function,
   loadUsersCatalogAction: Function,
 };
@@ -23,6 +26,7 @@ type Props = {
 export const AppRoutes = (props: Props) => {
   useEffect(() => {
     props.loadCatalogObsSFPAction();
+    props.loadCatalogObsASFAction();
     props.loadCatalogAction();
     props.loadAuditCatalogAction();
     props.loadUsersCatalogAction();
@@ -42,6 +46,15 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route exact path={['/observation/create', '/observation/:id/edit']}>
           <FormContainer />
+        </Route>
+        <Route exact path={['/', '/observation-asf/list']}>
+          <ObservationASFTableContainer />
+        </Route>
+        <Route
+          exact
+          path={['/observation-asf/create', '/observation-asf/:id/edit']}
+        >
+          <ObservationsASFFormContainer />
         </Route>
         <Route exact path={['/', '/observation-sfp/list']}>
           <ObservationSFPTableContainer />

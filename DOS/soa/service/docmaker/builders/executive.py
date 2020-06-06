@@ -57,7 +57,12 @@ class Executive(object):
         rep = cls()
         rep.output_file = output_file
         rep.story.append(cls._header_table(plogo))
+        rep.story.append(cls._exercise_table([{
+            'ejercicio':10000,
+            'cant_obs':20000,
+            'monto':30000}]))
         rep._build()
+
 
     @classmethod
     def _header_table(cls, plogo):
@@ -119,5 +124,31 @@ class Executive(object):
             ('ALIGN', (0, 0),(0, 0), 'LEFT'),
             ('ALIGN', (1, 0),(1, 0), 'CENTRE'),
         ]))
+
+        return table
+
+    @classmethod
+    def _exercise_table(cls, array_dat):
+
+        header_concepts = (
+            'EJERCICIO',
+            'Cant. Obs',
+            'Monto',
+        )
+
+        cont_rows = [[
+                i['ejercicio'], \
+                i['cant_obs'], \
+                i['monto']] for i in array_dat]
+
+        cont = [header_concepts] + cont_rows
+
+        table = Table(cont,
+            [
+                2.3 * cm,
+                3.8 * cm,
+                3.8 * cm
+            ]
+        )
 
         return table

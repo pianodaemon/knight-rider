@@ -1,6 +1,6 @@
 from reportlab.platypus import BaseDocTemplate, PageTemplate, Frame, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
@@ -21,12 +21,8 @@ class Executive(object):
         # Setup document template
         doc = BaseDocTemplate(
                 self.output_file,
-                pagesize=letter,
-                rightMargin=30,
-                leftMargin=30,
-                topMargin=30,
-                bottomMargin=18,
-        )
+                pagesize=landscape(letter),
+                showBoundary=1)
 
         def fp_foot(c, d):
             c.saveState()
@@ -35,14 +31,19 @@ class Executive(object):
             c.drawCentredString(width / 2.0, (1.00 * cm), 'FOOTER_ABOUT')
             c.restoreState()
 
-        executive_frame = Frame(
-            doc.leftMargin, doc.bottomMargin, doc.width, doc.height,
-            id='executive_frame'
-        )
+        executive_frame = Frame(doc.leftMargin, doc.height-5*2.54 * cm,
+                doc.width, 5 * 2.54 * cm,
+                leftPadding = 0, rightPadding = 0,
+                topPadding = 0, bottomPadding = 0,
+                id='executive_frame')
 
         doc.addPageTemplates(
             [
-                PageTemplate(id='executive_frame', frames=[executive_frame], onPage=fp_foot),
+                PageTemplate(
+                    id='executive_frame',
+                    onPage=fp_foot,
+                    frames=[executive_frame]
+                ),
             ]
         )
 

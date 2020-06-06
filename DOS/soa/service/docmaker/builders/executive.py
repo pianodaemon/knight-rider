@@ -57,10 +57,10 @@ class Executive(object):
         rep = cls()
         rep.output_file = output_file
         rep.story.append(cls._header_table(plogo))
-        rep.story.append(cls._exercise_table('ASF', [{
-            'ejercicio':10000,
-            'cant_obs':20000,
-            'monto':30000}]))
+        rep.story.append(cls._exercise_table({
+            'ASF': [{'ejercicio':1, 'cant_obs':20000, 'monto':30000}],
+            'SFP': [{'ejercicio':1, 'cant_obs':50000, 'monto':70000}],
+        }))
         rep._build()
 
 
@@ -128,7 +128,7 @@ class Executive(object):
         return table
 
     @classmethod
-    def _exercise_table(cls, ente, array_dat):
+    def _exercise_table(cls, array_dat):
 
         header_concepts = (
             '',
@@ -136,31 +136,33 @@ class Executive(object):
             'Monto',
         )
 
-        cont_rows = [[
-                i['ejercicio'], \
-                i['cant_obs'], \
-                i['monto']] for i in array_dat]
 
-        cont = [('EJERCICIO', ente, "")] + [header_concepts] + cont_rows
+        cont = [('EJERCICIO', 'ASF', "", 'EJERCICIO', 'SFP', "")] + [header_concepts * 2] + [[i['ejercicio'], \
+                i['cant_obs'], \
+                i['monto'],
+                j['ejercicio'], \
+                j['cant_obs'], \
+                j['monto']] for i, j in zip(array_dat['ASF'], array_dat['SFP'])]
 
         table = Table(cont,
             [
                 2.3 * cm,
                 3.8 * cm,
                 3.8 * cm
-            ]
+            ] * 2
         )
 
+        ente_style = lambda offset: [
+                ('SPAN',(offset + 0, 0), (offset + 0, 1)),
+                ('VALIGN', (offset + 0, 0), (offset + 0,1), 'MIDDLE'),
+
+                ('SPAN', (offset + 1, 0), (offset + 2, 0)),
+                ('ALIGN', (offset + 1, 0), (offset + 2, 0), 'CENTER'),
+        ]
+
         table.setStyle(TableStyle([
-                # Body and header look and feel (common)
-                ('SPAN',(0, 0), (0, 1)),
-                ('VALIGN', (0, 0), (0,1), 'MIDDLE'),
-
-                ('SPAN', (1, 0), (2, 0)),
-                ('ALIGN', (1, 0), (2, 0), 'CENTER'),
-
                 ('GRID',(0,0),(-1,-1),0.5,colors.grey),
                 ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-        ]))
+        ] + ente_style(0) + ente_style(3)))
 
         return table

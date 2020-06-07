@@ -24,6 +24,11 @@ obs_ires_asf_ns_captions = {
     'fecha_reintegro': 'Fecha de reintegro',
     'monto_por_reintegrar': 'Monto por reintegrar',
     'tiene_pras': 'Flag que indica si la observación tiene campos de captura para un PRAS',
+    'seguimientos': 'Seguimientos',
+    'pras': 'Campos de captura de PRAS',
+    'direccion_id': 'Id de la dirección (según obs preliminar)',
+    'auditoria_id': 'Id de la auditoría (según obs preliminar)',
+    'programa_social_id': 'Id del programa social (según obs preliminar)',
     
     'observacion_id': 'Id de la observación a la que pertenece el seguimiento',
     'seguimiento_id': 'Id del seguimiento',
@@ -122,8 +127,11 @@ obs_ires_asf = api.model('Observación de la ASF (Informe de Resultados)', {
     'fecha_reintegro': fields.Date(description=obs_ires_asf_ns_captions['fecha_reintegro']),
     'monto_por_reintegrar': fields.Float(description=obs_ires_asf_ns_captions['monto_por_reintegrar']),
     'tiene_pras': fields.Boolean(description=obs_ires_asf_ns_captions['tiene_pras']),
-    'seguimientos': fields.List(fields.Nested(seguimiento), description='Seguimientos'),
-    'pras': fields.Nested(pras, description='Campos de captura para un PRAS'),
+    'seguimientos': fields.List(fields.Nested(seguimiento), description=obs_ires_asf_ns_captions['seguimientos']),
+    'pras': fields.Nested(pras, description=obs_ires_asf_ns_captions['pras']),
+    'direccion_id': fields.Integer(description=obs_ires_asf_ns_captions['direccion_id']),
+    'auditoria_id': fields.Integer(description=obs_ires_asf_ns_captions['auditoria_id']),
+    'programa_social_id': fields.Integer(description=obs_ires_asf_ns_captions['programa_social_id']),
 })
 
 
@@ -132,12 +140,23 @@ pair = api.model('Id-Title pair', {
     'title': fields.String(description='Entry title'),
 })
 
+audit = api.model('Datos de una auditoría', {
+    'id': fields.Integer(description='Id de la auditoría'),
+    'title': fields.String(description='Título de la auditoría'),
+    'dependency_id': fields.Integer(description='Id de la Dependencia'),
+    'year': fields.Integer(description='Año'),
+})
+
 catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASF (Informe de Resultados)', {
     'medios_notif_seguimiento_asf': fields.List(fields.Nested(pair)),
     'estatus_ires_asf': fields.List(fields.Nested(pair)),
     'autoridades_invest': fields.List(fields.Nested(pair)),
     'observation_codes': fields.List(fields.Nested(pair)),
     'observation_types': fields.List(fields.Nested(pair)),
+    'audits': fields.List(fields.Nested(audit)),
+    'dependencies': fields.List(fields.Nested(pair)),
+    'divisions': fields.List(fields.Nested(pair)),
+    'social_programs': fields.List(fields.Nested(pair)),
 })
 
 @ns.route('/')
@@ -184,7 +203,7 @@ class ObservacionIResASFList(Resource):
     @ns.marshal_with(obs_ires_asf, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
-        ''' To create an observation (Informe de Resultados de la ASF). '''
+        ''' Not available yet. To create an observation (Informe de Resultados de la ASF). '''
         try:
             obs = observaciones_ires_asf.create(**api.payload)
         except psycopg2.Error as err:
@@ -223,7 +242,7 @@ class ObservacionIResASF(Resource):
     @ns.expect(obs_ires_asf)
     @ns.marshal_with(obs_ires_asf)
     def put(self, id):
-        ''' To update an observation (Informe de Resultados de la ASF) '''
+        ''' Not available yet. To update an observation (Informe de Resultados de la ASF) '''
         try:
             obs = observaciones_ires_asf.update(id, **api.payload)
         except psycopg2.Error as err:
@@ -240,7 +259,7 @@ class ObservacionIResASF(Resource):
 
     @ns.marshal_with(obs_ires_asf)
     def delete(self, id):
-        ''' To delete an observation (Informe de Resultados de la ASF) '''
+        ''' Not available yet. To delete an observation (Informe de Resultados de la ASF) '''
         try:
             obs = observaciones_ires_asf.delete(id)
         except psycopg2.Error as err:
@@ -267,7 +286,11 @@ class Catalog(Resource):
                 'estatus_ires_asf',
                 'autoridades_invest',
                 'observation_codes',
-                'observation_types'
+                'observation_types',
+                'audits',
+                'dependencies',
+                'divisions',
+                'social_programs'
             ])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))

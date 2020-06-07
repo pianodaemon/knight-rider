@@ -11,6 +11,8 @@ class Executive(object):
 
     __slots__ = ['story', 'output_file']
 
+    _actors = ('ASF', 'SFP')
+
     def __init__(self):
 
         # We shall start off with an empty one
@@ -58,8 +60,8 @@ class Executive(object):
         rep.output_file = output_file
         rep.story.append(cls._header_table(plogo))
         rep.story.append(cls._exercise_table({
-            'ASF': [{'ejercicio':1, 'cant_obs':20000, 'monto':30000}],
-            'SFP': [{'ejercicio':1, 'cant_obs':50000, 'monto':70000}],
+            'ASF': [{'ejercicio':1, 'cant_obs':20000, 'monto':30000}, {'ejercicio':2, 'cant_obs':40000, 'monto':90000}],
+            'SFP': [{'ejercicio':1, 'cant_obs':50000, 'monto':70000}, {'ejercicio':2, 'cant_obs':10000, 'monto':10000}],
         }))
         rep._build()
 
@@ -136,21 +138,35 @@ class Executive(object):
             'Monto',
         )
 
+        def placement(*args):
+            verticals = []
+            for arg in args:
+                verticals += [arg['ejercicio'], arg['cant_obs'], arg['monto']]
+            return verticals
 
-        cont = [('EJERCICIO', 'ASF', "", 'EJERCICIO', 'SFP', "")] + [header_concepts * 2] + [[i['ejercicio'], \
-                i['cant_obs'], \
-                i['monto'],
-                j['ejercicio'], \
-                j['cant_obs'], \
-                j['monto']] for i, j in zip(array_dat['ASF'], array_dat['SFP'])]
+        def header_exercises():
+            verticals = []
+            for i in  cls._actors:
+                verticals.append('EJERCICIO')
+                verticals.append(i)
+                verticals.append("")
+            return verticals
+
+        cont = [header_exercises()] + [header_concepts * len(cls._actors)] + [placement(*t) \
+                 for t in zip(*tuple(map(lambda i: array_dat[i], cls._actors)))]
 
         table = Table(cont,
             [
                 2.3 * cm,
                 3.8 * cm,
                 3.8 * cm
-            ] * 2
+            ] * len(cls._actors)
         )
+
+        predominant_style = [
+                ('GRID',(0,0),(-1,-1),0.5,colors.grey),
+                ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ]
 
         ente_style = lambda offset: [
                 ('SPAN',(offset + 0, 0), (offset + 0, 1)),
@@ -160,9 +176,9 @@ class Executive(object):
                 ('ALIGN', (offset + 1, 0), (offset + 2, 0), 'CENTER'),
         ]
 
-        table.setStyle(TableStyle([
-                ('GRID',(0,0),(-1,-1),0.5,colors.grey),
-                ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-        ] + ente_style(0) + ente_style(3)))
+        for idx, _ in enumerate(cls._actors):
+            predominant_style += ente_style(idx * 3)
+
+        table.setStyle(TableStyle(predominant_style))
 
         return table

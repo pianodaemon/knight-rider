@@ -162,6 +162,19 @@ export function AppBarComponent() {
         },
       ],
     },
+    observationAsf: {
+      url: '/observation-asf/list',
+      text: 'Observaciones ASF',
+      icon: <ImageSearchIcon />,
+      open: true,
+      childrenList: [
+        {
+          url: '/observation-asf/create',
+          text: 'Crear',
+          icon: <NoteAddIcon />,
+        },
+      ],
+    },
     user: {
       url: '/user/list',
       text: 'Usuarios',

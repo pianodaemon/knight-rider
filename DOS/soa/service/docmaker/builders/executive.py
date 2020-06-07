@@ -11,7 +11,7 @@ class Executive(object):
 
     __slots__ = ['story', 'output_file']
 
-    _actors = ('ASF', 'SFP')
+    _actors = ('ASF', 'SFP', 'ASENL', 'CyTG', 'TOTAL')
 
     def __init__(self):
 
@@ -62,6 +62,10 @@ class Executive(object):
         rep.story.append(cls._exercise_table({
             'ASF': [{'ejercicio':1, 'cant_obs':20000, 'monto':30000}, {'ejercicio':2, 'cant_obs':40000, 'monto':90000}],
             'SFP': [{'ejercicio':1, 'cant_obs':50000, 'monto':70000}, {'ejercicio':2, 'cant_obs':10000, 'monto':10000}],
+            'ASENL': [{'ejercicio':1, 'cant_obs':1800, 'monto':80000}, {'ejercicio':2, 'cant_obs':17000, 'monto':14000}],
+            'CyTG': [{'ejercicio':1, 'cant_obs':9999, 'monto':8888}, {'ejercicio':2, 'cant_obs':3333, 'monto':5555}],
+            'TOTAL': [{'ejercicio':1, 'cant_obs':99999, 'monto':99999}, {'ejercicio':2, 'cant_obs':99999, 'monto':99999}],
+
         }))
         rep._build()
 
@@ -157,23 +161,30 @@ class Executive(object):
 
         table = Table(cont,
             [
-                2.3 * cm,
-                3.8 * cm,
-                3.8 * cm
+                1.6 * cm,
+                1.8 * cm,
+                1.8 * cm
             ] * len(cls._actors)
         )
 
         predominant_style = [
-                ('GRID',(0,0),(-1,-1),0.5,colors.grey),
+                ('ALIGN', (0, 0),(-1, -1), 'CENTER'),
+                ('FONT', (0, 0),(-1, -1), 'Helvetica', 7),
+                ('GRID',(0, 0), (-1,-1), 0.5,colors.grey),
                 ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
         ]
 
         ente_style = lambda offset: [
+                # Exercise header cell
                 ('SPAN',(offset + 0, 0), (offset + 0, 1)),
-                ('VALIGN', (offset + 0, 0), (offset + 0,1), 'MIDDLE'),
+                ('FONT', (offset + 0, 0), (offset + 0, 1), 'Helvetica-Bold', 7),
+                ('VALIGN', (offset + 0, 0), (offset + 0, 1), 'MIDDLE'),
 
+                # Ente header cell
                 ('SPAN', (offset + 1, 0), (offset + 2, 0)),
-                ('ALIGN', (offset + 1, 0), (offset + 2, 0), 'CENTER'),
+                ('FONT', (offset + 1, 0), (offset + 2, 0), 'Helvetica-Bold', 7),
+                ('BACKGROUND', (offset + 1, 0), (offset + 2, 0), colors.black),
+                ('TEXTCOLOR', (offset + 1, 0), (offset + 2, 0), colors.white),
         ]
 
         for idx, _ in enumerate(cls._actors):

@@ -28,14 +28,15 @@ class Executive(object):
 
         def fp_foot(c, d):
             c.saveState()
-            width, height = letter
+            width, height = landscape(letter)
             c.setFont('Helvetica', 7)
             c.drawCentredString(width / 2.0, (1.00 * cm), 'FOOTER_ABOUT')
             c.restoreState()
 
-        executive_frame = Frame(doc.leftMargin, doc.height-5*2.54 * cm,
-                doc.width, 5 * 2.54 * cm,
-                leftPadding = 0, rightPadding = 0,
+        executive_frame = Frame(
+                15, 45,
+                27 * cm, 19.5 * cm,
+                leftPadding = 0.1 * cm , rightPadding = 0,
                 topPadding = 0, bottomPadding = 0,
                 id='executive_frame')
 
@@ -79,8 +80,8 @@ class Executive(object):
 
             # load on memory image instances
             ref = Image(plogo)
-            ref.drawHeight = 3.8*cm
-            ref.drawWidth = 5.2*cm
+            ref.drawHeight = 1.6*cm
+            ref.drawWidth = 1.2*cm
 
             return ref
 
@@ -171,7 +172,7 @@ class Executive(object):
                 ('ALIGN', (0, 0),(-1, -1), 'CENTER'),
                 ('FONT', (0, 0),(-1, -1), 'Helvetica', 7),
                 ('GRID',(0, 0), (-1,-1), 0.5,colors.grey),
-                ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+                #('BOX', (0, 0), (-1, -1), 0.25, colors.black),
         ]
 
         ente_style = lambda offset: [

@@ -110,7 +110,7 @@ pair = api.model('Id-Title pair', {
     'title': fields.String(description='Entry title'),
 })
 
-auditData = api.model('Datos de una auditoría', {
+audit = api.model('Datos de una auditoría', {
     'id': fields.Integer(description='Id de la auditoría'),
     'title': fields.String(description='Título de la auditoría'),
     'dependency_id': fields.Integer(description='Id de la Dependencia'),
@@ -119,7 +119,7 @@ auditData = api.model('Datos de una auditoría', {
 
 catalog = api.model('Leyendas y datos para la UI de Observaciones SFP', {
     'divisions': fields.List(fields.Nested(pair)),
-    'audits': fields.List(fields.Nested(auditData)),
+    'audits': fields.List(fields.Nested(audit)),
     'dependencies': fields.List(fields.Nested(pair)),
     'social_programs': fields.List(fields.Nested(pair)),
     'autoridades_invest': fields.List(fields.Nested(pair)),

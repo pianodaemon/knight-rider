@@ -160,11 +160,13 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if target_items > per_page:
         target_items = per_page
 
-    return (
-        page_entities('observaciones_ires_asf', offset + whole_pages_offset, target_items, order_by, order, search_params),
-        total_items,
-        total_pages
-    )
+    entities = page_entities('observaciones_ires_asf', offset + whole_pages_offset, target_items, order_by, order, search_params)
+
+    # Adding some obs preliminares' data
+    for e in entities:
+        add_preliminar_data(e)
+
+    return (entities, total_items, total_pages)
 
 
 def get_catalogs(table_name_list):
@@ -174,11 +176,19 @@ def get_catalogs(table_name_list):
     for table in table_name_list:
         values_l = []
         
-        sql = '''
-            SELECT *
-            FROM {}
-            ORDER BY id;
-        '''.format(table)
+        if table == 'audits':
+            sql = '''
+                SELECT id, title, dependency_id, year
+                FROM {}
+                WHERE NOT blocked
+                ORDER BY title;
+            '''.format(table)
+        else:
+            sql = '''
+                SELECT *
+                FROM {}
+                ORDER BY id;
+            '''.format(table)
 
         rows = exec_steady(sql)
         
@@ -237,6 +247,9 @@ def add_observacion_data(ent):
     else:
         mod_ent['pras'] = None
 
+    # Add obs preliminar data
+    add_preliminar_data(mod_ent)
+
     return mod_ent
 
 
@@ -272,3 +285,19 @@ def seguimientos_to_comp_type_arr_lit(seguimientos):
     segs_str += "]"
 
     return segs_str
+
+
+def add_preliminar_data(ent):
+    sql = '''
+        SELECT direccion_id, programa_social_id, auditoria_id
+        FROM observaciones_pre_asf
+        WHERE id = {}
+        AND NOT blocked;
+    '''.format(ent['observacion_pre_id'])
+
+    rows = exec_steady(sql)
+
+    row = dict(rows[0])
+    ent['direccion_id'] = row['direccion_id']
+    ent['programa_social_id'] = row['programa_social_id']
+    ent['auditoria_id'] = row['auditoria_id']

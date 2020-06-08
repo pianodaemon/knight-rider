@@ -37,7 +37,7 @@ obs_pre_asf_ns_captions = {
 
 ns = api.namespace("obs_pre_asf", description="Servicios disponibles para Observaciones de la ASF (Preliminares)")
 
-obs_pre_asf_fields = {
+obs_pre_asf = api.model('Observación de la ASF (Preliminar)', {
     'id': fields.Integer(description=obs_pre_asf_ns_captions['id']),
     'direccion_id': fields.Integer(description=obs_pre_asf_ns_captions['direccion_id']),
     'fecha_captura': fields.Date(description=obs_pre_asf_ns_captions['fecha_captura']),
@@ -62,16 +62,14 @@ obs_pre_asf_fields = {
     'fecha_oficio_org_fiscalizador': fields.Date(description=obs_pre_asf_ns_captions['fecha_oficio_org_fiscalizador']),
     'estatus_criterio_int_id': fields.Integer(description=obs_pre_asf_ns_captions['estatus_criterio_int_id']),
     'proyecciones': fields.List(fields.Integer(), description=obs_pre_asf_ns_captions['proyecciones']),
-}
-obs_pre_asf = api.model('Observación de la ASF (Preliminar)', obs_pre_asf_fields)
-
+})
 
 pair = api.model('Id-Title pair', {
     'id': fields.Integer(description='An integer as entry identifier'),
     'title': fields.String(description='Entry title'),
 })
 
-auditData = api.model('Datos de una auditoría', {
+audit = api.model('Datos de una auditoría', {
     'id': fields.Integer(description='Id de la auditoría'),
     'title': fields.String(description='Título de la auditoría'),
     'dependency_id': fields.Integer(description='Id de la Dependencia'),
@@ -80,7 +78,7 @@ auditData = api.model('Datos de una auditoría', {
 
 catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASF (Preliminares)', {
     'divisions': fields.List(fields.Nested(pair)),
-    'audits': fields.List(fields.Nested(auditData)),
+    'audits': fields.List(fields.Nested(audit)),
     'dependencies': fields.List(fields.Nested(pair)),
     'social_programs': fields.List(fields.Nested(pair)),
     'observation_codes': fields.List(fields.Nested(pair)),

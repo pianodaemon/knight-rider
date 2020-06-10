@@ -9,16 +9,19 @@ import { ObservationsSFPFormContainer } from '../../observations-sfp/views/obser
 import { ObservationsASFFormContainer } from '../../observations-asf/views/observation-asf-form.container';
 import { AuditContainer } from '../../auditories/views/audit-form.container';
 import { UsersFormContainer } from '../../users/views/users-form.container';
-import { ResultsReportFormContainer } from '../../auditories/views/results-report-form.container';
+import { ResultsReportFormContainer as RForm } from '../../auditories/views/results-report-form.container';
 import { NotFound } from './not-found.component';
 import { ObservationSFPTableContainer } from '../../observations-sfp/views/observation-sfp-table.container';
 import { ObservationASFTableContainer } from '../../observations-asf/views/observation-asf-table.container';
+import { ResultsReportTableContainer } from '../../results-report/views/results-report-table.container';
+import { ResultsReportFormContainer } from '../../results-report/views/results-report-form.container';
 
 type Props = {
   history: History,
   loadCatalogAction: Function,
   loadCatalogObsSFPAction: Function,
   loadCatalogObsASFAction: Function,
+  loadCatalogResultsReportAction: Function,
   loadAuditCatalogAction: Function,
   loadUsersCatalogAction: Function,
 };
@@ -30,6 +33,7 @@ export const AppRoutes = (props: Props) => {
     props.loadCatalogAction();
     props.loadAuditCatalogAction();
     props.loadUsersCatalogAction();
+    props.loadCatalogResultsReportAction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -65,6 +69,15 @@ export const AppRoutes = (props: Props) => {
         >
           <ObservationsSFPFormContainer />
         </Route>
+        <Route
+          exact
+          path={['/results-report/create', '/results-report/:id/edit']}
+        >
+          <ResultsReportFormContainer />
+        </Route>
+        <Route exact path={['/', '/results-report/list']}>
+          <ResultsReportTableContainer />
+        </Route>
         <Route exact path={['/user/create', '/user/:id/edit']}>
           <UsersFormContainer />
         </Route>
@@ -72,7 +85,7 @@ export const AppRoutes = (props: Props) => {
           <UsersTableContainer />
         </Route>
         <Route exact path={['/results_report/create']}>
-          <ResultsReportFormContainer />
+          <RForm />
         </Route>
         <Route path="*">
           <NotFound />

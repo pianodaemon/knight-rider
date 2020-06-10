@@ -164,12 +164,25 @@ export function AppBarComponent() {
     },
     observationAsf: {
       url: '/observation-asf/list',
-      text: 'Observaciones ASF',
+      text: 'Observaciones Preliminares ASF',
       icon: <ImageSearchIcon />,
       open: true,
       childrenList: [
         {
           url: '/observation-asf/create',
+          text: 'Crear',
+          icon: <NoteAddIcon />,
+        },
+      ],
+    },
+    resultsReport: {
+      url: '/results-report/list',
+      text: 'Observaciones de la ASF (Informe de Resultados)',
+      icon: <ImageSearchIcon />,
+      open: true,
+      childrenList: [
+        {
+          url: '/results-report/create',
           text: 'Crear',
           icon: <NoteAddIcon />,
         },

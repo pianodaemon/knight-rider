@@ -1,50 +1,35 @@
 /* eslint-disable no-alert */
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
 import MaterialTable, { MTableToolbar } from 'material-table';
 import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
-import { ObservationASF } from '../state/observations-asf.reducer';
+import { ResultsReport } from '../state/results-report.reducer';
 
 type Props = {
-  observations: Array<ObservationASF>,
-  loadObservationsASFAction: Function,
-  removeObservationSFPAction: Function,
+  reports: Array<ResultsReport>,
+  loadResultsReportAction: Function,
+  removeResultsReportAction: Function,
   loading: boolean,
   paging: any,
 };
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    truncate: {
-      overflow: 'hidden',
-      paddingRight: '1em',
-      maxHeight: '7.5em',
-      maxWidth: '30em',
-      textOverflow: 'ellipsis',
-      width: '30em',
-    },
-  })
-);
-
-export const ObservationASFTable = (props: Props) => {
+export const ResultsReportTable = (props: Props) => {
   const {
     loading,
-    loadObservationsASFAction,
-    observations,
+    loadResultsReportAction,
+    reports,
     paging,
-    // removeObservationSFPAction,
+    removeResultsReportAction,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
   const customSort = () => 0;
   const draggable: boolean = false;
   const sorting: boolean = false;
-  const classes = useStyles();
   useEffect(() => {
-    loadObservationsASFAction({ per_page: paging.per_page, order });
+    loadResultsReportAction({ per_page: paging.per_page, order });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const columns = [
@@ -66,30 +51,21 @@ export const ObservationASFTable = (props: Props) => {
       sorting,
       customSort,
     },
+    { title: 'Dependencia', field: 'programa_social_id_title', sorting },
     { title: 'Programa', field: 'programa_social_id_title', sorting },
-    {
-      title: 'Observación',
-      field: 'observacion',
-      sorting,
-      render: (rowData: any) => (
-        <div>
-          <p className={classes.truncate}>{rowData.observacion}</p>
-        </div>
-      ),
-    },
   ];
   return (
     <MaterialTable
-      title="Observaciones Preliminares ASF"
+      title="Informe de Resultados"
       onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
-        loadObservationsASFAction({
+        loadResultsReportAction({
           ...paging,
           order: orderDirection,
           order_by: 'id',
         });
       }}
       columns={columns}
-      data={observations || []}
+      data={reports || []}
       options={{
         draggable,
         initialPage: 1, // @todo include this settings value in a CONSTANTS file
@@ -110,7 +86,7 @@ export const ObservationASFTable = (props: Props) => {
               rowsPerPage={per_page}
               rowsPerPageOptions={[5, 10, 25, 50, 100]}
               onChangePage={(event, currentPage: number) => {
-                loadObservationsASFAction({
+                loadResultsReportAction({
                   per_page,
                   page: currentPage + 1,
                   order,
@@ -119,7 +95,7 @@ export const ObservationASFTable = (props: Props) => {
               }}
               onChangeRowsPerPage={(event: any) => {
                 componentProps.onChangeRowsPerPage(event);
-                loadObservationsASFAction({
+                loadResultsReportAction({
                   per_page: event.target.value,
                 });
               }}
@@ -136,9 +112,9 @@ export const ObservationASFTable = (props: Props) => {
                   color="primary"
                   startIcon={<PostAddIcon />}
                   size="medium"
-                  onClick={() => history.push('/observation-asf/create')}
+                  onClick={() => history.push('/results-report/create')}
                 >
-                  Agregar Observaciones Preliminares ASF
+                  Agregar Informe de Resultados
                 </Button>
               </div>
             </div>
@@ -148,21 +124,21 @@ export const ObservationASFTable = (props: Props) => {
       actions={[
         {
           icon: 'edit',
-          tooltip: 'Editar Observación',
+          tooltip: 'Editar Informe de Resultados',
           onClick: (event, rowData: any) =>
-            history.push(`/observation-asf/${rowData.id}/edit`),
+            history.push(`/results-report/${rowData.id}/edit`),
         },
         {
           icon: 'delete',
-          tooltip: 'Eliminar Observación',
+          tooltip: 'Eliminar Informe de Resultados',
           onClick: (event, rowData: any) => {
             if (
               // eslint-disable-next-line no-restricted-globals
               confirm(
-                `¿Realmente quieres eliminar la Observación Preliminar ASF ${rowData.id}?\n Esta acción es irreversible`
+                `¿Realmente quieres eliminar el Informe de Resultados ${rowData.id}?\n Esta acción es irreversible`
               )
             ) {
-              // removeObservationSFPAction(rowData.id);
+              removeResultsReportAction(rowData.id);
             }
           },
         },

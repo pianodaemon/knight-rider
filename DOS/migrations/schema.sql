@@ -16,18 +16,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- Name: film_summary; Type: TYPE; Schema: public; Owner: postgres
---
-
-CREATE TYPE public.film_summary AS (
-	pos integer,
-	newcol character varying
-);
-
-
-ALTER TYPE public.film_summary OWNER TO postgres;
-
 
 
 SET default_tablespace = '';
@@ -544,7 +532,6 @@ ALTER TABLE public.observaciones_sfp_seq OWNER TO postgres;
 CREATE TABLE public.observaciones_sfp (
     id integer DEFAULT nextval('public.observaciones_sfp_seq'::regclass) NOT NULL,
     direccion_id integer NOT NULL,
-    dependencia_id integer NOT NULL,
     fecha_captura date NOT NULL,
     programa_social_id integer NOT NULL,
     auditoria_id integer NOT NULL,
@@ -1456,14 +1443,6 @@ ALTER TABLE ONLY public.observaciones_sfp
 
 ALTER TABLE ONLY public.observaciones_sfp
     ADD CONSTRAINT observaciones_autoridades_invest_fkey FOREIGN KEY (autoridad_invest_id) REFERENCES public.autoridades_invest(id);
-
-
---
--- Name: observaciones_sfp observaciones_dependencies_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.observaciones_sfp
-    ADD CONSTRAINT observaciones_dependencies_fkey FOREIGN KEY (dependencia_id) REFERENCES public.dependencies(id);
 
 
 --

@@ -16,6 +16,19 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- Name: film_summary; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.film_summary AS (
+	pos integer,
+	newcol character varying
+);
+
+
+ALTER TYPE public.film_summary OWNER TO postgres;
+
+
 
 SET default_tablespace = '';
 
@@ -235,12 +248,50 @@ COMMENT ON TABLE public.divisions IS 'Relacion que alberga las direcciones de la
 
 
 --
+-- Name: estatus_ires_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.estatus_ires_asf (
+    id integer NOT NULL,
+    title character varying NOT NULL
+);
+
+
+ALTER TABLE public.estatus_ires_asf OWNER TO postgres;
+
+--
+-- Name: TABLE estatus_ires_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.estatus_ires_asf IS 'Catalogo de estatus para una obs de informe de resultados de ASF';
+
+
+--
+-- Name: estatus_pre_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.estatus_pre_asf (
+    id integer NOT NULL,
+    title character varying NOT NULL
+);
+
+
+ALTER TABLE public.estatus_pre_asf OWNER TO postgres;
+
+--
+-- Name: TABLE estatus_pre_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.estatus_pre_asf IS 'Grupo de estatus para una obs preliminar de ASF';
+
+
+--
 -- Name: estatus_sfp; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.estatus_sfp (
     id integer NOT NULL,
-    titulo character varying NOT NULL
+    title character varying NOT NULL
 );
 
 
@@ -345,6 +396,131 @@ ALTER TABLE public.gral_user_authority_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE public.gral_user_authority_id_seq OWNED BY public.user_authority.id;
+
+
+--
+-- Name: medios_notif_seguimiento_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.medios_notif_seguimiento_asf (
+    id integer NOT NULL,
+    title character varying NOT NULL
+);
+
+
+ALTER TABLE public.medios_notif_seguimiento_asf OWNER TO postgres;
+
+--
+-- Name: TABLE medios_notif_seguimiento_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.medios_notif_seguimiento_asf IS 'Catalogo de medios de notificacion de un seguimiento de obs de ASF';
+
+
+--
+-- Name: observaciones_ires_asf_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.observaciones_ires_asf_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.observaciones_ires_asf_seq OWNER TO postgres;
+
+--
+-- Name: observaciones_ires_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.observaciones_ires_asf (
+    id integer DEFAULT nextval('public.observaciones_ires_asf_seq'::regclass) NOT NULL,
+    observacion_pre_id integer DEFAULT 0 NOT NULL,
+    num_oficio_of character varying NOT NULL,
+    fecha_recibido date NOT NULL,
+    fecha_vencimiento date NOT NULL,
+    observacion_ir text NOT NULL,
+    tipo_observacion_id integer NOT NULL,
+    accion character varying NOT NULL,
+    clave_accion character varying NOT NULL,
+    monto_observado double precision DEFAULT 0 NOT NULL,
+    monto_a_reintegrar double precision DEFAULT 0 NOT NULL,
+    monto_reintegrado double precision DEFAULT 0 NOT NULL,
+    fecha_reintegro date NOT NULL,
+    monto_por_reintegrar double precision DEFAULT 0 NOT NULL,
+    tiene_pras boolean DEFAULT false NOT NULL,
+    blocked boolean DEFAULT false NOT NULL,
+    hora_ult_cambio timestamp with time zone NOT NULL,
+    hora_creacion timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.observaciones_ires_asf OWNER TO postgres;
+
+--
+-- Name: TABLE observaciones_ires_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.observaciones_ires_asf IS 'Observaciones de informe de resultados de ASF';
+
+
+--
+-- Name: observaciones_pre_asf_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.observaciones_pre_asf_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.observaciones_pre_asf_seq OWNER TO postgres;
+
+--
+-- Name: observaciones_pre_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.observaciones_pre_asf (
+    id integer DEFAULT nextval('public.observaciones_pre_asf_seq'::regclass) NOT NULL,
+    direccion_id integer NOT NULL,
+    fecha_captura date NOT NULL,
+    programa_social_id integer NOT NULL,
+    auditoria_id integer NOT NULL,
+    num_oficio_of character varying NOT NULL,
+    fecha_recibido date NOT NULL,
+    fecha_vencimiento_of date NOT NULL,
+    num_observacion integer NOT NULL,
+    observacion text NOT NULL,
+    monto_observado double precision DEFAULT 0 NOT NULL,
+    num_oficio_cytg character varying NOT NULL,
+    fecha_oficio_cytg date NOT NULL,
+    fecha_recibido_dependencia date NOT NULL,
+    fecha_vencimiento date NOT NULL,
+    num_oficio_resp_dependencia character varying NOT NULL,
+    fecha_oficio_resp_dependencia date NOT NULL,
+    resp_dependencia text NOT NULL,
+    comentarios text NOT NULL,
+    clasif_final_cytg integer NOT NULL,
+    num_oficio_org_fiscalizador character varying NOT NULL,
+    fecha_oficio_org_fiscalizador date NOT NULL,
+    estatus_criterio_int_id integer NOT NULL,
+    blocked boolean DEFAULT false NOT NULL,
+    hora_ult_cambio timestamp with time zone NOT NULL,
+    hora_creacion timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.observaciones_pre_asf OWNER TO postgres;
+
+--
+-- Name: TABLE observaciones_pre_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.observaciones_pre_asf IS 'Observaciones preliminares de ASF';
 
 
 --
@@ -590,6 +766,77 @@ COMMENT ON TABLE public.orgchart_roles IS 'Roles del diagrama organizacional';
 
 
 --
+-- Name: pras_ires_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pras_ires_asf (
+    pras_observacion_id integer NOT NULL,
+    num_oficio_of_vista_cytg character varying NOT NULL,
+    fecha_oficio_of_vista_cytg date NOT NULL,
+    num_oficio_cytg_aut_invest character varying NOT NULL,
+    fecha_oficio_cytg_aut_invest date NOT NULL,
+    num_carpeta_investigacion character varying NOT NULL,
+    num_oficio_cytg_org_fiscalizador character varying NOT NULL,
+    fecha_oficio_cytg_org_fiscalizador date NOT NULL,
+    num_oficio_vai_municipio character varying NOT NULL,
+    fecha_oficio_vai_municipio date NOT NULL,
+    autoridad_invest_id integer NOT NULL,
+    num_oficio_pras_of character varying NOT NULL,
+    fecha_oficio_pras_of date NOT NULL,
+    num_oficio_pras_cytg_dependencia character varying NOT NULL,
+    num_oficio_resp_dependencia character varying NOT NULL,
+    fecha_oficio_resp_dependencia date NOT NULL
+);
+
+
+ALTER TABLE public.pras_ires_asf OWNER TO postgres;
+
+--
+-- Name: TABLE pras_ires_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.pras_ires_asf IS 'Campos habilitados cuando columna observaciones_ires_asf.accion = PRAS';
+
+
+--
+-- Name: proyecciones_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.proyecciones_asf (
+    id integer NOT NULL,
+    title character varying NOT NULL
+);
+
+
+ALTER TABLE public.proyecciones_asf OWNER TO postgres;
+
+--
+-- Name: TABLE proyecciones_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.proyecciones_asf IS 'Grupo de proyecciones para una obs de ASF';
+
+
+--
+-- Name: proyecciones_obs_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.proyecciones_obs_asf (
+    observacion_id integer NOT NULL,
+    proyeccion_id integer NOT NULL
+);
+
+
+ALTER TABLE public.proyecciones_obs_asf OWNER TO postgres;
+
+--
+-- Name: TABLE proyecciones_obs_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.proyecciones_obs_asf IS 'Proyecciones asociadas a una obs de ASF en particular';
+
+
+--
 -- Name: sectors; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -606,6 +853,42 @@ ALTER TABLE public.sectors OWNER TO postgres;
 --
 
 COMMENT ON TABLE public.sectors IS 'Relacion que alberga los sectores (utilizados como attributos de agrupacion para las dependencias)';
+
+
+--
+-- Name: seguimientos_obs_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.seguimientos_obs_asf (
+    observacion_id integer NOT NULL,
+    seguimiento_id integer DEFAULT 0 NOT NULL,
+    medio_notif_seguimiento_id integer NOT NULL,
+    num_oficio_cytg_oic character varying NOT NULL,
+    fecha_oficio_cytg_oic date NOT NULL,
+    fecha_recibido_dependencia date NOT NULL,
+    fecha_vencimiento_cytg date NOT NULL,
+    num_oficio_resp_dependencia character varying NOT NULL,
+    fecha_recibido_oficio_resp date NOT NULL,
+    resp_dependencia text NOT NULL,
+    comentarios text NOT NULL,
+    clasif_final_interna_cytg integer NOT NULL,
+    num_oficio_org_fiscalizador character varying NOT NULL,
+    fecha_oficio_org_fiscalizador date NOT NULL,
+    estatus_id integer NOT NULL,
+    monto_solventado double precision DEFAULT 0 NOT NULL,
+    num_oficio_monto_solventado character varying NOT NULL,
+    fecha_oficio_monto_solventado date NOT NULL,
+    monto_pendiente_solventar double precision DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.seguimientos_obs_asf OWNER TO postgres;
+
+--
+-- Name: TABLE seguimientos_obs_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.seguimientos_obs_asf IS 'Seguimientos para una observacion de ASF';
 
 
 --
@@ -809,6 +1092,38 @@ ALTER TABLE ONLY public.divisions
 
 
 --
+-- Name: estatus_ires_asf estatus_ires_asf_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estatus_ires_asf
+    ADD CONSTRAINT estatus_ires_asf_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: estatus_ires_asf estatus_ires_asf_title_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estatus_ires_asf
+    ADD CONSTRAINT estatus_ires_asf_title_unique UNIQUE (title);
+
+
+--
+-- Name: estatus_pre_asf estatus_pre_asf_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estatus_pre_asf
+    ADD CONSTRAINT estatus_pre_asf_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: estatus_pre_asf estatus_pre_asf_title_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estatus_pre_asf
+    ADD CONSTRAINT estatus_pre_asf_title_unique UNIQUE (title);
+
+
+--
 -- Name: estatus_sfp estatus_sfp_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -821,7 +1136,7 @@ ALTER TABLE ONLY public.estatus_sfp
 --
 
 ALTER TABLE ONLY public.estatus_sfp
-    ADD CONSTRAINT estatus_sfp_titulo_unique UNIQUE (titulo);
+    ADD CONSTRAINT estatus_sfp_titulo_unique UNIQUE (title);
 
 
 --
@@ -849,11 +1164,43 @@ ALTER TABLE ONLY public.geo_municipalities
 
 
 --
+-- Name: medios_notif_seguimiento_asf medios_notif_seguimiento_asf_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.medios_notif_seguimiento_asf
+    ADD CONSTRAINT medios_notif_seguimiento_asf_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: medios_notif_seguimiento_asf medios_notif_seguimiento_asf_title_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.medios_notif_seguimiento_asf
+    ADD CONSTRAINT medios_notif_seguimiento_asf_title_unique UNIQUE (title);
+
+
+--
+-- Name: observaciones_ires_asf observaciones_ires_asf_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_ires_asf
+    ADD CONSTRAINT observaciones_ires_asf_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: observaciones_sfp observaciones_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.observaciones_sfp
     ADD CONSTRAINT observaciones_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: observaciones_pre_asf observaciones_pre_asf_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_pre_asf
+    ADD CONSTRAINT observaciones_pre_asf_pkey PRIMARY KEY (id);
 
 
 --
@@ -945,6 +1292,38 @@ ALTER TABLE ONLY public.orgchart_roles
 
 
 --
+-- Name: pras_ires_asf pras_ires_asf_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pras_ires_asf
+    ADD CONSTRAINT pras_ires_asf_pkey PRIMARY KEY (pras_observacion_id);
+
+
+--
+-- Name: proyecciones_asf proyecciones_asf_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proyecciones_asf
+    ADD CONSTRAINT proyecciones_asf_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: proyecciones_asf proyecciones_asf_title_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proyecciones_asf
+    ADD CONSTRAINT proyecciones_asf_title_unique UNIQUE (title);
+
+
+--
+-- Name: proyecciones_obs_asf proyecciones_obs_asf_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proyecciones_obs_asf
+    ADD CONSTRAINT proyecciones_obs_asf_pkey PRIMARY KEY (observacion_id, proyeccion_id);
+
+
+--
 -- Name: sectors sector_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -958,6 +1337,14 @@ ALTER TABLE ONLY public.sectors
 
 ALTER TABLE ONLY public.sectors
     ADD CONSTRAINT sector_unique_title UNIQUE (title);
+
+
+--
+-- Name: seguimientos_obs_asf seguimientos_obs_asf_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_asf
+    ADD CONSTRAINT seguimientos_obs_asf_pkey PRIMARY KEY (observacion_id, seguimiento_id);
 
 
 --
@@ -1088,6 +1475,14 @@ ALTER TABLE ONLY public.observaciones_sfp
 
 
 --
+-- Name: observaciones_ires_asf observaciones_ires_asf_observation_types_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_ires_asf
+    ADD CONSTRAINT observaciones_ires_asf_observation_types_fkey FOREIGN KEY (tipo_observacion_id) REFERENCES public.observation_types(id);
+
+
+--
 -- Name: observaciones_sfp observaciones_observation_codes_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1101,6 +1496,54 @@ ALTER TABLE ONLY public.observaciones_sfp
 
 ALTER TABLE ONLY public.observaciones_sfp
     ADD CONSTRAINT observaciones_observation_types_fkey FOREIGN KEY (tipo_observacion_id) REFERENCES public.observation_types(id);
+
+
+--
+-- Name: observaciones_pre_asf observaciones_pre_asf_audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_pre_asf
+    ADD CONSTRAINT observaciones_pre_asf_audits_fkey FOREIGN KEY (auditoria_id) REFERENCES public.audits(id);
+
+
+--
+-- Name: observaciones_pre_asf observaciones_pre_asf_divisions_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_pre_asf
+    ADD CONSTRAINT observaciones_pre_asf_divisions_fkey FOREIGN KEY (direccion_id) REFERENCES public.divisions(id);
+
+
+--
+-- Name: observaciones_pre_asf observaciones_pre_asf_estatus_pre_asf_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_pre_asf
+    ADD CONSTRAINT observaciones_pre_asf_estatus_pre_asf_fkey FOREIGN KEY (estatus_criterio_int_id) REFERENCES public.estatus_pre_asf(id);
+
+
+--
+-- Name: observaciones_pre_asf observaciones_pre_asf_observation_codes_bis_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_pre_asf
+    ADD CONSTRAINT observaciones_pre_asf_observation_codes_bis_fkey FOREIGN KEY (num_observacion) REFERENCES public.observation_codes(id);
+
+
+--
+-- Name: observaciones_pre_asf observaciones_pre_asf_observation_codes_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_pre_asf
+    ADD CONSTRAINT observaciones_pre_asf_observation_codes_fkey FOREIGN KEY (clasif_final_cytg) REFERENCES public.observation_codes(id);
+
+
+--
+-- Name: observaciones_pre_asf observaciones_pre_asf_social_programs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_pre_asf
+    ADD CONSTRAINT observaciones_pre_asf_social_programs_fkey FOREIGN KEY (programa_social_id) REFERENCES public.social_programs(id);
 
 
 --
@@ -1149,6 +1592,62 @@ ALTER TABLE ONLY public.observations
 
 ALTER TABLE ONLY public.observations
     ADD CONSTRAINT observations_social_programs_fkey FOREIGN KEY (social_program_id) REFERENCES public.social_programs(id) NOT VALID;
+
+
+--
+-- Name: pras_ires_asf pras_ires_asf_autoridades_invest_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pras_ires_asf
+    ADD CONSTRAINT pras_ires_asf_autoridades_invest_fkey FOREIGN KEY (autoridad_invest_id) REFERENCES public.autoridades_invest(id);
+
+
+--
+-- Name: proyecciones_obs_asf proyecciones_obs_asf_observaciones_pre_asf_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proyecciones_obs_asf
+    ADD CONSTRAINT proyecciones_obs_asf_observaciones_pre_asf_fkey FOREIGN KEY (observacion_id) REFERENCES public.observaciones_pre_asf(id);
+
+
+--
+-- Name: proyecciones_obs_asf proyecciones_obs_asf_proyecciones_asf_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.proyecciones_obs_asf
+    ADD CONSTRAINT proyecciones_obs_asf_proyecciones_asf_fkey FOREIGN KEY (proyeccion_id) REFERENCES public.proyecciones_asf(id);
+
+
+--
+-- Name: seguimientos_obs_asf seguimientos_obs_asf_estatus_ires_asf_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_asf
+    ADD CONSTRAINT seguimientos_obs_asf_estatus_ires_asf_fkey FOREIGN KEY (estatus_id) REFERENCES public.estatus_ires_asf(id);
+
+
+--
+-- Name: seguimientos_obs_asf seguimientos_obs_asf_medios_notif_seguimiento_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_asf
+    ADD CONSTRAINT seguimientos_obs_asf_medios_notif_seguimiento_fkey FOREIGN KEY (medio_notif_seguimiento_id) REFERENCES public.medios_notif_seguimiento_asf(id);
+
+
+--
+-- Name: seguimientos_obs_asf seguimientos_obs_asf_observaciones_ires_asf_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_asf
+    ADD CONSTRAINT seguimientos_obs_asf_observaciones_ires_asf_fkey FOREIGN KEY (observacion_id) REFERENCES public.observaciones_ires_asf(id);
+
+
+--
+-- Name: seguimientos_obs_asf seguimientos_obs_asf_observation_codes_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_asf
+    ADD CONSTRAINT seguimientos_obs_asf_observation_codes_fkey FOREIGN KEY (clasif_final_interna_cytg) REFERENCES public.observation_codes(id);
 
 
 --

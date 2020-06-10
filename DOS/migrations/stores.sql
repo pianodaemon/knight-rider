@@ -82,6 +82,169 @@ ALTER FUNCTION public.alter_audit(_audit_id integer, _title character varying, _
 
 
 --
+-- Name: alter_observacion_pre_asf(integer, integer, date, integer, integer, character varying, date, date, integer, text, double precision, character varying, date, date, date, character varying, date, text, text, integer, character varying, date, integer, integer[]); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.alter_observacion_pre_asf(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _num_oficio_of character varying, _fecha_recibido date, _fecha_vencimiento_of date, _num_observacion integer, _observacion text, _monto_observado double precision, _num_oficio_cytg character varying, _fecha_oficio_cytg date, _fecha_recibido_dependencia date, _fecha_vencimiento date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_criterio_int_id integer, _proyecciones integer[]) RETURNS record
+    LANGUAGE plpgsql
+    AS $$
+
+DECLARE
+
+    current_moment timestamp with time zone = now();
+    coincidences integer := 0;
+    ult_obs_id integer := 0;
+	proyecciones_arr_len integer := array_length(_proyecciones, 1);
+	proyecciones_aux_arr integer[];
+	idx integer := 0;
+	
+    -- dump of errors
+    rmsg text;
+
+BEGIN
+
+    CASE
+
+        WHEN _observacion_id = 0 THEN
+		
+            INSERT INTO observaciones_pre_asf (
+                direccion_id,
+				fecha_captura,
+				programa_social_id,
+				auditoria_id,
+				num_oficio_of,
+				fecha_recibido,
+				fecha_vencimiento_of,
+				num_observacion,
+				observacion,
+				monto_observado,
+				num_oficio_cytg,
+				fecha_oficio_cytg,
+				fecha_recibido_dependencia,
+				fecha_vencimiento,
+				num_oficio_resp_dependencia,
+				fecha_oficio_resp_dependencia,
+				resp_dependencia,
+				comentarios,
+				clasif_final_cytg,
+				num_oficio_org_fiscalizador,
+				fecha_oficio_org_fiscalizador,
+				estatus_criterio_int_id,
+				hora_ult_cambio,
+				hora_creacion
+            ) VALUES (
+                _direccion_id,
+				_fecha_captura,
+				_programa_social_id,
+				_auditoria_id,
+				_num_oficio_of,
+				_fecha_recibido,
+				_fecha_vencimiento_of,
+				_num_observacion,
+				_observacion,
+				_monto_observado,
+				_num_oficio_cytg,
+				_fecha_oficio_cytg,
+				_fecha_recibido_dependencia,
+				_fecha_vencimiento,
+				_num_oficio_resp_dependencia,
+				_fecha_oficio_resp_dependencia,
+				_resp_dependencia,
+				_comentarios,
+				_clasif_final_cytg,
+				_num_oficio_org_fiscalizador,
+				_fecha_oficio_org_fiscalizador,
+				_estatus_criterio_int_id,
+				current_moment,
+				current_moment
+            ) RETURNING id INTO ult_obs_id;
+			
+			for idx in 1 .. proyecciones_arr_len loop
+				proyecciones_aux_arr[idx] = ult_obs_id;
+			end loop;
+			
+			INSERT INTO proyecciones_obs_asf
+			select *
+			from unnest(proyecciones_aux_arr, _proyecciones);
+			
+
+        WHEN _observacion_id > 0 THEN
+
+			-- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- STARTS - Validates observacion preliminar ASF id
+            --
+            -- JUSTIFICATION: Because UPDATE statement does not issue
+            -- any exception if nothing was updated.
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            SELECT count(id)
+            FROM observaciones_pre_asf INTO coincidences
+            WHERE NOT blocked AND id = _observacion_id;
+
+            IF NOT coincidences = 1 THEN
+                RAISE EXCEPTION 'Observacion preliminar ASF con id % no existe', _observacion_id;
+            END IF;
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- ENDS - Validates observacion preliminar ASF id
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            UPDATE observaciones_pre_asf
+            SET direccion_id = _direccion_id,
+				fecha_captura = _fecha_captura,
+				programa_social_id = _programa_social_id,
+				auditoria_id = _auditoria_id,
+				num_oficio_of = _num_oficio_of,
+				fecha_recibido = _fecha_recibido,
+				fecha_vencimiento_of = _fecha_vencimiento_of,
+				num_observacion = _num_observacion,
+				observacion = _observacion,
+				monto_observado = _monto_observado,
+				num_oficio_cytg = _num_oficio_cytg,
+				fecha_oficio_cytg = _fecha_oficio_cytg,
+				fecha_recibido_dependencia = _fecha_recibido_dependencia,
+				fecha_vencimiento = _fecha_vencimiento,
+				num_oficio_resp_dependencia = _num_oficio_resp_dependencia,
+				fecha_oficio_resp_dependencia = _fecha_oficio_resp_dependencia,
+				resp_dependencia = _resp_dependencia,
+				comentarios = _comentarios,
+				clasif_final_cytg = _clasif_final_cytg,
+				num_oficio_org_fiscalizador = _num_oficio_org_fiscalizador,
+				fecha_oficio_org_fiscalizador = _fecha_oficio_org_fiscalizador,
+				estatus_criterio_int_id = _estatus_criterio_int_id,
+				hora_ult_cambio = current_moment
+            WHERE id = _observacion_id;
+			
+			delete from proyecciones_obs_asf where observacion_id = _observacion_id;
+			
+			for idx in 1 .. proyecciones_arr_len loop
+				proyecciones_aux_arr[idx] = _observacion_id;
+			end loop;
+			
+			INSERT INTO proyecciones_obs_asf
+			select *
+			from unnest(proyecciones_aux_arr, _proyecciones);
+
+			ult_obs_id = _observacion_id;
+			
+        ELSE
+            RAISE EXCEPTION 'Observacion preliminar ASF con id % no soportado', _observacion_id;
+
+    END CASE;
+
+    RETURN ( ult_obs_id::integer, ''::text );
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS rmsg = MESSAGE_TEXT;
+            return ( -1::integer, rmsg::text );
+
+END;
+$$;
+
+
+ALTER FUNCTION public.alter_observacion_pre_asf(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _num_oficio_of character varying, _fecha_recibido date, _fecha_vencimiento_of date, _num_observacion integer, _observacion text, _monto_observado double precision, _num_oficio_cytg character varying, _fecha_oficio_cytg date, _fecha_recibido_dependencia date, _fecha_vencimiento date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_criterio_int_id integer, _proyecciones integer[]) OWNER TO postgres;
+
+
+--
 -- Name: alter_observacion_sfp(integer, integer[], integer, integer, date, integer, integer, character varying, date, date, integer, text, character varying, character varying, integer, double precision, public.seguimientos_obs_sfp[], double precision, double precision, date, double precision, character varying, date, character varying, date, character varying, character varying, date, integer, character varying, date, character varying, character varying, date); Type: FUNCTION; Schema: public; Owner: postgres
 --
 

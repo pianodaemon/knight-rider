@@ -33,7 +33,7 @@ export const reportSelector = createSelector(
 
 export const isLoadingSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.loading,
+  (slice: any) => slice.loading
 );
 
 export const reportsCatalogSelector = createSelector(

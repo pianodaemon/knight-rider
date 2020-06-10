@@ -48,18 +48,26 @@ export const observationsCatalogSelector = createSelector(
     slice.observations &&
     Array.isArray(slice.observations) &&
     slice.observations.map((observation: ObservationSFP) => {
+      const dependencia_id = catalog.audits.find(
+        (item: any) => item.id === observation.auditoria_id
+      )
+        ? (
+            catalog.audits.find(
+              (item: any) => item.id === observation.auditoria_id
+            ) || {}
+          ).dependency_id
+        : '';
       let direccion_id_title: any = catalog.divisions.find(
         (item: any) => item.id === observation.direccion_id
       );
       let auditoria_id_title: any = catalog.audits.find(
         (item: any) => item.id === observation.auditoria_id
       );
-      let dependencia_id_title: any = catalog.dependencies.find(
-        (item: any) =>
-          item.id === parseInt(observation.dependencia_id.toString(), 10)
-      );
       let programa_social_id_title: any = catalog.social_programs.find(
         (item: any) => item.id === observation.programa_social_id
+      );
+      let dependencia_id_title: any = catalog.dependencies.find(
+        (item: any) => item.id === dependencia_id
       );
       direccion_id_title = direccion_id_title ? direccion_id_title.title : null;
       auditoria_id_title = auditoria_id_title ? auditoria_id_title.title : null;

@@ -51,7 +51,7 @@ export const ResultsReportTable = (props: Props) => {
       sorting,
       customSort,
     },
-    { title: 'Dependencia', field: 'programa_social_id_title', sorting },
+    { title: 'Dependencia', field: 'dependencia_id_title', sorting },
     { title: 'Programa', field: 'programa_social_id_title', sorting },
   ];
   return (

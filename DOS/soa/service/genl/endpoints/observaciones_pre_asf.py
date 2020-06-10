@@ -132,7 +132,7 @@ class ObservacionPreAsfList(Resource):
     @ns.marshal_with(obs_pre_asf, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
-        ''' Not available yet. To create an observation (preliminar de la ASF). '''
+        ''' To create an observation (preliminar de la ASF). '''
         try:
             obs = observaciones_pre_asf.create(**api.payload)
         except psycopg2.Error as err:
@@ -171,7 +171,7 @@ class ObservacionPreAsf(Resource):
     @ns.expect(obs_pre_asf)
     @ns.marshal_with(obs_pre_asf)
     def put(self, id):
-        ''' Not available yet. To update an observation (preliminar de la ASF) '''
+        ''' To update an observation (preliminar de la ASF) '''
         try:
             obs = observaciones_pre_asf.update(id, **api.payload)
         except psycopg2.Error as err:
@@ -188,7 +188,7 @@ class ObservacionPreAsf(Resource):
 
     @ns.marshal_with(obs_pre_asf)
     def delete(self, id):
-        ''' Not available yet. To delete an observation (preliminar de la ASF) '''
+        ''' To delete an observation (preliminar de la ASF) '''
         try:
             obs = observaciones_pre_asf.delete(id)
         except psycopg2.Error as err:

@@ -65,7 +65,7 @@ seguimiento = api.model('Seguimiento de una Observación SFP', {
     'monto_pendiente_solventar': fields.Float(description='Monto Pendiente de solventar'),
 })
 
-obs_sfp_fields = {
+obs_sfp = api.model('Observación SFP', {
     'id': fields.Integer(description=obs_sfp_ns_captions['id']),
     'direccion_id': fields.Integer(description=obs_sfp_ns_captions['direccion_id']),
     'fecha_captura': fields.Date(description=obs_sfp_ns_captions['fecha_captura']),
@@ -99,8 +99,7 @@ obs_sfp_fields = {
     'fecha_oficio_resp_dependencia': fields.Date(description=obs_sfp_ns_captions['fecha_oficio_resp_dependencia']),
     'seguimientos': fields.List(fields.Nested(seguimiento), description=obs_sfp_ns_captions['seguimientos']),
     'anios_cuenta_publica': fields.List(fields.Integer(), description=obs_sfp_ns_captions['anios_cuenta_publica']),
-}
-obs_sfp = api.model('Observación SFP', obs_sfp_fields)
+})
 
 
 pair = api.model('Id-Title pair', {

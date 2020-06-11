@@ -203,7 +203,7 @@ class ObservacionIResASFList(Resource):
     @ns.marshal_with(obs_ires_asf, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
-        ''' Not available yet. To create an observation (Informe de Resultados de la ASF). '''
+        ''' To create an observation (Informe de Resultados de la ASF). '''
         try:
             obs = observaciones_ires_asf.create(**api.payload)
         except psycopg2.Error as err:
@@ -242,7 +242,7 @@ class ObservacionIResASF(Resource):
     @ns.expect(obs_ires_asf)
     @ns.marshal_with(obs_ires_asf)
     def put(self, id):
-        ''' Not available yet. To update an observation (Informe de Resultados de la ASF) '''
+        ''' To update an observation (Informe de Resultados de la ASF) '''
         try:
             obs = observaciones_ires_asf.update(id, **api.payload)
         except psycopg2.Error as err:
@@ -259,7 +259,7 @@ class ObservacionIResASF(Resource):
 
     @ns.marshal_with(obs_ires_asf)
     def delete(self, id):
-        ''' Not available yet. To delete an observation (Informe de Resultados de la ASF) '''
+        ''' To delete an observation (Informe de Resultados de la ASF) '''
         try:
             obs = observaciones_ires_asf.delete(id)
         except psycopg2.Error as err:

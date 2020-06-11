@@ -82,6 +82,232 @@ ALTER FUNCTION public.alter_audit(_audit_id integer, _title character varying, _
 
 
 --
+-- Name: alter_observacion_ires_asf(integer, integer, character varying, date, date, text, integer, character varying, character varying, double precision, double precision, double precision, date, double precision, boolean, public.seguimientos_obs_asf[], public.pras_ires_asf); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.alter_observacion_ires_asf(_observacion_id integer, _observacion_pre_id integer, _num_oficio_of character varying, _fecha_recibido date, _fecha_vencimiento date, _observacion_ir text, _tipo_observacion_id integer, _accion character varying, _clave_accion character varying, _monto_observado double precision, _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _tiene_pras boolean, _seguimientos public.seguimientos_obs_asf[], _pras public.pras_ires_asf) RETURNS record
+    LANGUAGE plpgsql
+    AS $$
+
+DECLARE
+
+    current_moment timestamp with time zone = now();
+    coincidences integer := 0;
+    ult_obs_id integer := 0;
+	seguimientos_arr_len integer := array_length(_seguimientos, 1);
+	idx integer := 0;
+	
+    -- dump of errors
+    rmsg text;
+
+BEGIN
+
+    CASE
+
+        WHEN _observacion_id = 0 THEN
+		
+            INSERT INTO observaciones_ires_asf (
+				observacion_pre_id,
+				num_oficio_of,
+				fecha_recibido,
+				fecha_vencimiento,
+				observacion_ir,
+				tipo_observacion_id,
+				accion,
+				clave_accion,
+				monto_observado,
+				monto_a_reintegrar,
+				monto_reintegrado,
+				fecha_reintegro,
+				monto_por_reintegrar,
+				tiene_pras,
+				hora_ult_cambio,
+				hora_creacion
+            ) VALUES (
+				_observacion_pre_id,
+				_num_oficio_of,
+				_fecha_recibido,
+				_fecha_vencimiento,
+				_observacion_ir,
+				_tipo_observacion_id,
+				_accion,
+				_clave_accion,
+				_monto_observado,
+				_monto_a_reintegrar,
+				_monto_reintegrado,
+				_fecha_reintegro,
+				_monto_por_reintegrar,
+				_tiene_pras,
+				current_moment,
+				current_moment
+            ) RETURNING id INTO ult_obs_id;
+			
+            FOR idx IN 1 .. seguimientos_arr_len LOOP
+
+                INSERT INTO seguimientos_obs_asf
+				VALUES (
+                    ult_obs_id,
+					_seguimientos[idx].seguimiento_id,
+					_seguimientos[idx].medio_notif_seguimiento_id,
+					_seguimientos[idx].num_oficio_cytg_oic,
+					_seguimientos[idx].fecha_oficio_cytg_oic,
+					_seguimientos[idx].fecha_recibido_dependencia,
+					_seguimientos[idx].fecha_vencimiento_cytg,
+					_seguimientos[idx].num_oficio_resp_dependencia,
+					_seguimientos[idx].fecha_recibido_oficio_resp,
+					_seguimientos[idx].resp_dependencia,
+					_seguimientos[idx].comentarios,
+					_seguimientos[idx].clasif_final_interna_cytg,
+					_seguimientos[idx].num_oficio_org_fiscalizador,
+					_seguimientos[idx].fecha_oficio_org_fiscalizador,
+					_seguimientos[idx].estatus_id,
+					_seguimientos[idx].monto_solventado,
+					_seguimientos[idx].num_oficio_monto_solventado,
+					_seguimientos[idx].fecha_oficio_monto_solventado,				
+					_seguimientos[idx].monto_pendiente_solventar
+                );
+            
+			END LOOP;
+			
+			if _tiene_pras then
+				
+				INSERT INTO pras_ires_asf
+				values (
+					ult_obs_id,
+					_pras.num_oficio_of_vista_cytg,
+					_pras.fecha_oficio_of_vista_cytg,
+					_pras.num_oficio_cytg_aut_invest,
+					_pras.fecha_oficio_cytg_aut_invest,
+					_pras.num_carpeta_investigacion,
+					_pras.num_oficio_cytg_org_fiscalizador,
+					_pras.fecha_oficio_cytg_org_fiscalizador,
+					_pras.num_oficio_vai_municipio,
+					_pras.fecha_oficio_vai_municipio,
+					_pras.autoridad_invest_id,
+					_pras.num_oficio_pras_of,
+					_pras.fecha_oficio_pras_of,
+					_pras.num_oficio_pras_cytg_dependencia,
+					_pras.num_oficio_resp_dependencia,
+					_pras.fecha_oficio_resp_dependencia
+				);
+				
+			end if;
+
+
+        WHEN _observacion_id > 0 THEN
+
+			-- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- STARTS - Validates observacion ASF (IRes) id
+            --
+            -- JUSTIFICATION: Because UPDATE statement does not issue
+            -- any exception if nothing was updated.
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            SELECT count(id)
+            FROM observaciones_ires_asf INTO coincidences
+            WHERE NOT blocked AND id = _observacion_id;
+
+            IF NOT coincidences = 1 THEN
+                RAISE EXCEPTION 'observation ASF (IRes) identifier % does not exist', _observacion_id;
+            END IF;
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            -- ENDS - Validates observacion ASF (IRes) id
+            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            UPDATE observaciones_ires_asf
+            SET observacion_pre_id = _observacion_pre_id,
+				num_oficio_of = _num_oficio_of,
+				fecha_recibido = _fecha_recibido,
+				fecha_vencimiento = _fecha_vencimiento,
+				observacion_ir = _observacion_ir,
+				tipo_observacion_id = _tipo_observacion_id,
+				accion = _accion,
+				clave_accion = _clave_accion,
+				monto_observado = _monto_observado,
+				monto_a_reintegrar = _monto_a_reintegrar,
+				monto_reintegrado = _monto_reintegrado,
+				fecha_reintegro = _fecha_reintegro,
+				monto_por_reintegrar = _monto_por_reintegrar,
+				tiene_pras = _tiene_pras,
+				hora_ult_cambio = current_moment
+            WHERE id = _observacion_id;
+
+            delete from seguimientos_obs_asf where observacion_id = _observacion_id;
+			
+			FOR idx IN 1 .. seguimientos_arr_len LOOP
+
+                INSERT INTO seguimientos_obs_asf
+				VALUES (
+                    _observacion_id,
+					_seguimientos[idx].seguimiento_id,
+					_seguimientos[idx].medio_notif_seguimiento_id,
+					_seguimientos[idx].num_oficio_cytg_oic,
+					_seguimientos[idx].fecha_oficio_cytg_oic,
+					_seguimientos[idx].fecha_recibido_dependencia,
+					_seguimientos[idx].fecha_vencimiento_cytg,
+					_seguimientos[idx].num_oficio_resp_dependencia,
+					_seguimientos[idx].fecha_recibido_oficio_resp,
+					_seguimientos[idx].resp_dependencia,
+					_seguimientos[idx].comentarios,
+					_seguimientos[idx].clasif_final_interna_cytg,
+					_seguimientos[idx].num_oficio_org_fiscalizador,
+					_seguimientos[idx].fecha_oficio_org_fiscalizador,
+					_seguimientos[idx].estatus_id,
+					_seguimientos[idx].monto_solventado,
+					_seguimientos[idx].num_oficio_monto_solventado,
+					_seguimientos[idx].fecha_oficio_monto_solventado,				
+					_seguimientos[idx].monto_pendiente_solventar
+                );
+            
+			END LOOP;
+			
+			if _tiene_pras then
+			
+				update pras_ires_asf
+				set num_oficio_of_vista_cytg = _pras.num_oficio_of_vista_cytg,
+					fecha_oficio_of_vista_cytg = _pras.fecha_oficio_of_vista_cytg,
+					num_oficio_cytg_aut_invest = _pras.num_oficio_cytg_aut_invest,
+					fecha_oficio_cytg_aut_invest = _pras.fecha_oficio_cytg_aut_invest,
+					num_carpeta_investigacion = _pras.num_carpeta_investigacion,
+					num_oficio_cytg_org_fiscalizador = _pras.num_oficio_cytg_org_fiscalizador,
+					fecha_oficio_cytg_org_fiscalizador = _pras.fecha_oficio_cytg_org_fiscalizador,
+					num_oficio_vai_municipio = _pras.num_oficio_vai_municipio,
+					fecha_oficio_vai_municipio = _pras.fecha_oficio_vai_municipio,
+					autoridad_invest_id = _pras.autoridad_invest_id,
+					num_oficio_pras_of = _pras.num_oficio_pras_of,
+					fecha_oficio_pras_of = _pras.fecha_oficio_pras_of,
+					num_oficio_pras_cytg_dependencia = _pras.num_oficio_pras_cytg_dependencia,
+					num_oficio_resp_dependencia = _pras.num_oficio_resp_dependencia,
+					fecha_oficio_resp_dependencia = _pras.fecha_oficio_resp_dependencia
+				where pras_observacion_id = _observacion_id;
+				
+			else
+			
+				delete from pras_ires_asf where pras_observacion_id = _observacion_id;
+			
+			end if;
+			
+			ult_obs_id = _observacion_id;
+			
+        ELSE
+            RAISE EXCEPTION 'negative observation ASF (IRes) identifier % is unsupported', _observacion_id;
+
+    END CASE;
+
+    RETURN ( ult_obs_id::integer, ''::text );
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS rmsg = MESSAGE_TEXT;
+            return ( -1::integer, rmsg::text );
+
+END;
+$$;
+
+
+ALTER FUNCTION public.alter_observacion_ires_asf(_observacion_id integer, _observacion_pre_id integer, _num_oficio_of character varying, _fecha_recibido date, _fecha_vencimiento date, _observacion_ir text, _tipo_observacion_id integer, _accion character varying, _clave_accion character varying, _monto_observado double precision, _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _tiene_pras boolean, _seguimientos public.seguimientos_obs_asf[], _pras public.pras_ires_asf) OWNER TO postgres;
+
+
+--
 -- Name: alter_observacion_pre_asf(integer, integer, date, integer, integer, character varying, date, date, integer, text, double precision, character varying, date, date, date, character varying, date, text, text, integer, character varying, date, integer, integer[]); Type: FUNCTION; Schema: public; Owner: postgres
 --
 

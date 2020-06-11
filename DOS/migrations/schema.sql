@@ -17,8 +17,78 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 
-
 SET default_tablespace = '';
+
+--
+-- Name: pras_ires_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pras_ires_asf (
+    pras_observacion_id integer NOT NULL,
+    num_oficio_of_vista_cytg character varying NOT NULL,
+    fecha_oficio_of_vista_cytg date NOT NULL,
+    num_oficio_cytg_aut_invest character varying NOT NULL,
+    fecha_oficio_cytg_aut_invest date NOT NULL,
+    num_carpeta_investigacion character varying NOT NULL,
+    num_oficio_cytg_org_fiscalizador character varying NOT NULL,
+    fecha_oficio_cytg_org_fiscalizador date NOT NULL,
+    num_oficio_vai_municipio character varying NOT NULL,
+    fecha_oficio_vai_municipio date NOT NULL,
+    autoridad_invest_id integer NOT NULL,
+    num_oficio_pras_of character varying NOT NULL,
+    fecha_oficio_pras_of date NOT NULL,
+    num_oficio_pras_cytg_dependencia character varying NOT NULL,
+    num_oficio_resp_dependencia character varying NOT NULL,
+    fecha_oficio_resp_dependencia date NOT NULL
+);
+
+
+ALTER TABLE public.pras_ires_asf OWNER TO postgres;
+
+--
+-- Name: TABLE pras_ires_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.pras_ires_asf IS 'Campos habilitados cuando columna observaciones_ires_asf.accion = PRAS';
+
+
+--
+-- Name: seguimientos_obs_asf; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.seguimientos_obs_asf (
+    observacion_id integer NOT NULL,
+    seguimiento_id integer DEFAULT 0 NOT NULL,
+    medio_notif_seguimiento_id integer NOT NULL,
+    num_oficio_cytg_oic character varying NOT NULL,
+    fecha_oficio_cytg_oic date NOT NULL,
+    fecha_recibido_dependencia date NOT NULL,
+    fecha_vencimiento_cytg date NOT NULL,
+    num_oficio_resp_dependencia character varying NOT NULL,
+    fecha_recibido_oficio_resp date NOT NULL,
+    resp_dependencia text NOT NULL,
+    comentarios text NOT NULL,
+    clasif_final_interna_cytg integer NOT NULL,
+    num_oficio_org_fiscalizador character varying NOT NULL,
+    fecha_oficio_org_fiscalizador date NOT NULL,
+    estatus_id integer NOT NULL,
+    monto_solventado double precision DEFAULT 0 NOT NULL,
+    num_oficio_monto_solventado character varying NOT NULL,
+    fecha_oficio_monto_solventado date NOT NULL,
+    monto_pendiente_solventar double precision DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.seguimientos_obs_asf OWNER TO postgres;
+
+--
+-- Name: TABLE seguimientos_obs_asf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.seguimientos_obs_asf IS 'Seguimientos para una observacion de ASF';
+
+
+
 
 --
 -- Name: seguimientos_obs_sfp; Type: TABLE; Schema: public; Owner: postgres
@@ -753,39 +823,6 @@ COMMENT ON TABLE public.orgchart_roles IS 'Roles del diagrama organizacional';
 
 
 --
--- Name: pras_ires_asf; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.pras_ires_asf (
-    pras_observacion_id integer NOT NULL,
-    num_oficio_of_vista_cytg character varying NOT NULL,
-    fecha_oficio_of_vista_cytg date NOT NULL,
-    num_oficio_cytg_aut_invest character varying NOT NULL,
-    fecha_oficio_cytg_aut_invest date NOT NULL,
-    num_carpeta_investigacion character varying NOT NULL,
-    num_oficio_cytg_org_fiscalizador character varying NOT NULL,
-    fecha_oficio_cytg_org_fiscalizador date NOT NULL,
-    num_oficio_vai_municipio character varying NOT NULL,
-    fecha_oficio_vai_municipio date NOT NULL,
-    autoridad_invest_id integer NOT NULL,
-    num_oficio_pras_of character varying NOT NULL,
-    fecha_oficio_pras_of date NOT NULL,
-    num_oficio_pras_cytg_dependencia character varying NOT NULL,
-    num_oficio_resp_dependencia character varying NOT NULL,
-    fecha_oficio_resp_dependencia date NOT NULL
-);
-
-
-ALTER TABLE public.pras_ires_asf OWNER TO postgres;
-
---
--- Name: TABLE pras_ires_asf; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON TABLE public.pras_ires_asf IS 'Campos habilitados cuando columna observaciones_ires_asf.accion = PRAS';
-
-
---
 -- Name: proyecciones_asf; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -840,42 +877,6 @@ ALTER TABLE public.sectors OWNER TO postgres;
 --
 
 COMMENT ON TABLE public.sectors IS 'Relacion que alberga los sectores (utilizados como attributos de agrupacion para las dependencias)';
-
-
---
--- Name: seguimientos_obs_asf; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.seguimientos_obs_asf (
-    observacion_id integer NOT NULL,
-    seguimiento_id integer DEFAULT 0 NOT NULL,
-    medio_notif_seguimiento_id integer NOT NULL,
-    num_oficio_cytg_oic character varying NOT NULL,
-    fecha_oficio_cytg_oic date NOT NULL,
-    fecha_recibido_dependencia date NOT NULL,
-    fecha_vencimiento_cytg date NOT NULL,
-    num_oficio_resp_dependencia character varying NOT NULL,
-    fecha_recibido_oficio_resp date NOT NULL,
-    resp_dependencia text NOT NULL,
-    comentarios text NOT NULL,
-    clasif_final_interna_cytg integer NOT NULL,
-    num_oficio_org_fiscalizador character varying NOT NULL,
-    fecha_oficio_org_fiscalizador date NOT NULL,
-    estatus_id integer NOT NULL,
-    monto_solventado double precision DEFAULT 0 NOT NULL,
-    num_oficio_monto_solventado character varying NOT NULL,
-    fecha_oficio_monto_solventado date NOT NULL,
-    monto_pendiente_solventar double precision DEFAULT 0 NOT NULL
-);
-
-
-ALTER TABLE public.seguimientos_obs_asf OWNER TO postgres;
-
---
--- Name: TABLE seguimientos_obs_asf; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON TABLE public.seguimientos_obs_asf IS 'Seguimientos para una observacion de ASF';
 
 
 --

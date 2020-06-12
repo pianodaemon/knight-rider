@@ -1,24 +1,24 @@
 import { connect } from 'react-redux';
 import { ObservationsASFForm } from './observation-asf-form.component';
-import { createObservationSFPAction } from '../state/usecases/create-observation-sfp.usecase';
+import { createObservationASFAction } from '../state/usecases/create-observation-asf.usecase';
 import { readObservationASFAction } from '../state/usecases/read-observation-asf.usecase';
-import { updateObservationSFPAction } from '../state/usecases/update-observation-sfp.usecate';
+import { updateObservationASFAction } from '../state/usecases/update-observation-asf.usecate';
 
 import {
   catalogSelector,
-  observationSFPSelector,
+  observationASFSelector,
 } from '../state/observations-asf.selectors';
 
 const mapDispatchToProps = {
-  createObservationSFPAction,
+  createObservationASFAction,
   readObservationASFAction,
-  updateObservationSFPAction,
+  updateObservationASFAction,
 };
 
 function mapStateToProps(state: any) {
   return {
     catalog: catalogSelector(state),
-    observation: observationSFPSelector(state),
+    observation: observationASFSelector(state),
   };
 }
 

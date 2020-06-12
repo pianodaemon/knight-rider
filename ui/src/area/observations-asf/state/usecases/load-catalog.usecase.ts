@@ -6,18 +6,18 @@ import { observationsASFReducer } from '../observations-asf.reducer';
 
 const postfix = '/app';
 const LOAD_CATALOG_ASF = `LOAD_CATALOG_ASF${postfix}`;
-const LOAD_CATALOG_SUCCESS_ASF = `LOAD_CATALOG_SUCCESS_ASF${postfix}`;
-const LOAD_CATALOG_ERROR_ASF = `LOAD_CATALOG_ERROR_ASF${postfix}`;
+const LOAD_CATALOG_ASF_SUCCESS = `LOAD_CATALOG_ASF_SUCCESS${postfix}`;
+const LOAD_CATALOG_ASF_ERROR = `LOAD_CATALOG_ASF_ERROR${postfix}`;
 
 export const loadCatalogAction: ActionFunctionAny<Action<any>> = createAction(
   LOAD_CATALOG_ASF
 );
 export const loadCatalogSuccessAction: ActionFunctionAny<
   Action<any>
-> = createAction(LOAD_CATALOG_SUCCESS_ASF);
+> = createAction(LOAD_CATALOG_ASF_SUCCESS);
 export const loadCatalogErrorAction: ActionFunctionAny<
   Action<any>
-> = createAction(LOAD_CATALOG_ERROR_ASF);
+> = createAction(LOAD_CATALOG_ASF_ERROR);
 
 function* loadCatalogsWorker(): Generator<any, any, any> {
   try {
@@ -40,14 +40,14 @@ const observationsReducerHandlers = {
       loading: true,
     };
   },
-  [LOAD_CATALOG_SUCCESS_ASF]: (state: any, action: any) => {
+  [LOAD_CATALOG_ASF_SUCCESS]: (state: any, action: any) => {
     return {
       ...state,
       catalog: action.payload,
       loading: false,
     };
   },
-  [LOAD_CATALOG_ERROR_ASF]: (state: any) => {
+  [LOAD_CATALOG_ASF_ERROR]: (state: any) => {
     return {
       ...state,
       loading: false,

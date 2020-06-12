@@ -23,9 +23,9 @@ import { NumberFormatCustom } from 'src/shared/components/number-format-custom.c
 import { Catalog, /* ObservationSFP */ } from '../state/observations-asf.reducer';
 
 type Props = {
-  createObservationSFPAction: Function,
+  createObservationASFAction: Function,
   readObservationASFAction: Function,
-  updateObservationSFPAction: Function,
+  updateObservationASFAction: Function,
   catalog: Catalog | null,
   observation: any | null,
 };
@@ -139,9 +139,9 @@ const useStyles = makeStyles((theme: Theme) =>
 export const ObservationsASFForm = (props: Props) => {
   const {
     catalog,
-    createObservationSFPAction,
+    createObservationASFAction,
     observation,
-    updateObservationSFPAction,
+    updateObservationASFAction,
   } = props;
   const classes = useStyles();
   const history = useHistory();
@@ -182,7 +182,7 @@ export const ObservationsASFForm = (props: Props) => {
     const errors: any = {};
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> = fields.filter((item: string) => /^fecha_/i.test(item)) || [];
-    const noMandatoryFields: Array<string> = ["id", "seguimientos", "anios_cuenta_publica"];
+    const noMandatoryFields: Array<string> = ["id",];
 
     // Mandatory fields (not empty)
     fields.filter(field => !noMandatoryFields.includes(field)).forEach((field: string) => {
@@ -202,6 +202,9 @@ export const ObservationsASFForm = (props: Props) => {
         errors[field] = errors[field] || 'Revise que el año de la fecha que ingresó sea posterior al Año de la Auditoría';
       }
     });
+    if (!values.proyecciones.length) {
+      errors.proyecciones = 'Required';
+    }
     /* @todo use scroll to view
     const element = document.getElementById(Object.keys(errors)[0]);
     if (element) {
@@ -221,17 +224,12 @@ export const ObservationsASFForm = (props: Props) => {
         validate={validate}
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
-          const fields: any = values;
-          const anio_auditoria = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).year : '';
-          fields.anios_cuenta_publica = [anio_auditoria];
-          fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
-            return { ...item, seguimiento_id: index };
-          });
+          const fields: any = {...values, monto_observado: parseFloat(values.monto_observado) };
           if (id) {
             delete fields.id;
-            updateObservationSFPAction({ id, fields, history, releaseForm });
+            updateObservationASFAction({ id, fields, history, releaseForm });
           } else {
-            createObservationSFPAction({ fields, history, releaseForm });
+            createObservationASFAction({ fields, history, releaseForm });
           }
         }}
         enableReinitialize
@@ -793,9 +791,10 @@ export const ObservationsASFForm = (props: Props) => {
                         input={<Input id="select-multiple-chip" />}
                         renderValue={(selected) => (
                           <div className={classes.chips}>
-                            {(selected as number[]).map((value) => (
+                            {(selected as number[]).map((value, index) => (
                               <Chip
-                                key={catalog?.estatus_pre_asf?.find(item => item.id === value)?.id}
+                                key={`chip-${index+1}`}
+                                // key={catalog?.estatus_pre_asf?.find(item => item.id === value)?.id}
                                 label={catalog?.estatus_pre_asf?.find(item => item.id === value)?.title}
                                 className={classes.chip} 
                               />
@@ -810,6 +809,16 @@ export const ObservationsASFForm = (props: Props) => {
                           </MenuItem>
                         ))}
                       </Select>
+                      {errors.proyecciones &&
+                          touched.proyecciones &&
+                          errors.proyecciones && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Seleccione una Proyección
+                            </FormHelperText>
+                          )}
                     </FormControl>
                   </Grid>
                 </Grid>

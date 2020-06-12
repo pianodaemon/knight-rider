@@ -11,7 +11,7 @@ import { ObservationASF } from '../state/observations-asf.reducer';
 type Props = {
   observations: Array<ObservationASF>,
   loadObservationsASFAction: Function,
-  removeObservationSFPAction: Function,
+  removeObservationASFAction: Function,
   loading: boolean,
   paging: any,
 };
@@ -35,7 +35,7 @@ export const ObservationASFTable = (props: Props) => {
     loadObservationsASFAction,
     observations,
     paging,
-    // removeObservationSFPAction,
+    removeObservationASFAction,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -162,7 +162,7 @@ export const ObservationASFTable = (props: Props) => {
                 `¿Realmente quieres eliminar la Observación Preliminar ASF ${rowData.id}?\n Esta acción es irreversible`
               )
             ) {
-              // removeObservationSFPAction(rowData.id);
+              removeObservationASFAction(rowData.id);
             }
           },
         },

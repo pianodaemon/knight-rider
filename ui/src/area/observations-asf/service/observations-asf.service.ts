@@ -20,7 +20,7 @@ export function getObservations(options: any): Promise<any> {
   );
 }
 
-export function createObservationSFP(fields: ObservationASF): Promise<any> {
+export function createObservationASF(fields: ObservationASF): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/${PREFIX}`, {
     method: 'post',
     headers: {
@@ -31,7 +31,7 @@ export function createObservationSFP(fields: ObservationASF): Promise<any> {
   });
 }
 
-export function readObservationSFP(id: number | string): Promise<any> {
+export function readObservationASF(id: number | string): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/${PREFIX}/${id}`, {
     method: 'get',
     headers: {
@@ -41,7 +41,7 @@ export function readObservationSFP(id: number | string): Promise<any> {
   });
 }
 
-export function updateObservationSFP(
+export function updateObservationASF(
   id: number | string,
   fields: ObservationASF
 ): Promise<any> {
@@ -55,7 +55,7 @@ export function updateObservationSFP(
   });
 }
 
-export function deleteObservationSFP(id: number | string): Promise<any> {
+export function deleteObservationASF(id: number | string): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/${PREFIX}/${id}`, {
     method: 'delete',
   });

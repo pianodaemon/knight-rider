@@ -5,19 +5,19 @@ import { getCatalog } from '../../service/catalog.service';
 import { resultsReportReducer } from '../results-report.reducer';
 
 const postfix = '/app';
-const LOAD_CATALOG_ASF = `LOAD_CATALOG_ASF${postfix}`;
-const LOAD_CATALOG_SUCCESS_ASF = `LOAD_CATALOG_SUCCESS_ASF${postfix}`;
-const LOAD_CATALOG_ERROR_ASF = `LOAD_CATALOG_ERROR_ASF${postfix}`;
+const LOAD_CATALOG_RR = `LOAD_CATALOG_RR${postfix}`;
+const LOAD_CATALOG_RR_SUCCESS = `LOAD_CATALOG_RR_SUCCESS${postfix}`;
+const LOAD_CATALOG_RR_ERROR = `LOAD_CATALOG_RR_ERROR${postfix}`;
 
 export const loadCatalogAction: ActionFunctionAny<Action<any>> = createAction(
-  LOAD_CATALOG_ASF
+  LOAD_CATALOG_RR
 );
 export const loadCatalogSuccessAction: ActionFunctionAny<
   Action<any>
-> = createAction(LOAD_CATALOG_SUCCESS_ASF);
+> = createAction(LOAD_CATALOG_RR_SUCCESS);
 export const loadCatalogErrorAction: ActionFunctionAny<
   Action<any>
-> = createAction(LOAD_CATALOG_ERROR_ASF);
+> = createAction(LOAD_CATALOG_RR_ERROR);
 
 function* loadCatalogsWorker(): Generator<any, any, any> {
   try {
@@ -30,24 +30,24 @@ function* loadCatalogsWorker(): Generator<any, any, any> {
 }
 
 function* loadCatalogWatcher(): Generator<any, any, any> {
-  yield takeLatest(LOAD_CATALOG_ASF, loadCatalogsWorker);
+  yield takeLatest(LOAD_CATALOG_RR, loadCatalogsWorker);
 }
 
 const resultsReportReducerHandlers = {
-  [LOAD_CATALOG_ASF]: (state: any) => {
+  [LOAD_CATALOG_RR]: (state: any) => {
     return {
       ...state,
       loading: true,
     };
   },
-  [LOAD_CATALOG_SUCCESS_ASF]: (state: any, action: any) => {
+  [LOAD_CATALOG_RR_SUCCESS]: (state: any, action: any) => {
     return {
       ...state,
       catalog: action.payload,
       loading: false,
     };
   },
-  [LOAD_CATALOG_ERROR_ASF]: (state: any) => {
+  [LOAD_CATALOG_RR_ERROR]: (state: any) => {
     return {
       ...state,
       loading: false,

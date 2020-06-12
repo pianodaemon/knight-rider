@@ -22,7 +22,7 @@ export const catalogSelector = createSelector(sliceSelector, (slice: any) => {
   };
 });
 
-export const observationSFPSelector = createSelector(
+export const observationASFSelector = createSelector(
   sliceSelector,
   catalogSelector,
   (slice: any): ObservationASF | null => {

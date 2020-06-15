@@ -149,6 +149,13 @@ def get_catalogs(table_name_list):
                 WHERE NOT blocked
                 ORDER BY title;
             '''.format(table)
+        elif table == 'dependencies':
+            sql = '''
+                SELECT dep.id, dep.title, dep.description, clasif.title as clasif_title
+                FROM dependencies as dep
+                JOIN dependencia_clasif AS clasif ON dep.clasif_id = clasif.id
+                ORDER BY dep.id;
+            '''.format(table)
         else:
             sql = '''
                 SELECT *

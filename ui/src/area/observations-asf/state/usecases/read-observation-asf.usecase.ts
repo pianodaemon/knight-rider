@@ -1,7 +1,7 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
-import { readObservationSFP } from '../../service/observations-asf.service';
+import { readObservationASF } from '../../service/observations-asf.service';
 import { observationsASFReducer } from '../observations-asf.reducer';
 
 const postfix = '/app';
@@ -22,7 +22,7 @@ export const readObservationASFErrorAction: ActionFunctionAny<
 function* readObservationASFWorker(action: any): Generator<any, any, any> {
   try {
     const { id } = action.payload;
-    const result = yield call(readObservationSFP, id);
+    const result = yield call(readObservationASF, id);
     yield put(readObservationASFSuccessAction(result));
   } catch (e) {
     const { history } = action.payload;

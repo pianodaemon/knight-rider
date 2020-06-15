@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { ObservationASFTable } from './observation-asf-table.component';
 import { loadObservationsASFAction } from '../state/usecases/load-observations-asf.usecase';
-import { removeObservationSFPAction } from '../state/usecases/remove-observation.usecase';
+import { removeObservationASFAction } from '../state/usecases/remove-observation-asf.usecase';
 
 import {
   isLoadingSelector,
@@ -11,7 +11,7 @@ import {
 
 const mapDispatchToProps = {
   loadObservationsASFAction,
-  removeObservationSFPAction,
+  removeObservationASFAction,
 };
 
 function mapStateToProps(state: any) {

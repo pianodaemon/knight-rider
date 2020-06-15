@@ -147,6 +147,13 @@ audit = api.model('Datos de una auditoría', {
     'year': fields.Integer(description='Año'),
 })
 
+dependency = api.model('Datos de una Dependencia', {
+    'id': fields.Integer(description='Id de la Dependencia'),
+    'title': fields.String(description='Título de la Dependencia'),
+    'description': fields.String(description='Descripción de la Dependencia'),
+    'clasif_title': fields.String(description='Clasificación de la Dependencia'),
+})
+
 catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASF (Informe de Resultados)', {
     'medios_notif_seguimiento_asf': fields.List(fields.Nested(pair)),
     'estatus_ires_asf': fields.List(fields.Nested(pair)),
@@ -154,7 +161,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASF (Inf
     'observation_codes': fields.List(fields.Nested(pair)),
     'observation_types': fields.List(fields.Nested(pair)),
     'audits': fields.List(fields.Nested(audit)),
-    'dependencies': fields.List(fields.Nested(pair)),
+    'dependencies': fields.List(fields.Nested(dependency)),
     'divisions': fields.List(fields.Nested(pair)),
     'social_programs': fields.List(fields.Nested(pair)),
 })

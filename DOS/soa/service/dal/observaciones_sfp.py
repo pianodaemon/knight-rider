@@ -5,13 +5,11 @@ from dal.entity import page_entities, count_entities, fetch_entity, delete_entit
 from misc.helperpg import EmptySetError
 
 def _alter_observation(**kwargs):
-    anios_cta_publica_str = str(set(kwargs['anios_cuenta_publica']))
     seguimientos_str = seguimientos_to_comp_type_arr_lit(kwargs['seguimientos'])
 
     """Calls database function in charge of creation and edition of an observation (sfp)"""
     sql = """SELECT * FROM alter_observacion_sfp(
         {}::integer,
-        '{}'::integer[],
         {}::integer,
         '{}'::date,
         {}::integer,
@@ -45,7 +43,6 @@ def _alter_observation(**kwargs):
         '{}'::date)
         AS result( rc integer, msg text )""".format(
             kwargs['id'],
-            anios_cta_publica_str,
             kwargs['direccion_id'],
             kwargs['fecha_captura'],
             kwargs['programa_social_id'],
@@ -173,12 +170,42 @@ def get_catalogs(table_name_list):
         values_l = []
         
         if table == 'audits':
+            
             sql = '''
-                SELECT id, title, dependency_id, year
-                FROM {}
+                SELECT aud.id, dep.dependencia_id
+                FROM audits AS aud
+                JOIN auditoria_dependencias AS dep ON aud.id = dep.auditoria_id
+                WHERE NOT aud.blocked;
+            '''
+
+            dependencias = exec_steady(sql)
+            d = transform_list_into_dict(dependencias)
+            
+            sql = '''
+                SELECT aud.id, ani.anio_cuenta_pub
+                FROM audits AS aud
+                JOIN auditoria_anios_cuenta_pub AS ani ON aud.id = ani.auditoria_id
+                WHERE NOT aud.blocked;
+            '''
+
+            anios = exec_steady(sql)
+            a = transform_list_into_dict(anios)
+
+            sql = '''
+                SELECT id, title
+                FROM audits
                 WHERE NOT blocked
                 ORDER BY title;
-            '''.format(table)
+            '''
+
+            rows = exec_steady(sql)
+
+            for row in rows:
+                r = dict(row)
+                r['dependency_ids'] = d[row[0]]
+                r['years'] = a[row[0]]
+                values_l.append(r)
+
         elif table == 'dependencies':
             sql = '''
                 SELECT dep.id, dep.title, dep.description, clasif.title as clasif_title
@@ -186,6 +213,11 @@ def get_catalogs(table_name_list):
                 JOIN dependencia_clasif AS clasif ON dep.clasif_id = clasif.id
                 ORDER BY dep.id;
             '''.format(table)
+
+            rows = exec_steady(sql)
+            for row in rows:
+                values_l.append(dict(row))
+        
         else:
             sql = '''
                 SELECT *
@@ -193,10 +225,9 @@ def get_catalogs(table_name_list):
                 ORDER BY id;
             '''.format(table)
 
-        rows = exec_steady(sql)
-        
-        for row in rows:
-            values_l.append(dict(row))
+            rows = exec_steady(sql)
+            for row in rows:
+                values_l.append(dict(row))
         
         fields_d[table] = values_l
 
@@ -252,19 +283,6 @@ def add_observacion_data(ent):
     for row in rows:
         mod_ent['seguimientos'].append(dict(row))
 
-    sql = '''
-        SELECT anio_cuenta_publica
-        FROM anios_cuenta_publica_obs_sfp
-        WHERE observacion_id = {}
-        ORDER BY anio_cuenta_publica;
-    '''.format(mod_ent['id'])
-
-    rows = exec_steady(sql)
-
-    mod_ent['anios_cuenta_publica'] = []
-    for row in rows:
-        mod_ent['anios_cuenta_publica'].append(row[0])
-
     return mod_ent
 
 
@@ -300,3 +318,15 @@ def seguimientos_to_comp_type_arr_lit(seguimientos):
     segs_str += "]"
 
     return segs_str
+
+
+def transform_list_into_dict(input_list):
+    output_dict = {}
+    
+    for i in input_list:
+        if i[0] not in output_dict:
+            output_dict[i[0]] = [i[1]]
+        else:
+            output_dict[i[0]].append(i[1])
+
+    return output_dict

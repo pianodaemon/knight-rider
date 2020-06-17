@@ -1,16 +1,21 @@
 --
--- Name: alter_audit(integer, character varying, integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: alter_audit(integer, character varying, integer[], integer[]); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.alter_audit(_audit_id integer, _title character varying, _dependency_id integer, _year integer) RETURNS record
+CREATE FUNCTION public.alter_audit(_audit_id integer, _title character varying, _dependency_ids integer[], _years integer[]) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
 DECLARE
 
     current_moment timestamp with time zone = now();
-    coincidences integer := 0;
     latter_id integer := 0;
+	dependency_ids_arr_len integer := array_length(_dependency_ids, 1);
+	years_arr_len integer := array_length(_years, 1);
+	idx integer := 0;
+	row_counter bigint := 0;
+	aux_arr integer[];
+	aux_arr2 integer[];
 
     -- dump of errors
     rmsg text;
@@ -23,44 +28,66 @@ BEGIN
 
             INSERT INTO audits (
                 title,
-                dependency_id,
-                year,
                 inception_time,
                 touch_latter_time
             ) VALUES (
                 _title,
-                _dependency_id,
-                _year,
                 current_moment,
-                current_moment		
+                current_moment
             ) RETURNING id INTO latter_id;
+			
+			for idx in 1 .. dependency_ids_arr_len loop
+				aux_arr[idx] = latter_id;
+			end loop;
+			
+			insert into auditoria_dependencias
+			select *
+			from unnest(aux_arr, _dependency_ids);
+			
+			for idx in 1 .. years_arr_len loop
+				aux_arr2[idx] = latter_id;
+			end loop;
+			
+			insert into auditoria_anios_cuenta_pub
+			select *
+			from unnest(aux_arr2, _years);
+
 
         WHEN _audit_id > 0 THEN
 
-            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-            -- STARTS - Validates audit id
-            --
-            -- JUSTIFICATION: Because UPDATE statement does not issue
-            -- any exception if nothing was updated.
-            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-            SELECT count(id)
-            FROM audits INTO coincidences
-            WHERE not blocked AND id = _audit_id;
-
-            IF not coincidences = 1 THEN
-                RAISE EXCEPTION 'audit identifier % does not exist', _audit_id;
-            END IF;
-            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-            -- ENDS - Validate audit id
-            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
             UPDATE audits
-            SET title  = _title, dependency_id = _dependency_id, year = _year,
+            SET title = _title,
                 touch_latter_time = current_moment
             WHERE id = _audit_id;
+			
+			GET DIAGNOSTICS row_counter = ROW_COUNT;
+			if row_counter <> 1 then
+				RAISE EXCEPTION 'Audit identifier % does not exist', _audit_id;
+			end if;
+			
+			delete from auditoria_dependencias where auditoria_id = _audit_id;
+			
+			for idx in 1 .. dependency_ids_arr_len loop
+				aux_arr[idx] = _audit_id;
+			end loop;
+			
+			insert into auditoria_dependencias
+			select *
+			from unnest(aux_arr, _dependency_ids);
+
+			delete from auditoria_anios_cuenta_pub where auditoria_id = _audit_id;
+						
+			for idx in 1 .. years_arr_len loop
+				aux_arr2[idx] = _audit_id;
+			end loop;
+			
+			insert into auditoria_anios_cuenta_pub
+			select *
+			from unnest(aux_arr2, _years);
 
             -- Upon edition we return audit id as latter id
             latter_id = _audit_id;
+
 
         ELSE
             RAISE EXCEPTION 'negative audit identifier % is unsupported', _audit_id;
@@ -78,7 +105,7 @@ END;
 $$;
 
 
-ALTER FUNCTION public.alter_audit(_audit_id integer, _title character varying, _dependency_id integer, _year integer) OWNER TO postgres;
+ALTER FUNCTION public.alter_audit(_audit_id integer, _title character varying, _dependency_ids integer[], _years integer[]) OWNER TO postgres;
 
 
 --
@@ -96,6 +123,7 @@ DECLARE
     ult_obs_id integer := 0;
 	seguimientos_arr_len integer := array_length(_seguimientos, 1);
 	idx integer := 0;
+	row_counter bigint := 0;
 	
     -- dump of errors
     rmsg text;
@@ -163,7 +191,7 @@ BEGIN
 					_seguimientos[idx].estatus_id,
 					_seguimientos[idx].monto_solventado,
 					_seguimientos[idx].num_oficio_monto_solventado,
-					_seguimientos[idx].fecha_oficio_monto_solventado,				
+					_seguimientos[idx].fecha_oficio_monto_solventado,
 					_seguimientos[idx].monto_pendiente_solventar
                 );
             
@@ -279,6 +307,31 @@ BEGIN
 					num_oficio_resp_dependencia = _pras.num_oficio_resp_dependencia,
 					fecha_oficio_resp_dependencia = _pras.fecha_oficio_resp_dependencia
 				where pras_observacion_id = _observacion_id;
+				
+				GET DIAGNOSTICS row_counter = ROW_COUNT;
+				if row_counter <> 1 then
+					
+					insert into pras_ires_asf
+					values (
+						_observacion_id,
+						_pras.num_oficio_of_vista_cytg,
+						_pras.fecha_oficio_of_vista_cytg,
+						_pras.num_oficio_cytg_aut_invest,
+						_pras.fecha_oficio_cytg_aut_invest,
+						_pras.num_carpeta_investigacion,
+						_pras.num_oficio_cytg_org_fiscalizador,
+						_pras.fecha_oficio_cytg_org_fiscalizador,
+						_pras.num_oficio_vai_municipio,
+						_pras.fecha_oficio_vai_municipio,
+						_pras.autoridad_invest_id,
+						_pras.num_oficio_pras_of,
+						_pras.fecha_oficio_pras_of,
+						_pras.num_oficio_pras_cytg_dependencia,
+						_pras.num_oficio_resp_dependencia,
+						_pras.fecha_oficio_resp_dependencia
+					);
+				
+				end if;
 				
 			else
 			
@@ -471,10 +524,10 @@ ALTER FUNCTION public.alter_observacion_pre_asf(_observacion_id integer, _direcc
 
 
 --
--- Name: alter_observacion_sfp(integer, integer[], integer, date, integer, integer, character varying, date, date, integer, text, character varying, character varying, integer, double precision, public.seguimientos_obs_sfp[], double precision, double precision, date, double precision, character varying, date, character varying, date, character varying, character varying, date, integer, character varying, date, character varying, character varying, date); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: alter_observacion_sfp(integer, integer, date, integer, integer, character varying, date, date, integer, text, character varying, character varying, integer, double precision, public.seguimientos_obs_sfp[], double precision, double precision, date, double precision, character varying, date, character varying, date, character varying, character varying, date, integer, character varying, date, character varying, character varying, date); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.alter_observacion_sfp(_observacion_id integer, _anios_cta_publica integer[], _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _acta_cierre character varying, _fecha_firma_acta_cierre date, _fecha_compromiso date, _clave_observacion_id integer, _observacion text, _acciones_correctivas character varying, _acciones_preventivas character varying, _tipo_observacion_id integer, _monto_observado double precision, _seguimientos public.seguimientos_obs_sfp[], _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _num_oficio_of_vista_cytg character varying, _fecha_oficio_of_vista_cytg date, _num_oficio_cytg_aut_invest character varying, _fecha_oficio_cytg_aut_invest date, _num_carpeta_investigacion character varying, _num_oficio_vai_municipio character varying, _fecha_oficio_vai_municipio date, _autoridad_invest_id integer, _num_oficio_pras_of character varying, _fecha_oficio_pras_of date, _num_oficio_pras_cytg_dependencia character varying, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date) RETURNS record
+CREATE FUNCTION public.alter_observacion_sfp(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _acta_cierre character varying, _fecha_firma_acta_cierre date, _fecha_compromiso date, _clave_observacion_id integer, _observacion text, _acciones_correctivas character varying, _acciones_preventivas character varying, _tipo_observacion_id integer, _monto_observado double precision, _seguimientos public.seguimientos_obs_sfp[], _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _num_oficio_of_vista_cytg character varying, _fecha_oficio_of_vista_cytg date, _num_oficio_cytg_aut_invest character varying, _fecha_oficio_cytg_aut_invest date, _num_carpeta_investigacion character varying, _num_oficio_vai_municipio character varying, _fecha_oficio_vai_municipio date, _autoridad_invest_id integer, _num_oficio_pras_of character varying, _fecha_oficio_pras_of date, _num_oficio_pras_cytg_dependencia character varying, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
@@ -484,8 +537,6 @@ DECLARE
     coincidences integer := 0;
     ult_obs_id integer := 0;
 	seguimientos_arr_len integer := array_length(_seguimientos, 1);
-	anios_cta_publica_arr_len integer := array_length(_anios_cta_publica, 1);
-	anios_aux_arr integer[];
 	idx integer := 0;
 	
     -- dump of errors
@@ -605,14 +656,6 @@ BEGIN
             
 			END LOOP;
 			
-			for idx in 1 .. anios_cta_publica_arr_len loop
-				anios_aux_arr[idx] = ult_obs_id;
-			end loop;
-			
-			INSERT INTO anios_cuenta_publica_obs_sfp
-			select *
-			from unnest(anios_aux_arr, _anios_cta_publica);
-			
 
         WHEN _observacion_id > 0 THEN
 
@@ -709,16 +752,6 @@ BEGIN
             
 			END LOOP;
 			
-			delete from anios_cuenta_publica_obs_sfp where observacion_id = _observacion_id;
-			
-			for idx in 1 .. anios_cta_publica_arr_len loop
-				anios_aux_arr[idx] = _observacion_id;
-			end loop;
-			
-			INSERT INTO anios_cuenta_publica_obs_sfp
-			select *
-			from unnest(anios_aux_arr, _anios_cta_publica);
-
 			ult_obs_id = _observacion_id;
 			
         ELSE
@@ -737,7 +770,7 @@ END;
 $$;
 
 
-ALTER FUNCTION public.alter_observacion_sfp(_observacion_id integer, _anios_cta_publica integer[], _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _acta_cierre character varying, _fecha_firma_acta_cierre date, _fecha_compromiso date, _clave_observacion_id integer, _observacion text, _acciones_correctivas character varying, _acciones_preventivas character varying, _tipo_observacion_id integer, _monto_observado double precision, _seguimientos public.seguimientos_obs_sfp[], _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _num_oficio_of_vista_cytg character varying, _fecha_oficio_of_vista_cytg date, _num_oficio_cytg_aut_invest character varying, _fecha_oficio_cytg_aut_invest date, _num_carpeta_investigacion character varying, _num_oficio_vai_municipio character varying, _fecha_oficio_vai_municipio date, _autoridad_invest_id integer, _num_oficio_pras_of character varying, _fecha_oficio_pras_of date, _num_oficio_pras_cytg_dependencia character varying, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date) OWNER TO postgres;
+ALTER FUNCTION public.alter_observacion_sfp(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _acta_cierre character varying, _fecha_firma_acta_cierre date, _fecha_compromiso date, _clave_observacion_id integer, _observacion text, _acciones_correctivas character varying, _acciones_preventivas character varying, _tipo_observacion_id integer, _monto_observado double precision, _seguimientos public.seguimientos_obs_sfp[], _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _num_oficio_of_vista_cytg character varying, _fecha_oficio_of_vista_cytg date, _num_oficio_cytg_aut_invest character varying, _fecha_oficio_cytg_aut_invest date, _num_carpeta_investigacion character varying, _num_oficio_vai_municipio character varying, _fecha_oficio_vai_municipio date, _autoridad_invest_id integer, _num_oficio_pras_of character varying, _fecha_oficio_pras_of date, _num_oficio_pras_cytg_dependencia character varying, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date) OWNER TO postgres;
 
 
 --

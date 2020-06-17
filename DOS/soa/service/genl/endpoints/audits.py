@@ -10,12 +10,24 @@ from misc.helperpg import get_msg_pgerror, EmptySetError
 
 ns = api.namespace("audits", description="Available services for an audit")
 
-audit = api.model('Audit', {
-    'id': fields.Integer(description='Audit identifier'),
-    'title': fields.String(description='Alphanumeric audit\'s identifier'),
-    'dependency_id': fields.Integer(description='Dependency which originated the audit'),
-    'year': fields.Integer(description='Public account year'),
+audit = api.model('Datos de una auditoría', {
+    'id': fields.Integer(description='Id de la auditoría'),
+    'title': fields.String(description='Título de la auditoría'),
+    'dependency_ids': fields.List(fields.Integer(), description='List of dependency ids'),
+    'years': fields.List(fields.Integer(), description='List of years (public account)'),
 })
+
+dependency = api.model('Datos de una Dependencia', {
+    'id': fields.Integer(description='Id de la Dependencia'),
+    'title': fields.String(description='Título de la Dependencia'),
+    'description': fields.String(description='Descripción de la Dependencia'),
+    'clasif_title': fields.String(description='Clasificación de la Dependencia'),
+})
+
+catalog = api.model('Leyendas y datos para la UI de Observaciones SFP', {
+    'dependencies': fields.List(fields.Nested(dependency)),
+})
+
 
 @ns.route('/')
 class AuditList(Resource):
@@ -28,8 +40,6 @@ class AuditList(Resource):
     @ns.param("per_page", "How many items per page, default is 10")
     @ns.param("page", "Which page to fetch, default is 1")
     @ns.param("title", "Alphanumeric audit's identifier")
-    @ns.param("dependency_id", "Dependency which originated the audit")
-    @ns.param("year", "Public account year")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several audits. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -43,7 +53,7 @@ class AuditList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['title', 'dependency_id', 'year']
+            ['title']
         )
 
         try:
@@ -136,6 +146,7 @@ class Audit(Resource):
 @ns.response(500, 'Server error')
 class Catalog(Resource):
 
+    @ns.marshal_with(catalog)
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
         try:

@@ -6,14 +6,19 @@ from misc.helperpg import EmptySetError
 
 def _alter_audit(**kwargs):
     """Calls sp in charge of create and edit a audit"""
+    dependecy_ids_str = str(set(kwargs['dependency_ids']))
+    years_str = str(set(kwargs['years']))
+
     sql = """SELECT * FROM alter_audit(
         {}::integer,
         '{}'::character varying,
-        {}::integer,
-        {}::integer)
+        '{}'::integer[],
+        '{}'::integer[])
         AS result( rc integer, msg text )""".format(
-            kwargs["id"], kwargs["title"],
-            kwargs["dependency_id"], kwargs["year"]
+            kwargs["id"],
+            kwargs["title"],
+            dependecy_ids_str,
+            years_str
         )
 
     rcode, rmsg = run_stored_procedure(sql)
@@ -26,8 +31,7 @@ def _alter_audit(**kwargs):
         id = rcode
 
     ent = fetch_entity("audits", id)
-    transform_data(ent)
-    return ent
+    return add_audit_data(ent)
 
 
 def create(**kwargs):
@@ -39,8 +43,7 @@ def create(**kwargs):
 def read(id):
     ''' Fetches an audit entity '''
     ent = fetch_entity("audits", id)
-    transform_data(ent)
-    return ent
+    return add_audit_data(ent)
 
 
 def update(id, **kwargs):
@@ -52,8 +55,7 @@ def update(id, **kwargs):
 def delete(id):
     ''' Deletes an audit entity '''
     ent = delete_entity("audits", id)
-    transform_data(ent)
-    return ent
+    return add_audit_data(ent)
 
 
 def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
@@ -68,7 +70,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if limit < 1:
         raise Exception("Value of param 'limit' should be >= 1")
 
-    order_by_values = ('id', 'title', 'dependency_id', 'year')
+    order_by_values = ('id', 'title')
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
 
@@ -96,8 +98,15 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if target_items > per_page:
         target_items = per_page
 
+    entities = page_entities('audits', offset + whole_pages_offset, target_items, order_by, order, search_params)
+    
+    # Adding some dependency and year (public account) data
+    enriched_list = []
+    for e in entities:
+        enriched_list.append(add_audit_data(e))
+
     return (
-        page_entities('audits', offset + whole_pages_offset, target_items, order_by, order, search_params),
+        enriched_list,
         total_items,
         total_pages
     )
@@ -109,13 +118,23 @@ def get_catalogs(table_name_list):
 
     for table in table_name_list:
         values_l = []
-        sql = '''
-            SELECT *
-            FROM {}
-            ORDER BY id;
-        '''.format(table)
+
+        if table == 'dependencies':
+            sql = '''
+                SELECT dep.id, dep.title, dep.description, clasif.title as clasif_title
+                FROM dependencies as dep
+                JOIN dependencia_clasif AS clasif ON dep.clasif_id = clasif.id
+                ORDER BY dep.id;
+            '''.format(table)
+        else:
+            sql = '''
+                SELECT *
+                FROM {}
+                ORDER BY id;
+            '''.format(table)
 
         rows = exec_steady(sql)
+
         for row in rows:
             values_l.append(dict(row))
         
@@ -124,6 +143,33 @@ def get_catalogs(table_name_list):
     return fields_d
 
 
-def transform_data(ent):
-    ent['inception_time'] = ent['inception_time'].__str__()
-    ent['touch_latter_time'] = ent['touch_latter_time'].__str__()
+def add_audit_data(ent):
+    attributes = set([
+        'id',
+        'title',
+    ])
+    mod_ent = {attr: ent[attr] for attr in attributes}
+
+    mod_ent['dependency_ids'] = []
+    sql = '''
+        SELECT dependencia_id
+        FROM auditoria_dependencias
+        WHERE auditoria_id = {};
+    '''.format(mod_ent['id'])
+
+    rows = exec_steady(sql)
+    for row in rows:
+        mod_ent['dependency_ids'].append(row[0])
+
+    mod_ent['years'] = []
+    sql = '''
+        SELECT anio_cuenta_pub
+        FROM auditoria_anios_cuenta_pub
+        WHERE auditoria_id = {};
+    '''.format(mod_ent['id'])
+
+    rows = exec_steady(sql)
+    for row in rows:
+        mod_ent['years'].append(row[0])
+
+    return mod_ent

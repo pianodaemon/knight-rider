@@ -143,12 +143,42 @@ def get_catalogs(table_name_list):
         values_l = []
         
         if table == 'audits':
+            
             sql = '''
-                SELECT id, title, dependency_id, year
-                FROM {}
+                SELECT aud.id, dep.dependencia_id
+                FROM audits AS aud
+                JOIN auditoria_dependencias AS dep ON aud.id = dep.auditoria_id
+                WHERE NOT aud.blocked;
+            '''
+
+            dependencias = exec_steady(sql)
+            d = transform_list_into_dict(dependencias)
+            
+            sql = '''
+                SELECT aud.id, ani.anio_cuenta_pub
+                FROM audits AS aud
+                JOIN auditoria_anios_cuenta_pub AS ani ON aud.id = ani.auditoria_id
+                WHERE NOT aud.blocked;
+            '''
+
+            anios = exec_steady(sql)
+            a = transform_list_into_dict(anios)
+
+            sql = '''
+                SELECT id, title
+                FROM audits
                 WHERE NOT blocked
                 ORDER BY title;
-            '''.format(table)
+            '''
+
+            rows = exec_steady(sql)
+
+            for row in rows:
+                r = dict(row)
+                r['dependency_ids'] = d[row[0]]
+                r['years'] = a[row[0]]
+                values_l.append(r)
+
         elif table == 'dependencies':
             sql = '''
                 SELECT dep.id, dep.title, dep.description, clasif.title as clasif_title
@@ -156,6 +186,11 @@ def get_catalogs(table_name_list):
                 JOIN dependencia_clasif AS clasif ON dep.clasif_id = clasif.id
                 ORDER BY dep.id;
             '''.format(table)
+
+            rows = exec_steady(sql)
+            for row in rows:
+                values_l.append(dict(row))
+        
         else:
             sql = '''
                 SELECT *
@@ -163,10 +198,9 @@ def get_catalogs(table_name_list):
                 ORDER BY id;
             '''.format(table)
 
-        rows = exec_steady(sql)
-        
-        for row in rows:
-            values_l.append(dict(row))
+            rows = exec_steady(sql)
+            for row in rows:
+                values_l.append(dict(row))
         
         fields_d[table] = values_l
 
@@ -301,3 +335,15 @@ def add_preliminar_data(ent):
     ent['direccion_id'] = row['direccion_id']
     ent['programa_social_id'] = row['programa_social_id']
     ent['auditoria_id'] = row['auditoria_id']
+
+
+def transform_list_into_dict(input_list):
+    output_dict = {}
+    
+    for i in input_list:
+        if i[0] not in output_dict:
+            output_dict[i[0]] = [i[1]]
+        else:
+            output_dict[i[0]].append(i[1])
+
+    return output_dict

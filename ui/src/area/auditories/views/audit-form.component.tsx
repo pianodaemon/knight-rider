@@ -8,7 +8,11 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
 import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdown.component';
+import { range } from 'src/shared/utils/range.util';
 import { Catalog, Audit } from '../state/audits.reducer';
 
 type Props = {
@@ -102,8 +106,8 @@ export const AuditsForm = (props: Props) => {
   const { id } = useParams();
   const initialValues = {
     title: '',
-    dependency_id: '',
-    year: '',
+    dependency_ids: [],
+    years: [],
   };
   useEffect(() => {
     if (id) {
@@ -121,12 +125,12 @@ export const AuditsForm = (props: Props) => {
             errors.title = 'Required';
           }
 
-          if (!values.dependency_id) {
-            errors.dependency_id = 'Required';
+          if (!values.dependency_ids.length) {
+            errors.dependency_ids = 'Required';
           }
 
-          if (!values.year) {
-            errors.year = 'Required';
+          if (!values.years.length) {
+            errors.years = 'Required';
           }
           return errors;
         }}
@@ -159,7 +163,7 @@ export const AuditsForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         id="title"
-                        label="Descripción"
+                        label="Auditoría no."
                         value={values.title || ''}
                         onChange={handleChange('title')}
                       />
@@ -168,7 +172,7 @@ export const AuditsForm = (props: Props) => {
                           error
                           classes={{ error: classes.textErrorHelper }}
                         >
-                          Ingrese una descripción
+                          Ingrese un no. de Auditoría
                         </FormHelperText>
                       )}
                     </FormControl>
@@ -181,18 +185,20 @@ export const AuditsForm = (props: Props) => {
                         label="Dependencia"
                         name="dependencia"
                         onChange={(value: any) => {
-                          return setFieldValue('dependency_id', value);
+                          return setFieldValue('dependency_ids', value);
                         }}
                         options={
                           catalog && catalog.dependencies
                             ? catalog.dependencies
                             : []
                         }
-                        value={catalog ? values.dependency_id || '' : ''}
+                        value={catalog ? values.dependency_ids || [] : []}
+                        groupField="clasif_title"
+                        multiple
                       />
-                      {errors.dependency_id &&
-                        touched.dependency_id &&
-                        errors.dependency_id && (
+                      {errors.dependency_ids &&
+                        touched.dependency_ids &&
+                        errors.dependency_ids && (
                           <FormHelperText
                             error
                             classes={{ error: classes.textErrorHelper }}
@@ -206,19 +212,28 @@ export const AuditsForm = (props: Props) => {
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <TextField
-                        id="year"
-                        label="Año"
-                        value={values.year || ''}
-                        onChange={handleChange('year')}
-                        inputProps={{ type: 'number', min: 1900 }}
-                      />
-                      {errors.year && touched.year && errors.year && (
+                      <InputLabel id="proyecciones-mutiple-chip-label">
+                        Año
+                      </InputLabel>
+                      <Select
+                        labelId="years-label"
+                        id="years"
+                        multiple
+                        value={values.years || []}
+                        onChange={handleChange('years')}
+                      >
+                        {range(2000, new Date().getFullYear()).map((year) => (
+                          <MenuItem key={year} value={year}>
+                            {year}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.years && touched.years && errors.years && (
                         <FormHelperText
                           error
                           classes={{ error: classes.textErrorHelper }}
                         >
-                          Ingrese un año
+                          Ingrese año(s)
                         </FormHelperText>
                       )}
                     </FormControl>

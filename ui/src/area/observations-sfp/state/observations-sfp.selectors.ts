@@ -48,15 +48,17 @@ export const observationsCatalogSelector = createSelector(
     slice.observations &&
     Array.isArray(slice.observations) &&
     slice.observations.map((observation: ObservationSFP) => {
-      const dependencia_id = catalog.audits.find(
-        (item: any) => item.id === observation.auditoria_id
-      )
-        ? (
-            catalog.audits.find(
-              (item: any) => item.id === observation.auditoria_id
-            ) || {}
-          ).dependency_id
-        : '';
+      const anio_auditoria =
+        catalog &&
+        catalog.audits &&
+        observation.auditoria_id &&
+        catalog.audits.find((item: any) => item.id === observation.auditoria_id)
+          ? (
+              catalog.audits.find(
+                (item: any) => item.id === observation.auditoria_id,
+              ) || {}
+            ).years
+          : '';
       let direccion_id_title: any = catalog.divisions.find(
         (item: any) => item.id === observation.direccion_id
       );
@@ -66,23 +68,34 @@ export const observationsCatalogSelector = createSelector(
       let programa_social_id_title: any = catalog.social_programs.find(
         (item: any) => item.id === observation.programa_social_id
       );
-      let dependencia_id_title: any = catalog.dependencies.find(
-        (item: any) => item.id === dependencia_id
-      );
       direccion_id_title = direccion_id_title ? direccion_id_title.title : null;
       auditoria_id_title = auditoria_id_title ? auditoria_id_title.title : null;
-      dependencia_id_title = dependencia_id_title
-        ? dependencia_id_title.title
-        : null;
       programa_social_id_title = programa_social_id_title
         ? programa_social_id_title.title
         : null;
+      const dependencies =
+        catalog &&
+        catalog.audits &&
+        observation.auditoria_id &&
+        catalog.audits.find((item: any) => item.id === observation.auditoria_id)
+          ? (
+              catalog.audits.find(
+                (item: any) => item.id === observation.auditoria_id,
+              ) || {}
+            ).dependency_ids
+              .map((dependency: number) =>
+                catalog.dependencies.find((item: any) => item.id === dependency)
+              )
+              .map((item: any) => item.title)
+              .join(', ')
+          : '';
       return {
         ...observation,
         direccion_id_title,
         auditoria_id_title,
-        dependencia_id_title,
+        dependencies,
         programa_social_id_title,
+        anio_auditoria: anio_auditoria.join(', '),
       };
     })
 );

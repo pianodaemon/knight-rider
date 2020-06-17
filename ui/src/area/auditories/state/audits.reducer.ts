@@ -4,8 +4,8 @@ import { createAndMergeSliceReducer } from 'src/redux-utils/create-and-merge-sli
 export interface Audit {
   id: number;
   title: string;
-  dependency_id: number;
-  year: number;
+  dependency_ids: Array<number>;
+  years: Array<number>;
 }
 
 // Mutated Audit Interface to be used as a Request body on Create/Update Actions

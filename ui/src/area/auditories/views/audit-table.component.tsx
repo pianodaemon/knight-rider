@@ -56,14 +56,14 @@ export const AuditTable = (props: Props) => {
           sorting,
         },
         {
-          title: 'Dependencia',
-          field: 'dependency_id_title',
+          title: 'Dependencia(s)',
+          field: 'dependencies',
           sorting,
           customSort,
         },
         {
-          title: 'Año',
-          field: 'year',
+          title: 'Año(s)',
+          field: 'years',
           sorting,
         },
       ]}

@@ -4,7 +4,7 @@ import { createAndMergeSliceReducer } from 'src/redux-utils/create-and-merge-sli
 export interface ObservationSFP {
   id: number;
   direccion_id: number;
-  dependencia_id: number;
+  // dependencia_id: number;
   fecha_captura: string;
   programa_social_id: number;
   auditoria_id: number;
@@ -35,7 +35,7 @@ export interface ObservationSFP {
   num_oficio_resp_dependencia: number;
   fecha_oficio_resp_dependencia: number;
   seguimientos: Array<Seguimiento> | null;
-  anios_cuenta_publica: Array<number> | null;
+  // anios_cuenta_publica: Array<number> | null;
 }
 
 type Seguimiento = {
@@ -75,8 +75,8 @@ interface ObservationsSFPSlice {
 type Audit = {
   id: number,
   title: string,
-  dependency_id: number,
-  year: number,
+  dependency_ids: Array<number>,
+  years: Array<number>,
 };
 
 type CatalogItem = {

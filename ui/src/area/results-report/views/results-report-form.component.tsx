@@ -231,7 +231,7 @@ export const ResultsReportForm = (props: Props) => {
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = values;
-          const anio_auditoria = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).year : '';
+          const anio_auditoria = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).years : '';
           fields.anios_cuenta_publica = [anio_auditoria];
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
             return { ...item, seguimiento_id: index };
@@ -254,9 +254,34 @@ export const ResultsReportForm = (props: Props) => {
           isSubmitting,
           setFieldValue,
         }) => {
-          const anio_auditoria = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).year : '';
-          const dependencia_id = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).dependency_id : '';
-          const dependencia = catalog && catalog.dependencies && dependencia_id && catalog.dependencies.find((item) => item.id === dependencia_id) ? (catalog.dependencies.find((item) => item.id === dependencia_id) || {}).title : '';
+          const anio_auditoria =
+            catalog &&
+            catalog.audits &&
+            values.auditoria_id &&
+            catalog.audits.find(
+              (item) => item.id === values.auditoria_id
+            )
+              ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).years?.join(', ')
+              : '';
+          const dependency_ids = 
+            catalog &&
+            catalog.audits &&
+            values.auditoria_id &&
+            catalog.audits.find(
+              (item) => item.id === values.auditoria_id
+            )
+              ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).dependency_ids
+              : '';
+          const dependencias = 
+            catalog &&
+            catalog.dependencies &&
+            dependency_ids &&
+            dependency_ids.length &&
+            dependency_ids.map(
+              (dependency: any) => catalog?.dependencies?.find((item) => item.id === dependency)
+                ? (catalog.dependencies.find((item) => item.id === dependency) || {}).title
+                : ''
+            ).join(', ');
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Informe de Resultados</h1>
@@ -282,7 +307,7 @@ export const ResultsReportForm = (props: Props) => {
                       <TextField
                         id="dependencia_id"
                         label="Dependencia"
-                        value={dependencia || ''}
+                        value={dependencias || ''}
                         variant="filled"
                         disabled
                         InputProps={{

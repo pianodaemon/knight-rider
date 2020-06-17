@@ -243,9 +243,34 @@ export const ObservationsASFForm = (props: Props) => {
           isSubmitting,
           setFieldValue,
         }) => {
-          const anio_auditoria = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).year : '';
-          const dependencia_id = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).dependency_id : '';
-          const dependencia = catalog && catalog.dependencies && dependencia_id && catalog.dependencies.find((item) => item.id === dependencia_id) ? (catalog.dependencies.find((item) => item.id === dependencia_id) || {}).title : '';
+          const years =
+            catalog &&
+            catalog.audits &&
+            values.auditoria_id &&
+            catalog.audits.find(
+              (item) => item.id === values.auditoria_id
+            ) 
+              ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).years?.join(', ') 
+              : '';
+          const dependency_ids =
+            catalog &&
+            catalog.audits &&
+            values.auditoria_id &&
+            catalog.audits.find(
+              (item) => item.id === values.auditoria_id
+            )
+              ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).dependency_ids
+              : '';
+          const dependencias = 
+            catalog &&
+            catalog.dependencies &&
+            dependency_ids &&
+            dependency_ids.length &&
+            dependency_ids.map(
+              (dependency: any) => catalog?.dependencies?.find((item) => item.id === dependency)
+                ? (catalog.dependencies.find((item) => item.id === dependency) || {}).title
+                : ''
+            ).join(', ');
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Observaciones Preliminares ASF</h1>
@@ -257,7 +282,7 @@ export const ObservationsASFForm = (props: Props) => {
                       <TextField
                         id="audit_date"
                         label="Año de la cuenta pública"
-                        value={anio_auditoria || ''}
+                        value={years || ''}
                         variant="filled"
                         disabled
                         InputProps={{
@@ -271,7 +296,7 @@ export const ObservationsASFForm = (props: Props) => {
                       <TextField
                         id="dependencia_id"
                         label="Dependencia"
-                        value={dependencia || ''}
+                        value={dependencias || ''}
                         variant="filled"
                         disabled
                         InputProps={{

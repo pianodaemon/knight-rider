@@ -65,7 +65,7 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route
           exact
-          path={['/observation-sfp/create', '/observation-sfp/:id/edit']}
+          path={['/observation-sfp/create', '/observation-sfp/:id/:action']}
         >
           <ObservationsSFPFormContainer />
         </Route>

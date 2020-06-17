@@ -49,8 +49,8 @@ type CatalogItem = {
 };
 
 type Audit = CatalogItem & {
-  dependency_id: number,
-  year: number,
+  dependency_ids: Array<number>,
+  years: Array<number>,
 };
 
 type Division = CatalogItem;

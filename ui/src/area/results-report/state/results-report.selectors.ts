@@ -45,15 +45,22 @@ export const reportsCatalogSelector = createSelector(
     slice.reports &&
     Array.isArray(slice.reports) &&
     slice.reports.map((report: ResultsReport) => {
-      const dependencia_id = catalog.audits.find(
-        (item: any) => item.id === report.auditoria_id
-      )
-        ? (
-            catalog.audits.find(
-              (item: any) => item.id === report.auditoria_id
-            ) || {}
-          ).dependency_id
-        : '';
+      const dependencies =
+        catalog &&
+        catalog.audits &&
+        report.auditoria_id &&
+        catalog.audits.find((item: any) => item.id === report.auditoria_id)
+          ? (
+              catalog.audits.find(
+                (item: any) => item.id === report.auditoria_id,
+              ) || {}
+            ).dependency_ids
+              .map((dependency: number) =>
+                catalog.dependencies.find((item: any) => item.id === dependency)
+              )
+              .map((item: any) => item.title)
+              .join(', ')
+          : '';
       let direccion_id_title: any = catalog.divisions.find(
         (item: any) => item.id === report.direccion_id
       );
@@ -63,23 +70,17 @@ export const reportsCatalogSelector = createSelector(
       let programa_social_id_title: any = catalog.social_programs.find(
         (item: any) => item.id === report.programa_social_id
       );
-      let dependencia_id_title: any = catalog.dependencies.find(
-        (item: any) => item.id === dependencia_id
-      );
       direccion_id_title = direccion_id_title ? direccion_id_title.title : null;
       auditoria_id_title = auditoria_id_title ? auditoria_id_title.title : null;
       programa_social_id_title = programa_social_id_title
         ? programa_social_id_title.title
-        : null;
-      dependencia_id_title = dependencia_id_title
-        ? dependencia_id_title.title
         : null;
       return {
         ...report,
         direccion_id_title,
         auditoria_id_title,
         programa_social_id_title,
-        dependencia_id_title,
+        dependencies,
       };
     })
 );

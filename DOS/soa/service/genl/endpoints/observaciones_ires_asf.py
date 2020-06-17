@@ -143,8 +143,8 @@ pair = api.model('Id-Title pair', {
 audit = api.model('Datos de una auditoría', {
     'id': fields.Integer(description='Id de la auditoría'),
     'title': fields.String(description='Título de la auditoría'),
-    'dependency_id': fields.Integer(description='Id de la Dependencia'),
-    'year': fields.Integer(description='Año'),
+    'dependency_ids': fields.List(fields.Integer(), description='List of dependency ids'),
+    'years': fields.List(fields.Integer(), description='List of years (public account)'),
 })
 
 dependency = api.model('Datos de una Dependencia', {

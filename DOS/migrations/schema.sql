@@ -189,6 +189,44 @@ COMMENT ON TABLE public.apps IS 'Relacion que alberga las aplicaciones que seran
 
 
 --
+-- Name: auditoria_anios_cuenta_pub; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auditoria_anios_cuenta_pub (
+    auditoria_id integer NOT NULL,
+    anio_cuenta_pub integer DEFAULT 2012 NOT NULL
+);
+
+
+ALTER TABLE public.auditoria_anios_cuenta_pub OWNER TO postgres;
+
+--
+-- Name: TABLE auditoria_anios_cuenta_pub; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.auditoria_anios_cuenta_pub IS 'Anios de cuenta publica para una auditoria';
+
+
+--
+-- Name: auditoria_dependencias; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auditoria_dependencias (
+    auditoria_id integer NOT NULL,
+    dependencia_id integer NOT NULL
+);
+
+
+ALTER TABLE public.auditoria_dependencias OWNER TO postgres;
+
+--
+-- Name: TABLE auditoria_dependencias; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.auditoria_dependencias IS 'Dependencias para una auditoria';
+
+
+--
 -- Name: audits_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -209,8 +247,6 @@ ALTER TABLE public.audits_id_seq OWNER TO postgres;
 CREATE TABLE public.audits (
     id integer DEFAULT nextval('public.audits_id_seq'::regclass) NOT NULL,
     title character varying NOT NULL,
-    dependency_id integer,
-    year integer DEFAULT 2012 NOT NULL,
     inception_time timestamp with time zone NOT NULL,
     blocked boolean DEFAULT false NOT NULL,
     touch_latter_time timestamp with time zone NOT NULL
@@ -224,20 +260,6 @@ ALTER TABLE public.audits OWNER TO postgres;
 --
 
 COMMENT ON COLUMN public.audits.title IS 'Este es el alphanumerico que identifica a una auditoria';
-
-
---
--- Name: COLUMN audits.dependency_id; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN public.audits.dependency_id IS 'Dependencia que ha originado la auditoria';
-
-
---
--- Name: COLUMN audits.year; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN public.audits.year IS 'Ano de la cuenta publica';
 
 
 --
@@ -267,13 +289,33 @@ CREATE TABLE public.autoridades_invest (
 ALTER TABLE public.autoridades_invest OWNER TO postgres;
 
 --
+-- Name: dependencia_clasif; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.dependencia_clasif (
+    id integer NOT NULL,
+    title character varying NOT NULL
+);
+
+
+ALTER TABLE public.dependencia_clasif OWNER TO postgres;
+
+--
+-- Name: TABLE dependencia_clasif; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.dependencia_clasif IS 'Clasificacion de dependencias';
+
+
+--
 -- Name: dependencies; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.dependencies (
     id integer NOT NULL,
     title character varying NOT NULL,
-    description text
+    description text,
+    clasif_id integer NOT NULL
 );
 
 
@@ -992,6 +1034,22 @@ ALTER TABLE ONLY public.apps
 
 
 --
+-- Name: auditoria_anios_cuenta_pub auditoria_anios_cuenta_pub_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auditoria_anios_cuenta_pub
+    ADD CONSTRAINT auditoria_anios_cuenta_pub_pkey PRIMARY KEY (auditoria_id, anio_cuenta_pub);
+
+
+--
+-- Name: auditoria_dependencias auditoria_dependencias_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auditoria_dependencias
+    ADD CONSTRAINT auditoria_dependencias_pkey PRIMARY KEY (auditoria_id, dependencia_id);
+
+
+--
 -- Name: audits audits_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1045,6 +1103,22 @@ ALTER TABLE ONLY public.geo_countries
 
 ALTER TABLE ONLY public.geo_countries
     ADD CONSTRAINT country_title_key UNIQUE (title);
+
+
+--
+-- Name: dependencia_clasif dependencia_clasif_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dependencia_clasif
+    ADD CONSTRAINT dependencia_clasif_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: dependencia_clasif dependencia_clasif_unique_title; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dependencia_clasif
+    ADD CONSTRAINT dependencia_clasif_unique_title UNIQUE (title);
 
 
 --
@@ -1415,6 +1489,22 @@ ALTER TABLE ONLY public.anios_cuenta_publica_obs_sfp
 
 
 --
+-- Name: auditoria_anios_cuenta_pub auditoria_anios_cuenta_pub_audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auditoria_anios_cuenta_pub
+    ADD CONSTRAINT auditoria_anios_cuenta_pub_audits_fkey FOREIGN KEY (auditoria_id) REFERENCES public.audits(id);
+
+
+--
+-- Name: auditoria_dependencias auditoria_dependencias_audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auditoria_dependencias
+    ADD CONSTRAINT auditoria_dependencias_audits_fkey FOREIGN KEY (auditoria_id) REFERENCES public.audits(id);
+
+
+--
 -- Name: observations audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1428,6 +1518,14 @@ ALTER TABLE ONLY public.observations
 
 ALTER TABLE ONLY public.authorities
     ADD CONSTRAINT authorities_app_id_fkey FOREIGN KEY (app_id) REFERENCES public.apps(id);
+
+
+--
+-- Name: dependencies dependencies_dependencia_clasif_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dependencies
+    ADD CONSTRAINT dependencies_dependencia_clasif_fkey FOREIGN KEY (clasif_id) REFERENCES public.dependencia_clasif(id);
 
 
 --

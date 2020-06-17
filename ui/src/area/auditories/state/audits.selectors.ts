@@ -31,20 +31,20 @@ export const auditsCatalogSelector = createSelector(
     slice.audits &&
     Array.isArray(slice.audits) &&
     slice.audits.map((audit: Audit) => {
-      let dependency_id_title = catalog.dependencies.find(
-        (item: any) => item.id === audit.dependency_id
-      );
-      dependency_id_title = dependency_id_title
-        ? dependency_id_title.title
-        : null;
+      const dependencies = audit.dependency_ids
+        .map((dependency: any) =>
+          catalog.dependencies.find((item: any) => item.id === dependency)
+        )
+        .map((item: any) => (item ? item.title : ''));
       return {
         ...audit,
-        dependency_id_title,
+        dependencies: dependencies.join(', '),
+        years: audit.years.join(', '),
       };
     })
 );
 
 export const pagingSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.paging,
+  (slice: any) => slice.paging
 );

@@ -140,6 +140,7 @@ export function AppBarComponent() {
         { url: '/audit/create', text: 'Crear', icon: <NoteAddIcon /> },
       ],
     },
+    /*
     observation: {
       url: '/observation/list',
       text: 'Observaciones',
@@ -149,6 +150,7 @@ export function AppBarComponent() {
         { url: '/observation/create', text: 'Crear', icon: <NoteAddIcon /> },
       ],
     },
+    */
     observationSfp: {
       url: '/observation-sfp/list',
       text: 'Observaciones SFP',

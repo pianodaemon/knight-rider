@@ -61,14 +61,19 @@ export const ObservationSFPTable = (props: Props) => {
       sorting,
     },
     {
+      title: 'Año(s) de la Cuenta Pública',
+      field: 'anio_auditoria',
+      sorting,
+    },
+    {
       title: 'Auditoría',
       field: 'auditoria_id_title',
       sorting,
       customSort,
     },
     {
-      title: 'Dependencia',
-      field: 'dependencia_id_title',
+      title: 'Dependencia(s)',
+      field: 'dependencies',
       sorting,
     },
     { title: 'Programa', field: 'programa_social_id_title', sorting },
@@ -85,7 +90,7 @@ export const ObservationSFPTable = (props: Props) => {
   ];
   return (
     <MaterialTable
-      title="Observaciones SFP"
+      title="Observaciones de Resultados SFP"
       onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
         loadObservationsSFPAction({
           ...paging,
@@ -151,6 +156,12 @@ export const ObservationSFPTable = (props: Props) => {
         },
       }}
       actions={[
+        {
+          icon: 'search',
+          tooltip: 'Visualizar Observación',
+          onClick: (event, rowData: any) =>
+            history.push(`/observation-sfp/${rowData.id}/view`),
+        },
         {
           icon: 'edit',
           tooltip: 'Editar Observación',

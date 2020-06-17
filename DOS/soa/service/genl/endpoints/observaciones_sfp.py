@@ -41,7 +41,6 @@ obs_sfp_ns_captions = {
     'num_oficio_resp_dependencia': 'Num. de Oficio de respuesta de la Dependencia',
     'fecha_oficio_resp_dependencia': 'Fecha de Oficio de respuesta de la Dependencia',
     'seguimientos': 'Seguimientos (lista de cédulas)',
-    'anios_cuenta_publica': 'Años de la cuenta pública',
 }
 
 ns = api.namespace("obs_sfp", description="Servicios disponibles para Observaciones de la SFP (Informe de Resultados)")
@@ -98,7 +97,6 @@ obs_sfp = api.model('Observación SFP', {
     'num_oficio_resp_dependencia': fields.String(description=obs_sfp_ns_captions['num_oficio_resp_dependencia']),
     'fecha_oficio_resp_dependencia': fields.Date(description=obs_sfp_ns_captions['fecha_oficio_resp_dependencia']),
     'seguimientos': fields.List(fields.Nested(seguimiento), description=obs_sfp_ns_captions['seguimientos']),
-    'anios_cuenta_publica': fields.List(fields.Integer(), description=obs_sfp_ns_captions['anios_cuenta_publica']),
 })
 
 
@@ -110,8 +108,15 @@ pair = api.model('Id-Title pair', {
 audit = api.model('Datos de una auditoría', {
     'id': fields.Integer(description='Id de la auditoría'),
     'title': fields.String(description='Título de la auditoría'),
-    'dependency_id': fields.Integer(description='Id de la Dependencia'),
-    'year': fields.Integer(description='Año'),
+    'dependency_ids': fields.List(fields.Integer(), description='List of dependency ids'),
+    'years': fields.List(fields.Integer(), description='List of years (public account)'),
+})
+
+dependency = api.model('Datos de una Dependencia', {
+    'id': fields.Integer(description='Id de la Dependencia'),
+    'title': fields.String(description='Título de la Dependencia'),
+    'description': fields.String(description='Descripción de la Dependencia'),
+    'clasif_title': fields.String(description='Clasificación de la Dependencia'),
 })
 
 dependency = api.model('Datos de una Dependencia', {

@@ -83,6 +83,13 @@ dependency = api.model('Datos de una Dependencia', {
     'clasif_title': fields.String(description='Clasificación de la Dependencia'),
 })
 
+dependency = api.model('Datos de una Dependencia', {
+    'id': fields.Integer(description='Id de la Dependencia'),
+    'title': fields.String(description='Título de la Dependencia'),
+    'description': fields.String(description='Descripción de la Dependencia'),
+    'clasif_title': fields.String(description='Clasificación de la Dependencia'),
+})
+
 catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASF (Preliminares)', {
     'divisions': fields.List(fields.Nested(pair)),
     'audits': fields.List(fields.Nested(audit)),

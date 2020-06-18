@@ -892,8 +892,7 @@ export const ObservationsASFForm = (props: Props) => {
                             {(selected as number[]).map((value, index) => (
                               <Chip
                                 key={`chip-${index+1}`}
-                                // key={catalog?.estatus_pre_asf?.find(item => item.id === value)?.id}
-                                label={catalog?.estatus_pre_asf?.find(item => item.id === value)?.title}
+                                label={catalog?.proyecciones_asf?.find(item => item.id === value)?.title}
                                 className={classes.chip} 
                               />
                             ))}
@@ -901,7 +900,7 @@ export const ObservationsASFForm = (props: Props) => {
                         )}
                         MenuProps={MenuProps}
                       >
-                        {catalog && catalog.estatus_pre_asf && catalog.estatus_pre_asf.map((name) => (
+                        {catalog && catalog.proyecciones_asf && catalog.proyecciones_asf.map((name) => (
                           <MenuItem key={name.id} value={name.id}>
                             {name.title}
                           </MenuItem>

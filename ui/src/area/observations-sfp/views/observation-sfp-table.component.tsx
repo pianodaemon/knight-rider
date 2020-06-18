@@ -61,7 +61,7 @@ export const ObservationSFPTable = (props: Props) => {
       sorting,
     },
     {
-      title: 'Año(s) de la Cuenta Pública',
+      title: 'Cuenta Pública',
       field: 'anio_auditoria',
       sorting,
     },

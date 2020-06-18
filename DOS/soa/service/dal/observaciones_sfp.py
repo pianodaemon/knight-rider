@@ -17,7 +17,7 @@ def _alter_observation(**kwargs):
         '{}'::character varying,
         '{}'::date,
         '{}'::date,
-        {}::integer,
+        '{}'::character varying,
         '{}'::text,
         '{}'::character varying,
         '{}'::character varying,
@@ -50,7 +50,7 @@ def _alter_observation(**kwargs):
             kwargs['acta_cierre'],
             kwargs['fecha_firma_acta_cierre'],
             kwargs['fecha_compromiso'],
-            kwargs['clave_observacion_id'],
+            kwargs['clave_observacion'],
             kwargs['observacion'],
             kwargs['acciones_correctivas'],
             kwargs['acciones_preventivas'],
@@ -126,7 +126,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         raise Exception("Value of param 'limit' should be >= 1")
 
     order_by_values = (
-        'id', 'tipo_observacion_id', 'programa_social_id', 'auditoria_id', 'observacion', 'clave_observacion_id', 'direccion_id'
+        'id', 'tipo_observacion_id', 'programa_social_id', 'auditoria_id', 'observacion', 'clave_observacion', 'direccion_id'
     )
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
@@ -244,7 +244,7 @@ def add_observacion_data(ent):
         'acta_cierre',
         'fecha_firma_acta_cierre',
         'fecha_compromiso',
-        'clave_observacion_id',
+        'clave_observacion',
         'observacion',
         'acciones_correctivas',
         'acciones_preventivas',

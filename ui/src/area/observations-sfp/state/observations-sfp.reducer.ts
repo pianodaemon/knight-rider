@@ -11,7 +11,7 @@ export interface ObservationSFP {
   acta_cierre: string;
   fecha_firma_acta_cierre: string;
   fecha_compromiso: string;
-  clave_observacion_id: number;
+  clave_observacion: string;
   observacion: string;
   acciones_correctivas: string;
   acciones_preventivas: string;

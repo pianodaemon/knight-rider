@@ -12,6 +12,8 @@ import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import IconButton from '@material-ui/core/IconButton';
+import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import Chip from '@material-ui/core/Chip';
 import Input from '@material-ui/core/Input';
@@ -20,6 +22,7 @@ import DateFnsUtils from '@date-io/date-fns';
 import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picker.component';
 import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
+import { SingleTextResponsiveModal } from 'src/shared/components/modal/single-text-responsive-modal.component';
 import { Catalog, /* ObservationSFP */ } from '../state/observations-asf.reducer';
 
 type Props = {
@@ -145,11 +148,12 @@ export const ObservationsASFForm = (props: Props) => {
   } = props;
   const classes = useStyles();
   const history = useHistory();
-  const { id } = useParams();
+  const { action, id } = useParams();
+  const fechaCaptura = new Date();
   const initialValues = {
     id: '',
     direccion_id: '',
-    fecha_captura: null,
+    fecha_captura: `${fechaCaptura.getFullYear()}-${fechaCaptura.getMonth()}-${fechaCaptura.getDate()}`,
     programa_social_id: '',
     auditoria_id: '',
     num_oficio_of: '',
@@ -216,6 +220,7 @@ export const ObservationsASFForm = (props: Props) => {
     */
     return errors;
   };
+  const [modalField, setModalField] = React.useState({field: '', text: '', open: false});
   return (
     <Paper className={classes.paper}>
       <Formik
@@ -293,20 +298,6 @@ export const ObservationsASFForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <TextField
-                        id="dependencia_id"
-                        label="Dependencia"
-                        value={dependencias || ''}
-                        variant="filled"
-                        disabled
-                        InputProps={{
-                          readOnly: true,
-                        }} 
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
                       <InputLabel>
                         Dirección
                       </InputLabel>
@@ -339,6 +330,20 @@ export const ObservationsASFForm = (props: Props) => {
                           </FormHelperText>
                         )}
                     </FormControl>
+                  </Grid>                  
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        id="dependencia_id"
+                        label="Dependencia"
+                        value={dependencias || ''}
+                        variant="filled"
+                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }} 
+                      />
+                    </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
@@ -347,6 +352,10 @@ export const ObservationsASFForm = (props: Props) => {
                         label="Fecha de Captura"
                         name="fecha_captura"
                         id="fecha_captura"
+                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }} 
                       />
                       {errors.fecha_captura &&
                         touched.fecha_captura && (
@@ -376,6 +385,28 @@ export const ObservationsASFForm = (props: Props) => {
                         }
                         value={catalog ? values.programa_social_id || '' : ''}
                       />
+                      <div style={{width: 32, height: 32}}>
+                        <IconButton
+                          aria-label="toggle visibility"
+                          onClick={
+                            () => setModalField({
+                                ...modalField,
+                                open: true,
+                                field: "Programa",
+                                text:
+                                  catalog &&
+                                  catalog.social_programs &&
+                                  values.programa_social_id &&
+                                  catalog.social_programs.find(item => item.id === values.programa_social_id)
+                                    ? (catalog.social_programs.find(item => item.id === values.programa_social_id) || {}).title || ''
+                                    : ''
+                              })
+                            }
+                          onMouseDown={() => {}}
+                        >
+                          <ZoomInIcon />
+                        </IconButton>
+                      </div>
                       {errors.programa_social_id &&
                         touched.programa_social_id && (
                           <FormHelperText
@@ -392,7 +423,7 @@ export const ObservationsASFForm = (props: Props) => {
                       <AutoCompleteDropdown
                         fieldLabel="title"
                         fieldValue="id"
-                        label="Auditoría"
+                        label="No. de Auditoría"
                         name="auditoria_id"
                         onChange={(value: any) => {
                           return setFieldValue('auditoria_id', value);
@@ -510,6 +541,19 @@ export const ObservationsASFForm = (props: Props) => {
                         rows={5}
                         rowsMax={5}
                         onChange={handleChange('observacion')}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <IconButton
+                                aria-label="toggle visibility"
+                                onClick={() => setModalField({...modalField, open: true, field: "Observación", text: values.observacion })}
+                                onMouseDown={() => {}}
+                              >
+                                <ZoomInIcon />
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
                       />
                       {errors.observacion && touched.observacion && errors.observacion && (
                       <FormHelperText
@@ -669,6 +713,22 @@ export const ObservationsASFForm = (props: Props) => {
                         label="Respuesta de la dependencia"
                         value={values.resp_dependencia || ''}
                         onChange={handleChange('resp_dependencia')}
+                        multiline
+                        rows={5}
+                        rowsMax={5}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <IconButton
+                                aria-label="toggle visibility"
+                                onClick={() => setModalField({...modalField, open: true, field: "Respuesta de la dependencia", text: values.resp_dependencia })}
+                                onMouseDown={() => {}}
+                              >
+                                <ZoomInIcon />
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
                       />
                       {errors.resp_dependencia && touched.resp_dependencia && errors.resp_dependencia && (
                       <FormHelperText
@@ -690,6 +750,19 @@ export const ObservationsASFForm = (props: Props) => {
                         rows={5}
                         rowsMax={5}
                         onChange={handleChange('comentarios')}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <IconButton
+                                aria-label="toggle visibility"
+                                onClick={() => setModalField({...modalField, open: true, field: "Comentarios", text: values.comentarios })}
+                                onMouseDown={() => {}}
+                              >
+                                <ZoomInIcon />
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
                       />
                       {errors.comentarios && touched.comentarios && errors.comentarios && (
                       <FormHelperText
@@ -771,7 +844,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel id="estatus_criterio_int_id">
-                        Estatus
+                        Estatus del Proceso (Criterio Interno)
                       </InputLabel>
                       <Select
                         labelId="estatus_criterio_int_id"
@@ -819,8 +892,7 @@ export const ObservationsASFForm = (props: Props) => {
                             {(selected as number[]).map((value, index) => (
                               <Chip
                                 key={`chip-${index+1}`}
-                                // key={catalog?.estatus_pre_asf?.find(item => item.id === value)?.id}
-                                label={catalog?.estatus_pre_asf?.find(item => item.id === value)?.title}
+                                label={catalog?.proyecciones_asf?.find(item => item.id === value)?.title}
                                 className={classes.chip} 
                               />
                             ))}
@@ -828,7 +900,7 @@ export const ObservationsASFForm = (props: Props) => {
                         )}
                         MenuProps={MenuProps}
                       >
-                        {catalog && catalog.estatus_pre_asf && catalog.estatus_pre_asf.map((name) => (
+                        {catalog && catalog.proyecciones_asf && catalog.proyecciones_asf.map((name) => (
                           <MenuItem key={name.id} value={name.id}>
                             {name.title}
                           </MenuItem>
@@ -847,6 +919,7 @@ export const ObservationsASFForm = (props: Props) => {
                     </FormControl>
                   </Grid>
                 </Grid>
+                {action !== "view" && (
                 <Button
                   variant="contained"
                   className={classes.submitInput}
@@ -855,7 +928,14 @@ export const ObservationsASFForm = (props: Props) => {
                 >
                   {!id ? 'Crear' : 'Actualizar'}
                 </Button>
+                )}
               </form>
+              <SingleTextResponsiveModal 
+                open={modalField.open}
+                onClose={() => setModalField({...modalField, open: false})}
+                field={modalField.field}
+                text={modalField.text}
+              />
             </MuiPickersUtilsProvider>
           );
         }}

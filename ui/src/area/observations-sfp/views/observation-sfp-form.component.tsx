@@ -692,7 +692,7 @@ export const ObservationsSFPForm = (props: Props) => {
 
               <hr className={classes.hrSpacer} />
               <hr className={classes.hrDivider} />              
-              <fieldset className={classes.fieldset} disabled>
+              <fieldset className={classes.fieldset}>
                 <legend className={classes.containerLegend}>
                   <Typography variant="body2" align="center" classes={{root:classes.legend}}>
                     Seguimientos
@@ -847,9 +847,9 @@ export const ObservationsSFPForm = (props: Props) => {
                             <Grid item xs={12} sm={6}>
                               <FormControl className={classes.formControl}>
                                 <TextField 
-                                  // id="resp_dependencia"
+                                  id={`resp_dependencia_${index}`}
                                   label="Respuesta de la dependencia"
-                                  // name={`seguimientos.${index}.resp_dependencia`}
+                                  name={`seguimientos.${index}.resp_dependencia`}
                                   onChange={(value: any) => setFieldValue(`seguimientos.${index}.resp_dependencia`, value.target.value)}
                                   value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].resp_dependencia : ''}
                                   multiline

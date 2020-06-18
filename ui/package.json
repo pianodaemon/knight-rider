@@ -20,6 +20,7 @@
     "@types/yup": "^0.26.34",
     "axios": "^0.19.2",
     "connected-react-router": "^6.8.0",
+    "decimal.js": "^10.2.0",
     "formik": "^2.1.4",
     "material-table": "^1.57.2",
     "react": "^16.13.1",

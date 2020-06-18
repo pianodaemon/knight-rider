@@ -2,6 +2,7 @@ import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
+import { loadCatalogAction as loadCatalogObsSFPAction } from 'src/area/observations-sfp/state/usecases/load-catalog.usecase';
 import { createAudit } from '../../service/audits.service';
 import { auditsReducer } from '../audits.reducer';
 import { loadAuditCatalogAction } from './load-audit-catalog.usecase';
@@ -28,6 +29,7 @@ function* createAuditWorker(action: any): Generator<any, any, any> {
     yield put(createAuditActionSuccessAction(result));
     yield history.push('/audit/list');
     yield put(loadAuditCatalogAction());
+    yield put(loadCatalogObsSFPAction());
     yield put(
       notificationAction({
         message: `¡Auditoría ${result.id} ha sido creada!`,

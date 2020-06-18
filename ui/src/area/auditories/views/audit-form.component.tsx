@@ -11,6 +11,8 @@ import TextField from '@material-ui/core/TextField';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
+import Chip from '@material-ui/core/Chip';
+import Input from '@material-ui/core/Input';
 import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdown.component';
 import { range } from 'src/shared/utils/range.util';
 import { Catalog, Audit } from '../state/audits.reducer';
@@ -23,6 +25,16 @@ type Props = {
   updateAuditAction: Function,
 };
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -95,6 +107,13 @@ const useStyles = makeStyles((theme: Theme) =>
     hrSpacer: {
       height: '25px',
       border: 'none',
+    },
+    chips: {
+      display: 'flex',
+      flexWrap: 'wrap',
+    },
+    chip: {
+      margin: 2,
     },
   }),
 );
@@ -211,16 +230,30 @@ export const AuditsForm = (props: Props) => {
                 </Grid>
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <InputLabel id="proyecciones-mutiple-chip-label">
-                        Año
-                      </InputLabel>
+                    <FormControl
+                      className={classes.formControl}
+                      style={{ maxWidth: '300px' }}
+                    >
+                      <InputLabel id="years-mutiple-chip-label">Año(s)</InputLabel>
                       <Select
-                        labelId="years-label"
+                        labelId="years-mutiple-chip-label"
                         id="years"
                         multiple
                         value={values.years || []}
                         onChange={handleChange('years')}
+                        input={<Input id="select-multiple-chip" />}
+                        renderValue={(selected) => (
+                          <div className={classes.chips}>
+                            {(selected as number[]).map((value, index) => (
+                              <Chip
+                                key={`chip-${index+1}`}
+                                label={value}
+                                className={classes.chip}
+                              />
+                            ))}
+                          </div>
+                        )}
+                        MenuProps={MenuProps}
                       >
                         {range(2000, new Date().getFullYear()).map((year) => (
                           <MenuItem key={year} value={year}>

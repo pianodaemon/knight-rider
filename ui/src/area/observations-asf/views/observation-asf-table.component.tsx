@@ -56,6 +56,11 @@ export const ObservationASFTable = (props: Props) => {
       sorting: !sorting,
     },
     {
+      title: 'Cuenta Pública',
+      field: 'years',
+      sorting,
+    },
+    {
       title: 'Dirección',
       field: 'direccion_id_title',
       sorting,
@@ -146,6 +151,12 @@ export const ObservationASFTable = (props: Props) => {
         },
       }}
       actions={[
+        {
+          icon: 'search',
+          tooltip: 'Visualizar Observación',
+          onClick: (event, rowData: any) =>
+            history.push(`/observation-asf/${rowData.id}/view`),
+        },
         {
           icon: 'edit',
           tooltip: 'Editar Observación',

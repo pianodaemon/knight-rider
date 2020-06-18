@@ -145,7 +145,7 @@ export const ObservationsSFPForm = (props: Props) => {
     acta_cierre: '',
     fecha_firma_acta_cierre: null,
     fecha_compromiso: null,
-    clave_observacion_id: '',
+    clave_observacion: '',
     observacion: '',
     acciones_correctivas: '',
     acciones_preventivas: '',
@@ -497,28 +497,19 @@ export const ObservationsSFPForm = (props: Props) => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>
-                    <AutoCompleteDropdown
-                      fieldLabel="title"
-                      fieldValue="id"
+                    <TextField
+                      id="clave_observacion"
                       label="# o Clave de Observación"
-                      name="clave_observacion_id"
-                      onChange={(value: any) => {
-                        return setFieldValue('clave_observacion_id', value);
-                      }}
-                      options={
-                      catalog && catalog.observation_codes
-                        ? catalog.observation_codes
-                        : []
-                      }
-                      value={catalog ? values.clave_observacion_id || '' : ''}
+                      value={values.clave_observacion || ''}
+                      onChange={handleChange('clave_observacion')}
                     />
-                    {errors.clave_observacion_id &&
-                      touched.clave_observacion_id && (
+                    {errors.clave_observacion &&
+                      touched.clave_observacion && (
                         <FormHelperText
                           error
                           classes={{ error: classes.textErrorHelper }}
                         >
-                          Seleccione un # o Clave Observación
+                          Ingrese una Clave de Observación
                         </FormHelperText>
                       )}
                   </FormControl>

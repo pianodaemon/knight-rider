@@ -56,7 +56,7 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route
           exact
-          path={['/observation-asf/create', '/observation-asf/:id/edit']}
+          path={['/observation-asf/create', '/observation-asf/:id/:action']}
         >
           <ObservationsASFFormContainer />
         </Route>

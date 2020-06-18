@@ -48,6 +48,17 @@ export const observationsCatalogSelector = createSelector(
     slice.observations &&
     Array.isArray(slice.observations) &&
     slice.observations.map((observation: ObservationASF) => {
+      const years =
+        catalog &&
+        catalog.audits &&
+        observation.auditoria_id &&
+        catalog.audits.find((item: any) => item.id === observation.auditoria_id)
+          ? (
+              catalog.audits.find(
+                (item: any) => item.id === observation.auditoria_id
+              ) || {}
+            ).years
+          : '';
       let direccion_id_title: any = catalog.divisions.find(
         (item: any) => item.id === observation.direccion_id
       );
@@ -67,6 +78,7 @@ export const observationsCatalogSelector = createSelector(
         direccion_id_title,
         auditoria_id_title,
         programa_social_id_title,
+        years,
       };
     })
 );

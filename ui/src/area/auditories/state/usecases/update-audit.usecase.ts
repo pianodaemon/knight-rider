@@ -2,6 +2,7 @@ import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
+import { loadCatalogAction as loadCatalogObsSFPAction } from 'src/area/observations-sfp/state/usecases/load-catalog.usecase';
 import { updateAudit } from '../../service/audits.service';
 import { auditsReducer } from '../audits.reducer';
 import { loadAuditsAction } from './load-audits.usecase';
@@ -28,10 +29,11 @@ function* updateAuditWorker(action: any): Generator<any, any, any> {
     yield put(updateAuditSuccessAction(result));
     yield history.push('/audit/list');
     yield put(loadAuditsAction());
+    yield put(loadCatalogObsSFPAction());
     yield put(
       notificationAction({
         message: `Auditoría ${result.id} ha sido actualizada!`,
-      }),
+      })
     );
   } catch (e) {
     const { releaseForm } = action.payload;
@@ -45,7 +47,7 @@ function* updateAuditWorker(action: any): Generator<any, any, any> {
       notificationAction({
         message,
         type: 'error',
-      }),
+      })
     );
     yield console.log(e);
   }

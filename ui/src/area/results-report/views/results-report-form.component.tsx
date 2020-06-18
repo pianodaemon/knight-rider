@@ -118,13 +118,6 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: 'hidden',
       whiteSpace: 'pre'
     },
-    chips: {
-      display: 'flex',
-      flexWrap: 'wrap',
-    },
-    chip: {
-      margin: 2,
-    },
   })
 );
 

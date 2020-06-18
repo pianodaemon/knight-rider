@@ -157,18 +157,6 @@ ALTER SEQUENCE public.amounts_id_seq OWNED BY public.amounts.id;
 
 
 --
--- Name: anios_cuenta_publica_obs_sfp; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.anios_cuenta_publica_obs_sfp (
-    observacion_id integer NOT NULL,
-    anio_cuenta_publica integer DEFAULT 2012 NOT NULL
-);
-
-
-ALTER TABLE public.anios_cuenta_publica_obs_sfp OWNER TO postgres;
-
---
 -- Name: apps; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -650,7 +638,7 @@ CREATE TABLE public.observaciones_sfp (
     acta_cierre character varying NOT NULL,
     fecha_firma_acta_cierre date NOT NULL,
     fecha_compromiso date NOT NULL,
-    clave_observacion_id integer NOT NULL,
+    clave_observacion character varying NOT NULL,
     observacion text NOT NULL,
     acciones_correctivas character varying NOT NULL,
     acciones_preventivas character varying NOT NULL,
@@ -1007,14 +995,6 @@ ALTER TABLE ONLY public.user_authority ALTER COLUMN id SET DEFAULT nextval('publ
 
 ALTER TABLE ONLY public.amounts
     ADD CONSTRAINT amounts_pkey PRIMARY KEY (id);
-
-
---
--- Name: anios_cuenta_publica_obs_sfp anios_cuenta_publica_obs_sfp_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.anios_cuenta_publica_obs_sfp
-    ADD CONSTRAINT anios_cuenta_publica_obs_sfp_pkey PRIMARY KEY (observacion_id, anio_cuenta_publica);
 
 
 --
@@ -1481,14 +1461,6 @@ ALTER TABLE ONLY public.amounts
 
 
 --
--- Name: anios_cuenta_publica_obs_sfp anios_cuenta_publica_obs_sfp_observaciones_sfp_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.anios_cuenta_publica_obs_sfp
-    ADD CONSTRAINT anios_cuenta_publica_obs_sfp_observaciones_sfp_fkey FOREIGN KEY (observacion_id) REFERENCES public.observaciones_sfp(id);
-
-
---
 -- Name: auditoria_anios_cuenta_pub auditoria_anios_cuenta_pub_audits_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1558,14 +1530,6 @@ ALTER TABLE ONLY public.observaciones_sfp
 
 ALTER TABLE ONLY public.observaciones_ires_asf
     ADD CONSTRAINT observaciones_ires_asf_observation_types_fkey FOREIGN KEY (tipo_observacion_id) REFERENCES public.observation_types(id);
-
-
---
--- Name: observaciones_sfp observaciones_observation_codes_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.observaciones_sfp
-    ADD CONSTRAINT observaciones_observation_codes_fkey FOREIGN KEY (clave_observacion_id) REFERENCES public.observation_codes(id);
 
 
 --

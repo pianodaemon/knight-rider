@@ -524,10 +524,10 @@ ALTER FUNCTION public.alter_observacion_pre_asf(_observacion_id integer, _direcc
 
 
 --
--- Name: alter_observacion_sfp(integer, integer, date, integer, integer, character varying, date, date, integer, text, character varying, character varying, integer, double precision, public.seguimientos_obs_sfp[], double precision, double precision, date, double precision, character varying, date, character varying, date, character varying, character varying, date, integer, character varying, date, character varying, character varying, date); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: alter_observacion_sfp(integer, integer, date, integer, integer, character varying, date, date, character varying, text, character varying, character varying, integer, double precision, public.seguimientos_obs_sfp[], double precision, double precision, date, double precision, character varying, date, character varying, date, character varying, character varying, date, integer, character varying, date, character varying, character varying, date); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.alter_observacion_sfp(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _acta_cierre character varying, _fecha_firma_acta_cierre date, _fecha_compromiso date, _clave_observacion_id integer, _observacion text, _acciones_correctivas character varying, _acciones_preventivas character varying, _tipo_observacion_id integer, _monto_observado double precision, _seguimientos public.seguimientos_obs_sfp[], _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _num_oficio_of_vista_cytg character varying, _fecha_oficio_of_vista_cytg date, _num_oficio_cytg_aut_invest character varying, _fecha_oficio_cytg_aut_invest date, _num_carpeta_investigacion character varying, _num_oficio_vai_municipio character varying, _fecha_oficio_vai_municipio date, _autoridad_invest_id integer, _num_oficio_pras_of character varying, _fecha_oficio_pras_of date, _num_oficio_pras_cytg_dependencia character varying, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date) RETURNS record
+CREATE FUNCTION public.alter_observacion_sfp(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _acta_cierre character varying, _fecha_firma_acta_cierre date, _fecha_compromiso date, _clave_observacion character varying, _observacion text, _acciones_correctivas character varying, _acciones_preventivas character varying, _tipo_observacion_id integer, _monto_observado double precision, _seguimientos public.seguimientos_obs_sfp[], _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _num_oficio_of_vista_cytg character varying, _fecha_oficio_of_vista_cytg date, _num_oficio_cytg_aut_invest character varying, _fecha_oficio_cytg_aut_invest date, _num_carpeta_investigacion character varying, _num_oficio_vai_municipio character varying, _fecha_oficio_vai_municipio date, _autoridad_invest_id integer, _num_oficio_pras_of character varying, _fecha_oficio_pras_of date, _num_oficio_pras_cytg_dependencia character varying, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
@@ -556,7 +556,7 @@ BEGIN
 				acta_cierre,
 				fecha_firma_acta_cierre,
 				fecha_compromiso,
-				clave_observacion_id,
+				clave_observacion,
 				observacion,
 				acciones_correctivas,
 				acciones_preventivas,
@@ -589,7 +589,7 @@ BEGIN
 				_acta_cierre,
 				_fecha_firma_acta_cierre,
 				_fecha_compromiso,
-				_clave_observacion_id,
+				_clave_observacion,
 				_observacion,
 				_acciones_correctivas,
 				_acciones_preventivas,
@@ -684,7 +684,7 @@ BEGIN
 				acta_cierre = _acta_cierre,
 				fecha_firma_acta_cierre = _fecha_firma_acta_cierre,
 				fecha_compromiso = _fecha_compromiso,
-				clave_observacion_id = _clave_observacion_id,
+				clave_observacion = _clave_observacion,
 				observacion = _observacion,
 				acciones_correctivas = _acciones_correctivas,
 				acciones_preventivas = _acciones_preventivas,
@@ -770,7 +770,7 @@ END;
 $$;
 
 
-ALTER FUNCTION public.alter_observacion_sfp(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _acta_cierre character varying, _fecha_firma_acta_cierre date, _fecha_compromiso date, _clave_observacion_id integer, _observacion text, _acciones_correctivas character varying, _acciones_preventivas character varying, _tipo_observacion_id integer, _monto_observado double precision, _seguimientos public.seguimientos_obs_sfp[], _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _num_oficio_of_vista_cytg character varying, _fecha_oficio_of_vista_cytg date, _num_oficio_cytg_aut_invest character varying, _fecha_oficio_cytg_aut_invest date, _num_carpeta_investigacion character varying, _num_oficio_vai_municipio character varying, _fecha_oficio_vai_municipio date, _autoridad_invest_id integer, _num_oficio_pras_of character varying, _fecha_oficio_pras_of date, _num_oficio_pras_cytg_dependencia character varying, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date) OWNER TO postgres;
+ALTER FUNCTION public.alter_observacion_sfp(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _acta_cierre character varying, _fecha_firma_acta_cierre date, _fecha_compromiso date, _clave_observacion character varying, _observacion text, _acciones_correctivas character varying, _acciones_preventivas character varying, _tipo_observacion_id integer, _monto_observado double precision, _seguimientos public.seguimientos_obs_sfp[], _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _num_oficio_of_vista_cytg character varying, _fecha_oficio_of_vista_cytg date, _num_oficio_cytg_aut_invest character varying, _fecha_oficio_cytg_aut_invest date, _num_carpeta_investigacion character varying, _num_oficio_vai_municipio character varying, _fecha_oficio_vai_municipio date, _autoridad_invest_id integer, _num_oficio_pras_of character varying, _fecha_oficio_pras_of date, _num_oficio_pras_cytg_dependencia character varying, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date) OWNER TO postgres;
 
 
 --

@@ -17,7 +17,7 @@ obs_sfp_ns_captions = {
     'acta_cierre': 'Acta de cierre o equivalente',
     'fecha_firma_acta_cierre': 'Fecha de firma del Acta de cierre',
     'fecha_compromiso': 'Fecha compromiso',
-    'clave_observacion_id': 'Id de la clave de observacion',
+    'clave_observacion': 'Clave o Num. de observacion',
     'observacion': 'Texto de la observacion',
     'acciones_correctivas': 'Acciones correctivas',
     'acciones_preventivas': 'Acciones preventivas',
@@ -73,7 +73,7 @@ obs_sfp = api.model('Observación SFP', {
     'acta_cierre': fields.String(description=obs_sfp_ns_captions['acta_cierre']),
     'fecha_firma_acta_cierre': fields.Date(description=obs_sfp_ns_captions['fecha_firma_acta_cierre']),
     'fecha_compromiso': fields.Date(description=obs_sfp_ns_captions['fecha_compromiso']),
-    'clave_observacion_id': fields.Integer(description=obs_sfp_ns_captions['clave_observacion_id']),
+    'clave_observacion': fields.String(description=obs_sfp_ns_captions['clave_observacion']),
     'observacion': fields.String(description=obs_sfp_ns_captions['observacion']),
     'acciones_correctivas': fields.String(description=obs_sfp_ns_captions['acciones_correctivas']),
     'acciones_preventivas': fields.String(description=obs_sfp_ns_captions['acciones_preventivas']),
@@ -119,13 +119,6 @@ dependency = api.model('Datos de una Dependencia', {
     'clasif_title': fields.String(description='Clasificación de la Dependencia'),
 })
 
-dependency = api.model('Datos de una Dependencia', {
-    'id': fields.Integer(description='Id de la Dependencia'),
-    'title': fields.String(description='Título de la Dependencia'),
-    'description': fields.String(description='Descripción de la Dependencia'),
-    'clasif_title': fields.String(description='Clasificación de la Dependencia'),
-})
-
 catalog = api.model('Leyendas y datos para la UI de Observaciones SFP', {
     'divisions': fields.List(fields.Nested(pair)),
     'audits': fields.List(fields.Nested(audit)),
@@ -151,7 +144,7 @@ class ObservacionSfpList(Resource):
     @ns.param("programa_social_id", obs_sfp_ns_captions['programa_social_id'])
     @ns.param("auditoria_id", obs_sfp_ns_captions['auditoria_id'])
     @ns.param("observacion", obs_sfp_ns_captions['observacion'])
-    @ns.param("clave_observacion_id", obs_sfp_ns_captions['clave_observacion_id'])
+    @ns.param("clave_observacion", obs_sfp_ns_captions['clave_observacion'])
     @ns.param("direccion_id", obs_sfp_ns_captions['direccion_id'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
@@ -166,7 +159,7 @@ class ObservacionSfpList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['tipo_observacion_id', 'programa_social_id', 'auditoria_id', 'observacion', 'clave_observacion_id', 'direccion_id']
+            ['tipo_observacion_id', 'programa_social_id', 'auditoria_id', 'observacion', 'clave_observacion', 'direccion_id']
         )
 
         try:

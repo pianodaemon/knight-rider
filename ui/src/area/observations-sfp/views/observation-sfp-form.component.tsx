@@ -24,6 +24,7 @@ import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picke
 import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { SingleTextResponsiveModal } from 'src/shared/components/modal/single-text-responsive-modal.component';
+import { sub } from 'src/shared/math/add.util';
 import { Catalog, /* ObservationSFP */ } from '../state/observations-sfp.reducer';
 
 type Props = {
@@ -151,8 +152,8 @@ export const ObservationsSFPForm = (props: Props) => {
     acciones_preventivas: '',
     tipo_observacion_id: '',
     monto_observado: '',
-    monto_a_reintegrar: '',
-    monto_reintegrado: '',
+    monto_a_reintegrar: 0,
+    monto_reintegrado: 0,
     fecha_reintegro: null,
     monto_por_reintegrar: '',
     num_oficio_of_vista_cytg: '',
@@ -1121,14 +1122,17 @@ export const ObservationsSFPForm = (props: Props) => {
                   <FormControl className={classes.formControl}>
                     <TextField
                       label="Monto por Reintegrar"
-                      value={values.monto_por_reintegrar}
+                      value={sub(values.monto_a_reintegrar || 0, values.monto_reintegrado || 0)}
                       onChange={handleChange('monto_por_reintegrar')}
                       name="monto_por_reintegrar"
                       id="monto_por_reintegrar"
                       placeholder="0"
+                      variant="filled"
+                      disabled
                       InputProps={{
                         inputComponent: NumberFormatCustom as any,
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        readOnly: true,
                       }}
                     />
                     {errors.monto_por_reintegrar &&

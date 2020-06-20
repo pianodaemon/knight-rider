@@ -17,7 +17,7 @@ def _alter_observation(**kwargs):
         '{}'::character varying,
         '{}'::date,
         '{}'::date,
-        {}::integer,
+        '{}'::character varying,
         '{}'::text,
         {}::double precision,
         '{}'::character varying,

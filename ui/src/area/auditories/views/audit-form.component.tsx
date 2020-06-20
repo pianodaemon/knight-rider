@@ -13,8 +13,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import Chip from '@material-ui/core/Chip';
 import Input from '@material-ui/core/Input';
-import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdown.component';
+import { AutoCompleteTreeDropdown } from 'src/shared/components/autocomplete-tree-dropdown.component';
 import { range } from 'src/shared/utils/range.util';
+import clsx from  'clsx';
 import { Catalog, Audit } from '../state/audits.reducer';
 
 type Props = {
@@ -115,6 +116,13 @@ const useStyles = makeStyles((theme: Theme) =>
     chip: {
       margin: 2,
     },
+    tree: {
+      minWidth: 400,
+      [theme.breakpoints.down('sm')]: {
+        minWidth: '100%',
+        maxWidth: '100%',
+      },
+    }
   }),
 );
 
@@ -197,8 +205,8 @@ export const AuditsForm = (props: Props) => {
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <AutoCompleteDropdown
+                    <FormControl className={clsx(classes.formControl, classes.tree)}>
+                      <AutoCompleteTreeDropdown
                         fieldLabel="title"
                         fieldValue="id"
                         label="Dependencia"

@@ -581,7 +581,7 @@ CREATE TABLE public.observaciones_pre_asf (
     num_oficio_of character varying NOT NULL,
     fecha_recibido date NOT NULL,
     fecha_vencimiento_of date NOT NULL,
-    num_observacion integer NOT NULL,
+    num_observacion character varying NOT NULL,
     observacion text NOT NULL,
     monto_observado double precision DEFAULT 0 NOT NULL,
     num_oficio_cytg character varying NOT NULL,
@@ -1562,14 +1562,6 @@ ALTER TABLE ONLY public.observaciones_pre_asf
 
 ALTER TABLE ONLY public.observaciones_pre_asf
     ADD CONSTRAINT observaciones_pre_asf_estatus_pre_asf_fkey FOREIGN KEY (estatus_criterio_int_id) REFERENCES public.estatus_pre_asf(id);
-
-
---
--- Name: observaciones_pre_asf observaciones_pre_asf_observation_codes_bis_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.observaciones_pre_asf
-    ADD CONSTRAINT observaciones_pre_asf_observation_codes_bis_fkey FOREIGN KEY (num_observacion) REFERENCES public.observation_codes(id);
 
 
 --

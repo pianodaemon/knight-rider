@@ -153,7 +153,7 @@ export const ObservationsASFForm = (props: Props) => {
   const initialValues = {
     id: '',
     direccion_id: '',
-    fecha_captura: `${fechaCaptura.getFullYear()}-${fechaCaptura.getMonth()}-${fechaCaptura.getDate()}`,
+    fecha_captura: `${fechaCaptura.getFullYear()}-${fechaCaptura.getMonth()+1}-${fechaCaptura.getDate()}`,
     programa_social_id: '',
     auditoria_id: '',
     num_oficio_of: '',

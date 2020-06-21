@@ -140,7 +140,7 @@ export const ObservationsSFPForm = (props: Props) => {
     id: '',
     direccion_id: '',
     // dependencia_id: '',
-    fecha_captura: `${fechaCaptura.getFullYear()}-${fechaCaptura.getMonth()}-${fechaCaptura.getDate()}`,
+    fecha_captura: `${fechaCaptura.getFullYear()}-${fechaCaptura.getMonth()+1}-${fechaCaptura.getDate()}`,
     programa_social_id: '',
     auditoria_id: '',
     acta_cierre: '',

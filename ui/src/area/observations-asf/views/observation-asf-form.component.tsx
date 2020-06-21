@@ -505,20 +505,11 @@ export const ObservationsASFForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <AutoCompleteDropdown
-                        fieldLabel="title"
-                        fieldValue="id"
+                      <TextField
+                        id="num_observacion"
                         label="# de Observación"
-                        name="num_observacion"
-                        onChange={(value: any) => {
-                          return setFieldValue('num_observacion', value);
-                        }}
-                        options={
-                        catalog && catalog.observation_codes
-                          ? catalog.observation_codes
-                          : []
-                        }
-                        value={catalog ? values.num_observacion || '' : ''}
+                        value={values.num_observacion || ''}
+                        onChange={handleChange('num_observacion')}
                       />
                       {errors.num_observacion &&
                         touched.num_observacion && (

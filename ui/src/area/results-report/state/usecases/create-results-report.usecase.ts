@@ -31,7 +31,7 @@ function* createResultsReportWorker(action: any): Generator<any, any, any> {
     yield put(loadResultsReportAction());
     yield put(
       notificationAction({
-        message: `¡Informe de Resultados ${result.id} ha sido creada!`,
+        message: `¡Observación de Resultados ASF ${result.id} ha sido creada!`,
         type: 'success',
       })
     );

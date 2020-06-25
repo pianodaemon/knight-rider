@@ -1058,7 +1058,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                     inputComponent: NumberFormatCustom as any,
                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                   }}
-                                  value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado : 0)}
+                                  value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
                                   disabled
                                   variant="filled"
                                 />

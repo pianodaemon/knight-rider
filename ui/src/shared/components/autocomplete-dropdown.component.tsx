@@ -13,6 +13,7 @@ type Props = {
   value: any,
   groupField?: string,
   multiple?: boolean,
+  disabled?: boolean,
 };
 
 export function AutoCompleteDropdown(props: Props) {
@@ -26,6 +27,7 @@ export function AutoCompleteDropdown(props: Props) {
     onChange,
     options,
     value,
+    disabled,
   } = props;
   const opts = groupField
     ? options
@@ -82,6 +84,27 @@ export function AutoCompleteDropdown(props: Props) {
       // value={itemSelected && value ? itemSelected : null}
       value={selected}
       multiple={multiple}
+      disabled={disabled}
+      /*
+      // @todo Load More Options feature
+      ListboxProps={{
+        onScroll: (event: any) => {
+          console.log(
+            event.target.scrollTop,
+            event.target.scrollHeight,
+            event.target.clientHeight,
+            event.target.scrollTop+event.target.clientHeight === event.target.scrollHeight
+          );
+          if (
+            event.target.scrollTop + event.target.clientHeight ===
+            event.target.scrollHeight
+          ) {
+            alert('lol');
+          }
+        }
+      }}
+      debug
+      */
     />
   );
 }

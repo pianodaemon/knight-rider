@@ -16,6 +16,9 @@ import PostAddIcon from '@material-ui/icons/PostAdd';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import mxLocale from "date-fns/locale/es";
 import DateFnsUtils from '@date-io/date-fns';
 import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picker.component';
@@ -204,6 +207,7 @@ export const ResultsReportForm = (props: Props) => {
         errors[field] = errors[field] || 'Revise que el año de la fecha que ingresó sea posterior al Año de la Auditoría';
       }
     });
+    console.log(errors);
     /* @todo use scroll to view
     const element = document.getElementById(Object.keys(errors)[0]);
     if (element) {
@@ -277,7 +281,7 @@ export const ResultsReportForm = (props: Props) => {
             ).join(', ');
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
-              <h1 style={{ color: '#128aba' }}>Informe de Resultados</h1>
+              <h1 style={{ color: '#128aba' }}>Observación de Resultados ASF</h1>
               <hr className={classes.hrDivider} />
               <form onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
@@ -735,9 +739,9 @@ export const ResultsReportForm = (props: Props) => {
                                   </InputLabel>
                                   <Select
                                     labelId="medio_notif_seguimiento_id"
-                                    id="medio_notif_seguimiento_id-select"
-                                    value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].medio_notif_seguimiento_id : ''}
-                                    onChange={handleChange('medio_notif_seguimiento_id')}
+                                    // id="medio_notif_seguimiento_id-select"
+                                    value={catalog && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].medio_notif_seguimiento_id : ''}
+                                    onChange={handleChange(`seguimientos.${index}.medio_notif_seguimiento_id`)}
                                   >
                                     {catalog &&
                                         catalog.medios_notif_seguimiento_asf &&
@@ -1081,6 +1085,48 @@ export const ResultsReportForm = (props: Props) => {
                   />
                 </fieldset>
 
+                <hr className={classes.hrSpacer} />
+                <hr className={classes.hrDivider} />
+
+                <fieldset className={classes.fieldset}>
+                  <legend className={classes.containerLegend}>
+                    <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                      PRA
+                    </Typography>
+                  </legend>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6}>
+                      <FormGroup row>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={values.tiene_pras}
+                              onChange={handleChange('tiene_pras')}
+                              name="checkedB"
+                              color="primary"
+                            />
+                          }
+                          label="¿Tiene PRA?"
+                        />
+                      </FormGroup>
+                    </Grid>
+                  </Grid>
+                  
+                  {values?.tiene_pras && (
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="num_oficio_of_vista_cytg"
+                          label="# de Oficio de la Vista CyTG"
+                          value={values.pras.num_oficio_of_vista_cytg || ''}
+                          onChange={handleChange('pras.num_oficio_of_vista_cytg')}
+                        />
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                )}
+                </fieldset>
 
                 <Button
                   variant="contained"

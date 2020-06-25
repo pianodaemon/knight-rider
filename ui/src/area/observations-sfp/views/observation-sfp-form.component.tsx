@@ -58,6 +58,14 @@ const useStyles = makeStyles((theme: Theme) =>
         display: 'flex',
       },
     },
+    formControlFull: {
+      margin: theme.spacing(1),
+      minWidth: 350,
+      [theme.breakpoints.up('xs')]: {
+        minWidth: '100%',
+        display: 'flex',
+      },
+    },
     fieldset: {
       borderRadius: 3,
       borderWidth: 0,
@@ -70,10 +78,11 @@ const useStyles = makeStyles((theme: Theme) =>
       top: '-30px',
       position: 'relative',
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      width: '128px',
+      width: 'auto',
       margin: '0px auto',
       textAlign: 'center',
-      background: 'transparent',
+      background: 'white',
+      padding: '0 15px',
       [theme.breakpoints.down('sm')]: {
         margin: '0 auto',
         width: 'auto !important',
@@ -323,6 +332,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       id="direccion_id-select"
                       value={catalog ? values.direccion_id || '' : ''}
                       onChange={handleChange('direccion_id')}
+                      disabled={(action === 'view')}
                     >
                       {catalog &&
                           catalog.divisions &&
@@ -401,6 +411,7 @@ export const ObservationsSFPForm = (props: Props) => {
                           : []
                       }
                       value={catalog ? values.programa_social_id || '' : ''}
+                      disabled={(action === 'view')}
                     />
                     {errors.programa_social_id &&
                       touched.programa_social_id && (
@@ -424,11 +435,12 @@ export const ObservationsSFPForm = (props: Props) => {
                         return setFieldValue('auditoria_id', value);
                       }}
                       options={
-                      catalog && catalog.audits
-                        ? catalog.audits
-                        : []
-                    }
+                        catalog && catalog.audits
+                          ? catalog.audits
+                          : []
+                      }
                       value={catalog ? values.auditoria_id || '' : ''}
+                      disabled={(action === 'view')}
                     />
                     {errors.auditoria_id &&
                       touched.auditoria_id && (
@@ -448,6 +460,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       label="Acta de Cierre o Equivalente"
                       value={values.acta_cierre || ''}
                       onChange={handleChange('acta_cierre')}
+                      disabled={(action === 'view')}
                     />
                     {errors.acta_cierre &&
                       touched.acta_cierre && (
@@ -466,6 +479,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       component={FormikDatePicker}
                       label="Fecha firma de acta"
                       name="fecha_firma_acta_cierre"
+                      disabled={(action === 'view')}
                     />
                     {errors.fecha_firma_acta_cierre &&
                       touched.fecha_firma_acta_cierre && (
@@ -484,6 +498,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       component={FormikDatePicker}
                       label="Fecha Compromiso"
                       name="fecha_compromiso"
+                      disabled={(action === 'view')}
                     />
                     {errors.fecha_compromiso &&
                       touched.fecha_compromiso && (
@@ -503,6 +518,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       label="# o Clave de Observación"
                       value={values.clave_observacion || ''}
                       onChange={handleChange('clave_observacion')}
+                      disabled={(action === 'view')}
                     />
                     {errors.clave_observacion &&
                       touched.clave_observacion && (
@@ -515,8 +531,8 @@ export const ObservationsSFPForm = (props: Props) => {
                       )}
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl className={classes.formControl}>
+                <Grid item xs={12} sm={12} md={6}>
+                  <FormControl className={classes.formControlFull}>
                     <TextField
                       id="observacion"
                       label="Observación"
@@ -538,6 +554,7 @@ export const ObservationsSFPForm = (props: Props) => {
                           </InputAdornment>
                         ),
                       }}
+                      disabled={(action === 'view')}
                     />
                     {errors.observacion && touched.observacion && errors.observacion && (
                     <FormHelperText
@@ -549,8 +566,8 @@ export const ObservationsSFPForm = (props: Props) => {
                       )}
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl className={classes.formControl}>
+                <Grid item xs={12} sm={12} md={6}>
+                  <FormControl className={classes.formControlFull}>
                     <TextField
                       id="acciones_correctivas"
                       label="Acciones Correctivas"
@@ -572,6 +589,7 @@ export const ObservationsSFPForm = (props: Props) => {
                           </InputAdornment>
                         ),
                       }}
+                      disabled={(action === 'view')}
                     />
                     {errors.acciones_correctivas && touched.acciones_correctivas && errors.acciones_correctivas && (
                     <FormHelperText
@@ -583,8 +601,8 @@ export const ObservationsSFPForm = (props: Props) => {
                       )}
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl className={classes.formControl}>
+                <Grid item xs={12} sm={12} md={6}>
+                  <FormControl className={classes.formControlFull}>
                     <TextField
                       id="acciones_preventivas"
                       label="Acciones Preventivas"
@@ -606,6 +624,7 @@ export const ObservationsSFPForm = (props: Props) => {
                           </InputAdornment>
                         ),
                       }}
+                      disabled={(action === 'view')}
                     />
                     {errors.acciones_preventivas && touched.acciones_preventivas && errors.acciones_preventivas && (
                     <FormHelperText
@@ -627,6 +646,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       id="tipo_observacion_id-select"
                       value={catalog ? values.tipo_observacion_id || '' : ''}
                       onChange={handleChange('tipo_observacion_id')}
+                      disabled={(action === 'view')}
                     >
                       {catalog &&
                           catalog.observation_types &&
@@ -656,7 +676,7 @@ export const ObservationsSFPForm = (props: Props) => {
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>
                     <TextField
-                      label="Monto Observado"
+                      label="Monto Observado (miles de pesos)"
                       value={values.monto_observado}
                       onChange={handleChange('monto_observado')}
                       name="monto_observado"
@@ -666,6 +686,7 @@ export const ObservationsSFPForm = (props: Props) => {
                         inputComponent: NumberFormatCustom as any,
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
                       }}
+                      disabled={(action === 'view')}
                     />
                     {errors.monto_observado &&
                       touched.monto_observado &&
@@ -747,6 +768,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   label="# Oficio CyTG u OIC"
                                   onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_cytg_oic`, value.target.value)}
                                   value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_cytg_oic : ''}
+                                  disabled={(action === 'view')}
                                 />
                               </FormControl>
                             </Grid>
@@ -757,6 +779,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   // id="fecha_oficio_cytg_oic"
                                   label="Fecha de Oficio CyTG"
                                   name={`seguimientos.${index}.fecha_oficio_cytg_oic`}
+                                  disabled={(action === 'view')}
                                 />
                                 {errors.fecha_oficio_cytg_oic &&
                             touched.fecha_oficio_cytg_oic && (
@@ -776,6 +799,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   // id="fecha_recibido_dependencia"
                                   label="Fecha de Recibido de la dependencia (ACUSE)"
                                   name={`seguimientos.${index}.fecha_recibido_dependencia`}
+                                  disabled={(action === 'view')}
                                 />
                                 {errors.fecha_recibido_dependencia &&
                             touched.fecha_recibido_dependencia && (
@@ -795,6 +819,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   // id="fecha_vencimiento_cytg"
                                   label="Fecha de vencimiento CyTG"
                                   name={`seguimientos.${index}.fecha_vencimiento_cytg`}
+                                  disabled={(action === 'view')}
                                 />
                                 {errors.fecha_vencimiento_cytg &&
                             touched.fecha_vencimiento_cytg && (
@@ -814,6 +839,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   label="# De Oficio de respuesta dependencia"
                                   onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_resp_dependencia`, value.target.value)}
                                   value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_resp_dependencia : ''}
+                                  disabled={(action === 'view')}
                                 />
                               </FormControl>
                             </Grid>
@@ -824,6 +850,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   label="Fecha de recibido del oficio de respuesta"
                                   name={`seguimientos.${index}.fecha_recibido_oficio_resp`}
                                   // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].fecha_recibido_oficio_resp : ''}
+                                  disabled={(action === 'view')}
                                 />
                                 {errors.fecha_recibido_oficio_resp &&
                             touched.fecha_recibido_oficio_resp && (
@@ -836,8 +863,8 @@ export const ObservationsSFPForm = (props: Props) => {
                             )}
                               </FormControl>
                             </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <FormControl className={classes.formControl}>
+                            <Grid item xs={12} sm={12} md={6}>
+                              <FormControl className={classes.formControlFull}>
                                 <TextField 
                                   id={`resp_dependencia_${index}`}
                                   label="Respuesta de la dependencia"
@@ -860,11 +887,12 @@ export const ObservationsSFPForm = (props: Props) => {
                                       </InputAdornment>
                                     ),
                                   }}
+                                  disabled={(action === 'view')}
                                 />
                               </FormControl>
                             </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <FormControl className={classes.formControl}>
+                            <Grid item xs={12} sm={12} md={6}>
+                              <FormControl className={classes.formControlFull}>
                                 <FastField
                                   component={TextField}
                                   // id="comentarios-seguimiento"
@@ -888,6 +916,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                       </InputAdornment>
                                     ),
                                   }}
+                                  disabled={(action === 'view')}
                                 />
                                 {errors.comentarios && touched.comentarios && errors.comentarios && (
                                 <FormHelperText
@@ -915,6 +944,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                       : []
                                   }
                                   value={catalog && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].clasif_final_interna_cytg : ''}
+                                  disabled={(action === 'view')}
                                 />
                               </FormControl>
                             </Grid>
@@ -925,6 +955,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   label="# Oficio para Organo fiscalizador"
                                   onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_org_fiscalizador`, value.target.value)}
                                   value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_org_fiscalizador : ''}
+                                  disabled={(action === 'view')}
                                 />
                               </FormControl>
                             </Grid>
@@ -935,6 +966,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   label="Fecha del Oficio para Órgano fiscalizador"
                                   name={`seguimientos.${index}.fecha_oficio_org_fiscalizador`}
                                   // value={seguimiento.fecha_oficio_org_fiscalizador}
+                                  disabled={(action === 'view')}
                                 />
                                 {errors.fecha_oficio_org_fiscalizador &&
                             touched.fecha_oficio_org_fiscalizador && (
@@ -959,6 +991,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   // id="estatus_id-select"
                                   onChange={handleChange(`seguimientos.${index}.estatus_id`)}
                                   value={catalog && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].estatus_id : ''}
+                                  disabled={(action === 'view')}
                                 >
                                   {catalog &&
                                       catalog.estatus_sfp &&
@@ -987,7 +1020,7 @@ export const ObservationsSFPForm = (props: Props) => {
                             <Grid item xs={12} sm={6}>
                               <FormControl className={classes.formControl}>
                                 <TextField
-                                  label="Monto Solventado"
+                                  label="Monto Solventado (miles de pesos)"
                                   // onChange={handleChange('monto_solventado')}
                                   // name="monto_solventado"
                                   // id="monto_solventado"
@@ -998,6 +1031,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                   }}
                                   value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado : ''}
+                                  disabled={(action === 'view')}
                                 />
                                 {errors.monto_solventado &&
                                 touched.monto_solventado &&
@@ -1014,7 +1048,7 @@ export const ObservationsSFPForm = (props: Props) => {
                             <Grid item xs={12} sm={6}>
                               <FormControl className={classes.formControl}>
                                 <TextField
-                                  label="Monto Pendiente de solventar"
+                                  label="Monto Pendiente de solventar (miles de pesos)"
                                   // onChange={handleChange('monto_pendiente_solventar')}
                                   // name="monto_pendiente_solventar"
                                   // id="monto_pendiente_solventar"
@@ -1024,7 +1058,9 @@ export const ObservationsSFPForm = (props: Props) => {
                                     inputComponent: NumberFormatCustom as any,
                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                   }}
-                                  value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
+                                  value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado : 0)}
+                                  disabled
+                                  variant="filled"
                                 />
                                 {errors.monto_pendiente_solventar &&
                                 touched.monto_pendiente_solventar &&
@@ -1046,12 +1082,11 @@ export const ObservationsSFPForm = (props: Props) => {
                 />
               </fieldset>
 
-
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>
                     <TextField
-                      label="Monto a Reintegrar"
+                      label="Monto a Reintegrar (miles de pesos)"
                       value={values.monto_a_reintegrar}
                       onChange={handleChange('monto_a_reintegrar')}
                       name="monto_a_reintegrar"
@@ -1061,6 +1096,7 @@ export const ObservationsSFPForm = (props: Props) => {
                         inputComponent: NumberFormatCustom as any,
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
                       }}
+                      disabled={(action === 'view')}
                     />
                     {errors.monto_a_reintegrar &&
                       touched.monto_a_reintegrar &&
@@ -1077,7 +1113,7 @@ export const ObservationsSFPForm = (props: Props) => {
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>
                     <TextField
-                      label="Monto Reintegrado"
+                      label="Monto Reintegrado (miles de pesos)"
                       value={values.monto_reintegrado}
                       onChange={handleChange('monto_reintegrado')}
                       name="monto_reintegrado"
@@ -1087,6 +1123,7 @@ export const ObservationsSFPForm = (props: Props) => {
                         inputComponent: NumberFormatCustom as any,
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
                       }}
+                      disabled={(action === 'view')}
                     />
                     {errors.monto_reintegrado &&
                       touched.monto_reintegrado &&
@@ -1106,6 +1143,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       component={FormikDatePicker}
                       label="Fecha Reintegro"
                       name="fecha_reintegro"
+                      disabled={(action === 'view')}
                     />
                     {errors.fecha_reintegro &&
                       touched.fecha_reintegro && (
@@ -1121,7 +1159,7 @@ export const ObservationsSFPForm = (props: Props) => {
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>
                     <TextField
-                      label="Monto por Reintegrar"
+                      label="Monto por Reintegrar (miles de pesos)"
                       value={sub(values.monto_a_reintegrar || 0, values.monto_reintegrado || 0)}
                       onChange={handleChange('monto_por_reintegrar')}
                       name="monto_por_reintegrar"
@@ -1147,6 +1185,20 @@ export const ObservationsSFPForm = (props: Props) => {
                       )}
                   </FormControl>
                 </Grid>
+              </Grid>
+
+              <hr className={classes.hrSpacer} />
+              <hr className={classes.hrDivider} /> 
+
+              <fieldset className={classes.fieldset}>
+                <legend className={classes.containerLegend}>
+                  <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                    Fin Seguimientos
+                  </Typography>
+                </legend>
+              </fieldset>
+              
+              <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>
                     <TextField
@@ -1154,6 +1206,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       label="# de oficio del OF que da vista a la CyTG"
                       value={values.num_oficio_of_vista_cytg || ''}
                       onChange={handleChange('num_oficio_of_vista_cytg')}
+                      disabled={(action === 'view')}
                     />
                     {errors.num_oficio_of_vista_cytg &&
                       touched.num_oficio_of_vista_cytg && (
@@ -1172,6 +1225,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       component={FormikDatePicker}
                       label="Fecha oficio"
                       name="fecha_oficio_of_vista_cytg"
+                      disabled={(action === 'view')}
                     />
                     {errors.fecha_oficio_of_vista_cytg &&
                       touched.fecha_oficio_of_vista_cytg && (
@@ -1192,6 +1246,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       value={values.num_oficio_cytg_aut_invest || ''}
                       onChange={handleChange('num_oficio_cytg_aut_invest')}
                       InputLabelProps={{ shrink: true }}
+                      disabled={(action === 'view')}
                     />
                     {errors.num_oficio_cytg_aut_invest &&
                       touched.num_oficio_cytg_aut_invest && (
@@ -1210,6 +1265,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       component={FormikDatePicker}
                       label="Fecha oficio"
                       name="fecha_oficio_cytg_aut_invest"
+                      disabled={(action === 'view')}
                     />
                     {errors.fecha_oficio_cytg_aut_invest &&
                       touched.fecha_oficio_cytg_aut_invest && (
@@ -1229,6 +1285,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       label="# de Carpeta de Invest."
                       value={values.num_carpeta_investigacion || ''}
                       onChange={handleChange('num_carpeta_investigacion')}
+                      disabled={(action === 'view')}
                     />
                     {errors.num_carpeta_investigacion &&
                       touched.num_carpeta_investigacion && (
@@ -1248,6 +1305,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       label="# de Oficio VAI a Municipio"
                       value={values.num_oficio_vai_municipio || ''}
                       onChange={handleChange('num_oficio_vai_municipio')}
+                      disabled={(action === 'view')}
                     />
                     {errors.num_oficio_vai_municipio &&
                       touched.num_oficio_vai_municipio && (
@@ -1266,6 +1324,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       component={FormikDatePicker}
                       label="Fecha oficio"
                       name="fecha_oficio_vai_municipio"
+                      disabled={(action === 'view')}
                     />
                     {errors.fecha_oficio_vai_municipio &&
                       touched.fecha_oficio_vai_municipio && (
@@ -1288,6 +1347,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       id="autoridad_invest_id-select"
                       value={catalog ? values.autoridad_invest_id || '' : ''}
                       onChange={handleChange('autoridad_invest_id')}
+                      disabled={(action === 'view')}
                     >
                       {catalog &&
                           catalog.autoridades_invest &&
@@ -1320,6 +1380,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       label="# de Oficio de PRAS DEL OF"
                       value={values.num_oficio_pras_of || ''}
                       onChange={handleChange('num_oficio_pras_of')}
+                      disabled={(action === 'view')}
                     />
                     {errors.num_oficio_pras_of &&
                       touched.num_oficio_pras_of && (
@@ -1338,6 +1399,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       component={FormikDatePicker}
                       label="Fecha oficio"
                       name="fecha_oficio_pras_of"
+                      disabled={(action === 'view')}
                     />
                     {errors.fecha_oficio_pras_of &&
                       touched.fecha_oficio_pras_of && (
@@ -1358,6 +1420,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       value={values.num_oficio_pras_cytg_dependencia || ''}
                       onChange={handleChange('num_oficio_pras_cytg_dependencia')}
                       InputLabelProps={{ shrink: true }}
+                      disabled={(action === 'view')}
                     />
                     {errors.num_oficio_pras_cytg_dependencia &&
                       touched.num_oficio_pras_cytg_dependencia && (
@@ -1377,6 +1440,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       label="# Oficio de respuesta de la dependencia"
                       value={values.num_oficio_resp_dependencia || ''}
                       onChange={handleChange('num_oficio_resp_dependencia')}
+                      disabled={(action === 'view')}
                     />
                     {errors.num_oficio_resp_dependencia &&
                       touched.num_oficio_resp_dependencia && (
@@ -1395,6 +1459,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       component={FormikDatePicker}
                       label="Fecha oficio"
                       name="fecha_oficio_resp_dependencia"
+                      disabled={(action === 'view')}
                     />
                     {errors.fecha_oficio_resp_dependencia &&
                       touched.fecha_oficio_resp_dependencia && (

@@ -28,7 +28,7 @@ function* removeResultsReportWorker(action: any): Generator<any, any, any> {
     yield put(loadResultsReportAction());
     yield put(
       notificationAction({
-        message: `Informe de Resultados ${result.id} ha sido eliminada!`,
+        message: `Observación de Resultados ASF ${result.id} ha sido eliminada!`,
       })
     );
   } catch (e) {

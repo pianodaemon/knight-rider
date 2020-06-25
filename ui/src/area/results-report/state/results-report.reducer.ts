@@ -18,7 +18,7 @@ export interface ResultsReport {
   monto_por_reintegrar: number;
   tiene_pras: boolean;
   seguimientos: Array<Seguimiento>;
-  pras: Array<PRA>;
+  pras: PRA;
   direccion_id: number;
   auditoria_id: number;
   programa_social_id: number;

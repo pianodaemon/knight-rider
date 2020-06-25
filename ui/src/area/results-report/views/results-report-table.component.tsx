@@ -56,7 +56,7 @@ export const ResultsReportTable = (props: Props) => {
   ];
   return (
     <MaterialTable
-      title="Informe de Resultados"
+      title="Observaciones de Resultados ASF"
       onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
         loadResultsReportAction({
           ...paging,
@@ -114,7 +114,7 @@ export const ResultsReportTable = (props: Props) => {
                   size="medium"
                   onClick={() => history.push('/results-report/create')}
                 >
-                  Agregar Informe de Resultados
+                  Agregar Observación de Resultados ASF
                 </Button>
               </div>
             </div>
@@ -124,18 +124,18 @@ export const ResultsReportTable = (props: Props) => {
       actions={[
         {
           icon: 'edit',
-          tooltip: 'Editar Informe de Resultados',
+          tooltip: 'Editar Observación de Resultados ASF',
           onClick: (event, rowData: any) =>
             history.push(`/results-report/${rowData.id}/edit`),
         },
         {
           icon: 'delete',
-          tooltip: 'Eliminar Informe de Resultados',
+          tooltip: 'Eliminar Observación de Resultados ASF',
           onClick: (event, rowData: any) => {
             if (
               // eslint-disable-next-line no-restricted-globals
               confirm(
-                `¿Realmente quieres eliminar el Informe de Resultados ${rowData.id}?\n Esta acción es irreversible`
+                `¿Realmente quieres eliminar la Observación de Resultados ASF ${rowData.id}?\n Esta acción es irreversible`
               )
             ) {
               removeResultsReportAction(rowData.id);

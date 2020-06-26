@@ -361,10 +361,10 @@ ALTER FUNCTION public.alter_observacion_ires_asf(_observacion_id integer, _obser
 
 
 --
--- Name: alter_observacion_pre_asf(integer, integer, date, integer, integer, character varying, date, date, character varying, text, double precision, character varying, date, date, date, character varying, date, text, text, integer, character varying, date, integer, integer[]); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: alter_observacion_pre_asf(integer, integer, date, integer, integer, character varying, date, date, integer, text, double precision, character varying, date, date, date, character varying, date, text, text, integer, character varying, date, integer, integer[]); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.alter_observacion_pre_asf(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _num_oficio_of character varying, _fecha_recibido date, _fecha_vencimiento_of date, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg character varying, _fecha_oficio_cytg date, _fecha_recibido_dependencia date, _fecha_vencimiento date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_criterio_int_id integer, _proyecciones integer[]) RETURNS record
+CREATE FUNCTION public.alter_observacion_pre_asf(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _num_oficio_of character varying, _fecha_recibido date, _fecha_vencimiento_of date, _num_observacion integer, _observacion text, _monto_observado double precision, _num_oficio_cytg character varying, _fecha_oficio_cytg date, _fecha_recibido_dependencia date, _fecha_vencimiento date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_criterio_int_id integer, _proyecciones integer[]) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
@@ -520,7 +520,7 @@ END;
 $$;
 
 
-ALTER FUNCTION public.alter_observacion_pre_asf(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _num_oficio_of character varying, _fecha_recibido date, _fecha_vencimiento_of date, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg character varying, _fecha_oficio_cytg date, _fecha_recibido_dependencia date, _fecha_vencimiento date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_criterio_int_id integer, _proyecciones integer[]) OWNER TO postgres;
+ALTER FUNCTION public.alter_observacion_pre_asf(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _num_oficio_of character varying, _fecha_recibido date, _fecha_vencimiento_of date, _num_observacion integer, _observacion text, _monto_observado double precision, _num_oficio_cytg character varying, _fecha_oficio_cytg date, _fecha_recibido_dependencia date, _fecha_vencimiento date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_criterio_int_id integer, _proyecciones integer[]) OWNER TO postgres;
 
 
 --

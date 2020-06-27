@@ -151,7 +151,7 @@ export const ResultsReportForm = (props: Props) => {
     monto_por_reintegrar: '',
     tiene_pras: false,
     seguimientos: [],
-    pras: [],
+    pras: {},
     direccion_id: '',
     auditoria_id: '',
     programa_social_id: '',
@@ -187,7 +187,7 @@ export const ResultsReportForm = (props: Props) => {
     const errors: any = {};
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> = fields.filter((item: string) => /^fecha_/i.test(item)) || [];
-    const noMandatoryFields: Array<string> = ["id", "seguimientos", "pras", "anios_cuenta_publica"];
+    const noMandatoryFields: Array<string> = ["id", "seguimientos", "pras", "tiene_pras"];
 
     // Mandatory fields (not empty)
     fields.filter(field => !noMandatoryFields.includes(field)).forEach((field: string) => {
@@ -207,7 +207,16 @@ export const ResultsReportForm = (props: Props) => {
         errors[field] = errors[field] || 'Revise que el año de la fecha que ingresó sea posterior al Año de la Auditoría';
       }
     });
-    console.log(errors);
+
+    // PRAs
+    /*
+    if (values.tiene_pras) {
+      Object.keys(values.pras).forEach((field: any) => {
+        errors[`pras_${field}`] = 'Required';
+      });
+    }
+    */
+    console.log('errors', errors);
     /* @todo use scroll to view
     const element = document.getElementById(Object.keys(errors)[0]);
     if (element) {
@@ -227,12 +236,14 @@ export const ResultsReportForm = (props: Props) => {
         validate={validate}
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
-          const fields: any = values;
-          const anio_auditoria = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).years : '';
-          fields.anios_cuenta_publica = [anio_auditoria];
+          const fields: any = {...values };
+          fields.pras.pras_observacion_id = fields.id;
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
             return { ...item, seguimiento_id: index };
           });
+          // if (!fields.tiene_pras) {
+          //   delete fields.pras;
+          // }
           if (id) {
             delete fields.id;
             updateResultsReportAction({ id, fields, history, releaseForm });
@@ -250,7 +261,7 @@ export const ResultsReportForm = (props: Props) => {
           handleSubmit,
           isSubmitting,
           setFieldValue,
-        }) => {
+        }: any) => {
           const anio_auditoria =
             catalog &&
             catalog.audits &&
@@ -1118,14 +1129,247 @@ export const ResultsReportForm = (props: Props) => {
                       <FormControl className={classes.formControl}>
                         <TextField
                           id="num_oficio_of_vista_cytg"
-                          label="# de Oficio de la Vista CyTG"
+                          label="# de Oficio del OF que da vista a la CyTG"
                           value={values.pras.num_oficio_of_vista_cytg || ''}
                           onChange={handleChange('pras.num_oficio_of_vista_cytg')}
                         />
+                        {errors.pras_num_oficio_of_vista_cytg &&
+                        touched.pras && touched.pras.num_oficio_of_vista_cytg && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese # de Oficio del OF que da vista a la CyTG
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de Oficio del OF que da vista a la CyTG"
+                          name="pras.fecha_oficio_of_vista_cytg"
+                          id="fecha_oficio_of_vista_cytg"
+                        />
+                        {errors.fecha_oficio_of_vista_cytg &&
+                          touched.fecha_oficio_of_vista_cytg && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_oficio_of_vista_cytg}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="num_oficio_cytg_aut_invest"
+                          label="# de Oficio de la CyTG para la Autoridad Investigadora"
+                          value={values.pras.num_oficio_cytg_aut_invest || ''}
+                          onChange={handleChange('pras.num_oficio_cytg_aut_invest')}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de Oficio de la CyTG para la Autoridad Investigadora"
+                          name="pras.fecha_oficio_cytg_aut_invest"
+                          id="fecha_oficio_cytg_aut_invest"
+                        />
+                        {errors.fecha_oficio_cytg_aut_invest &&
+                          touched.fecha_oficio_cytg_aut_invest && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_oficio_cytg_aut_invest}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="num_carpeta_investigacion"
+                          label="# de Carpeta de Investigación"
+                          value={values.pras.num_carpeta_investigacion || ''}
+                          onChange={handleChange('pras.num_carpeta_investigacion')}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="num_oficio_cytg_org_fiscalizador"
+                          label="# de Oficio de la CyTG para Órgano Fiscalizador"
+                          value={values.pras.num_oficio_cytg_org_fiscalizador || ''}
+                          onChange={handleChange('pras.num_oficio_cytg_org_fiscalizador')}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de Oficio de la CyTG para Órgano Fiscalizador"
+                          name="pras.fecha_oficio_cytg_org_fiscalizador"
+                          id="fecha_oficio_cytg_org_fiscalizador"
+                        />
+                        {errors.fecha_oficio_cytg_org_fiscalizador &&
+                          touched.fecha_oficio_cytg_org_fiscalizador && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_oficio_cytg_org_fiscalizador}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="num_oficio_vai_municipio"
+                          label="# de Oficio VAI a Municipio"
+                          value={values.pras.num_oficio_vai_municipio || ''}
+                          onChange={handleChange('pras.num_oficio_vai_municipio')}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de Oficio VAI a Municipio"
+                          name="pras.fecha_oficio_vai_municipio"
+                          id="fecha_oficio_vai_municipio"
+                        />
+                        {errors.fecha_oficio_vai_municipio &&
+                          touched.fecha_oficio_vai_municipio && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_oficio_vai_municipio}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <InputLabel id="tipo_observacion_id">
+                          Autoridad Investigadora
+                        </InputLabel>
+                        <Select
+                          labelId="autoridad_invest_id"
+                          id="autoridad_invest_id-select"
+                          value={catalog ? values.pras.autoridad_invest_id || '' : ''}
+                          onChange={handleChange('pras.autoridad_invest_id')}
+                        >
+                          {catalog &&
+                              catalog.autoridades_invest &&
+                              catalog.autoridades_invest.map((item) => {
+                                return (
+                                  <MenuItem
+                                    value={item.id}
+                                    key={`type-${item.id}`}
+                                  >
+                                    {item.title}
+                                  </MenuItem>
+                                );
+                              })}
+                        </Select>
+                        {errors.autoridad_invest_id &&
+                            touched.autoridad_invest_id &&
+                            errors.autoridad_invest_id && (
+                              <FormHelperText
+                                error
+                                classes={{ error: classes.textErrorHelper }}
+                              >
+                                Seleccione una Autoridad Investigadora
+                              </FormHelperText>
+                            )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="num_oficio_pras_of"
+                          label="# de Oficio de PRAS del OF"
+                          value={values.pras.num_oficio_pras_of || ''}
+                          onChange={handleChange('pras.num_oficio_pras_of')}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de Oficio de PRAS del OF"
+                          name="pras.fecha_oficio_pras_of"
+                          id="fecha_oficio_pras_of"
+                        />
+                        {errors.fecha_oficio_pras_of &&
+                          touched.fecha_oficio_pras_of && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_oficio_pras_of}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="num_oficio_pras_cytg_dependencia"
+                          label="# de Oficio PRAS de la CyTG para la dependencia"
+                          value={values.pras.num_oficio_pras_cytg_dependencia || ''}
+                          onChange={handleChange('pras.num_oficio_pras_cytg_dependencia')}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="num_oficio_resp_dependencia"
+                          label="# de Oficio de respuesta de la dependencia"
+                          value={values.pras.num_oficio_resp_dependencia || ''}
+                          onChange={handleChange('pras.num_oficio_resp_dependencia')}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de Oficio de respuesta de la dependencia"
+                          name="pras.fecha_oficio_resp_dependencia"
+                          id="fecha_oficio_resp_dependencia"
+                        />
+                        {errors.fecha_oficio_resp_dependencia &&
+                          touched.fecha_oficio_resp_dependencia && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_oficio_resp_dependencia}
+                            </FormHelperText>
+                          )}
                       </FormControl>
                     </Grid>
                   </Grid>
-                )}
+                  )}
                 </fieldset>
 
                 <Button

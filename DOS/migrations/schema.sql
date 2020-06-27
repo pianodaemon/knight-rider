@@ -182,7 +182,7 @@ COMMENT ON TABLE public.apps IS 'Relacion que alberga las aplicaciones que seran
 
 CREATE TABLE public.auditoria_anios_cuenta_pub (
     auditoria_id integer NOT NULL,
-    anio_cuenta_pub integer DEFAULT 2012 NOT NULL
+    anio_cuenta_pub integer NOT NULL
 );
 
 
@@ -277,6 +277,27 @@ CREATE TABLE public.autoridades_invest (
 ALTER TABLE public.autoridades_invest OWNER TO postgres;
 
 --
+-- Name: clasifs_internas_cytg; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.clasifs_internas_cytg (
+    org_fiscal_id integer NOT NULL,
+    direccion_id integer NOT NULL,
+    sorting_val integer NOT NULL,
+    title character varying NOT NULL
+);
+
+
+ALTER TABLE public.clasifs_internas_cytg OWNER TO postgres;
+
+--
+-- Name: TABLE clasifs_internas_cytg; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.clasifs_internas_cytg IS 'Clasificaciones internas CyTG por direccion y organo fiscalizador';
+
+
+--
 -- Name: dependencia_clasif; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -303,7 +324,10 @@ CREATE TABLE public.dependencies (
     id integer NOT NULL,
     title character varying NOT NULL,
     description text,
-    clasif_id integer NOT NULL
+    clasif_id integer NOT NULL,
+    central boolean DEFAULT false NOT NULL,
+    paraestatal boolean DEFAULT false NOT NULL,
+    obra_pub boolean DEFAULT false NOT NULL
 );
 
 
@@ -581,7 +605,7 @@ CREATE TABLE public.observaciones_pre_asf (
     num_oficio_of character varying NOT NULL,
     fecha_recibido date NOT NULL,
     fecha_vencimiento_of date NOT NULL,
-    num_observacion character varying NOT NULL,
+    num_observacion integer NOT NULL,
     observacion text NOT NULL,
     monto_observado double precision DEFAULT 0 NOT NULL,
     num_oficio_cytg character varying NOT NULL,
@@ -1038,6 +1062,14 @@ ALTER TABLE ONLY public.audits
 
 
 --
+-- Name: audits audits_unique_title; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.audits
+    ADD CONSTRAINT audits_unique_title UNIQUE (title);
+
+
+--
 -- Name: authorities authorities_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1067,6 +1099,14 @@ ALTER TABLE ONLY public.autoridades_invest
 
 ALTER TABLE ONLY public.autoridades_invest
     ADD CONSTRAINT autoridades_invest_titulo_unique UNIQUE (title);
+
+
+--
+-- Name: clasifs_internas_cytg clasifs_internas_cytg_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.clasifs_internas_cytg
+    ADD CONSTRAINT clasifs_internas_cytg_pkey PRIMARY KEY (org_fiscal_id, direccion_id, sorting_val);
 
 
 --
@@ -1493,6 +1533,22 @@ ALTER TABLE ONLY public.authorities
 
 
 --
+-- Name: clasifs_internas_cytg clasifs_internas_cytg_divisions_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.clasifs_internas_cytg
+    ADD CONSTRAINT clasifs_internas_cytg_divisions_fkey FOREIGN KEY (direccion_id) REFERENCES public.divisions(id);
+
+
+--
+-- Name: clasifs_internas_cytg clasifs_internas_cytg_fiscals_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.clasifs_internas_cytg
+    ADD CONSTRAINT clasifs_internas_cytg_fiscals_fkey FOREIGN KEY (org_fiscal_id) REFERENCES public.fiscals(id);
+
+
+--
 -- Name: dependencies dependencies_dependencia_clasif_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1562,6 +1618,14 @@ ALTER TABLE ONLY public.observaciones_pre_asf
 
 ALTER TABLE ONLY public.observaciones_pre_asf
     ADD CONSTRAINT observaciones_pre_asf_estatus_pre_asf_fkey FOREIGN KEY (estatus_criterio_int_id) REFERENCES public.estatus_pre_asf(id);
+
+
+--
+-- Name: observaciones_pre_asf observaciones_pre_asf_observation_codes_bis_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_pre_asf
+    ADD CONSTRAINT observaciones_pre_asf_observation_codes_bis_fkey FOREIGN KEY (num_observacion) REFERENCES public.observation_codes(id);
 
 
 --

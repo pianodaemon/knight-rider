@@ -88,9 +88,13 @@ type Division = CatalogItem;
 type Dependency = CatalogItem;
 type SocialProgram = CatalogItem;
 type AutoridadesInvest = CatalogItem;
-type ObservationCodes = CatalogItem;
+// type ObservationCodes = CatalogItem;
 type ObservationTypes = CatalogItem;
 type Estatus = CatalogItem;
+type ClasifInternas = {
+  direccion_id: number,
+  clasifs_internas_pairs: Array<{ sorting_val: number, title: string }>,
+};
 
 export type Catalog = {
   audits: Array<Audit> | null,
@@ -98,9 +102,10 @@ export type Catalog = {
   dependencies: Array<Dependency> | null,
   divisions: Array<Division> | null,
   estatus_sfp: Array<Estatus> | null,
-  observation_codes: Array<ObservationCodes> | null,
+  // observation_codes: Array<ObservationCodes> | null,
   observation_types: Array<ObservationTypes> | null,
   social_programs: Array<SocialProgram> | null,
+  clasifs_internas_cytg: Array<ClasifInternas>,
 };
 
 const initialState: ObservationsSFPSlice = {

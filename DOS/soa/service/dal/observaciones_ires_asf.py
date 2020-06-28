@@ -288,7 +288,7 @@ def seguimientos_to_comp_type_arr_lit(seguimientos):
             str(s['monto_solventado']) + ", " +
             "'" + s['num_oficio_monto_solventado'] + "', " +
             "'" + s['fecha_oficio_monto_solventado'] + "', " +
-            str(s['monto_pendiente_solventar']) + ", " +
+            str(s['monto_pendiente_solventar']) +
             ")"
         )
 

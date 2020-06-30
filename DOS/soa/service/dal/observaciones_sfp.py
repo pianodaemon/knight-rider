@@ -325,25 +325,27 @@ def seguimientos_to_comp_type_arr_lit(seguimientos):
         if not first:
             segs_str += ", "
         
-        l = []
-        l.append(s['observacion_id'])
-        l.append(s['seguimiento_id'])
-        l.append(s['num_oficio_cytg_oic'])
-        l.append(s['fecha_oficio_cytg_oic'])
-        l.append(s['fecha_recibido_dependencia'])
-        l.append(s['fecha_vencimiento_cytg'])
-        l.append(s['num_oficio_resp_dependencia'])
-        l.append(s['fecha_recibido_oficio_resp'])
-        l.append(s['resp_dependencia'])
-        l.append(s['comentarios'])
-        l.append(s['clasif_final_interna_cytg'])
-        l.append(s['num_oficio_org_fiscalizador'])
-        l.append(s['fecha_oficio_org_fiscalizador'])
-        l.append(s['estatus_id'])
-        l.append(s['monto_solventado'])
-        l.append(s['monto_pendiente_solventar'])
-        m = str(l)
-        segs_str += "(" + m[1:-1] + ")"
+        segs_str += (
+            "(" +
+            str(s['observacion_id']) + ", " +
+            str(s['seguimiento_id']) + ", " +
+            "'" + s['num_oficio_cytg_oic'] + "', " +
+            "'" + s['fecha_oficio_cytg_oic'] + "', " +
+            "'" + s['fecha_recibido_dependencia'] + "', " +
+            "'" + s['fecha_vencimiento_cytg'] + "', " +
+            "'" + s['num_oficio_resp_dependencia'] + "', " +
+            "'" + s['fecha_recibido_oficio_resp'] + "', " +
+            "'" + s['resp_dependencia'] + "', " +
+            "'" + s['comentarios'] + "', " +
+            str(s['clasif_final_interna_cytg']) + ", " +
+            "'" + s['num_oficio_org_fiscalizador'] + "', " +
+            "'" + s['fecha_oficio_org_fiscalizador'] + "', " +
+            str(s['estatus_id']) + ", " +
+            str(s['monto_solventado']) + ", " +
+            str(s['monto_pendiente_solventar']) +
+            ")"
+        )
+        
         first = False
     
     segs_str += "]"

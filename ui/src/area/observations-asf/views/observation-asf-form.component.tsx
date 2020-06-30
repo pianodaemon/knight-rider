@@ -769,16 +769,16 @@ export const ObservationsASFForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <AutoCompleteDropdown
                         fieldLabel="title"
-                        fieldValue="id"
+                        fieldValue="sorting_val"
                         label="Clasificación final CyTG"
                         name="clasif_final_cytg"
                         onChange={(value: any) => {
                           return setFieldValue('clasif_final_cytg', value);
                         }}
                         options={
-                        catalog && catalog.observation_codes
-                          ? catalog.observation_codes
-                          : []
+                          catalog && catalog.clasifs_internas_cytg
+                            ? (catalog.clasifs_internas_cytg.find((item: any) => item.direccion_id === values.direccion_id) || {}).clasifs_internas_pairs || []
+                            : []
                         }
                         value={catalog ? values.clasif_final_cytg || '' : ''}
                       />

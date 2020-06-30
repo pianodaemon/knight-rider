@@ -202,6 +202,37 @@ def get_catalogs(table_name_list):
             for row in rows:
                 values_l.append(dict(row))
         
+        elif table == 'clasifs_internas_cytg':
+            sql = '''
+                SELECT clas.direccion_id, clas.sorting_val, clas.title
+                FROM fiscals AS fisc
+                JOIN clasifs_internas_cytg AS clas ON fisc.id = clas.org_fiscal_id
+                WHERE fisc.title = '{}'
+                ORDER BY clas.direccion_id, clas.sorting_val;
+            '''.format('ASF')
+
+            rows = exec_steady(sql)
+
+            first_dir = 0
+
+            for row in rows:
+                if row[0] != first_dir:
+                    clasif = {
+                        'direccion_id': row[0],
+                        'clasifs_internas_pairs': [{
+                            'sorting_val': row[1],
+                            'title': row[2]
+                        }]
+                    }
+                    values_l.append(clasif)
+                else:
+                    clasif['clasifs_internas_pairs'].append({
+                        'sorting_val': row[1],
+                        'title': row[2]
+                    })
+                
+                first_dir = row[0]
+
         else:
             sql = '''
                 SELECT *

@@ -56,18 +56,23 @@ type Audit = CatalogItem & {
 type Division = CatalogItem;
 type Dependency = CatalogItem;
 type SocialProgram = CatalogItem;
-type ObservationCodes = CatalogItem;
+// type ObservationCodes = CatalogItem;
 type EstatusPreASF = CatalogItem;
 type ProyeccionesASF = CatalogItem;
+type ClasifInternas = {
+  direccion_id: number,
+  clasifs_internas_pairs: Array<{ sorting_val: number, title: string }>,
+};
 
 export type Catalog = {
   audits: Array<Audit> | null,
   dependencies: Array<Dependency> | null,
   divisions: Array<Division> | null,
-  observation_codes: Array<ObservationCodes> | null,
+  // observation_codes: Array<ObservationCodes> | null,
   estatus_pre_asf: Array<EstatusPreASF> | null,
   social_programs: Array<SocialProgram> | null,
   proyecciones_asf: Array<ProyeccionesASF> | null,
+  clasifs_internas_cytg: Array<ClasifInternas>,
 };
 
 const initialState: ObservationsASFSlice = {

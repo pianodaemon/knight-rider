@@ -83,12 +83,22 @@ dependency = api.model('Datos de una Dependencia', {
     'clasif_title': fields.String(description='Clasificación de la Dependencia'),
 })
 
+clasif_interna_pair = api.model('Par que asocia sorting_value y el title para la Clasificación interna CyTG', {
+    'sorting_val': fields.Integer(description='Valor para ordenamiento'),
+    'title': fields.String(description='Título de la Clasficación interna CyTG'),
+})
+
+clasif_interna_cytg = api.model('Clasificaciones internas CyTG para una Dirección', {
+    'direccion_id': fields.Integer(description='Id de la Dirección'),
+    'clasifs_internas_pairs': fields.List(fields.Nested(clasif_interna_pair)),
+})
+
 catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASF (Preliminares)', {
     'divisions': fields.List(fields.Nested(pair)),
     'audits': fields.List(fields.Nested(audit)),
     'dependencies': fields.List(fields.Nested(dependency)),
     'social_programs': fields.List(fields.Nested(pair)),
-    'observation_codes': fields.List(fields.Nested(pair)),
+    'clasifs_internas_cytg': fields.List(fields.Nested(clasif_interna_cytg)),
     'estatus_pre_asf': fields.List(fields.Nested(pair)),
     'proyecciones_asf': fields.List(fields.Nested(pair)),
 })
@@ -218,8 +228,13 @@ class Catalog(Resource):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
         try:
             field_catalog = observaciones_pre_asf.get_catalogs([
-                'divisions', 'audits', 'dependencies', 'social_programs',
-                'observation_codes', 'estatus_pre_asf', 'proyecciones_asf'
+                'divisions',
+                'audits',
+                'dependencies',
+                'social_programs',
+                'clasifs_internas_cytg',
+                'estatus_pre_asf',
+                'proyecciones_asf'
             ])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))

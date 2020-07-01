@@ -5,7 +5,7 @@ const sliceSelector = (state: any) => state[resultsReportReducer.sliceName];
 
 export const reportsSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.reports,
+  (slice: any) => slice.reports
 );
 
 export const catalogSelector = createSelector(sliceSelector, (slice: any) => {
@@ -28,7 +28,7 @@ export const reportSelector = createSelector(
       return null;
     }
     return report;
-  },
+  }
 );
 
 export const isLoadingSelector = createSelector(
@@ -52,7 +52,7 @@ export const reportsCatalogSelector = createSelector(
         catalog.audits.find((item: any) => item.id === report.auditoria_id)
           ? (
               catalog.audits.find(
-                (item: any) => item.id === report.auditoria_id,
+                (item: any) => item.id === report.auditoria_id
               ) || {}
             ).dependency_ids
               .map((dependency: number) =>
@@ -87,5 +87,25 @@ export const reportsCatalogSelector = createSelector(
 
 export const pagingSelector = createSelector(
   sliceSelector,
-  (slice: any) => slice.paging,
+  (slice: any) => slice.paging
+);
+
+export const pagingPreObsSelector = createSelector(
+  sliceSelector,
+  (slice: any) => slice.observacion_pre.paging
+);
+
+export const preObservationsSelector = createSelector(
+  sliceSelector,
+  (slice: any) => {
+    const { observations } = slice.observacion_pre;
+    return observations
+      ? observations.map((item: any) => {
+          return {
+            id: item.id,
+            observation: `Observación: ${item.id} - Auditoría ${item.auditoria_id}`,
+          };
+        })
+      : [];
+  }
 );

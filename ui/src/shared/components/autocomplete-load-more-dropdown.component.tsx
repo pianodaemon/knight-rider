@@ -1,33 +1,33 @@
 /* eslint-disable no-use-before-define */
-import React from 'react';
+import React, { useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 type Props = {
-  options: Array<any>,
-  onChange: any,
+  disabled?: boolean,
   fieldLabel: string,
   fieldValue: string,
+  groupField?: string,
   label: string,
   name: string,
+  onChange: any,
+  onSearch: any,
+  options: Array<any>,
   value: any,
-  groupField?: string,
-  multiple?: boolean,
-  disabled?: boolean,
 };
 
-export function AutoCompleteDropdown(props: Props) {
+export function AutoCompleteLoadMoreDropdown(props: Props) {
   const {
+    disabled,
     fieldLabel,
     fieldValue,
     groupField,
     label,
-    multiple,
     name,
     onChange,
+    onSearch,
     options,
     value,
-    disabled,
   } = props;
   const opts = groupField
     ? options
@@ -55,6 +55,7 @@ export function AutoCompleteDropdown(props: Props) {
       : [];
   const selected =
     value && Array.isArray(value) ? itemsSelected || [] : itemSelected || null;
+  const [search, setSearch] = useState<any>('');
   return (
     <Autocomplete
       id={`grouped-${name}`}
@@ -81,10 +82,57 @@ export function AutoCompleteDropdown(props: Props) {
       renderInput={(params) => {
         return <TextField {...params} label={label} />;
       }}
-      // value={itemSelected && value ? itemSelected : null}
       value={selected}
-      multiple={multiple}
       disabled={disabled}
+      /*
+      // @todo Load More Options feature
+      ListboxProps={{
+        onScroll: (event: any) => {
+          console.log(
+            event.target.scrollTop,
+            event.target.scrollHeight,
+            event.target.clientHeight,
+            event.target.scrollTop+event.target.clientHeight === event.target.scrollHeight
+          );
+          if (
+            event.target.scrollTop + event.target.clientHeight ===
+            event.target.scrollHeight
+          ) {
+            alert('lol');
+          }
+        }
+      }}
+      debug
+      */
+      onInputChange={(event, val: string, reason: string) => {
+        if (reason === 'input') {
+          setSearch(val);
+          onSearch(val);
+        }
+      }}
+      inputValue={search}
+      clearOnBlur
+      /*
+      // @todo Load More Options feature
+      ListboxProps={{
+        onScroll: (event: any) => {
+          console.log(
+            event.target.scrollTop,
+            event.target.scrollHeight,
+            event.target.clientHeight,
+            event.target.scrollTop+event.target.clientHeight === event.target.scrollHeight
+          );
+          if (
+            event.target.scrollTop + event.target.clientHeight ===
+            event.target.scrollHeight
+          ) {
+            alert('lol');
+          }
+        }
+      }}
+      debug
+      */
+      filterOptions={(ops) => ops}
     />
   );
 }

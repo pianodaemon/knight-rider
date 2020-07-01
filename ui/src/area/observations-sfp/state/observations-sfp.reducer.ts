@@ -105,7 +105,7 @@ export type Catalog = {
   // observation_codes: Array<ObservationCodes> | null,
   observation_types: Array<ObservationTypes> | null,
   social_programs: Array<SocialProgram> | null,
-  clasifs_internas_cytg: Array<ClasifInternas>,
+  clasifs_internas_cytg: Array<ClasifInternas> | null,
 };
 
 const initialState: ObservationsSFPSlice = {

@@ -78,6 +78,20 @@ interface ResultsReportSlice {
     order: string,
     order_by: string,
   };
+  observacion_pre: {
+    paging: {
+      count: number,
+      pages: number,
+      page: number,
+      per_page: number,
+      order: string,
+      order_by: string,
+    },
+    auditoria_id: number, // @todo this is a query param, it should be wrapped on a criteria object when more params were added
+    loading: boolean,
+    observations: Array<any> | null,
+    error: any,
+  };
 }
 
 type CatalogItem = {
@@ -128,6 +142,20 @@ const initialState: ResultsReportSlice = {
     per_page: 5,
     order: 'desc',
     order_by: 'id',
+  },
+  observacion_pre: {
+    paging: {
+      count: 0,
+      pages: 0,
+      page: 1,
+      per_page: 5,
+      order: 'desc',
+      order_by: 'id',
+    },
+    auditoria_id: 0, // Query param
+    error: null,
+    loading: false,
+    observations: null,
   },
 };
 

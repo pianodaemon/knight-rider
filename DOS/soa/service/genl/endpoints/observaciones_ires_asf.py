@@ -154,11 +154,21 @@ dependency = api.model('Datos de una Dependencia', {
     'clasif_title': fields.String(description='Clasificación de la Dependencia'),
 })
 
+clasif_interna_pair = api.model('Par que asocia sorting_value y el title para la Clasificación interna CyTG', {
+    'sorting_val': fields.Integer(description='Valor para ordenamiento'),
+    'title': fields.String(description='Título de la Clasficación interna CyTG'),
+})
+
+clasif_interna_cytg = api.model('Clasificaciones internas CyTG para una Dirección', {
+    'direccion_id': fields.Integer(description='Id de la Dirección'),
+    'clasifs_internas_pairs': fields.List(fields.Nested(clasif_interna_pair)),
+})
+
 catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASF (Informe de Resultados)', {
     'medios_notif_seguimiento_asf': fields.List(fields.Nested(pair)),
     'estatus_ires_asf': fields.List(fields.Nested(pair)),
     'autoridades_invest': fields.List(fields.Nested(pair)),
-    'observation_codes': fields.List(fields.Nested(pair)),
+    'clasifs_internas_cytg': fields.List(fields.Nested(clasif_interna_cytg)),
     'observation_types': fields.List(fields.Nested(pair)),
     'audits': fields.List(fields.Nested(audit)),
     'dependencies': fields.List(fields.Nested(dependency)),
@@ -292,7 +302,7 @@ class Catalog(Resource):
                 'medios_notif_seguimiento_asf',
                 'estatus_ires_asf',
                 'autoridades_invest',
-                'observation_codes',
+                'clasifs_internas_cytg',
                 'observation_types',
                 'audits',
                 'dependencies',

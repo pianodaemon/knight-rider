@@ -3,6 +3,7 @@ package authentication
 import (
 	"crypto/rsa"
 	"encoding/json"
+	"net/http"
 
 	dal "immortalcrab.com/sso/internal/storage"
 	ton "immortalcrab.com/sso/internal/token"
@@ -40,6 +41,27 @@ func NewTokenClerk(logger *logrus.Logger,
 	}
 }
 
+// Ceases a token that has been embedded within the request
+func (self *TokenClerk) CeaseToken(req *http.Request) error {
+
+	tokenReq, err := ton.ExtractFromReq(self.config.PublicKey, req)
+
+	if err != nil {
+
+		return err
+	}
+
+	err = dal.Expire(req.Header.Get("Authorization"), tokenReq)
+
+	if err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+// Issues a newer token once the authentication ran smoothly
 func (self *TokenClerk) IssueToken(username, password string) ([]byte, error) {
 
 	user, err := dal.Authenticate(username, password)

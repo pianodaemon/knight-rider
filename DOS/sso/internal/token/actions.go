@@ -2,7 +2,7 @@ package token
 
 import (
 	"crypto/rsa"
-    "time"
+	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )

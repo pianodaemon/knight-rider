@@ -1,7 +1,7 @@
 GOCMD=go
 GOBUILD=$(GOCMD) build -ldflags="-w -s" 
 
-SSO_EXE=sso-api
+SSO_EXE=sso
 
 all: build
 

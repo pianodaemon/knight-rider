@@ -80,6 +80,8 @@ func Engage(logger *logrus.Logger) (merr error) {
 
 			mgmt.HandleFunc("/token-auth", co.SignOn(clerk.IssueToken)).Methods("POST")
 
+			mgmt.HandleFunc("/logout", co.SingOff(clerk.CeaseToken)).Methods("GET")
+
 			return router
 		}
 

@@ -27,14 +27,14 @@ func ExtractFromReq(publicKey *rsa.PublicKey, req *http.Request) (*jwt.Token, er
 }
 
 // Generates a token along with its claims by signing with private key
-func Generate(privateKey *rsa.PrivateKey, expirationDelta int, userUUID string) (string, error) {
+func Generate(privateKey *rsa.PrivateKey, expirationDelta int, userUID string) (string, error) {
 
 	token := jwt.New(jwt.SigningMethodRS512)
 
 	token.Claims = jwt.MapClaims{
 		"exp": time.Now().Add(time.Hour * time.Duration(expirationDelta)).Unix(),
 		"iat": time.Now().Unix(),
-		"sub": userUUID,
+		"sub": userUID,
 	}
 
 	tokenString, err := token.SignedString(privateKey)

@@ -4,7 +4,8 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-func ExpireToken(tokenStr string, token *jwt.Token) error {
+// Expires a token by placement of at cache (latter resouce usage)
+func Expire(tokenStr string, token *jwt.Token) error {
 
 	return nil
 }

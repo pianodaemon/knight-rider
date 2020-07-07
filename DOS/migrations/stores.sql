@@ -361,10 +361,10 @@ ALTER FUNCTION public.alter_observacion_ires_asf(_observacion_id integer, _obser
 
 
 --
--- Name: alter_observacion_pre_asenl(integer, integer, text, integer, double precision, date, integer, character varying, integer, character varying, date, date, integer, character varying, text, double precision, character varying, date, date, date, character varying, date, text, text, integer, character varying, date, integer, integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: alter_observacion_pre_asenl(integer, integer, text, integer, double precision, date, integer, integer, integer, character varying, date, date, integer, character varying, text, double precision, character varying, date, date, date, character varying, date, text, text, integer, character varying, date, integer, integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.alter_observacion_pre_asenl(_observacion_id integer, _direccion_id integer, _compartida_observacion text, _compartida_tipo_observacion_id integer, _compartida_monto double precision, _fecha_captura date, _programa_social_id integer, _tipo_auditoria character varying, _auditoria_id integer, _num_oficio_notif_obs_prelim character varying, _fecha_recibido date, _fecha_vencimiento_of date, _tipo_observacion_id integer, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg_oic character varying, _fecha_oficio_cytg_oic date, _fecha_recibido_dependencia date, _fecha_vencimiento_cytg date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_proceso_id integer, _proyeccion_solventacion_id integer, _resultado_final_pub_id integer) RETURNS record
+CREATE FUNCTION public.alter_observacion_pre_asenl(_observacion_id integer, _direccion_id integer, _compartida_observacion text, _compartida_tipo_observacion_id integer, _compartida_monto double precision, _fecha_captura date, _programa_social_id integer, _tipo_auditoria_id integer, _auditoria_id integer, _num_oficio_notif_obs_prelim character varying, _fecha_recibido date, _fecha_vencimiento_of date, _tipo_observacion_id integer, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg_oic character varying, _fecha_oficio_cytg_oic date, _fecha_recibido_dependencia date, _fecha_vencimiento_cytg date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_proceso_id integer, _proyeccion_solventacion_id integer, _resultado_final_pub_id integer) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
@@ -390,7 +390,7 @@ BEGIN
 				compartida_monto,
 				fecha_captura,
 				programa_social_id,
-				tipo_auditoria,
+				tipo_auditoria_id,
 				auditoria_id,
 				num_oficio_notif_obs_prelim,
 				fecha_recibido,
@@ -422,7 +422,7 @@ BEGIN
 				_compartida_monto,
 				_fecha_captura,
 				_programa_social_id,
-				_tipo_auditoria,
+				_tipo_auditoria_id,
 				_auditoria_id,
 				_num_oficio_notif_obs_prelim,
 				_fecha_recibido,
@@ -458,7 +458,7 @@ BEGIN
 				compartida_monto = _compartida_monto,
 				fecha_captura = _fecha_captura,
 				programa_social_id = _programa_social_id,
-				tipo_auditoria = _tipo_auditoria,
+				tipo_auditoria_id = _tipo_auditoria_id,
 				auditoria_id = _auditoria_id,
 				num_oficio_notif_obs_prelim = _num_oficio_notif_obs_prelim,
 				fecha_recibido = _fecha_recibido,
@@ -507,7 +507,7 @@ END;
 $$;
 
 
-ALTER FUNCTION public.alter_observacion_pre_asenl(_observacion_id integer, _direccion_id integer, _compartida_observacion text, _compartida_tipo_observacion_id integer, _compartida_monto double precision, _fecha_captura date, _programa_social_id integer, _tipo_auditoria character varying, _auditoria_id integer, _num_oficio_notif_obs_prelim character varying, _fecha_recibido date, _fecha_vencimiento_of date, _tipo_observacion_id integer, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg_oic character varying, _fecha_oficio_cytg_oic date, _fecha_recibido_dependencia date, _fecha_vencimiento_cytg date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_proceso_id integer, _proyeccion_solventacion_id integer, _resultado_final_pub_id integer) OWNER TO postgres;
+ALTER FUNCTION public.alter_observacion_pre_asenl(_observacion_id integer, _direccion_id integer, _compartida_observacion text, _compartida_tipo_observacion_id integer, _compartida_monto double precision, _fecha_captura date, _programa_social_id integer, _tipo_auditoria_id integer, _auditoria_id integer, _num_oficio_notif_obs_prelim character varying, _fecha_recibido date, _fecha_vencimiento_of date, _tipo_observacion_id integer, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg_oic character varying, _fecha_oficio_cytg_oic date, _fecha_recibido_dependencia date, _fecha_vencimiento_cytg date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_proceso_id integer, _proyeccion_solventacion_id integer, _resultado_final_pub_id integer) OWNER TO postgres;
 
 
 --
@@ -1118,21 +1118,21 @@ ALTER FUNCTION public.alter_observation_preliminar(_observation_id integer, _typ
 
 
 --
--- Name: alter_user(integer, character varying, character varying, integer, integer, integer[], boolean); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: alter_user(integer, character varying, character varying, integer, integer, boolean, character varying, character varying, integer[]); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.alter_user(_user_id integer, _username character varying, _passwd character varying, _orgchart_role_id integer, _division_id integer, _access_vector integer[], _disabled boolean) RETURNS record
+CREATE FUNCTION public.alter_user(_user_id integer, _username character varying, _passwd character varying, _orgchart_role_id integer, _division_id integer, _disabled boolean, _first_name character varying, _last_name character varying, _access_vector integer[]) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
 DECLARE
 
     current_moment timestamp with time zone = now();
-    coincidences integer := 0;
     latter_id integer := 0;
 
-    row_counter integer := 1;
+    idx integer := 0;
     av_len integer := array_length(_access_vector, 1);
+	row_counter integer := 0;
 
     -- dump of errors
     rmsg text;
@@ -1148,64 +1148,63 @@ BEGIN
                 passwd,
                 orgchart_role_id,
                 division_id,
-                inception_time,
-                touch_latter_time
+				disabled,
+				first_name,
+				last_name,
+				touch_latter_time,
+                inception_time
             ) VALUES (
                 _username,
                 _passwd,
                 _orgchart_role_id,
                 _division_id,
+				_disabled,
+				_first_name,
+				_last_name,
                 current_moment,
                 current_moment
             ) RETURNING id INTO latter_id;
 
-            FOR row_counter IN 1 .. av_len LOOP
+            FOR idx IN 1 .. av_len LOOP
 
                 INSERT INTO user_authority(
                     user_id,
                     authority_id
                 ) VALUES (
                     latter_id,
-                    _access_vector[row_counter]
+                    _access_vector[idx]
                 );
 
             END LOOP;
 
         WHEN _user_id > 0 THEN
 
-            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-            -- STARTS - Validates user id
-            --
-            -- JUSTIFICATION: Because UPDATE statement does not issue
-            -- any exception if nothing was updated.
-            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-            SELECT count(id)
-            FROM users INTO coincidences
-            WHERE not blocked AND id = _user_id;
-
-            IF not coincidences = 1 THEN
-                RAISE EXCEPTION 'user identifier % does not exist', _user_id;
-            END IF;
-            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-            -- ENDS - Validate user id
-            -- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-            UPDATE users
-            SET username  = _username, passwd = _passwd, disabled = _disabled,
-                orgchart_role_id = _orgchart_role_id, division_id = _division_id,
-                touch_latter_time = current_moment
+			UPDATE users
+			SET username = _username,
+				passwd = _passwd,
+				orgchart_role_id = _orgchart_role_id,
+				division_id = _division_id,
+				disabled = _disabled,
+				first_name = _first_name,
+				last_name = _last_name,
+				touch_latter_time = current_moment
             WHERE id = _user_id;
+			
+			GET DIAGNOSTICS row_counter = ROW_COUNT;
+			if row_counter <> 1 then
+				RAISE EXCEPTION 'user identifier % does not exist', _user_id;
+			end if;
 
             DELETE FROM user_authority where user_id = _user_id;
 
-            FOR row_counter IN 1 .. av_len LOOP
+            FOR idx IN 1 .. av_len LOOP
 
                 INSERT INTO user_authority(
                     user_id,
                     authority_id
                 ) VALUES (
                     _user_id,
-                    _access_vector[row_counter]
+                    _access_vector[idx]
                 );
 
             END LOOP;
@@ -1229,6 +1228,6 @@ END;
 $$;
 
 
-ALTER FUNCTION public.alter_user(_user_id integer, _username character varying, _passwd character varying, _orgchart_role_id integer, _division_id integer, _access_vector integer[], _disabled boolean) OWNER TO postgres;
+ALTER FUNCTION public.alter_user(_user_id integer, _username character varying, _passwd character varying, _orgchart_role_id integer, _division_id integer, _disabled boolean, _first_name character varying, _last_name character varying, _access_vector integer[]) OWNER TO postgres;
 
 

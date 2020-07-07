@@ -216,6 +216,18 @@ COMMENT ON TABLE public.auditoria_dependencias IS 'Dependencias para una auditor
 
 
 --
+-- Name: auditoria_tipos; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auditoria_tipos (
+    id integer NOT NULL,
+    title character varying NOT NULL
+);
+
+
+ALTER TABLE public.auditoria_tipos OWNER TO postgres;
+
+--
 -- Name: audits_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -497,40 +509,6 @@ CREATE TABLE public.geo_states (
 ALTER TABLE public.geo_states OWNER TO postgres;
 
 --
--- Name: user_authority; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.user_authority (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    authority_id integer NOT NULL
-);
-
-
-ALTER TABLE public.user_authority OWNER TO postgres;
-
---
--- Name: gral_user_authority_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.gral_user_authority_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.gral_user_authority_id_seq OWNER TO postgres;
-
---
--- Name: gral_user_authority_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.gral_user_authority_id_seq OWNED BY public.user_authority.id;
-
-
---
 -- Name: medios_notif_seguimiento_asf; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -624,7 +602,7 @@ CREATE TABLE public.observaciones_pre_asenl (
     compartida_monto double precision,
     fecha_captura date NOT NULL,
     programa_social_id integer,
-    tipo_auditoria character varying,
+    tipo_auditoria_id integer NOT NULL,
     auditoria_id integer NOT NULL,
     num_oficio_notif_obs_prelim character varying NOT NULL,
     fecha_recibido date NOT NULL,
@@ -1056,6 +1034,25 @@ COMMENT ON TABLE public.social_programs IS 'Alberga los programas sociales a los
 
 
 --
+-- Name: user_authority; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.user_authority (
+    user_id integer NOT NULL,
+    authority_id integer NOT NULL
+);
+
+
+ALTER TABLE public.user_authority OWNER TO postgres;
+
+--
+-- Name: TABLE user_authority; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.user_authority IS 'Relaciona usuarios del sistema con sus permisos';
+
+
+--
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1080,8 +1077,10 @@ CREATE TABLE public.users (
     orgchart_role_id integer NOT NULL,
     division_id integer NOT NULL,
     disabled boolean DEFAULT false NOT NULL,
-    touch_latter_time timestamp with time zone,
-    inception_time timestamp with time zone,
+    first_name character varying NOT NULL,
+    last_name character varying NOT NULL,
+    touch_latter_time timestamp with time zone NOT NULL,
+    inception_time timestamp with time zone NOT NULL,
     blocked boolean DEFAULT false NOT NULL
 );
 
@@ -1107,13 +1106,6 @@ ALTER TABLE ONLY public.amounts ALTER COLUMN id SET DEFAULT nextval('public.amou
 --
 
 ALTER TABLE ONLY public.observation_codes ALTER COLUMN id SET DEFAULT nextval('public.observation_codes_id_seq'::regclass);
-
-
---
--- Name: user_authority id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.user_authority ALTER COLUMN id SET DEFAULT nextval('public.gral_user_authority_id_seq'::regclass);
 
 
 --
@@ -1154,6 +1146,22 @@ ALTER TABLE ONLY public.auditoria_anios_cuenta_pub
 
 ALTER TABLE ONLY public.auditoria_dependencias
     ADD CONSTRAINT auditoria_dependencias_pkey PRIMARY KEY (auditoria_id, dependencia_id);
+
+
+--
+-- Name: auditoria_tipos auditoria_tipos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auditoria_tipos
+    ADD CONSTRAINT auditoria_tipos_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auditoria_tipos auditoria_tipos_title_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auditoria_tipos
+    ADD CONSTRAINT auditoria_tipos_title_unique UNIQUE (title);
 
 
 --
@@ -1609,7 +1617,7 @@ ALTER TABLE ONLY public.geo_states
 --
 
 ALTER TABLE ONLY public.user_authority
-    ADD CONSTRAINT user_authority_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT user_authority_pkey PRIMARY KEY (user_id, authority_id);
 
 
 --
@@ -1626,13 +1634,6 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_unique_username UNIQUE (username);
-
-
---
--- Name: fki_fk_; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX fki_fk_ ON public.user_authority USING btree (user_id);
 
 
 --
@@ -1737,6 +1738,14 @@ ALTER TABLE ONLY public.observaciones_ires_asf
 
 ALTER TABLE ONLY public.observaciones_sfp
     ADD CONSTRAINT observaciones_observation_types_fkey FOREIGN KEY (tipo_observacion_id) REFERENCES public.observation_types(id);
+
+
+--
+-- Name: observaciones_pre_asenl observaciones_pre_asenl_auditoria_tipos_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_pre_asenl
+    ADD CONSTRAINT observaciones_pre_asenl_auditoria_tipos_fkey FOREIGN KEY (tipo_auditoria_id) REFERENCES public.auditoria_tipos(id);
 
 
 --
@@ -1960,7 +1969,7 @@ ALTER TABLE ONLY public.user_authority
 --
 
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_divisions_fkey FOREIGN KEY (division_id) REFERENCES public.divisions(id) NOT VALID;
+    ADD CONSTRAINT users_divisions_fkey FOREIGN KEY (division_id) REFERENCES public.divisions(id);
 
 
 --
@@ -1968,7 +1977,7 @@ ALTER TABLE ONLY public.users
 --
 
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_orgchart_roles_fkey FOREIGN KEY (orgchart_role_id) REFERENCES public.orgchart_roles(id) NOT VALID;
+    ADD CONSTRAINT users_orgchart_roles_fkey FOREIGN KEY (orgchart_role_id) REFERENCES public.orgchart_roles(id);
 
 
 --

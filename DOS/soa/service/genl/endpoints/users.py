@@ -15,22 +15,26 @@ user_ns_captions = {
     'orgchart_role_id': 'Role id from organization chart',
     'division_id': 'Controller\'s office (Direccion de contraloria)',
     'disabled': 'Flag to put the user in state \'disabled\'',
+    'first_name': 'User\'s first name',
+    'last_name': 'User\'s last name',
 }
 
 ns = api.namespace("users", description="Available services for a user")
 
 usr_fields = {
     'id': fields.Integer(description=user_ns_captions['id']),
-    'username': fields.String(description=user_ns_captions['username'], required=True),
-    'passwd': fields.String(description=user_ns_captions['passwd'], required=True),
-    'orgchart_role_id': fields.Integer(description=user_ns_captions['orgchart_role_id'], required=True),
-    'division_id': fields.Integer(description=user_ns_captions['division_id'], required=True),
+    'username': fields.String(description=user_ns_captions['username']),
+    'passwd': fields.String(description=user_ns_captions['passwd']),
+    'orgchart_role_id': fields.Integer(description=user_ns_captions['orgchart_role_id']),
+    'division_id': fields.Integer(description=user_ns_captions['division_id']),
     'disabled': fields.Boolean(description=user_ns_captions['disabled']),
+    'first_name': fields.String(description=user_ns_captions['first_name']),
+    'last_name': fields.String(description=user_ns_captions['last_name']),
 }
 user = api.model('User', usr_fields)
 
 usr_fields_ext = dict(usr_fields)
-usr_fields_ext['access_vector'] = fields.List(fields.Integer(description='Authority id'), required=True)
+usr_fields_ext['access_vector'] = fields.List(fields.Integer(description='Authority id'))
 user_ext = api.model('Extended User', usr_fields_ext)
 
 pair = api.model('Id-Title pair', {

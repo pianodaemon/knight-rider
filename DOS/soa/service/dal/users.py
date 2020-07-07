@@ -1,23 +1,37 @@
 import math
+import hashlib
+import re
 
 from dal.helper import run_stored_procedure, exec_steady
 from dal.entity import page_entities, count_entities, fetch_entity, delete_entity
 from misc.helperpg import EmptySetError
 
 def _alter_user(**kwargs):
-    """Calls the db function in charge of creating and editing a user"""
+    """Calls the db function in charge of creating and editing a user"""    
+    
+    # Hashing the password
+    passwd = hashlib.sha256(kwargs["passwd"].encode("utf-8")).hexdigest()
+
     sql = """SELECT * FROM alter_user(
         {}::integer,
-        '{}'::text,
-        '{}'::text,
+        '{}'::character varying,
+        '{}'::character varying,
         {}::integer,
         {}::integer,
-        '{}'::integer[],
-        {}::boolean)
+        {}::boolean,
+        '{}'::character varying,
+        '{}'::character varying,
+        '{}'::integer[])
         AS result( rc integer, msg text )""".format(
-            kwargs["id"], kwargs["username"], kwargs["passwd"],
-            kwargs["orgchart_role_id"], kwargs["division_id"], str(set(kwargs["access_vector"])),
-            kwargs["disabled"]
+            kwargs["id"],
+            kwargs["username"],
+            passwd,
+            kwargs["orgchart_role_id"],
+            kwargs["division_id"],
+            kwargs["disabled"],
+            kwargs["first_name"],
+            kwargs["last_name"],
+            str(set(kwargs["access_vector"])),
         )
 
     rcode, rmsg = run_stored_procedure(sql)
@@ -36,7 +50,7 @@ def _alter_user(**kwargs):
 def create(**kwargs):
     ''' Creates a user entity '''
     kwargs['id'] = 0
-    kwargs['disabled'] = False
+    validate_input(**kwargs)
     return _alter_user(**kwargs)
 
 
@@ -49,6 +63,7 @@ def read(id):
 def update(id, **kwargs):
     ''' Updates a user entity '''
     kwargs['id'] = id
+    validate_input(**kwargs)
     return _alter_user(**kwargs)
 
 
@@ -133,7 +148,14 @@ def get_catalogs(table_name_list):
 
 def add_user_permissions(ent):
     attributes = set([
-        'id', 'username', 'passwd', 'orgchart_role_id', 'division_id', 'disabled'
+        'id',
+        'username',
+        'passwd',
+        'orgchart_role_id',
+        'division_id',
+        'disabled',
+        'first_name',
+        'last_name',
     ])
     mod_ent = {attr: ent[attr] for attr in attributes}
     mod_ent['access_vector'] = []
@@ -154,3 +176,12 @@ def add_user_permissions(ent):
         mod_ent['access_vector'].append(row[0])
 
     return mod_ent
+
+
+def validate_input(**kwargs):
+    pattern = r'[a-z0-9_\\-]{4,}'
+    
+    if re.fullmatch(pattern, kwargs["username"]) is None:
+        raise Exception(
+            """El username únicamente podrá contener los siguientes caracteres: letras minúsculas, dígitos, '_', '-', '\\', y será como mínimo de 4 caracteres."""
+        )

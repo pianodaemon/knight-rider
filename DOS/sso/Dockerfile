@@ -15,6 +15,7 @@ COPY internal internal
 
 COPY cmd cmd
 
+RUN apk add make
 RUN make clean build
 
 # Final image

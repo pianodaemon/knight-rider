@@ -1,12 +1,12 @@
 package storage
 
 import (
+	"crypto/sha256"
 	"database/sql"
 	"fmt"
 
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type (
@@ -24,6 +24,10 @@ type (
 		Password string `default:"postgres"`
 		Port     int    `default:"5432"`
 	}
+
+	LoginError struct {
+		What string
+	}
 )
 
 var pgSettings PgSqlSettings
@@ -31,6 +35,10 @@ var pgSettings PgSqlSettings
 func init() {
 
 	envconfig.Process("postgres", &pgSettings)
+}
+
+func (e *LoginError) Error() string {
+	return e.What
 }
 
 func shapeConnStr() string {
@@ -60,27 +68,29 @@ func Authenticate(username, password string) (*User, error) {
 	defer db.Close()
 
 	{
-		var uid, passwordHash, username string
+		var uid, passwordHash, username_ string
 		var disabled bool
 
-		err := db.QueryRow("SELECT id::string as uid, username, passwd, disabled FROM users WHERE username = $1",
-			username).Scan(&uid, &username, &passwordHash, &disabled)
+		err := db.QueryRow("SELECT id::character varying as uid, username, passwd, disabled FROM users WHERE username = $1",
+			username).Scan(&uid, &username_, &passwordHash, &disabled)
 
 		if err != nil {
 
 			return nil, err
 		}
 
-		err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
+		h := sha256.New()
+		h.Write([]byte(password))
+		hashed := fmt.Sprintf("%x", h.Sum(nil))
 
-		if err != nil {
+		if passwordHash != hashed {
 
-			return nil, err
+			return nil, &LoginError{"Verify your credentials"}
 		}
 
 		usr = &User{
 			UID:       uid,
-			Username:  username,
+			Username:  username_,
 			IsActive:  !disabled,
 			CreatedAt: 12123123,
 		}

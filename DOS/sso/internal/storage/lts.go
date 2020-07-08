@@ -24,10 +24,6 @@ type (
 		Password string `default:"postgres"`
 		Port     int    `default:"5432"`
 	}
-
-	LoginError struct {
-		What string
-	}
 )
 
 var pgSettings PgSqlSettings
@@ -35,10 +31,6 @@ var pgSettings PgSqlSettings
 func init() {
 
 	envconfig.Process("postgres", &pgSettings)
-}
-
-func (e *LoginError) Error() string {
-	return e.What
 }
 
 func shapeConnStr() string {
@@ -85,7 +77,7 @@ func Authenticate(username, password string) (*User, error) {
 
 		if passwordHash != hashed {
 
-			return nil, &LoginError{"Verify your credentials"}
+			return nil, fmt.Errorf("Verify your credentials")
 		}
 
 		usr = &User{

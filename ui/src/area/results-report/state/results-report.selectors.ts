@@ -102,13 +102,20 @@ export const pagingPreObsSelector = createSelector(
 
 export const preObservationsSelector = createSelector(
   sliceSelector,
-  (slice: any) => {
+  catalogSelector,
+  (slice: any, catalog: any) => {
     const { observations } = slice.observacion_pre;
     return observations
       ? observations.map((item: any) => {
+          const audit = catalog.audits.find(
+            (audit_item: any) => audit_item.id === item.auditoria_id
+          );
           return {
             id: item.id,
-            observation: `Observación: ${item.id} - Auditoría ${item.auditoria_id}`,
+            observation: `Observación: ${item.id} - Auditoría ${item.auditoria_id} : ${audit.title}`,
+            direccion_id: item.direccion_id,
+            programa_social_id: item.programa_social_id,
+            auditoria_id: item.auditoria_id,
           };
         })
       : [];

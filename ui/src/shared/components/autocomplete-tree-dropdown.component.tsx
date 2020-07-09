@@ -132,7 +132,7 @@ export function AutoCompleteTreeDropdown(props: Props) {
       {params.group}
     </ListSubheader>,
     <Collapse in={lists[params.key]} timeout="auto" unmountOnExit>
-      {params.children}{console.log(params)}
+      {params.children}
     </Collapse>,
   ];
   return (

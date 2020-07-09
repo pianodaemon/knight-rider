@@ -8,6 +8,9 @@ import {
   catalogSelector,
   reportSelector,
   preObservationsSelector,
+  isLoadingPreSelector,
+  canLoadMoreSelector,
+  auditIdSelector,
 } from '../state/results-report.selectors';
 
 const mapDispatchToProps = {
@@ -22,6 +25,9 @@ function mapStateToProps(state: any) {
     catalog: catalogSelector(state),
     report: reportSelector(state),
     observations: preObservationsSelector(state),
+    isLoadingPre: isLoadingPreSelector(state),
+    canLoadMore: canLoadMoreSelector(state),
+    auditId: auditIdSelector(state),
   };
 }
 

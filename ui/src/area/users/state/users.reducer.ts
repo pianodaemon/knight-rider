@@ -8,6 +8,8 @@ export interface User {
   division_id: number;
   disabled: boolean;
   access_vector: Array<any>;
+  first_name: string;
+  last_name: string;
 }
 
 interface UserSlice {

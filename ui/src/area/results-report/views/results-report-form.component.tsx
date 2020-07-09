@@ -463,11 +463,14 @@ export const ResultsReportForm = (props: Props) => {
                         }}
                         options={observations || []}
                         value={
-                          observations &&
-                          values.observacion_pre_id &&
-                          Array.isArray(values.observacion_pre_id) 
-                            ? [...values.observacion_pre_id]
-                            : values.observacion_pre_id ? [values.observacion_pre_id] : []
+                          (() => {
+                            const observacion_pre_id = values.observacion_pre_id ? [values.observacion_pre_id] : [];
+                            return observations &&
+                            values.observacion_pre_id &&
+                            Array.isArray(values.observacion_pre_id) 
+                              ? [...values.observacion_pre_id]
+                              : observacion_pre_id
+                          })()
                         }
                         onSearch={(value: any) => { 
                           const str = value.match(/^\b(id:)([0-9]+)\b$/i);

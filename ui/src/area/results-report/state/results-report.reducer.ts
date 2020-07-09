@@ -149,13 +149,13 @@ const initialState: ResultsReportSlice = {
       pages: 0,
       page: 1,
       per_page: 5,
-      order: 'desc',
+      order: 'asc',
       order_by: 'id',
     },
     auditoria_id: 0, // Query param
     error: null,
     loading: false,
-    observations: null,
+    observations: [],
   },
 };
 

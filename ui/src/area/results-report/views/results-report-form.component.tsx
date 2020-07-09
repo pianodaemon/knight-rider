@@ -366,8 +366,9 @@ export const ResultsReportForm = (props: Props) => {
                         Dirección
                       </InputLabel>
                       <Select
-                        labelId="direccion_id"
+                        disabled
                         id="direccion_id-select"
+                        labelId="direccion_id"
                         value={catalog && catalog.divisions ? values.direccion_id || '' : ''}
                         onChange={handleChange('direccion_id')}
                       >
@@ -398,6 +399,7 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <AutoCompleteDropdown
+                        disabled
                         fieldLabel="title"
                         fieldValue="id"
                         label="Programa"
@@ -434,11 +436,12 @@ export const ResultsReportForm = (props: Props) => {
                           return setFieldValue('auditoria_id', value);
                         }}
                         options={
-                        catalog && catalog.audits
-                          ? catalog.audits
-                          : []
-                      }
+                          catalog && catalog.audits
+                            ? catalog.audits
+                            : []
+                        }
                         value={catalog ? values.auditoria_id || '' : ''}
+                        disabled
                       />
                       {errors.auditoria_id &&
                         touched.auditoria_id && (
@@ -459,6 +462,16 @@ export const ResultsReportForm = (props: Props) => {
                         label="Observación Preliminar"
                         name="observacion_pre_id"
                         onChange={(value: any) => {
+                          if (Array.isArray(value) && value.length) {
+                            const {
+                              auditoria_id,
+                              direccion_id,
+                              programa_social_id
+                            } = (observations && observations.find((item: any) => item.id === value[0])) || {};
+                            setFieldValue('auditoria_id', auditoria_id);
+                            setFieldValue('direccion_id', direccion_id);
+                            setFieldValue('programa_social_id', programa_social_id);
+                          }
                           return setFieldValue('observacion_pre_id', value);
                         }}
                         options={observations || []}
@@ -504,7 +517,6 @@ export const ResultsReportForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                 
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField

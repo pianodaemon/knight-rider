@@ -51,6 +51,7 @@ export function AutoCompleteLoadMoreDropdown(props: Props) {
   const selected =
     value && Array.isArray(value) ? itemsSelected || [] : itemSelected || null;
   const [search, setSearch] = useState<any>('');
+  console.log('value:', value);
   return (
     <Autocomplete
       id={`grouped-${name}`}

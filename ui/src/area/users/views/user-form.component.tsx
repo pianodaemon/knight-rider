@@ -126,6 +126,8 @@ export const UserForm = (props: Props) => {
     division_id: '',
     disabled: false,
     access_vector: [],
+    first_name: '',
+    last_name: '',
   };
   useEffect(() => {
     if (id) {
@@ -157,6 +159,14 @@ export const UserForm = (props: Props) => {
 
           if (!values.access_vector.length) {
             errors.access_vector = 'Elija al menos un rol de usuario';
+          }
+
+          if (!values.first_name) {
+            errors.first_name = 'Required';
+          }
+
+          if (!values.last_name) {
+            errors.last_name = 'Required';
           }
 
           return errors;
@@ -209,7 +219,6 @@ export const UserForm = (props: Props) => {
                       )}
                     </FormControl>
                   </Grid>
-
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -228,7 +237,42 @@ export const UserForm = (props: Props) => {
                       )}
                     </FormControl>
                   </Grid>
-
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        id="first_name"
+                        label="Nombre"
+                        value={values.first_name ? values.first_name || '' : ''}
+                        onChange={handleChange('first_name')}
+                      />
+                      {errors.first_name && touched.first_name && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese un Nombre
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        id="last_name"
+                        label="Apellido"
+                        value={values.last_name ? values.last_name || '' : ''}
+                        onChange={handleChange('last_name')}
+                      />
+                      {errors.last_name && touched.last_name && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese un Apellido
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel>Puesto</InputLabel>
@@ -258,7 +302,6 @@ export const UserForm = (props: Props) => {
                       )}
                     </FormControl>
                   </Grid>
-
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel>División</InputLabel>
@@ -288,7 +331,6 @@ export const UserForm = (props: Props) => {
                       )}
                     </FormControl>
                   </Grid>
-
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <FormControlLabel

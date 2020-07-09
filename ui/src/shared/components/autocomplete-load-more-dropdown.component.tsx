@@ -2,13 +2,15 @@
 import React, { useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 type Props = {
   disabled?: boolean,
   fieldLabel: string,
   fieldValue: string,
-  groupField?: string,
+  // groupField?: string,
   label: string,
+  loading: boolean,
   name: string,
   onChange: any,
   onSearch: any,
@@ -21,23 +23,16 @@ export function AutoCompleteLoadMoreDropdown(props: Props) {
     disabled,
     fieldLabel,
     fieldValue,
-    groupField,
+    // groupField,
     label,
+    loading,
     name,
     onChange,
     onSearch,
     options,
     value,
   } = props;
-  const opts = groupField
-    ? options
-    : options.map((option: any) => {
-        const firstLetter = option[fieldLabel][0].toUpperCase();
-        return {
-          firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-          ...option,
-        };
-      });
+  const opts = options;
   const itemSelected =
     opts &&
     opts.find((item: any) => item[fieldValue].toString() === value.toString())
@@ -56,54 +51,60 @@ export function AutoCompleteLoadMoreDropdown(props: Props) {
   const selected =
     value && Array.isArray(value) ? itemsSelected || [] : itemSelected || null;
   const [search, setSearch] = useState<any>('');
+  console.log('value:', value);
   return (
     <Autocomplete
       id={`grouped-${name}`}
+      /*
       groupBy={(option: any) => {
         return groupField ? option[groupField] : option.firstLetter;
       }}
+      */
       noOptionsText="Sin opciones"
-      getOptionLabel={(option: any) => option[fieldLabel] || ''}
+      getOptionLabel={(option: any) => (option && option[fieldLabel]) || ''}
       getOptionSelected={(option: any, val: any) => {
+        if (val === undefined) {
+          return false;
+        }
         return val[fieldValue] === option[fieldValue];
       }}
       onChange={(event: any, newValue: any) => {
+        if (newValue && newValue.length === 2) {
+          newValue.shift();
+        }
         onChange(
           Array.isArray(value)
-            ? (newValue && newValue.map((item: any) => item[fieldValue])) || ''
+            ? (newValue && newValue.map((item: any) => item[fieldValue])) ||
+                undefined
             : (newValue && newValue[fieldValue]) || ''
         );
       }}
-      options={opts.sort((a: any, b: any) => {
-        return groupField
-          ? -b[groupField].localeCompare(a[groupField])
-          : -b.firstLetter.localeCompare(a.firstLetter);
-      })}
+      options={opts}
       renderInput={(params) => {
-        return <TextField {...params} label={label} />;
+        return (
+          <TextField
+            {...params}
+            label={label}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {loading ? (
+                    <CircularProgress color="inherit" size={20} />
+                  ) : null}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+              placeholder: 'Buscar Preliminar',
+            }}
+          />
+        );
       }}
       value={selected}
       disabled={disabled}
-      /*
-      // @todo Load More Options feature
-      ListboxProps={{
-        onScroll: (event: any) => {
-          console.log(
-            event.target.scrollTop,
-            event.target.scrollHeight,
-            event.target.clientHeight,
-            event.target.scrollTop+event.target.clientHeight === event.target.scrollHeight
-          );
-          if (
-            event.target.scrollTop + event.target.clientHeight ===
-            event.target.scrollHeight
-          ) {
-            alert('lol');
-          }
-        }
-      }}
-      debug
-      */
+      multiple
+      loading={loading}
+      loadingText="Cargando..."
       onInputChange={(event, val: string, reason: string) => {
         if (reason === 'input') {
           setSearch(val);
@@ -111,27 +112,22 @@ export function AutoCompleteLoadMoreDropdown(props: Props) {
         }
       }}
       inputValue={search}
-      clearOnBlur
-      /*
-      // @todo Load More Options feature
+      // clearOnBlur
       ListboxProps={{
+        style: {
+          height: '100px',
+          maxHeight: '150px',
+          overflow: 'auto',
+        },
         onScroll: (event: any) => {
-          console.log(
-            event.target.scrollTop,
-            event.target.scrollHeight,
-            event.target.clientHeight,
-            event.target.scrollTop+event.target.clientHeight === event.target.scrollHeight
-          );
           if (
             event.target.scrollTop + event.target.clientHeight ===
             event.target.scrollHeight
           ) {
-            alert('lol');
+            onSearch(search);
           }
-        }
+        },
       }}
-      debug
-      */
       filterOptions={(ops) => ops}
     />
   );

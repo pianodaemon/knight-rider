@@ -3,7 +3,7 @@ import { call, put, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { readResultsReport } from '../../service/results-report.service';
 import { resultsReportReducer } from '../results-report.reducer';
-// import { loadPreObservationsAction } from './load-pre-observations.usecase';
+import { loadPreObservationAction } from './load-pre-observation.usecase';
 
 const postfix = '/app';
 const READ_RESULTS_REPORT = `READ_RESULTS_REPORT${postfix}`;
@@ -25,7 +25,7 @@ function* readResultsReportWorker(action: any): Generator<any, any, any> {
     const { id } = action.payload;
     const result = yield call(readResultsReport, id);
     yield put(readResultsReportSuccessAction(result));
-    // yield put(loadPreObservationsAction({ auditoria_id: result.auditoria_id }));
+    yield put(loadPreObservationAction({ id: result.observacion_pre_id }));
   } catch (e) {
     const { history } = action.payload;
     yield put(readResultsReportErrorAction(e));

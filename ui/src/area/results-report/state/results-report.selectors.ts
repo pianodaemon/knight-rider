@@ -90,6 +90,11 @@ export const pagingSelector = createSelector(
   (slice: any) => slice.paging
 );
 
+export const observationPreAuditIdSelector = createSelector(
+  sliceSelector,
+  (slice: any) => slice.observacion_pre.auditoria_id
+);
+
 export const pagingPreObsSelector = createSelector(
   sliceSelector,
   (slice: any) => slice.observacion_pre.paging
@@ -109,3 +114,21 @@ export const preObservationsSelector = createSelector(
       : [];
   }
 );
+
+export const isLoadingPreSelector = createSelector(
+  sliceSelector,
+  (slice: any) => slice.observacion_pre.loading
+);
+
+export const canLoadMoreSelector = createSelector(
+  sliceSelector,
+  (slice: any) => {
+    const { page, per_page, pages, count } = slice.observacion_pre.paging;
+    return !(count && page === pages && per_page * pages >= count);
+  }
+);
+
+export const auditIdSelector = createSelector(sliceSelector, (slice: any) => {
+  const { auditoria_id } = slice.observacion_pre;
+  return auditoria_id;
+});

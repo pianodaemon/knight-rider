@@ -114,6 +114,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASENL (P
     'estatus_pre_asenl': fields.List(fields.Nested(pair)),
     'proyecciones_asenl': fields.List(fields.Nested(pair)),
     'auditoria_tipos': fields.List(fields.Nested(pair)),
+    'observation_types': fields.List(fields.Nested(pair)),
 })
 
 @ns.route('/')
@@ -249,6 +250,7 @@ class Catalog(Resource):
                 'estatus_pre_asenl',
                 'proyecciones_asenl',
                 'auditoria_tipos',
+                'observation_types',
             ])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))

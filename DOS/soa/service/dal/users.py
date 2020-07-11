@@ -150,7 +150,6 @@ def add_user_permissions(ent):
     attributes = set([
         'id',
         'username',
-        'passwd',
         'orgchart_role_id',
         'division_id',
         'disabled',

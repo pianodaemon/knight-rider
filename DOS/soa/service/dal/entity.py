@@ -76,7 +76,10 @@ def page_entities(table, offset, limit, order_by, order, search_params):
 
     entities = []
     for row in rows:
-        entities.append(dict(row))
+        r = dict(row)
+        if table == 'users':
+            del r['passwd']
+        entities.append(r)
 
     return entities
 
@@ -86,7 +89,7 @@ def _setup_search_criteria(table, search_params):
     for field, value in search_params.items():
         # For text fields... a different condition syntax is needed
         # TODO: Figure out a better method to identify fields of text type
-        if field == 'title' or field == 'observacion':
+        if field == 'title' or field[:11] == 'observacion':
             criteria.append("{}.{} ILIKE '%{}%'".format(table, field, value))
         else:
             criteria.append("{}.{} = {}".format(table, field, value))

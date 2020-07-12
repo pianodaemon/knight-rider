@@ -190,6 +190,19 @@ export function AppBarComponent() {
         },
       ],
     },
+    observationAsenl: {
+      url: '/observation-asenl/list',
+      text: 'Observaciones Preliminares ASENL',
+      icon: <ImageSearchIcon />,
+      open: true,
+      childrenList: [
+        {
+          url: '/observation-asenl/create',
+          text: 'Crear',
+          icon: <NoteAddIcon />,
+        },
+      ],
+    },
     user: {
       url: '/user/list',
       text: 'Usuarios',

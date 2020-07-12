@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { History } from 'history';
 import { Router, Switch, Route } from 'react-router-dom';
 import { AuditTableContainer } from '../../auditories/views/audit-table.container';
-import { TableContainer } from '../../auditories/views/table.container';
+// import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
-import { FormContainer } from '../../auditories/views/form.container';
+// import { FormContainer } from '../../auditories/views/form.container';
 import { ObservationsSFPFormContainer } from '../../observations-sfp/views/observation-sfp-form.container';
 import { ObservationsASFFormContainer } from '../../observations-asf/views/observation-asf-form.container';
 import { AuditContainer } from '../../auditories/views/audit-form.container';
@@ -12,6 +12,8 @@ import { UsersFormContainer } from '../../users/views/users-form.container';
 import { ResultsReportFormContainer as RForm } from '../../auditories/views/results-report-form.container';
 import { NotFound } from './not-found.component';
 import { ObservationSFPTableContainer } from '../../observations-sfp/views/observation-sfp-table.container';
+import { ObservationASENLTableContainer } from '../../observations-asenl/views/observation-asenl-table.container';
+import { ObservationASENLFormContainer } from '../../observations-asenl/views/observation-asenl-form.container';
 import { ObservationASFTableContainer } from '../../observations-asf/views/observation-asf-table.container';
 import { ResultsReportTableContainer } from '../../results-report/views/results-report-table.container';
 import { ResultsReportFormContainer } from '../../results-report/views/results-report-form.container';
@@ -24,6 +26,7 @@ type Props = {
   loadCatalogResultsReportAction: Function,
   loadAuditCatalogAction: Function,
   loadUsersCatalogAction: Function,
+  loadCatalogObsASENLAction: Function,
 };
 
 export const AppRoutes = (props: Props) => {
@@ -34,6 +37,7 @@ export const AppRoutes = (props: Props) => {
     props.loadAuditCatalogAction();
     props.loadUsersCatalogAction();
     props.loadCatalogResultsReportAction();
+    props.loadCatalogObsASENLAction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -46,10 +50,10 @@ export const AppRoutes = (props: Props) => {
           <AuditTableContainer />
         </Route>
         <Route exact path={['/', '/observation/list']}>
-          <TableContainer />
+          <AuditTableContainer />
         </Route>
         <Route exact path={['/observation/create', '/observation/:id/edit']}>
-          <FormContainer />
+          <NotFound />
         </Route>
         <Route exact path={['/', '/observation-asf/list']}>
           <ObservationASFTableContainer />
@@ -68,6 +72,15 @@ export const AppRoutes = (props: Props) => {
           path={['/observation-sfp/create', '/observation-sfp/:id/:action']}
         >
           <ObservationsSFPFormContainer />
+        </Route>
+        <Route exact path={['/', '/observation-asenl/list']}>
+          <ObservationASENLTableContainer />
+        </Route>
+        <Route
+          exact
+          path={['/observation-asenl/create', '/observation-asenl/:id/:action']}
+        >
+          <ObservationASENLFormContainer />
         </Route>
         <Route
           exact

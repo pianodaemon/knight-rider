@@ -279,7 +279,7 @@ export const ResultsReportForm = (props: Props) => {
           if (!fields.tiene_pras) {
             fields.pras = PRAS;
           }
-          fields.observacion_pre_id = Array.isArray(fields.observacion_pre_id) ? fields.observacion_pre_id.pop() : fields.observacion_pre_id;
+          fields.observacion_pre_id = Array.isArray(fields.observacion_pre_id) ? fields.observacion_pre_id[0] : fields.observacion_pre_id;
           if (id) {
             delete fields.id;
             updateResultsReportAction({ id, fields, history, releaseForm });

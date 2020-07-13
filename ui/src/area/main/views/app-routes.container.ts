@@ -4,6 +4,7 @@ import { loadCatalogAction as loadCatalogObsSFPAction } from 'src/area/observati
 import { loadCatalogAction as loadCatalogObsASFAction } from 'src/area/observations-asf/state/usecases/load-catalog.usecase';
 import { loadCatalogAction as loadCatalogObsASENLAction } from 'src/area/observations-asenl/state/usecases/load-catalog.usecase';
 import { loadCatalogAction as loadCatalogResultsReportAction } from 'src/area/results-report/state/usecases/load-catalog.usecase';
+import { loadCatalogResultsReportASENLAction } from 'src/area/results-report-asenl/state/usecases/load-catalog.usecase';
 import { loadAuditCatalogAction } from 'src/area/auditories/state/usecases/load-audit-catalog.usecase';
 import { loadUsersCatalogAction } from 'src/area/users/state/usecases/load-users-catalog.usecase';
 
@@ -17,6 +18,7 @@ const mapDispatchToProps = {
   loadCatalogResultsReportAction,
   loadUsersCatalogAction,
   loadCatalogObsASENLAction,
+  loadCatalogResultsReportASENLAction,
 };
 
 export const AppRoutesContainer = connect(null, mapDispatchToProps)(AppRoutes);

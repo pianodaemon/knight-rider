@@ -203,6 +203,19 @@ export function AppBarComponent() {
         },
       ],
     },
+    resultsReportAsenl: {
+      url: '/results-report-asenl/list',
+      text: 'Observaciones de la ASENL (Informe de Resultados)',
+      icon: <ImageSearchIcon />,
+      open: true,
+      childrenList: [
+        {
+          url: '/results-report-asenl/create',
+          text: 'Crear',
+          icon: <NoteAddIcon />,
+        },
+      ],
+    },
     user: {
       url: '/user/list',
       text: 'Usuarios',

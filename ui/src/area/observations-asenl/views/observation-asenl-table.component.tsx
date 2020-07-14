@@ -71,7 +71,7 @@ export const ObservationASENLTable = (props: Props) => {
       sorting,
       customSort,
     },
-    { title: 'Programa', field: 'programa_social_id_title', sorting },
+    { title: 'Dependencia(s)', field: 'dependencias', sorting },
     {
       title: 'Observación',
       field: 'observacion',

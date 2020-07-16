@@ -44,7 +44,7 @@ func NewTokenClerk(logger *logrus.Logger,
 // Ceases a token that has been embedded within the request
 func (self *TokenClerk) CeaseToken(req *http.Request) error {
 
-	tokenReq, err := ton.ExtractFromReq(self.config.PublicKey, req)
+	tokenReq, err := ton.ExtractFromReq(self.config.PublicKey, req, false)
 
 	if err != nil {
 

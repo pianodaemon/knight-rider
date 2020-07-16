@@ -59,25 +59,46 @@ export const observationsCatalogSelector = createSelector(
               ) || {}
             ).years
           : '';
+      const dependency_ids =
+        catalog &&
+        catalog.audits &&
+        observation.auditoria_id &&
+        catalog.audits.find((item: any) => item.id === observation.auditoria_id)
+          ? (
+              catalog.audits.find(
+                (item: any) => item.id === observation.auditoria_id
+              ) || {}
+            ).dependency_ids
+          : '';
+      const dependencias =
+        catalog &&
+        catalog.dependencies &&
+        dependency_ids &&
+        dependency_ids.length &&
+        dependency_ids
+          .map((dependency: any) =>
+            catalog?.dependencies?.find((item: any) => item.id === dependency)
+              ? (
+                  catalog.dependencies.find(
+                    (item: any) => item.id === dependency
+                  ) || {}
+                ).title
+              : ''
+          )
+          .join(', ');
       let direccion_id_title: any = catalog.divisions.find(
         (item: any) => item.id === observation.direccion_id
       );
       let auditoria_id_title: any = catalog.audits.find(
         (item: any) => item.id === observation.auditoria_id
       );
-      let programa_social_id_title: any = catalog.social_programs.find(
-        (item: any) => item.id === observation.programa_social_id
-      );
       direccion_id_title = direccion_id_title ? direccion_id_title.title : null;
       auditoria_id_title = auditoria_id_title ? auditoria_id_title.title : null;
-      programa_social_id_title = programa_social_id_title
-        ? programa_social_id_title.title
-        : null;
       return {
         ...observation,
         direccion_id_title,
         auditoria_id_title,
-        programa_social_id_title,
+        dependencias,
         years,
       };
     })

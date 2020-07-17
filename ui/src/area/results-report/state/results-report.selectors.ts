@@ -45,6 +45,17 @@ export const reportsCatalogSelector = createSelector(
     slice.reports &&
     Array.isArray(slice.reports) &&
     slice.reports.map((report: ResultsReport) => {
+      const anio_auditoria =
+        catalog &&
+        catalog.audits &&
+        report.auditoria_id &&
+        catalog.audits.find((item: any) => item.id === report.auditoria_id)
+          ? (
+              catalog.audits.find(
+                (item: any) => item.id === report.auditoria_id
+              ) || {}
+            ).years
+          : '';
       const dependencies =
         catalog &&
         catalog.audits &&
@@ -77,6 +88,7 @@ export const reportsCatalogSelector = createSelector(
         : null;
       return {
         ...report,
+        anio_auditoria,
         direccion_id_title,
         auditoria_id_title,
         programa_social_id_title,

@@ -15,6 +15,8 @@ import Typography from '@material-ui/core/Typography';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import IconButton from '@material-ui/core/IconButton';
+import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -25,6 +27,7 @@ import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picke
 import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdown.component';
 import { AutoCompleteLoadMoreDropdown } from 'src/shared/components/autocomplete-load-more-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
+import { SingleTextResponsiveModal } from 'src/shared/components/modal/single-text-responsive-modal.component';
 import { Catalog, /* ObservationSFP */ } from '../state/results-report.reducer';
 
 type Props = {
@@ -61,6 +64,20 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down('sm')]: {
         minWidth: '100%',
         display: 'flex',
+      },
+    },
+    formControlFull: {
+      margin: theme.spacing(1),
+      minWidth: 350,
+      [theme.breakpoints.up('xs')]: {
+        minWidth: '100%',
+        display: 'flex',
+      },
+    },
+    form: {
+      '& input:not([type=checkbox]):disabled, & textarea:disabled, & div[aria-disabled="true"]': {
+        color: theme.palette.text.primary,
+        opacity: 1
       },
     },
     fieldset: {
@@ -144,7 +161,7 @@ export const ResultsReportForm = (props: Props) => {
   } = props;
   const classes = useStyles();
   const history = useHistory();
-  const { id } = useParams();
+  const { action, id } = useParams<any>();
   const initialValues = {
     id: '',
     observacion_pre_id: '',
@@ -263,6 +280,12 @@ export const ResultsReportForm = (props: Props) => {
     */
     return errors;
   };
+  const disabledModeOn = action === 'view';
+  const [modalField, setModalField] = React.useState({
+    field: '',
+    text: '',
+    open: false,
+  });
   return (
     <Paper className={classes.paper}>
       <Formik
@@ -330,7 +353,7 @@ export const ResultsReportForm = (props: Props) => {
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Observación de Resultados ASF</h1>
               <hr className={classes.hrDivider} />
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} className={classes.form}>
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
@@ -457,6 +480,7 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <AutoCompleteLoadMoreDropdown
+                        disabled={disabledModeOn}
                         fieldLabel="observation"
                         fieldValue="id"
                         label="Observación Preliminar"
@@ -520,6 +544,7 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_of"
                         label="# de Oficio del OF (Resultados)"
                         value={values.num_oficio_of || ''}
@@ -539,6 +564,7 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de recibido"
                         name="fecha_recibido"
@@ -558,6 +584,7 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de vencimiento (Org Fisc)"
                         name="fecha_vencimiento"
@@ -574,13 +601,30 @@ export const ResultsReportForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12} sm={12} md={6}>
+                    <FormControl className={classes.formControlFull}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="observacion_ir"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <IconButton
+                                aria-label="toggle visibility"
+                                onClick={() => setModalField({...modalField, open: true, field: "Texto de la observación", text: values.observacion_ir })}
+                                onMouseDown={() => {}}
+                              >
+                                <ZoomInIcon />
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
                         label="Texto de la observación"
-                        value={values.observacion_ir || ''}
+                        multiline
                         onChange={handleChange('observacion_ir')}
+                        rows={5}
+                        rowsMax={5}
+                        value={values.observacion_ir || ''}
                       />
                       {errors.observacion_ir &&
                         touched.observacion_ir && (
@@ -599,10 +643,11 @@ export const ResultsReportForm = (props: Props) => {
                         Tipo de observación
                       </InputLabel>
                       <Select
-                        labelId="tipo_observacion_id"
+                        disabled={disabledModeOn}
                         id="tipo_observacion_id-select"
-                        value={catalog && catalog.observation_types ? values.tipo_observacion_id || '' : ''}
+                        labelId="tipo_observacion_id"
                         onChange={handleChange('tipo_observacion_id')}
+                        value={catalog && catalog.observation_types ? values.tipo_observacion_id || '' : ''}
                       >
                         {catalog &&
                             catalog.observation_types &&
@@ -632,10 +677,11 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="accion"
                         label="Acción"
-                        value={values.accion || ''}
                         onChange={handleChange('accion')}
+                        value={values.accion || ''}
                       />
                       {errors.accion &&
                         touched.accion && (
@@ -651,10 +697,11 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="clave_accion"
                         label="Clave Acción"
-                        value={values.clave_accion || ''}
                         onChange={handleChange('clave_accion')}
+                        value={values.clave_accion || ''}
                       />
                       {errors.clave_accion &&
                         touched.clave_accion && (
@@ -670,16 +717,17 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto Observado"
-                        value={values.monto_observado}
-                        onChange={handleChange('monto_observado')}
-                        name="monto_observado"
+                        disabled={disabledModeOn}
                         id="monto_observado"
-                        placeholder="0"
                         InputProps={{
                           inputComponent: NumberFormatCustom as any,
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
+                        label="Monto Observado"
+                        name="monto_observado"
+                        onChange={handleChange('monto_observado')}
+                        placeholder="0"
+                        value={values.monto_observado}
                       />
                       {errors.monto_observado &&
                         touched.monto_observado &&
@@ -710,6 +758,7 @@ export const ResultsReportForm = (props: Props) => {
                     validateOnChange={false}
                     render={(arrayHelpers: ArrayHelpers) => (
                       <>
+                        {action !== 'view' && (
                         <div style={{ padding: '0px 10px', textAlign: 'left', marginBottom: '10px' }}>
                           <Button
                             variant="contained"
@@ -721,21 +770,26 @@ export const ResultsReportForm = (props: Props) => {
                             Agregar Seguimiento
                           </Button>
                         </div>
+                        )}
                         {values && values.seguimientos && values.seguimientos.map((seguimiento: any, index: number) => (
                           <Paper className={classes.paper2} elevation={4} key={`fields-group-${index+1}`}>
                             <Grid container spacing={3}>
-                              <Grid item xs={12} sm={6}>                            
-                                <Button
-                                  variant="contained"
-                                  color="secondary"
-                                  startIcon={<DeleteForeverIcon />}
-                                  size="medium"
-                                  onClick={() => arrayHelpers.remove(index)}
-                                >
-                                  Remover Seguimiento
-                                </Button>
-                              </Grid>
-                              <Grid item xs={12} sm={6} />
+                              {action !== 'view' && (
+                              <>
+                                <Grid item xs={12} sm={6}>
+                                  <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    startIcon={<DeleteForeverIcon />}
+                                    size="medium"
+                                    onClick={() => arrayHelpers.remove(index)}
+                                  >
+                                    Remover Seguimiento
+                                  </Button>
+                                </Grid>
+                                <Grid item xs={12} sm={6} />
+                              </>
+                              )}
                               <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl}>
                                   <TextField 
@@ -754,8 +808,9 @@ export const ResultsReportForm = (props: Props) => {
                                     Medio notificación de seguimiento
                                   </InputLabel>
                                   <Select
-                                    labelId="medio_notif_seguimiento_id"
+                                    disabled={disabledModeOn}
                                     // id="medio_notif_seguimiento_id-select"
+                                    labelId="medio_notif_seguimiento_id"
                                     value={catalog && catalog.medios_notif_seguimiento_asf && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].medio_notif_seguimiento_id : ''}
                                     onChange={handleChange(`seguimientos.${index}.medio_notif_seguimiento_id`)}
                                   >
@@ -787,6 +842,7 @@ export const ResultsReportForm = (props: Props) => {
                               <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl}>
                                   <TextField 
+                                    disabled={disabledModeOn}
                                     // id="num_oficio_cytg_oic"
                                     label="# de Oficio CyTG u OIC"
                                     onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_cytg_oic`, value.target.value)}
@@ -798,6 +854,7 @@ export const ResultsReportForm = (props: Props) => {
                                 <FormControl className={classes.formControl}>
                                   <Field
                                     component={FormikDatePicker}
+                                    disabled={disabledModeOn}
                                     // id="fecha_oficio_cytg_oic"
                                     label="Fecha de Oficio CyTG"
                                     name={`seguimientos.${index}.fecha_oficio_cytg_oic`}
@@ -817,6 +874,7 @@ export const ResultsReportForm = (props: Props) => {
                                 <FormControl className={classes.formControl}>
                                   <Field
                                     component={FormikDatePicker}
+                                    disabled={disabledModeOn}
                                     // id="fecha_recibido_dependencia"
                                     label="Fecha de Recibido de la dependencia (ACUSE)"
                                     name={`seguimientos.${index}.fecha_recibido_dependencia`}
@@ -836,6 +894,7 @@ export const ResultsReportForm = (props: Props) => {
                                 <FormControl className={classes.formControl}>
                                   <Field
                                     component={FormikDatePicker}
+                                    disabled={disabledModeOn}
                                     // id="fecha_vencimiento_cytg"
                                     label="Fecha de vencimiento CyTG"
                                     name={`seguimientos.${index}.fecha_vencimiento_cytg`}
@@ -854,6 +913,7 @@ export const ResultsReportForm = (props: Props) => {
                               <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl}>
                                   <TextField
+                                    disabled={disabledModeOn}
                                     // id="num_oficio_resp_dependencia"
                                     label="# De Oficio de respuesta dependencia"
                                     onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_resp_dependencia`, value.target.value)}
@@ -865,6 +925,7 @@ export const ResultsReportForm = (props: Props) => {
                                 <FormControl className={classes.formControl}>
                                   <Field
                                     component={FormikDatePicker}
+                                    disabled={disabledModeOn}
                                     label="Fecha de recibido del oficio de respuesta"
                                     name={`seguimientos.${index}.fecha_recibido_oficio_resp`}
                                     // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].fecha_recibido_oficio_resp : ''}
@@ -880,22 +941,53 @@ export const ResultsReportForm = (props: Props) => {
                               )}
                                 </FormControl>
                               </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <FormControl className={classes.formControl}>
+                              <Grid item xs={12} sm={12} md={6}>
+                                <FormControl className={classes.formControlFull}>
                                   <TextField 
+                                    disabled={disabledModeOn}
                                     // id="resp_dependencia"
+                                    InputProps={{
+                                      startAdornment: (
+                                        <InputAdornment position="start">
+                                          <IconButton
+                                            aria-label="toggle visibility"
+                                            onClick={() => setModalField({...modalField, open: true, field: "Respuesta de la dependencia", text: values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].resp_dependencia : '' })}
+                                            onMouseDown={() => {}}
+                                          >
+                                            <ZoomInIcon />
+                                          </IconButton>
+                                        </InputAdornment>
+                                      ),
+                                    }}
                                     label="Respuesta de la dependencia"
+                                    multiline
                                     // name={`seguimientos.${index}.resp_dependencia`}
                                     onChange={(value: any) => setFieldValue(`seguimientos.${index}.resp_dependencia`, value.target.value)}
+                                    rows={5}
+                                    rowsMax={5}
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].resp_dependencia : ''}
                                   />
                                 </FormControl>
                               </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <FormControl className={classes.formControl}>
+                              <Grid item xs={12} sm={12} md={6}>
+                                <FormControl className={classes.formControlFull}>
                                   <FastField
                                     component={TextField}
+                                    disabled={disabledModeOn}
                                     // id="comentarios-seguimiento"
+                                    InputProps={{
+                                      startAdornment: (
+                                        <InputAdornment position="start">
+                                          <IconButton
+                                            aria-label="toggle visibility"
+                                            onClick={() => setModalField({...modalField, open: true, field: "Comentarios", text: values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].comentarios : '' })}
+                                            onMouseDown={() => {}}
+                                          >
+                                            <ZoomInIcon />
+                                          </IconButton>
+                                        </InputAdornment>
+                                      ),
+                                    }}
                                     label="Comentarios"
                                     multiline
                                     name={`seguimientos.${index}.comentarios`}
@@ -917,6 +1009,7 @@ export const ResultsReportForm = (props: Props) => {
                               <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl}>
                                   <AutoCompleteDropdown
+                                    disabled={disabledModeOn}
                                     fieldLabel="title"
                                     fieldValue="sorting_val"
                                     label="Clasificación final Interna CyTG"
@@ -931,11 +1024,30 @@ export const ResultsReportForm = (props: Props) => {
                                     }
                                     value={catalog && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].clasif_final_interna_cytg : ''}
                                   />
+                                  <div style={{ width: 32, height: 32 }}>
+                                    <IconButton
+                                      aria-label="toggle visibility"
+                                      onClick={() =>
+                                      setModalField({
+                                      ...modalField,
+                                      open: true,
+                                      field: 'Clasificación final Interna CyTG',
+                                      text:
+                                        catalog && catalog.clasifs_internas_cytg
+                                        ? (((catalog.clasifs_internas_cytg.find((item: any) => item.direccion_id === values.direccion_id) || {}).clasifs_internas_pairs || []).find((item: any) => item.sorting_val === values.seguimientos[index].clasif_final_interna_cytg) || {}).title || ''
+                                        : ''
+                                      })}
+                                      onMouseDown={() => {}}
+                                    >
+                                      <ZoomInIcon />
+                                    </IconButton>
+                                  </div>
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl}>
                                   <TextField 
+                                    disabled={disabledModeOn}
                                     // id="num_oficio_org_fiscalizador"
                                     label="# Oficio para Organo fiscalizador"
                                     onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_org_fiscalizador`, value.target.value)}
@@ -947,6 +1059,7 @@ export const ResultsReportForm = (props: Props) => {
                                 <FormControl className={classes.formControl}>
                                   <Field
                                     component={FormikDatePicker}
+                                    disabled={disabledModeOn}
                                     label="Fecha del Oficio para Órgano fiscalizador"
                                     name={`seguimientos.${index}.fecha_oficio_org_fiscalizador`}
                                     // value={seguimiento.fecha_oficio_org_fiscalizador}
@@ -970,8 +1083,9 @@ export const ResultsReportForm = (props: Props) => {
                                     Estatus
                                   </InputLabel>
                                   <Select
-                                    labelId="estatus_id"
+                                    disabled={disabledModeOn}
                                     // id="estatus_id-select"
+                                    labelId="estatus_id"
                                     onChange={handleChange(`seguimientos.${index}.estatus_id`)}
                                     value={catalog && catalog.estatus_ires_asf && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].estatus_id : ''}
                                   >
@@ -1002,16 +1116,16 @@ export const ResultsReportForm = (props: Props) => {
                               <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl}>
                                   <TextField
-                                    label="Monto Solventado"
-                                    // onChange={handleChange('monto_solventado')}
-                                    // name="monto_solventado"
+                                    disabled={disabledModeOn}
                                     // id="monto_solventado"
-                                    onChange={(value: any) => setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value)}
-                                    placeholder="0"
                                     InputProps={{
                                       inputComponent: NumberFormatCustom as any,
                                       startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                     }}
+                                    label="Monto Solventado"
+                                    // name="monto_solventado"
+                                    onChange={(value: any) => setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value)}
+                                    placeholder="0"
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado : ''}
                                   />
                                   {errors.monto_solventado &&
@@ -1030,6 +1144,7 @@ export const ResultsReportForm = (props: Props) => {
                                 <FormControl className={classes.formControl}>
                                   <FastField
                                     component={TextField}
+                                    disabled={disabledModeOn}
                                     // id="comentarios-seguimiento"
                                     label="# de Oficio (monto solventado)"
                                     name={`seguimientos.${index}.num_oficio_monto_solventado`}
@@ -1052,6 +1167,7 @@ export const ResultsReportForm = (props: Props) => {
                                 <FormControl className={classes.formControl}>
                                   <Field
                                     component={FormikDatePicker}
+                                    disabled={disabledModeOn}
                                     label="Fecha de Oficio - acuse (monto solventado)"
                                     name={`seguimientos.${index}.fecha_oficio_monto_solventado`}
                                     // value={seguimiento.fecha_oficio_monto_solventado}
@@ -1070,16 +1186,17 @@ export const ResultsReportForm = (props: Props) => {
                               <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl}>
                                   <TextField
-                                    label="Monto Pendiente de solventar"
-                                    value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
-                                    onChange={handleChange('monto_pendiente_solventar')}
-                                    name="monto_pendiente_solventar"
+                                    disabled={disabledModeOn}
                                     id="monto_pendiente_solventar"
-                                    placeholder="0"
                                     InputProps={{
                                       inputComponent: NumberFormatCustom as any,
                                       startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                     }}
+                                    label="Monto Pendiente de solventar"
+                                    name="monto_pendiente_solventar"
+                                    onChange={handleChange('monto_pendiente_solventar')}
+                                    placeholder="0"
+                                    value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
                                   />
                                   {errors.monto_pendiente_solventar &&
                                     touched.monto_pendiente_solventar &&
@@ -1105,16 +1222,17 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto a reintegrar"
-                        value={values.monto_a_reintegrar}
-                        onChange={handleChange('monto_a_reintegrar')}
-                        name="monto_a_reintegrar"
+                        disabled={disabledModeOn}
                         id="monto_a_reintegrar"
-                        placeholder="0"
                         InputProps={{
                           inputComponent: NumberFormatCustom as any,
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
+                        label="Monto a reintegrar"
+                        name="monto_a_reintegrar"
+                        onChange={handleChange('monto_a_reintegrar')}
+                        placeholder="0"
+                        value={values.monto_a_reintegrar}
                       />
                       {errors.monto_a_reintegrar &&
                         touched.monto_a_reintegrar &&
@@ -1131,16 +1249,17 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto reintegrado"
-                        value={values.monto_reintegrado}
-                        onChange={handleChange('monto_reintegrado')}
-                        name="monto_reintegrado"
+                        disabled={disabledModeOn}
                         id="monto_reintegrado"
-                        placeholder="0"
                         InputProps={{
                           inputComponent: NumberFormatCustom as any,
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
+                        label="Monto reintegrado"
+                        name="monto_reintegrado"
+                        onChange={handleChange('monto_reintegrado')}
+                        placeholder="0"
+                        value={values.monto_reintegrado}
                       />
                       {errors.monto_reintegrado &&
                         touched.monto_reintegrado &&
@@ -1158,9 +1277,10 @@ export const ResultsReportForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <Field
                         component={FormikDatePicker}
+                        disabled={disabledModeOn}
+                        id="fecha_reintegro"
                         label="Fecha de reintegro"
                         name="fecha_reintegro"
-                        id="fecha_reintegro"
                       />
                       {errors.fecha_reintegro &&
                         touched.fecha_reintegro && (
@@ -1176,16 +1296,17 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto por reintegrar"
-                        value={values.monto_por_reintegrar}
-                        onChange={handleChange('monto_por_reintegrar')}
-                        name="monto_por_reintegrar"
+                        disabled={disabledModeOn}
                         id="monto_por_reintegrar"
-                        placeholder="0"
                         InputProps={{
                           inputComponent: NumberFormatCustom as any,
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
+                        label="Monto por reintegrar"
+                        name="monto_por_reintegrar"
+                        onChange={handleChange('monto_por_reintegrar')}
+                        placeholder="0"
+                        value={values.monto_por_reintegrar}
                       />
                       {errors.monto_por_reintegrar &&
                         touched.monto_por_reintegrar &&
@@ -1220,9 +1341,10 @@ export const ResultsReportForm = (props: Props) => {
                         control={
                           <Checkbox
                             checked={values.tiene_pras}
-                            onChange={handleChange('tiene_pras')}
-                            name="tiene_pras"
                             color="primary"
+                            disabled={disabledModeOn}
+                            name="tiene_pras"
+                            onChange={handleChange('tiene_pras')}
                           />
                         }
                         label="¿Tiene PRAS?"
@@ -1236,10 +1358,11 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_of_vista_cytg"
                         label="# de Oficio del OF que da vista a la CyTG"
-                        value={values.pras.num_oficio_of_vista_cytg || ''}
                         onChange={handleChange('pras.num_oficio_of_vista_cytg')}
+                        value={values.pras.num_oficio_of_vista_cytg || ''}
                       />
                       {errors.pras_num_oficio_of_vista_cytg &&
                       touched.pras && touched.pras.num_oficio_of_vista_cytg && (
@@ -1256,9 +1379,10 @@ export const ResultsReportForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <Field
                         component={FormikDatePicker}
+                        disabled={disabledModeOn}
+                        id="fecha_oficio_of_vista_cytg"
                         label="Fecha de Oficio del OF que da vista a la CyTG"
                         name="pras.fecha_oficio_of_vista_cytg"
-                        id="fecha_oficio_of_vista_cytg"
                       />
                       {errors.pras_fecha_oficio_of_vista_cytg &&
                       touched.pras && touched.pras.fecha_oficio_of_vista_cytg && (
@@ -1274,11 +1398,12 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_cytg_aut_invest"
-                        label="# de Oficio de la CyTG para la Autoridad Investigadora"
-                        value={values.pras.num_oficio_cytg_aut_invest || ''}
-                        onChange={handleChange('pras.num_oficio_cytg_aut_invest')}
                         InputLabelProps={{ shrink: true }}
+                        label="# de Oficio de la CyTG para la Autoridad Investigadora"
+                        onChange={handleChange('pras.num_oficio_cytg_aut_invest')}
+                        value={values.pras.num_oficio_cytg_aut_invest || ''}
                       />
                       {errors.pras_num_oficio_cytg_aut_invest &&
                       touched.pras && touched.pras.num_oficio_cytg_aut_invest && (
@@ -1295,9 +1420,10 @@ export const ResultsReportForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <Field
                         component={FormikDatePicker}
+                        disabled={disabledModeOn}
+                        id="fecha_oficio_cytg_aut_invest"
                         label="Fecha de Oficio de la CyTG para la Autoridad Investigadora"
                         name="pras.fecha_oficio_cytg_aut_invest"
-                        id="fecha_oficio_cytg_aut_invest"
                       />
                       {errors.pras_fecha_oficio_cytg_aut_invest &&
                       touched.pras && touched.pras.fecha_oficio_cytg_aut_invest && (
@@ -1313,10 +1439,11 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_carpeta_investigacion"
                         label="# de Carpeta de Investigación"
-                        value={values.pras.num_carpeta_investigacion || ''}
                         onChange={handleChange('pras.num_carpeta_investigacion')}
+                        value={values.pras.num_carpeta_investigacion || ''}
                       />
                       {errors.pras_num_carpeta_investigacion &&
                       touched.pras && touched.pras.num_carpeta_investigacion && (
@@ -1332,11 +1459,12 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_cytg_org_fiscalizador"
-                        label="# de Oficio de la CyTG para Órgano Fiscalizador"
-                        value={values.pras.num_oficio_cytg_org_fiscalizador || ''}
-                        onChange={handleChange('pras.num_oficio_cytg_org_fiscalizador')}
                         InputLabelProps={{ shrink: true }}
+                        label="# de Oficio de la CyTG para Órgano Fiscalizador"
+                        onChange={handleChange('pras.num_oficio_cytg_org_fiscalizador')}
+                        value={values.pras.num_oficio_cytg_org_fiscalizador || ''}
                       />
                       {errors.pras_num_oficio_cytg_org_fiscalizador &&
                       touched.pras && touched.pras.num_oficio_cytg_org_fiscalizador && (
@@ -1353,9 +1481,10 @@ export const ResultsReportForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <Field
                         component={FormikDatePicker}
+                        disabled={disabledModeOn}
+                        id="fecha_oficio_cytg_org_fiscalizador"
                         label="Fecha de Oficio de la CyTG para Órgano Fiscalizador"
                         name="pras.fecha_oficio_cytg_org_fiscalizador"
-                        id="fecha_oficio_cytg_org_fiscalizador"
                       />
                       {errors.pras_fecha_oficio_cytg_org_fiscalizador &&
                       touched.pras && touched.pras.fecha_oficio_cytg_org_fiscalizador && (
@@ -1371,11 +1500,12 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_vai_municipio"
-                        label="# de Oficio VAI a Municipio"
-                        value={values.pras.num_oficio_vai_municipio || ''}
-                        onChange={handleChange('pras.num_oficio_vai_municipio')}
                         InputLabelProps={{ shrink: true }}
+                        label="# de Oficio VAI a Municipio"
+                        onChange={handleChange('pras.num_oficio_vai_municipio')}
+                        value={values.pras.num_oficio_vai_municipio || ''}
                       />
                       {errors.pras_num_oficio_vai_municipio &&
                       touched.pras && touched.pras.num_oficio_vai_municipio && (
@@ -1392,9 +1522,10 @@ export const ResultsReportForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <Field
                         component={FormikDatePicker}
+                        disabled={disabledModeOn}
+                        id="fecha_oficio_vai_municipio"
                         label="Fecha de Oficio VAI a Municipio"
                         name="pras.fecha_oficio_vai_municipio"
-                        id="fecha_oficio_vai_municipio"
                       />
                       {errors.pras_fecha_oficio_vai_municipio &&
                       touched.pras && touched.pras.fecha_oficio_vai_municipio && (
@@ -1413,10 +1544,11 @@ export const ResultsReportForm = (props: Props) => {
                         Autoridad Investigadora
                       </InputLabel>
                       <Select
-                        labelId="autoridad_invest_id"
+                        disabled={disabledModeOn}
                         id="autoridad_invest_id-select"
-                        value={catalog && catalog.autoridades_invest ? values.pras.autoridad_invest_id || '' : ''}
+                        labelId="autoridad_invest_id"
                         onChange={handleChange('pras.autoridad_invest_id')}
+                        value={catalog && catalog.autoridades_invest ? values.pras.autoridad_invest_id || '' : ''}
                       >
                         {catalog &&
                             catalog.autoridades_invest &&
@@ -1445,10 +1577,11 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_pras_of"
                         label="# de Oficio de PRAS del OF"
-                        value={values.pras.num_oficio_pras_of || ''}
                         onChange={handleChange('pras.num_oficio_pras_of')}
+                        value={values.pras.num_oficio_pras_of || ''}
                       />
                       {errors.pras_num_oficio_pras_of &&
                       touched.pras && touched.pras.num_oficio_pras_of && (
@@ -1465,9 +1598,10 @@ export const ResultsReportForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <Field
                         component={FormikDatePicker}
+                        disabled={disabledModeOn}
+                        id="fecha_oficio_pras_of"
                         label="Fecha de Oficio de PRAS del OF"
                         name="pras.fecha_oficio_pras_of"
-                        id="fecha_oficio_pras_of"
                       />
                       {errors.pras_fecha_oficio_pras_of &&
                       touched.pras && touched.pras.fecha_oficio_pras_of && (
@@ -1483,11 +1617,12 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_pras_cytg_dependencia"
-                        label="# de Oficio PRAS de la CyTG para la dependencia"
-                        value={values.pras.num_oficio_pras_cytg_dependencia || ''}
-                        onChange={handleChange('pras.num_oficio_pras_cytg_dependencia')}
                         InputLabelProps={{ shrink: true }}
+                        label="# de Oficio PRAS de la CyTG para la dependencia"
+                        onChange={handleChange('pras.num_oficio_pras_cytg_dependencia')}
+                        value={values.pras.num_oficio_pras_cytg_dependencia || ''}
                       />
                       {errors.pras_num_oficio_pras_cytg_dependencia &&
                       touched.pras && touched.pras.num_oficio_pras_cytg_dependencia && (
@@ -1503,10 +1638,11 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_resp_dependencia"
                         label="# de Oficio de respuesta de la dependencia"
-                        value={values.pras.num_oficio_resp_dependencia || ''}
                         onChange={handleChange('pras.num_oficio_resp_dependencia')}
+                        value={values.pras.num_oficio_resp_dependencia || ''}
                       />
                       {errors.pras_num_oficio_resp_dependencia &&
                       touched.pras && touched.pras.num_oficio_resp_dependencia && (
@@ -1523,9 +1659,10 @@ export const ResultsReportForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <Field
                         component={FormikDatePicker}
+                        disabled={disabledModeOn}
+                        id="fecha_oficio_resp_dependencia"
                         label="Fecha de Oficio de respuesta de la dependencia"
                         name="pras.fecha_oficio_resp_dependencia"
-                        id="fecha_oficio_resp_dependencia"
                       />
                       {errors.pras_fecha_oficio_resp_dependencia &&
                       touched.pras && touched.pras.fecha_oficio_resp_dependencia && (
@@ -1541,7 +1678,7 @@ export const ResultsReportForm = (props: Props) => {
                 </Grid>
                 )}
 
-
+                {action !== 'view' && (
                 <Button
                   variant="contained"
                   className={classes.submitInput}
@@ -1550,7 +1687,14 @@ export const ResultsReportForm = (props: Props) => {
                 >
                   {!id ? 'Crear' : 'Actualizar'}
                 </Button>
+                )}
               </form>
+              <SingleTextResponsiveModal
+                open={modalField.open}
+                onClose={() => setModalField({ ...modalField, open: false })}
+                field={modalField.field}
+                text={modalField.text}
+              />
             </MuiPickersUtilsProvider>
           );
         }}

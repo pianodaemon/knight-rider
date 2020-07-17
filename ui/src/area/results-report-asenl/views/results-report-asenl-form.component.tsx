@@ -826,6 +826,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha del Oficio de recomendación"
                         name="fecha_oficio_recomendacion"
@@ -845,6 +846,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de vencimiento para enviar a ASENL"
                         name="fecha_vencimiento_enviar_asenl"
@@ -884,6 +886,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de Oficio para dependencia"
                         name="fecha_oficio_dependencia"
@@ -903,6 +906,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de vencimiento interna CyTG"
                         name="fecha_vencimiento_interna_cytg"
@@ -942,6 +946,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de acuse de respuesta de dependencia"
                         name="fecha_acuse_resp_dependencia"
@@ -1016,6 +1021,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha del Oficio para enviar respuesta a la ASENL"
                         name="fecha_oficio_enviar_resp_asenl"
@@ -1075,6 +1081,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         label="Monto Observado"
                         value={values.monto_observado}
                         onChange={handleChange('monto_observado')}
@@ -1101,6 +1108,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         label="Monto solventado"
                         value={values.monto_solventado}
                         onChange={handleChange('monto_solventado')}
@@ -1127,6 +1135,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         label="Monto pendiente de solventar"
                         value={values.monto_pendiente_solventar}
                         onChange={handleChange('monto_pendiente_solventar')}
@@ -1153,6 +1162,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         label="Monto a reintegrar"
                         value={values.monto_a_reintegrar}
                         onChange={handleChange('monto_a_reintegrar')}
@@ -1178,6 +1188,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                   </Grid>
                 </Grid>
 
+                {action !== "view" && (
                 <Button
                   variant="contained"
                   className={classes.submitInput}
@@ -1186,6 +1197,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                 >
                   {!id ? 'Crear' : 'Actualizar'}
                 </Button>
+                )}
               </form>
               <SingleTextResponsiveModal 
                 open={modalField.open}

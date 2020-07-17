@@ -2,6 +2,7 @@ package token
 
 import (
 	"crypto/rsa"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -10,12 +11,21 @@ import (
 )
 
 // Extracts token from a http resquest by involving public key
-func ExtractFromReq(publicKey *rsa.PublicKey, req *http.Request) (*jwt.Token, error) {
+func ExtractFromReq(publicKey *rsa.PublicKey, req *http.Request, checkSignMethod bool) (*jwt.Token, error) {
 
 	tokenRequest, err := request.ParseFromRequest(
 		req,
 		request.OAuth2Extractor,
 		func(token *jwt.Token) (interface{}, error) {
+
+			if checkSignMethod {
+
+				if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+
+					return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+				}
+			}
+
 			return publicKey, nil
 		})
 

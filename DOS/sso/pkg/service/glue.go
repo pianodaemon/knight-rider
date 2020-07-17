@@ -2,7 +2,9 @@ package service
 
 import (
 	"crypto/rsa"
+	"net/http"
 
+	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
@@ -65,6 +67,17 @@ func Engage(logger *logrus.Logger) (merr error) {
 	}
 
 	{
+		requireTokenAut := func(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+
+			tokenReq, err := ton.ExtractFromReq(pub, req, true)
+
+			if err == nil && tokenReq.Valid {
+				next(rw, req)
+			} else {
+				rw.WriteHeader(http.StatusUnauthorized)
+			}
+		}
+
 		tcSettings := &aut.TokenClerkSettings{priv, pub, getExpDelta()}
 		clerk := aut.NewTokenClerk(logger, tcSettings)
 
@@ -80,7 +93,15 @@ func Engage(logger *logrus.Logger) (merr error) {
 
 			mgmt.HandleFunc("/token-auth", co.SignOn(clerk.IssueToken)).Methods("POST")
 
-			mgmt.HandleFunc("/logout", co.SingOff(clerk.CeaseToken)).Methods("GET")
+			mgmt.Handle("/logout", negroni.New(
+				negroni.HandlerFunc(requireTokenAut),
+				negroni.HandlerFunc(
+					func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+
+						co.SingOff(clerk.CeaseToken)(w, r)
+					},
+				),
+			)).Methods("GET")
 
 			return router
 		}

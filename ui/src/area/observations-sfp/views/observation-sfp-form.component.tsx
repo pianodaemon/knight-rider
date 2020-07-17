@@ -66,6 +66,12 @@ const useStyles = makeStyles((theme: Theme) =>
         display: 'flex',
       },
     },
+    form: {
+      '& input:not([type=checkbox]):disabled, & textarea:disabled, & div[aria-disabled="true"]': {
+        color: theme.palette.text.primary,
+        opacity: 1
+      },
+    },
     fieldset: {
       borderRadius: 3,
       borderWidth: 0,
@@ -143,7 +149,7 @@ export const ObservationsSFPForm = (props: Props) => {
   } = props;
   const classes = useStyles();
   const history = useHistory();
-  const { action, id } = useParams();
+  const { action, id } = useParams<any>();
   const fechaCaptura = new Date();
   const initialValues = {
     id: '',
@@ -306,7 +312,7 @@ export const ObservationsSFPForm = (props: Props) => {
           <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
             <h1 style={{ color: '#128aba' }}>Observaciones de Resultados SFP</h1>
             <hr className={classes.hrDivider} />
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className={classes.form}>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>

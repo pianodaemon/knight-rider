@@ -56,18 +56,24 @@ export const ObservationASFTable = (props: Props) => {
       sorting: !sorting,
     },
     {
-      title: 'Cuenta Pública',
-      field: 'years',
-      sorting,
-    },
-    {
       title: 'Dirección',
       field: 'direccion_id_title',
       sorting,
     },
     {
+      title: 'Cuenta Pública',
+      field: 'years',
+      sorting,
+    },
+    {
       title: 'Auditoría',
       field: 'auditoria_id_title',
+      sorting,
+      customSort,
+    },
+    {
+      title: 'Dependencia(s)',
+      field: 'dependencies',
       sorting,
       customSort,
     },

@@ -65,6 +65,20 @@ const useStyles = makeStyles((theme: Theme) =>
         display: 'flex',
       },
     },
+    formControlFull: {
+      margin: theme.spacing(1),
+      minWidth: 350,
+      [theme.breakpoints.up('xs')]: {
+        minWidth: '100%',
+        display: 'flex',
+      },
+    },
+    form: {
+      '& input:not([type=checkbox]):disabled, & textarea:disabled, & div[aria-disabled="true"]': {
+        color: theme.palette.text.primary,
+        opacity: 1
+      },
+    },
     fieldset: {
       borderRadius: 3,
       borderWidth: 0,
@@ -148,7 +162,7 @@ export const ObservationsASFForm = (props: Props) => {
   } = props;
   const classes = useStyles();
   const history = useHistory();
-  const { action, id } = useParams();
+  const { action, id } = useParams<any>();
   const fechaCaptura = new Date();
   const initialValues = {
     id: '',
@@ -220,6 +234,7 @@ export const ObservationsASFForm = (props: Props) => {
     */
     return errors;
   };
+  const disabledModeOn = action === 'view';
   const [modalField, setModalField] = React.useState({field: '', text: '', open: false});
   return (
     <Paper className={classes.paper}>
@@ -280,7 +295,7 @@ export const ObservationsASFForm = (props: Props) => {
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Observaciones Preliminares ASF</h1>
               <hr className={classes.hrDivider} />
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} className={classes.form}>
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
@@ -302,6 +317,7 @@ export const ObservationsASFForm = (props: Props) => {
                         Dirección
                       </InputLabel>
                       <Select
+                        disabled={disabledModeOn}
                         labelId="direccion_id"
                         id="direccion_id-select"
                         value={catalog ? values.direccion_id || '' : ''}
@@ -371,6 +387,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <AutoCompleteDropdown
+                        disabled={disabledModeOn}
                         fieldLabel="title"
                         fieldValue="id"
                         label="Programa"
@@ -421,6 +438,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <AutoCompleteDropdown
+                        disabled={disabledModeOn}
                         fieldLabel="title"
                         fieldValue="id"
                         label="No. de Auditoría"
@@ -449,6 +467,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_of"
                         label="# de Oficio del OF"
                         value={values.num_oficio_of || ''}
@@ -468,6 +487,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha recibido (Acuse)"
                         name="fecha_recibido"
@@ -487,6 +507,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de vencimiento (OF)"
                         name="fecha_vencimiento_of"
@@ -506,6 +527,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_observacion"
                         label="# de Observación"
                         value={values.num_observacion || ''}
@@ -522,9 +544,10 @@ export const ObservationsASFForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12} sm={12} md={6}>
+                    <FormControl className={classes.formControlFull}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="observacion"
                         label="Observación"
                         value={values.observacion || ''}
@@ -559,6 +582,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         label="Monto Observado"
                         value={values.monto_observado}
                         onChange={handleChange('monto_observado')}
@@ -585,6 +609,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_cytg"
                         label="# de Oficio CyTG u OIC"
                         value={values.num_oficio_cytg || ''}
@@ -605,6 +630,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de Oficio CyTG"
                         name="fecha_oficio_cytg"
@@ -624,6 +650,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de recibido de la dependencia (Acuse)"
                         name="fecha_recibido_dependencia"
@@ -643,6 +670,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de vencimiento"
                         name="fecha_vencimiento"
@@ -662,6 +690,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_resp_dependencia"
                         label="# de Oficio de respuesta de la dependencia"
                         value={values.num_oficio_resp_dependencia || ''}
@@ -681,6 +710,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de Oficio de respuesta"
                         name="fecha_oficio_resp_dependencia"
@@ -697,9 +727,10 @@ export const ObservationsASFForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12} sm={12} md={6}>
+                    <FormControl className={classes.formControlFull}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="resp_dependencia"
                         label="Respuesta de la dependencia"
                         value={values.resp_dependencia || ''}
@@ -731,9 +762,10 @@ export const ObservationsASFForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12} sm={12} md={6}>
+                    <FormControl className={classes.formControlFull}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="comentarios"
                         label="Comentarios"
                         value={values.comentarios || ''}
@@ -768,6 +800,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <AutoCompleteDropdown
+                        disabled={disabledModeOn}
                         fieldLabel="title"
                         fieldValue="sorting_val"
                         label="Clasificación final CyTG"
@@ -782,6 +815,25 @@ export const ObservationsASFForm = (props: Props) => {
                         }
                         value={catalog ? values.clasif_final_cytg || '' : ''}
                       />
+                      <div style={{width: 32, height: 32}}>
+                        <IconButton
+                          aria-label="toggle visibility"
+                          onClick={
+                            () => setModalField({
+                                ...modalField,
+                                open: true,
+                                field: "Clasificación final CyTG",
+                                text:
+                                  catalog && catalog.clasifs_internas_cytg 
+                                  ? (((catalog.clasifs_internas_cytg.find((item: any) => item.direccion_id === values.direccion_id) || {}).clasifs_internas_pairs || []).find((item: any) => item.sorting_val === values.clasif_final_cytg) || {}).title || ''
+                                  : ''
+                              })
+                            }
+                          onMouseDown={() => {}}
+                        >
+                          <ZoomInIcon />
+                        </IconButton>
+                      </div>
                       {errors.clasif_final_cytg &&
                         touched.clasif_final_cytg && (
                           <FormHelperText
@@ -796,6 +848,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
+                        disabled={disabledModeOn}
                         id="num_oficio_org_fiscalizador"
                         label="# de Oficio para Órgano Fiscalizador"
                         value={values.num_oficio_org_fiscalizador || ''}
@@ -816,6 +869,7 @@ export const ObservationsASFForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
+                        disabled={disabledModeOn}
                         component={FormikDatePicker}
                         label="Fecha de Oficio para Órgano Fiscalizador"
                         name="fecha_oficio_org_fiscalizador"
@@ -838,6 +892,7 @@ export const ObservationsASFForm = (props: Props) => {
                         Estatus del Proceso (Criterio Interno)
                       </InputLabel>
                       <Select
+                        disabled={disabledModeOn}
                         labelId="estatus_criterio_int_id"
                         id="estatus_criterio_int_id-select"
                         value={catalog ? values.estatus_criterio_int_id || '' : ''}
@@ -872,6 +927,7 @@ export const ObservationsASFForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <InputLabel id="proyecciones-mutiple-chip-label">Proyecciones</InputLabel>
                       <Select
+                        disabled={disabledModeOn}
                         labelId="proyecciones-mutiple-chip-label"
                         id="proyecciones"
                         multiple

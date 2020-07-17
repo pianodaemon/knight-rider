@@ -1,6 +1,7 @@
 /* eslint-disable no-alert */
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import MaterialTable, { MTableToolbar } from 'material-table';
 import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
@@ -15,6 +16,19 @@ type Props = {
   paging: any,
 };
 
+const useStyles = makeStyles(() =>
+  createStyles({
+    truncate: {
+      overflow: 'hidden',
+      paddingRight: '1em',
+      maxHeight: '7.5em',
+      maxWidth: '30em',
+      textOverflow: 'ellipsis',
+      width: '30em',
+    },
+  })
+);
+
 export const ResultsReportTable = (props: Props) => {
   const {
     loading,
@@ -28,6 +42,7 @@ export const ResultsReportTable = (props: Props) => {
   const customSort = () => 0;
   const draggable: boolean = false;
   const sorting: boolean = false;
+  const classes = useStyles();
   useEffect(() => {
     loadResultsReportAction({ per_page: paging.per_page, order });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -46,6 +61,11 @@ export const ResultsReportTable = (props: Props) => {
       sorting,
     },
     {
+      title: 'Cuenta Pública',
+      field: 'anio_auditoria',
+      sorting,
+    },
+    {
       title: 'Auditoría',
       field: 'auditoria_id_title',
       sorting,
@@ -53,6 +73,16 @@ export const ResultsReportTable = (props: Props) => {
     },
     { title: 'Dependencia', field: 'dependencies', sorting },
     { title: 'Programa', field: 'programa_social_id_title', sorting },
+    {
+      title: 'Observación',
+      field: 'observacion_ir',
+      sorting,
+      render: (rowData: any) => (
+        <div>
+          <p className={classes.truncate}>{rowData.observacion_ir}</p>
+        </div>
+      ),
+    },
   ];
   return (
     <MaterialTable
@@ -122,6 +152,12 @@ export const ResultsReportTable = (props: Props) => {
         },
       }}
       actions={[
+        {
+          icon: 'search',
+          tooltip: 'Visualizar Observación de Resultados ASF',
+          onClick: (event, rowData: any) =>
+            history.push(`/results-report/${rowData.id}/view`),
+        },
         {
           icon: 'edit',
           tooltip: 'Editar Observación de Resultados ASF',

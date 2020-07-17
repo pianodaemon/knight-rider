@@ -73,10 +73,27 @@ export const observationsCatalogSelector = createSelector(
       programa_social_id_title = programa_social_id_title
         ? programa_social_id_title.title
         : null;
+      const dependencies =
+        catalog &&
+        catalog.audits &&
+        observation.auditoria_id &&
+        catalog.audits.find((item: any) => item.id === observation.auditoria_id)
+          ? (
+              catalog.audits.find(
+                (item: any) => item.id === observation.auditoria_id,
+              ) || {}
+            ).dependency_ids
+              .map((dependency: number) =>
+                catalog.dependencies.find((item: any) => item.id === dependency)
+              )
+              .map((item: any) => item.title)
+              .join(', ')
+          : '';
       return {
         ...observation,
-        direccion_id_title,
         auditoria_id_title,
+        dependencies,
+        direccion_id_title,
         programa_social_id_title,
         years,
       };

@@ -88,7 +88,7 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route
           exact
-          path={['/results-report/create', '/results-report/:id/edit']}
+          path={['/results-report/create', '/results-report/:id/:action']}
         >
           <ResultsReportFormContainer />
         </Route>

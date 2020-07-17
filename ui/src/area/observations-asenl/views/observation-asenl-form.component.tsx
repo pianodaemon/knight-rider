@@ -54,6 +54,20 @@ const useStyles = makeStyles((theme: Theme) =>
         display: 'flex',
       },
     },
+    formControlFull: {
+      margin: theme.spacing(1),
+      minWidth: 350,
+      [theme.breakpoints.up('xs')]: {
+        minWidth: '100%',
+        display: 'flex',
+      },
+    },
+    form: {
+      '& input:not([type=checkbox]):disabled, & textarea:disabled, & div[aria-disabled="true"]': {
+        color: theme.palette.text.primary,
+        opacity: 1
+      },
+    },
     fieldset: {
       borderRadius: 3,
       borderWidth: 0,
@@ -292,7 +306,7 @@ export const ObservationsASENLForm = (props: Props) => {
                 Observaciones Preliminares ASENL
               </h1>
               <hr className={classes.hrDivider} />
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} className={classes.form}>
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
@@ -374,6 +388,7 @@ export const ObservationsASENLForm = (props: Props) => {
                       )}
                     </FormControl>
                   </Grid>
+                  {/*
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <AutoCompleteDropdown
@@ -431,6 +446,7 @@ export const ObservationsASENLForm = (props: Props) => {
                       )}
                     </FormControl>
                   </Grid>
+                  */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel>Tipo de Auditoría</InputLabel>
@@ -630,13 +646,13 @@ export const ObservationsASENLForm = (props: Props) => {
                       <Select
                         labelId="tipo_observacion_id"
                         id="tipo_observacion_id-select"
-                        value={catalog && catalog.divisions ? values.tipo_observacion_id || '' : ''}
+                        value={catalog && catalog.observation_types ? values.tipo_observacion_id || '' : ''}
                         onChange={handleChange('tipo_observacion_id')}
                         disabled={disabledModeOn}
                       >
                         {catalog &&
-                          catalog.divisions &&
-                          catalog.divisions.map((item) => {
+                          catalog.observation_types &&
+                          catalog.observation_types.map((item) => {
                             return (
                               <MenuItem value={item.id} key={`type-${item.id}`}>
                                 {item.title}
@@ -674,8 +690,8 @@ export const ObservationsASENLForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12} sm={12} md={6}>
+                    <FormControl className={classes.formControlFull}>
                       <TextField
                         id="observacion"
                         label="Observación"
@@ -857,8 +873,8 @@ export const ObservationsASENLForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12} sm={12} md={6}>
+                    <FormControl className={classes.formControlFull}>
                       <TextField
                         id="resp_dependencia"
                         label="Respuesta de la dependencia"
@@ -892,8 +908,8 @@ export const ObservationsASENLForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12} sm={12} md={6}>
+                    <FormControl className={classes.formControlFull}>
                       <TextField
                         id="comentarios"
                         label="Comentarios"

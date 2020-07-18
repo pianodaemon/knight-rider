@@ -15,7 +15,6 @@ obs_pre_asenl_ns_captions = {
     'compartida_tipo_observacion_id': 'Tipo de Observación (compartida)',
     'compartida_monto': 'Monto observado (compartida)',
     'fecha_captura': 'Fecha de captura',
-    'programa_social_id': 'Id del Programa Social',
     'tipo_auditoria_id': 'Id del Tipo de Auditoría',
     'auditoria_id': 'Id de la Auditoría',
     'num_oficio_notif_obs_prelim': 'Num. de Oficio donde notifican Observación Preliminar',
@@ -50,7 +49,6 @@ obs_pre_asenl = api.model('Observación de la ASENL (Preliminar)', {
     'compartida_tipo_observacion_id': fields.Integer(description=obs_pre_asenl_ns_captions['compartida_tipo_observacion_id']),
     'compartida_monto': fields.Float(description=obs_pre_asenl_ns_captions['compartida_monto']),
     'fecha_captura': fields.Date(description=obs_pre_asenl_ns_captions['fecha_captura']),
-    'programa_social_id': fields.Integer(description=obs_pre_asenl_ns_captions['programa_social_id']),
     'tipo_auditoria_id': fields.Integer(description=obs_pre_asenl_ns_captions['tipo_auditoria_id']),
     'auditoria_id': fields.Integer(description=obs_pre_asenl_ns_captions['auditoria_id']),
     'num_oficio_notif_obs_prelim': fields.String(description=obs_pre_asenl_ns_captions['num_oficio_notif_obs_prelim']),
@@ -109,7 +107,6 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASENL (P
     'divisions': fields.List(fields.Nested(pair)),
     'audits': fields.List(fields.Nested(audit)),
     'dependencies': fields.List(fields.Nested(dependency)),
-    'social_programs': fields.List(fields.Nested(pair)),
     'clasifs_internas_cytg': fields.List(fields.Nested(clasif_interna_cytg)),
     'estatus_pre_asenl': fields.List(fields.Nested(pair)),
     'proyecciones_asenl': fields.List(fields.Nested(pair)),
@@ -127,7 +124,6 @@ class ObservacionPreAsenlList(Resource):
     @ns.param("order", "ASC or DESC, which ordering to use, default is ASC")
     @ns.param("per_page", "How many items per page, default is 10")
     @ns.param("page", "Which page to fetch, default is 1")
-    @ns.param("programa_social_id", obs_pre_asenl_ns_captions['programa_social_id'])
     @ns.param("auditoria_id", obs_pre_asenl_ns_captions['auditoria_id'])
     @ns.param("observacion", obs_pre_asenl_ns_captions['observacion'])
     @ns.param("direccion_id", obs_pre_asenl_ns_captions['direccion_id'])
@@ -144,7 +140,7 @@ class ObservacionPreAsenlList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['programa_social_id', 'auditoria_id', 'observacion', 'direccion_id']
+            ['auditoria_id', 'observacion', 'direccion_id']
         )
 
         try:
@@ -245,7 +241,6 @@ class Catalog(Resource):
                 'divisions',
                 'audits',
                 'dependencies',
-                'social_programs',
                 'clasifs_internas_cytg',
                 'estatus_pre_asenl',
                 'proyecciones_asenl',

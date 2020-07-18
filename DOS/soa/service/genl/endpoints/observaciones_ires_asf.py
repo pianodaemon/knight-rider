@@ -154,6 +154,15 @@ dependency = api.model('Datos de una Dependencia', {
     'clasif_title': fields.String(description='Clasificación de la Dependencia'),
 })
 
+program  = api.model('Datos de un Programa social', {
+    'id': fields.Integer(description='Id del programa social'),
+    'title': fields.String(description='Siglas del programa social'),
+    'description': fields.String(description='Nombre del programa social'),
+    'central': fields.Boolean(description='Vinculado a Central'),
+    'paraestatal': fields.Boolean(description='Vinculado a Paraestatal'),
+    'obra_pub': fields.Boolean(description='Vinculado a Obra pública'),
+})
+
 clasif_interna_pair = api.model('Par que asocia sorting_value y el title para la Clasificación interna CyTG', {
     'sorting_val': fields.Integer(description='Valor para ordenamiento'),
     'title': fields.String(description='Título de la Clasficación interna CyTG'),
@@ -173,7 +182,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASF (Inf
     'audits': fields.List(fields.Nested(audit)),
     'dependencies': fields.List(fields.Nested(dependency)),
     'divisions': fields.List(fields.Nested(pair)),
-    'social_programs': fields.List(fields.Nested(pair)),
+    'social_programs': fields.List(fields.Nested(program)),
 })
 
 @ns.route('/')

@@ -15,7 +15,6 @@ def _alter_observation(**kwargs):
         '{}'::date,
         {}::integer,
         {}::integer,
-        {}::integer,
         '{}'::character varying,
         '{}'::date,
         '{}'::date,
@@ -44,7 +43,6 @@ def _alter_observation(**kwargs):
             kwargs['compartida_tipo_observacion_id'],
             kwargs['compartida_monto'],
             kwargs['fecha_captura'],
-            kwargs['programa_social_id'],
             kwargs['tipo_auditoria_id'],
             kwargs['auditoria_id'],
             kwargs['num_oficio_notif_obs_prelim'],
@@ -120,7 +118,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         raise Exception("Value of param 'limit' should be >= 1")
 
     order_by_values = (
-        'id', 'programa_social_id', 'auditoria_id', 'observacion', 'direccion_id'
+        'id', 'auditoria_id', 'observacion', 'direccion_id'
     )
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
@@ -267,7 +265,6 @@ def add_observacion_data(ent):
         'compartida_tipo_observacion_id',
         'compartida_monto',
         'fecha_captura',
-        'programa_social_id',
         'tipo_auditoria_id',
         'auditoria_id',
         'num_oficio_notif_obs_prelim',

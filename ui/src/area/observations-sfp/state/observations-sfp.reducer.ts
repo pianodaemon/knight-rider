@@ -4,7 +4,6 @@ import { createAndMergeSliceReducer } from 'src/redux-utils/create-and-merge-sli
 export interface ObservationSFP {
   id: number;
   direccion_id: number;
-  // dependencia_id: number;
   fecha_captura: string;
   programa_social_id: number;
   auditoria_id: number;
@@ -35,7 +34,6 @@ export interface ObservationSFP {
   num_oficio_resp_dependencia: number;
   fecha_oficio_resp_dependencia: number;
   seguimientos: Array<Seguimiento> | null;
-  // anios_cuenta_publica: Array<number> | null;
 }
 
 type Seguimiento = {
@@ -86,9 +84,12 @@ type CatalogItem = {
 
 type Division = CatalogItem;
 type Dependency = CatalogItem;
-type SocialProgram = CatalogItem;
+type SocialProgram = CatalogItem & {
+  central: boolean,
+  paraestatal: boolean,
+  obra_pub: boolean,
+};
 type AutoridadesInvest = CatalogItem;
-// type ObservationCodes = CatalogItem;
 type ObservationTypes = CatalogItem;
 type Estatus = CatalogItem;
 type ClasifInternas = {
@@ -102,7 +103,6 @@ export type Catalog = {
   dependencies: Array<Dependency> | null,
   divisions: Array<Division> | null,
   estatus_sfp: Array<Estatus> | null,
-  // observation_codes: Array<ObservationCodes> | null,
   observation_types: Array<ObservationTypes> | null,
   social_programs: Array<SocialProgram> | null,
   clasifs_internas_cytg: Array<ClasifInternas> | null,

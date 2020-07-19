@@ -388,65 +388,6 @@ export const ObservationsASENLForm = (props: Props) => {
                       )}
                     </FormControl>
                   </Grid>
-                  {/*
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <AutoCompleteDropdown
-                        fieldLabel="title"
-                        fieldValue="id"
-                        label="Programa"
-                        name="programa"
-                        onChange={(value: any) => {
-                          return setFieldValue('programa_social_id', value);
-                        }}
-                        options={
-                          catalog && catalog.social_programs
-                            ? catalog.social_programs
-                            : []
-                        }
-                        value={catalog && catalog.social_programs ? values.programa_social_id || '' : ''}
-                        disabled={disabledModeOn}
-                      />
-                      <div style={{ width: 32, height: 32 }}>
-                        <IconButton
-                          aria-label="toggle visibility"
-                          onClick={() =>
-                            setModalField({
-                              ...modalField,
-                              open: true,
-                              field: 'Programa',
-                              text:
-                                catalog &&
-                                catalog.social_programs &&
-                                values.programa_social_id &&
-                                catalog.social_programs.find(
-                                  (item) =>
-                                    item.id === values.programa_social_id
-                                )
-                                  ? (
-                                      catalog.social_programs.find(
-                                        (item) =>
-                                          item.id === values.programa_social_id
-                                      ) || {}
-                                    ).title || ''
-                                  : '',
-                            })}
-                          onMouseDown={() => {}}
-                        >
-                          <ZoomInIcon />
-                        </IconButton>
-                      </div>
-                      {errors.programa_social_id && touched.programa_social_id && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese un Programa
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <InputLabel>Tipo de Auditoría</InputLabel>

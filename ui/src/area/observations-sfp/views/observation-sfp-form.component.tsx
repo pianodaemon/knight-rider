@@ -154,7 +154,6 @@ export const ObservationsSFPForm = (props: Props) => {
   const initialValues = {
     id: '',
     direccion_id: '',
-    // dependencia_id: '',
     fecha_captura: `${fechaCaptura.getFullYear()}-${fechaCaptura.getMonth()+1}-${fechaCaptura.getDate()}`,
     programa_social_id: '',
     auditoria_id: '',
@@ -215,7 +214,7 @@ export const ObservationsSFPForm = (props: Props) => {
     const errors: any = {};
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> = fields.filter((item: string) => /^fecha_/i.test(item)) || [];
-    const noMandatoryFields: Array<string> = ["id", "seguimientos", "anios_cuenta_publica", "dependencia_id"];
+    const noMandatoryFields: Array<string> = ["id", "seguimientos", "anios_cuenta_publica",];
 
     // Mandatory fields (not empty)
     fields.filter(field => !noMandatoryFields.includes(field)).forEach((field: string) => {
@@ -272,6 +271,7 @@ export const ObservationsSFPForm = (props: Props) => {
         enableReinitialize
       >
         {({
+        validateForm,
         values,
         errors,
         touched,
@@ -337,7 +337,10 @@ export const ObservationsSFPForm = (props: Props) => {
                       labelId="direccion_id"
                       id="direccion_id-select"
                       value={catalog ? values.direccion_id || '' : ''}
-                      onChange={handleChange('direccion_id')}
+                      onChange={(value: any) => {
+                          setFieldValue('programa_social_id', '');
+                          setFieldValue('direccion_id', value.target.value);
+                      }}
                       disabled={(action === 'view')}
                     >
                       {catalog &&
@@ -412,8 +415,12 @@ export const ObservationsSFPForm = (props: Props) => {
                         return setFieldValue('programa_social_id', value);
                       }}
                       options={
-                        catalog && catalog.social_programs
-                          ? catalog.social_programs
+                        catalog && catalog.social_programs && catalog.divisions
+                          ? catalog.social_programs.filter((item: any) => {
+                            const direccion = ((catalog && catalog.divisions && catalog.divisions.find((division: any) => division.id === values.direccion_id)) || {}).title;
+                            // @todo Fix me: Hardcoded values.
+                            return (item.central && direccion === 'CENTRAL') || (item.paraestatal && direccion === 'PARAESTATAL') || (item.obra_pub && direccion === 'OBRAS');
+                          })
                           : []
                       }
                       value={catalog ? values.programa_social_id || '' : ''}

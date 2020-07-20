@@ -138,7 +138,7 @@ export const preObservationsSelector = createSelector(
   catalogSelector,
   (slice: any, catalog: any) => {
     const { observations } = slice.observacion_pre;
-    return observations
+    return observations && catalog.audits && catalog.audits.length
       ? observations.map((item: any) => {
           const audit = catalog.audits.find(
             (audit_item: any) => audit_item.id === item.auditoria_id

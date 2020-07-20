@@ -109,6 +109,186 @@ ALTER FUNCTION public.alter_audit(_audit_id integer, _title character varying, _
 
 
 --
+-- Name: alter_observacion_ires_asenl(integer, integer, character varying, date, integer, character varying, text, boolean, character varying, double precision, text, integer, double precision, text, integer, double precision, double precision, double precision, integer[], text, character varying, date, date, character varying, date, date, character varying, date, text, character varying, date, character varying, character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.alter_observacion_ires_asenl(_observacion_id integer, _observacion_pre_id integer, _num_oficio_of character varying, _fecha_publicacion date, _tipo_observacion_id integer, _num_observacion character varying, _observacion_final text, _observacion_reincidente boolean, _anios_reincidencia character varying, _monto_observado double precision, _compartida_observacion text, _compartida_tipo_observacion_id integer, _compartida_monto double precision, _comentarios text, _clasif_final_cytg integer, _monto_solventado double precision, _monto_pendiente_solventar double precision, _monto_a_reintegrar double precision, _acciones integer[], _recomendaciones text, _num_oficio_recomendacion character varying, _fecha_oficio_recomendacion date, _fecha_vencimiento_enviar_asenl date, _num_oficio_dependencia character varying, _fecha_oficio_dependencia date, _fecha_vencimiento_interna_cytg date, _num_oficio_resp_dependencia character varying, _fecha_acuse_resp_dependencia date, _resp_dependencia text, _num_oficio_enviar_resp_asenl character varying, _fecha_oficio_enviar_resp_asenl date, _unidad_investigadora character varying, _num_vai character varying) RETURNS record
+    LANGUAGE plpgsql
+    AS $$
+
+DECLARE
+
+    current_moment timestamp with time zone = now();
+    ult_obs_id integer := 0;
+	acciones_arr_len integer := array_length(_acciones, 1);
+	idx integer := 0;
+	row_counter bigint := 0;
+	
+    -- dump of errors
+    rmsg text;
+
+BEGIN
+
+    CASE
+
+        WHEN _observacion_id = 0 THEN
+		
+            INSERT INTO observaciones_ires_asenl (
+				observacion_pre_id,
+				num_oficio_of,
+				fecha_publicacion,
+				tipo_observacion_id,
+				num_observacion,
+				observacion_final,
+				observacion_reincidente,
+				anios_reincidencia,
+				monto_observado,
+				compartida_observacion,
+				compartida_tipo_observacion_id,
+				compartida_monto,
+				comentarios,
+				clasif_final_cytg,
+				monto_solventado,
+				monto_pendiente_solventar,
+				monto_a_reintegrar,
+				recomendaciones,
+				num_oficio_recomendacion,
+				fecha_oficio_recomendacion,
+				fecha_vencimiento_enviar_asenl,
+				num_oficio_dependencia,
+				fecha_oficio_dependencia,
+				fecha_vencimiento_interna_cytg,
+				num_oficio_resp_dependencia,
+				fecha_acuse_resp_dependencia,
+				resp_dependencia,
+				num_oficio_enviar_resp_asenl,
+				fecha_oficio_enviar_resp_asenl,
+				unidad_investigadora,
+				num_vai,
+				hora_ult_cambio,
+				hora_creacion
+            ) VALUES (
+				_observacion_pre_id,
+				_num_oficio_of,
+				_fecha_publicacion,
+				_tipo_observacion_id,
+				_num_observacion,
+				_observacion_final,
+				_observacion_reincidente,
+				_anios_reincidencia,
+				_monto_observado,
+				_compartida_observacion,
+				_compartida_tipo_observacion_id,
+				_compartida_monto,
+				_comentarios,
+				_clasif_final_cytg,
+				_monto_solventado,
+				_monto_pendiente_solventar,
+				_monto_a_reintegrar,
+				_recomendaciones,
+				_num_oficio_recomendacion,
+				_fecha_oficio_recomendacion,
+				_fecha_vencimiento_enviar_asenl,
+				_num_oficio_dependencia,
+				_fecha_oficio_dependencia,
+				_fecha_vencimiento_interna_cytg,
+				_num_oficio_resp_dependencia,
+				_fecha_acuse_resp_dependencia,
+				_resp_dependencia,
+				_num_oficio_enviar_resp_asenl,
+				_fecha_oficio_enviar_resp_asenl,
+				_unidad_investigadora,
+				_num_vai,
+				current_moment,
+				current_moment
+            ) RETURNING id INTO ult_obs_id;
+			
+            FOR idx IN 1 .. acciones_arr_len LOOP
+
+                INSERT INTO acciones_obs_asenl
+				VALUES (
+                    ult_obs_id,
+					_acciones[idx]
+                );
+            
+			END LOOP;
+
+        WHEN _observacion_id > 0 THEN
+
+            UPDATE observaciones_ires_asenl
+            SET observacion_pre_id = _observacion_pre_id,
+				num_oficio_of = _num_oficio_of,
+				fecha_publicacion = _fecha_publicacion,
+				tipo_observacion_id = _tipo_observacion_id,
+				num_observacion = _num_observacion,
+				observacion_final = _observacion_final,
+				observacion_reincidente = _observacion_reincidente,
+				anios_reincidencia = _anios_reincidencia,
+				monto_observado = _monto_observado,
+				compartida_observacion = _compartida_observacion,
+				compartida_tipo_observacion_id = _compartida_tipo_observacion_id,
+				compartida_monto = _compartida_monto,
+				comentarios = _comentarios,
+				clasif_final_cytg = _clasif_final_cytg,
+				monto_solventado = _monto_solventado,
+				monto_pendiente_solventar = _monto_pendiente_solventar,
+				monto_a_reintegrar = _monto_a_reintegrar,
+				recomendaciones = _recomendaciones,
+				num_oficio_recomendacion = _num_oficio_recomendacion,
+				fecha_oficio_recomendacion = _fecha_oficio_recomendacion,
+				fecha_vencimiento_enviar_asenl = _fecha_vencimiento_enviar_asenl,
+				num_oficio_dependencia = _num_oficio_dependencia,
+				fecha_oficio_dependencia = _fecha_oficio_dependencia,
+				fecha_vencimiento_interna_cytg = _fecha_vencimiento_interna_cytg,
+				num_oficio_resp_dependencia = _num_oficio_resp_dependencia,
+				fecha_acuse_resp_dependencia = _fecha_acuse_resp_dependencia,
+				resp_dependencia = _resp_dependencia,
+				num_oficio_enviar_resp_asenl = _num_oficio_enviar_resp_asenl,
+				fecha_oficio_enviar_resp_asenl = _fecha_oficio_enviar_resp_asenl,
+				unidad_investigadora = _unidad_investigadora,
+				num_vai = _num_vai,
+				hora_ult_cambio = current_moment
+            WHERE id = _observacion_id;
+			
+			GET DIAGNOSTICS row_counter = ROW_COUNT;
+			if row_counter <> 1 then
+				RAISE EXCEPTION 'Observación ASENL (IRes) con id % no existe', _observacion_id;
+			end if;
+
+            delete from acciones_obs_asenl where observacion_id = _observacion_id;
+			
+			FOR idx IN 1 .. acciones_arr_len LOOP
+
+                INSERT INTO acciones_obs_asenl
+				VALUES (
+                    _observacion_id,
+					_acciones[idx]
+                );
+            
+			END LOOP;
+			
+			ult_obs_id = _observacion_id;
+			
+        ELSE
+            RAISE EXCEPTION 'Negative observation ASENL (IRes) identifier % is unsupported', _observacion_id;
+
+    END CASE;
+
+    RETURN ( ult_obs_id::integer, ''::text );
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS rmsg = MESSAGE_TEXT;
+            return ( -1::integer, rmsg::text );
+
+END;
+$$;
+
+
+ALTER FUNCTION public.alter_observacion_ires_asenl(_observacion_id integer, _observacion_pre_id integer, _num_oficio_of character varying, _fecha_publicacion date, _tipo_observacion_id integer, _num_observacion character varying, _observacion_final text, _observacion_reincidente boolean, _anios_reincidencia character varying, _monto_observado double precision, _compartida_observacion text, _compartida_tipo_observacion_id integer, _compartida_monto double precision, _comentarios text, _clasif_final_cytg integer, _monto_solventado double precision, _monto_pendiente_solventar double precision, _monto_a_reintegrar double precision, _acciones integer[], _recomendaciones text, _num_oficio_recomendacion character varying, _fecha_oficio_recomendacion date, _fecha_vencimiento_enviar_asenl date, _num_oficio_dependencia character varying, _fecha_oficio_dependencia date, _fecha_vencimiento_interna_cytg date, _num_oficio_resp_dependencia character varying, _fecha_acuse_resp_dependencia date, _resp_dependencia text, _num_oficio_enviar_resp_asenl character varying, _fecha_oficio_enviar_resp_asenl date, _unidad_investigadora character varying, _num_vai character varying) OWNER TO postgres;
+
+
+--
 -- Name: alter_observacion_ires_asf(integer, integer, character varying, date, date, text, integer, character varying, character varying, double precision, double precision, double precision, date, double precision, boolean, public.seguimientos_obs_asf[], public.pras_ires_asf); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -361,10 +541,10 @@ ALTER FUNCTION public.alter_observacion_ires_asf(_observacion_id integer, _obser
 
 
 --
--- Name: alter_observacion_pre_asenl(integer, integer, text, integer, double precision, date, integer, integer, integer, character varying, date, date, integer, character varying, text, double precision, character varying, date, date, date, character varying, date, text, text, integer, character varying, date, integer, integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: alter_observacion_pre_asenl(integer, integer, text, integer, double precision, date, integer, integer, character varying, date, date, integer, character varying, text, double precision, character varying, date, date, date, character varying, date, text, text, integer, character varying, date, integer, integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.alter_observacion_pre_asenl(_observacion_id integer, _direccion_id integer, _compartida_observacion text, _compartida_tipo_observacion_id integer, _compartida_monto double precision, _fecha_captura date, _programa_social_id integer, _tipo_auditoria_id integer, _auditoria_id integer, _num_oficio_notif_obs_prelim character varying, _fecha_recibido date, _fecha_vencimiento_of date, _tipo_observacion_id integer, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg_oic character varying, _fecha_oficio_cytg_oic date, _fecha_recibido_dependencia date, _fecha_vencimiento_cytg date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_proceso_id integer, _proyeccion_solventacion_id integer, _resultado_final_pub_id integer) RETURNS record
+CREATE FUNCTION public.alter_observacion_pre_asenl(_observacion_id integer, _direccion_id integer, _compartida_observacion text, _compartida_tipo_observacion_id integer, _compartida_monto double precision, _fecha_captura date, _tipo_auditoria_id integer, _auditoria_id integer, _num_oficio_notif_obs_prelim character varying, _fecha_recibido date, _fecha_vencimiento_of date, _tipo_observacion_id integer, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg_oic character varying, _fecha_oficio_cytg_oic date, _fecha_recibido_dependencia date, _fecha_vencimiento_cytg date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_proceso_id integer, _proyeccion_solventacion_id integer, _resultado_final_pub_id integer) RETURNS record
     LANGUAGE plpgsql
     AS $$
 
@@ -389,7 +569,6 @@ BEGIN
 				compartida_tipo_observacion_id,
 				compartida_monto,
 				fecha_captura,
-				programa_social_id,
 				tipo_auditoria_id,
 				auditoria_id,
 				num_oficio_notif_obs_prelim,
@@ -421,7 +600,6 @@ BEGIN
 				_compartida_tipo_observacion_id,
 				_compartida_monto,
 				_fecha_captura,
-				_programa_social_id,
 				_tipo_auditoria_id,
 				_auditoria_id,
 				_num_oficio_notif_obs_prelim,
@@ -457,7 +635,6 @@ BEGIN
 				compartida_tipo_observacion_id = _compartida_tipo_observacion_id,
 				compartida_monto = _compartida_monto,
 				fecha_captura = _fecha_captura,
-				programa_social_id = _programa_social_id,
 				tipo_auditoria_id = _tipo_auditoria_id,
 				auditoria_id = _auditoria_id,
 				num_oficio_notif_obs_prelim = _num_oficio_notif_obs_prelim,
@@ -507,7 +684,7 @@ END;
 $$;
 
 
-ALTER FUNCTION public.alter_observacion_pre_asenl(_observacion_id integer, _direccion_id integer, _compartida_observacion text, _compartida_tipo_observacion_id integer, _compartida_monto double precision, _fecha_captura date, _programa_social_id integer, _tipo_auditoria_id integer, _auditoria_id integer, _num_oficio_notif_obs_prelim character varying, _fecha_recibido date, _fecha_vencimiento_of date, _tipo_observacion_id integer, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg_oic character varying, _fecha_oficio_cytg_oic date, _fecha_recibido_dependencia date, _fecha_vencimiento_cytg date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_proceso_id integer, _proyeccion_solventacion_id integer, _resultado_final_pub_id integer) OWNER TO postgres;
+ALTER FUNCTION public.alter_observacion_pre_asenl(_observacion_id integer, _direccion_id integer, _compartida_observacion text, _compartida_tipo_observacion_id integer, _compartida_monto double precision, _fecha_captura date, _tipo_auditoria_id integer, _auditoria_id integer, _num_oficio_notif_obs_prelim character varying, _fecha_recibido date, _fecha_vencimiento_of date, _tipo_observacion_id integer, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg_oic character varying, _fecha_oficio_cytg_oic date, _fecha_recibido_dependencia date, _fecha_vencimiento_cytg date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_proceso_id integer, _proyeccion_solventacion_id integer, _resultado_final_pub_id integer) OWNER TO postgres;
 
 
 --
@@ -671,6 +848,168 @@ $$;
 
 
 ALTER FUNCTION public.alter_observacion_pre_asf(_observacion_id integer, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _num_oficio_of character varying, _fecha_recibido date, _fecha_vencimiento_of date, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg character varying, _fecha_oficio_cytg date, _fecha_recibido_dependencia date, _fecha_vencimiento date, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date, _resp_dependencia text, _comentarios text, _clasif_final_cytg integer, _num_oficio_org_fiscalizador character varying, _fecha_oficio_org_fiscalizador date, _estatus_criterio_int_id integer, _proyecciones integer[]) OWNER TO postgres;
+
+
+--
+-- Name: alter_observacion_pre_cytg(integer, date, date, integer, date, integer, integer, integer, character varying, date, date, character varying, date, date, date, integer, character varying, text, double precision, character varying, date, date, date, boolean, character varying, date, character varying, date, date, integer, character varying, date, text, text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.alter_observacion_pre_cytg(_observacion_id integer, _periodo_revision_de date, _periodo_revision_a date, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _tipo_auditoria_id integer, _num_oficio_inicio character varying, _fecha_notificacion_inicio date, _fecha_vencimiento_nombra_enlace date, _num_oficio_requerimiento character varying, _fecha_notificacion_requerimiento date, _fecha_vencimiento_requerimiento date, _fecha_vencimiento_nueva date, _tipo_observacion_id integer, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg_oic_pre character varying, _fecha_oficio_cytg_pre date, _fecha_recibido_dependencia date, _fecha_vencimiento_pre date, _prorroga boolean, _num_oficio_solic_prorroga character varying, _fecha_oficio_solic_prorroga date, _num_oficio_contest_prorroga_cytg character varying, _fecha_oficio_contest_cytg date, _fecha_vencimiento_pre_nueva date, _clasif_pre_cytg integer, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp date, _resp_dependencia text, _comentarios text) RETURNS record
+    LANGUAGE plpgsql
+    AS $$
+
+DECLARE
+
+    current_moment timestamp with time zone = now();
+    ult_obs_id integer := 0;
+	row_counter bigint := 0;
+	
+    -- dump of errors
+    rmsg text;
+
+BEGIN
+
+    CASE
+
+        WHEN _observacion_id = 0 THEN
+		
+            INSERT INTO observaciones_pre_cytg (
+                periodo_revision_de,
+				periodo_revision_a,
+				direccion_id,
+				fecha_captura,
+				programa_social_id,
+				auditoria_id,
+				tipo_auditoria_id,
+				num_oficio_inicio,
+				fecha_notificacion_inicio,
+				fecha_vencimiento_nombra_enlace,
+				num_oficio_requerimiento,
+				fecha_notificacion_requerimiento,
+				fecha_vencimiento_requerimiento,
+				fecha_vencimiento_nueva,
+				tipo_observacion_id,
+				num_observacion,
+				observacion,
+				monto_observado,
+				num_oficio_cytg_oic_pre,
+				fecha_oficio_cytg_pre,
+				fecha_recibido_dependencia,
+				fecha_vencimiento_pre,
+				prorroga,
+				num_oficio_solic_prorroga,
+				fecha_oficio_solic_prorroga,
+				num_oficio_contest_prorroga_cytg,
+				fecha_oficio_contest_cytg,
+				fecha_vencimiento_pre_nueva,
+				clasif_pre_cytg,
+				num_oficio_resp_dependencia,
+				fecha_oficio_resp,
+				resp_dependencia,
+				comentarios,
+				hora_ult_cambio,
+				hora_creacion
+            ) VALUES (
+				_periodo_revision_de,
+				_periodo_revision_a,
+				_direccion_id,
+				_fecha_captura,
+				_programa_social_id,
+				_auditoria_id,
+				_tipo_auditoria_id,
+				_num_oficio_inicio,
+				_fecha_notificacion_inicio,
+				_fecha_vencimiento_nombra_enlace,
+				_num_oficio_requerimiento,
+				_fecha_notificacion_requerimiento,
+				_fecha_vencimiento_requerimiento,
+				_fecha_vencimiento_nueva,
+				_tipo_observacion_id,
+				_num_observacion,
+				_observacion,
+				_monto_observado,
+				_num_oficio_cytg_oic_pre,
+				_fecha_oficio_cytg_pre,
+				_fecha_recibido_dependencia,
+				_fecha_vencimiento_pre,
+				_prorroga,
+				_num_oficio_solic_prorroga,
+				_fecha_oficio_solic_prorroga,
+				_num_oficio_contest_prorroga_cytg,
+				_fecha_oficio_contest_cytg,
+				_fecha_vencimiento_pre_nueva,
+				_clasif_pre_cytg,
+				_num_oficio_resp_dependencia,
+				_fecha_oficio_resp,
+				_resp_dependencia,
+				_comentarios,
+				current_moment,
+				current_moment
+            ) RETURNING id INTO ult_obs_id;
+
+        WHEN _observacion_id > 0 THEN
+
+            UPDATE observaciones_pre_cytg
+            SET periodo_revision_de = _periodo_revision_de,
+				periodo_revision_a = _periodo_revision_a,
+				direccion_id = _direccion_id,
+				fecha_captura = _fecha_captura,
+				programa_social_id = _programa_social_id,
+				auditoria_id = _auditoria_id,
+				tipo_auditoria_id = _tipo_auditoria_id,
+				num_oficio_inicio = _num_oficio_inicio,
+				fecha_notificacion_inicio = _fecha_notificacion_inicio,
+				fecha_vencimiento_nombra_enlace = _fecha_vencimiento_nombra_enlace,
+				num_oficio_requerimiento = _num_oficio_requerimiento,
+				fecha_notificacion_requerimiento = _fecha_notificacion_requerimiento,
+				fecha_vencimiento_requerimiento = _fecha_vencimiento_requerimiento,
+				fecha_vencimiento_nueva = _fecha_vencimiento_nueva,
+				tipo_observacion_id = _tipo_observacion_id,
+				num_observacion = _num_observacion,
+				observacion = _observacion,
+				monto_observado = _monto_observado,
+				num_oficio_cytg_oic_pre = _num_oficio_cytg_oic_pre,
+				fecha_oficio_cytg_pre = _fecha_oficio_cytg_pre,
+				fecha_recibido_dependencia = _fecha_recibido_dependencia,
+				fecha_vencimiento_pre = _fecha_vencimiento_pre,
+				prorroga = _prorroga,
+				num_oficio_solic_prorroga = _num_oficio_solic_prorroga,
+				fecha_oficio_solic_prorroga = _fecha_oficio_solic_prorroga,
+				num_oficio_contest_prorroga_cytg = _num_oficio_contest_prorroga_cytg,
+				fecha_oficio_contest_cytg = _fecha_oficio_contest_cytg,
+				fecha_vencimiento_pre_nueva = _fecha_vencimiento_pre_nueva,
+				clasif_pre_cytg = _clasif_pre_cytg,
+				num_oficio_resp_dependencia = _num_oficio_resp_dependencia,
+				fecha_oficio_resp = _fecha_oficio_resp,
+				resp_dependencia = _resp_dependencia,
+				comentarios = _comentarios,
+				hora_ult_cambio = current_moment
+            WHERE id = _observacion_id;
+			
+			GET DIAGNOSTICS row_counter = ROW_COUNT;
+			if row_counter <> 1 then
+				RAISE EXCEPTION 'Observación preliminar de CyTG con id % no existe', _observacion_id;
+			end if;
+			
+			ult_obs_id = _observacion_id;
+			
+        ELSE
+            RAISE EXCEPTION 'Observación preliminar de CyTG con id % no soportado', _observacion_id;
+
+    END CASE;
+
+    RETURN ( ult_obs_id::integer, ''::text );
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS rmsg = MESSAGE_TEXT;
+            return ( -1::integer, rmsg::text );
+
+END;
+$$;
+
+
+ALTER FUNCTION public.alter_observacion_pre_cytg(_observacion_id integer, _periodo_revision_de date, _periodo_revision_a date, _direccion_id integer, _fecha_captura date, _programa_social_id integer, _auditoria_id integer, _tipo_auditoria_id integer, _num_oficio_inicio character varying, _fecha_notificacion_inicio date, _fecha_vencimiento_nombra_enlace date, _num_oficio_requerimiento character varying, _fecha_notificacion_requerimiento date, _fecha_vencimiento_requerimiento date, _fecha_vencimiento_nueva date, _tipo_observacion_id integer, _num_observacion character varying, _observacion text, _monto_observado double precision, _num_oficio_cytg_oic_pre character varying, _fecha_oficio_cytg_pre date, _fecha_recibido_dependencia date, _fecha_vencimiento_pre date, _prorroga boolean, _num_oficio_solic_prorroga character varying, _fecha_oficio_solic_prorroga date, _num_oficio_contest_prorroga_cytg character varying, _fecha_oficio_contest_cytg date, _fecha_vencimiento_pre_nueva date, _clasif_pre_cytg integer, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp date, _resp_dependencia text, _comentarios text) OWNER TO postgres;
 
 
 --

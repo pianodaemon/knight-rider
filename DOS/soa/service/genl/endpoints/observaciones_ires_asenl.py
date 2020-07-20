@@ -106,6 +106,12 @@ dependency = api.model('Datos de una Dependencia', {
     'clasif_title': fields.String(description='Clasificación de la Dependencia'),
 })
 
+accion = api.model('Acción (ASENL)', {
+    'id': fields.Integer(description='Id de la acción'),
+    'title': fields.String(description='Siglas de la acción'),
+    'description': fields.String(description='Nombre de la acción'),
+})
+
 clasif_final_pair = api.model('Par que asocia sorting_value y el title para la Clasificación interna CyTG', {
     'sorting_val': fields.Integer(description='Valor para ordenamiento'),
     'title': fields.String(description='Título de la Clasficación interna CyTG'),
@@ -122,7 +128,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASENL (I
     'audits': fields.List(fields.Nested(audit)),
     'dependencies': fields.List(fields.Nested(dependency)),
     'divisions': fields.List(fields.Nested(pair)),
-    'acciones_asenl': fields.List(fields.Nested(pair)),
+    'acciones_asenl': fields.List(fields.Nested(accion)),
 })
 
 @ns.route('/')

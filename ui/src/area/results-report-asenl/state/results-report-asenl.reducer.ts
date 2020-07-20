@@ -77,7 +77,7 @@ type Audit = CatalogItem & {
   dependency_ids: Array<number>,
   years: Array<number>,
 };
-type Dependency = CatalogItem;
+type Dependency = CatalogItem & { clasif_title: string, description: string };
 type Division = CatalogItem;
 type ObservationTypes = CatalogItem;
 type ClasifInternas = {

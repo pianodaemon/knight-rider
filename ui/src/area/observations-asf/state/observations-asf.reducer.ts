@@ -54,7 +54,7 @@ type Audit = CatalogItem & {
 };
 
 type Division = CatalogItem;
-type Dependency = CatalogItem;
+type Dependency = CatalogItem & { clasif_title: string, description: string };
 type SocialProgram = CatalogItem & {
   central: boolean,
   paraestatal: boolean,

@@ -83,11 +83,12 @@ type CatalogItem = {
 };
 
 type Division = CatalogItem;
-type Dependency = CatalogItem;
+type Dependency = CatalogItem & { description: string, clasif_title: string };
 type SocialProgram = CatalogItem & {
   central: boolean,
-  paraestatal: boolean,
+  description: string,
   obra_pub: boolean,
+  paraestatal: boolean,
 };
 type AutoridadesInvest = CatalogItem;
 type ObservationTypes = CatalogItem;

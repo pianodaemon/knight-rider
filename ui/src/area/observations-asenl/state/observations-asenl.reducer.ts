@@ -8,7 +8,6 @@ export interface ObservationASENL {
   compartida_tipo_observacion_id: number; // Tipo de Observación (compartida) [DONE]
   compartida_monto: number; // Monto observado (compartida) [DONE]
   fecha_captura: string; // Fecha de captura [DONE]
-  programa_social_id: number; // Id del Programa Social [DONE]
   tipo_auditoria_id: number; // Id del Tipo de Auditoría [DONE]
   auditoria_id: number; // Id de la Auditoría [DONE]
   num_oficio_notif_obs_prelim: string; // Num. de Oficio donde notifican Observación Preliminar [DONE]
@@ -63,7 +62,6 @@ type Audit = CatalogItem & {
 type AuditoriaTipos = CatalogItem;
 type Division = CatalogItem;
 type Dependency = CatalogItem & { description: string, clasif_title: string };
-type SocialProgram = CatalogItem;
 type EstatusPreASENL = CatalogItem;
 type ProyeccionesASENL = CatalogItem;
 type ObservationTypes = CatalogItem;
@@ -81,7 +79,6 @@ export type Catalog = {
   estatus_pre_asenl: Array<EstatusPreASENL> | null,
   observation_types: Array<ObservationTypes> | null,
   proyecciones_asenl: Array<ProyeccionesASENL> | null,
-  social_programs: Array<SocialProgram> | null,
 };
 
 const initialState: ObservationsASENLSlice = {

@@ -321,7 +321,10 @@ export const ObservationsASFForm = (props: Props) => {
                         labelId="direccion_id"
                         id="direccion_id-select"
                         value={catalog ? values.direccion_id || '' : ''}
-                        onChange={handleChange('direccion_id')}
+                        onChange={(value: any) => {
+                          setFieldValue('programa_social_id', '');
+                          setFieldValue('direccion_id', value.target.value);
+                      }}
                       >
                         {catalog &&
                             catalog.divisions &&
@@ -396,8 +399,12 @@ export const ObservationsASFForm = (props: Props) => {
                           return setFieldValue('programa_social_id', value);
                         }}
                         options={
-                          catalog && catalog.social_programs
-                            ? catalog.social_programs
+                          catalog && catalog.social_programs && catalog.divisions
+                            ? catalog.social_programs.filter((item: any) => {
+                              const direccion = ((catalog && catalog.divisions && catalog.divisions.find((division: any) => division.id === values.direccion_id)) || {}).title;
+                              // @todo Fix me: Hardcoded values.
+                              return (item.central && direccion === 'CENTRAL') || (item.paraestatal && direccion === 'PARAESTATAL') || (item.obra_pub && direccion === 'OBRAS');
+                            })
                             : []
                         }
                         value={catalog ? values.programa_social_id || '' : ''}

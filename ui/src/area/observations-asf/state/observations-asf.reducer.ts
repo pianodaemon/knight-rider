@@ -55,8 +55,11 @@ type Audit = CatalogItem & {
 
 type Division = CatalogItem;
 type Dependency = CatalogItem;
-type SocialProgram = CatalogItem;
-// type ObservationCodes = CatalogItem;
+type SocialProgram = CatalogItem & {
+  central: boolean,
+  paraestatal: boolean,
+  obra_pub: boolean,
+};
 type EstatusPreASF = CatalogItem;
 type ProyeccionesASF = CatalogItem;
 type ClasifInternas = {
@@ -68,7 +71,6 @@ export type Catalog = {
   audits: Array<Audit> | null,
   dependencies: Array<Dependency> | null,
   divisions: Array<Division> | null,
-  // observation_codes: Array<ObservationCodes> | null,
   estatus_pre_asf: Array<EstatusPreASF> | null,
   social_programs: Array<SocialProgram> | null,
   proyecciones_asf: Array<ProyeccionesASF> | null,

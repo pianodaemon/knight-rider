@@ -281,16 +281,26 @@ export const ObservationsASFForm = (props: Props) => {
             )
               ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).dependency_ids
               : '';
-          const dependencias = 
+          const dependencias =
             catalog &&
             catalog.dependencies &&
             dependency_ids &&
             dependency_ids.length &&
-            dependency_ids.map(
-              (dependency: any) => catalog?.dependencies?.find((item) => item.id === dependency)
-                ? (catalog.dependencies.find((item) => item.id === dependency) || {}).title
-                : ''
-            ).join(', ');
+            dependency_ids
+              .map((dependency: any) =>
+                catalog?.dependencies?.find((item) => item.id === dependency)
+                  ? `${(
+                      catalog.dependencies.find(
+                        (item) => item.id === dependency
+                      ) || {}
+                    ).title} - ${(
+                      catalog.dependencies.find(
+                        (item) => item.id === dependency
+                      ) || {}
+                    ).description}`
+                  : ''
+              )
+              .join(', ');
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Observaciones Preliminares ASF</h1>
@@ -320,7 +330,7 @@ export const ObservationsASFForm = (props: Props) => {
                         disabled={disabledModeOn}
                         labelId="direccion_id"
                         id="direccion_id-select"
-                        value={catalog ? values.direccion_id || '' : ''}
+                        value={catalog && catalog.divisions ? values.direccion_id || '' : ''}
                         onChange={(value: any) => {
                           setFieldValue('programa_social_id', '');
                           setFieldValue('direccion_id', value.target.value);
@@ -902,7 +912,7 @@ export const ObservationsASFForm = (props: Props) => {
                         disabled={disabledModeOn}
                         labelId="estatus_criterio_int_id"
                         id="estatus_criterio_int_id-select"
-                        value={catalog ? values.estatus_criterio_int_id || '' : ''}
+                        value={catalog && catalog.estatus_pre_asf ? values.estatus_criterio_int_id || '' : ''}
                         onChange={handleChange('estatus_criterio_int_id')}
                       >
                         {catalog &&

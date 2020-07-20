@@ -16,9 +16,19 @@ export const catalogSelector = createSelector(sliceSelector, (slice: any) => {
     slice && slice.catalog && slice.catalog.audits
       ? slice.catalog.audits.sort((a: any, b: any) => b.id - a.id)
       : [];
+  /* @todo Add when backend ready
+  const observation_types =
+    slice && slice.catalog && slice.catalog.observation_types
+      ? [
+          ...[{ id: '', title: 'Seleccione una Opción' }],
+          ...slice.catalog.observation_types,
+        ]
+      : [];
+  */
   return {
     ...slice.catalog,
     audits,
+    // observation_types
   };
 });
 

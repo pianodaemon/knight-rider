@@ -163,7 +163,6 @@ export const ObservationsASENLForm = (props: Props) => {
     fecha_captura: `${fechaCaptura.getFullYear()}-${
       fechaCaptura.getMonth() + 1
     }-${fechaCaptura.getDate()}`,
-    programa_social_id: '',
     tipo_auditoria_id: '',
     auditoria_id: '',
     num_oficio_notif_obs_prelim: '',
@@ -199,7 +198,7 @@ export const ObservationsASENLForm = (props: Props) => {
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> =
       fields.filter((item: string) => /^fecha_/i.test(item)) || [];
-    const noMandatoryFields: Array<string> = ['id'];
+    const noMandatoryFields: Array<string> = ['id', 'tipo_observacion_id'];
 
     // Mandatory fields (not empty)
     fields
@@ -292,11 +291,15 @@ export const ObservationsASENLForm = (props: Props) => {
             dependency_ids
               .map((dependency: any) =>
                 catalog?.dependencies?.find((item) => item.id === dependency)
-                  ? (
+                  ? `${(
                       catalog.dependencies.find(
                         (item) => item.id === dependency
                       ) || {}
-                    ).title
+                    ).title} - ${(
+                      catalog.dependencies.find(
+                        (item) => item.id === dependency
+                      ) || {}
+                    ).description}`
                   : ''
               )
               .join(', ');

@@ -15,13 +15,13 @@ export type Catalog = {
   dependencies: Array<Dependency> | null,
 };
 
-type Dependency = {
+export type Dependency = {
   id: number,
   title: string,
   description: string,
 };
 
-interface AuditsSlice {
+export interface AuditsSlice {
   audit: Audit | null;
   audits: Array<Audit> | null;
   catalog: Catalog | null;

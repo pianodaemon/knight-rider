@@ -271,6 +271,7 @@ export const ObservationsSFPForm = (props: Props) => {
         enableReinitialize
       >
         {({
+        validateForm,
         values,
         errors,
         touched,

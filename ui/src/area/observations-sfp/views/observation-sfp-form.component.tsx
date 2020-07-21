@@ -298,16 +298,26 @@ export const ObservationsSFPForm = (props: Props) => {
           )
             ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).dependency_ids 
             : '';
-        const dependencias = 
+        const dependencias =
           catalog &&
           catalog.dependencies &&
           dependency_ids &&
           dependency_ids.length &&
-          dependency_ids.map(
-            (dependency: any) => catalog?.dependencies?.find((item) => item.id === dependency)
-              ? (catalog.dependencies.find((item) => item.id === dependency) || {}).title
-              : ''
-          ).join(', ');
+          dependency_ids
+            .map((dependency: any) =>
+              catalog?.dependencies?.find((item) => item.id === dependency)
+                ? `${(
+                    catalog.dependencies.find(
+                      (item) => item.id === dependency
+                    ) || {}
+                  ).title} - ${(
+                    catalog.dependencies.find(
+                      (item) => item.id === dependency
+                    ) || {}
+                  ).description}`
+                : ''
+            )
+            .join(', ');
         return (
           <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
             <h1 style={{ color: '#128aba' }}>Observaciones de Resultados SFP</h1>
@@ -336,7 +346,7 @@ export const ObservationsSFPForm = (props: Props) => {
                     <Select
                       labelId="direccion_id"
                       id="direccion_id-select"
-                      value={catalog ? values.direccion_id || '' : ''}
+                      value={catalog && catalog.divisions ? values.direccion_id || '' : ''}
                       onChange={(value: any) => {
                           setFieldValue('programa_social_id', '');
                           setFieldValue('direccion_id', value.target.value);
@@ -423,7 +433,7 @@ export const ObservationsSFPForm = (props: Props) => {
                           })
                           : []
                       }
-                      value={catalog ? values.programa_social_id || '' : ''}
+                      value={catalog && catalog.social_programs ? values.programa_social_id || '' : ''}
                       disabled={(action === 'view')}
                     />
                     {errors.programa_social_id &&
@@ -452,7 +462,7 @@ export const ObservationsSFPForm = (props: Props) => {
                           ? catalog.audits
                           : []
                       }
-                      value={catalog ? values.auditoria_id || '' : ''}
+                      value={catalog && catalog.audits ? values.auditoria_id || '' : ''}
                       disabled={(action === 'view')}
                     />
                     {errors.auditoria_id &&
@@ -657,7 +667,7 @@ export const ObservationsSFPForm = (props: Props) => {
                     <Select
                       labelId="tipo_observacion_id"
                       id="tipo_observacion_id-select"
-                      value={catalog ? values.tipo_observacion_id || '' : ''}
+                      value={catalog && catalog.observation_types ? values.tipo_observacion_id || '' : ''}
                       onChange={handleChange('tipo_observacion_id')}
                       disabled={(action === 'view')}
                     >
@@ -956,7 +966,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                       ? (catalog.clasifs_internas_cytg.find((item: any) => item.direccion_id === values.direccion_id) || {}).clasifs_internas_pairs || []
                                       : []
                                   }
-                                  value={catalog && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].clasif_final_interna_cytg : ''}
+                                  value={catalog && catalog.clasifs_internas_cytg && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].clasif_final_interna_cytg : ''}
                                   disabled={(action === 'view')}
                                 />
                               </FormControl>
@@ -1003,7 +1013,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   labelId="estatus_id"
                                   // id="estatus_id-select"
                                   onChange={handleChange(`seguimientos.${index}.estatus_id`)}
-                                  value={catalog && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].estatus_id : ''}
+                                  value={catalog && catalog.estatus_sfp && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].estatus_id : ''}
                                   disabled={(action === 'view')}
                                 >
                                   {catalog &&
@@ -1358,7 +1368,7 @@ export const ObservationsSFPForm = (props: Props) => {
                     <Select
                       labelId="autoridad_invest_id"
                       id="autoridad_invest_id-select"
-                      value={catalog ? values.autoridad_invest_id || '' : ''}
+                      value={catalog && catalog.autoridades_invest ? values.autoridad_invest_id || '' : ''}
                       onChange={handleChange('autoridad_invest_id')}
                       disabled={(action === 'view')}
                     >

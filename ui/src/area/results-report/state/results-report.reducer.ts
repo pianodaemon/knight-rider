@@ -105,13 +105,18 @@ type Audit = CatalogItem & {
 };
 
 type AutoridadesInvest = CatalogItem;
-type Dependency = CatalogItem;
+type Dependency = CatalogItem & { clasif_title: string, description: string };
 type Division = CatalogItem;
 type EstatusIresASF = CatalogItem;
 type MediosNotifSeguimientoASF = CatalogItem;
 type ObservationTypes = CatalogItem;
 type ObservationCodes = CatalogItem;
-type SocialProgram = CatalogItem;
+type SocialProgram = CatalogItem & {
+  central: boolean,
+  description: string,
+  obra_pub: boolean,
+  paraestatal: boolean,
+};
 type ClasifInternas = {
   direccion_id: number,
   clasifs_internas_pairs: Array<{ sorting_val: number, title: string }>,

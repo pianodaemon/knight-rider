@@ -130,7 +130,7 @@ export const AuditsForm = (props: Props) => {
   const { catalog, createAuditAction, audit, updateAuditAction } = props;
   const classes = useStyles();
   const history = useHistory();
-  const { id } = useParams();
+  const { id } = useParams<any>();
   const initialValues = {
     title: '',
     dependency_ids: [],

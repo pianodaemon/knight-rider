@@ -339,16 +339,26 @@ export const ResultsReportForm = (props: Props) => {
             )
               ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).dependency_ids
               : '';
-          const dependencias = 
+          const dependencias =
             catalog &&
             catalog.dependencies &&
             dependency_ids &&
             dependency_ids.length &&
-            dependency_ids.map(
-              (dependency: any) => catalog?.dependencies?.find((item) => item.id === dependency)
-                ? (catalog.dependencies.find((item) => item.id === dependency) || {}).title
-                : ''
-            ).join(', ');
+            dependency_ids
+              .map((dependency: any) =>
+                catalog?.dependencies?.find((item) => item.id === dependency)
+                  ? `${(
+                      catalog.dependencies.find(
+                        (item) => item.id === dependency
+                      ) || {}
+                    ).title} - ${(
+                      catalog.dependencies.find(
+                        (item) => item.id === dependency
+                      ) || {}
+                    ).description}`
+                  : ''
+              )
+              .join(', ');
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Observación de Resultados ASF</h1>

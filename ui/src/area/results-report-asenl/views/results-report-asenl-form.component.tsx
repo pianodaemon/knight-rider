@@ -71,6 +71,12 @@ const useStyles = makeStyles((theme: Theme) =>
         display: 'flex',
       },
     },
+    form: {
+      '& input:not([type=checkbox]):disabled, & textarea:disabled, & div[aria-disabled="true"]': {
+        color: theme.palette.text.primary,
+        opacity: 1
+      },
+    },
     fieldset: {
       borderRadius: 3,
       borderWidth: 0,
@@ -273,21 +279,31 @@ export const ResultsReportASENLForm = (props: Props) => {
             )
               ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).dependency_ids
               : '';
-          const dependencias = 
+          const dependencias =
             catalog &&
             catalog.dependencies &&
             dependency_ids &&
             dependency_ids.length &&
-            dependency_ids.map(
-              (dependency: any) => catalog?.dependencies?.find((item) => item.id === dependency)
-                ? (catalog.dependencies.find((item) => item.id === dependency) || {}).title
-                : ''
-            ).join(', ');
+            dependency_ids
+              .map((dependency: any) =>
+                catalog?.dependencies?.find((item) => item.id === dependency)
+                  ? `${(
+                      catalog.dependencies.find(
+                        (item) => item.id === dependency
+                      ) || {}
+                    ).title} - ${(
+                      catalog.dependencies.find(
+                        (item) => item.id === dependency
+                      ) || {}
+                    ).description}`
+                  : ''
+              )
+              .join(', ');
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Observación de Resultados ASENL</h1>
               <hr className={classes.hrDivider} />
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} className={classes.form}>
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>

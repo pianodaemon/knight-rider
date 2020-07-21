@@ -13,9 +13,21 @@ export const catalogSelector = createSelector(sliceSelector, (slice: any) => {
     slice && slice.catalog && slice.catalog.audits
       ? slice.catalog.audits.sort((a: any, b: any) => b.id - a.id)
       : [];
+  const social_programs =
+    slice && slice.catalog && slice.catalog.social_programs
+      ? [
+          ...slice.catalog.social_programs.map((program: any) => {
+            return {
+              ...program,
+              title: `${program.title} - ${program.description}`,
+            };
+          }),
+        ]
+      : [];
   return {
     ...slice.catalog,
     audits,
+    social_programs,
   };
 });
 
@@ -38,63 +50,72 @@ export const isLoadingSelector = createSelector(
 
 export const reportsCatalogSelector = createSelector(
   sliceSelector,
-  catalogSelector,
-  (slice: any, catalog: any) =>
-    catalog &&
-    catalog.divisions &&
-    slice.reports &&
-    Array.isArray(slice.reports) &&
-    slice.reports.map((report: ResultsReport) => {
-      const anio_auditoria =
-        catalog &&
-        catalog.audits &&
-        report.auditoria_id &&
-        catalog.audits.find((item: any) => item.id === report.auditoria_id)
-          ? (
-              catalog.audits.find(
-                (item: any) => item.id === report.auditoria_id
-              ) || {}
-            ).years
-          : '';
-      const dependencies =
-        catalog &&
-        catalog.audits &&
-        report.auditoria_id &&
-        catalog.audits.find((item: any) => item.id === report.auditoria_id)
-          ? (
-              catalog.audits.find(
-                (item: any) => item.id === report.auditoria_id
-              ) || {}
-            ).dependency_ids
-              .map((dependency: number) =>
-                catalog.dependencies.find((item: any) => item.id === dependency)
-              )
-              .map((item: any) => item.title)
-              .join(', ')
-          : '';
-      let direccion_id_title: any = catalog.divisions.find(
-        (item: any) => item.id === report.direccion_id
-      );
-      let auditoria_id_title: any = catalog.audits.find(
-        (item: any) => item.id === report.auditoria_id
-      );
-      let programa_social_id_title: any = catalog.social_programs.find(
-        (item: any) => item.id === report.programa_social_id
-      );
-      direccion_id_title = direccion_id_title ? direccion_id_title.title : null;
-      auditoria_id_title = auditoria_id_title ? auditoria_id_title.title : null;
-      programa_social_id_title = programa_social_id_title
-        ? programa_social_id_title.title
-        : null;
-      return {
-        ...report,
-        anio_auditoria,
-        direccion_id_title,
-        auditoria_id_title,
-        programa_social_id_title,
-        dependencies,
-      };
-    })
+  (slice: any) => {
+    const { catalog } = slice;
+    return (
+      catalog &&
+      catalog.divisions &&
+      slice.reports &&
+      Array.isArray(slice.reports) &&
+      slice.reports.map((report: ResultsReport) => {
+        const anio_auditoria =
+          catalog &&
+          catalog.audits &&
+          report.auditoria_id &&
+          catalog.audits.find((item: any) => item.id === report.auditoria_id)
+            ? (
+                catalog.audits.find(
+                  (item: any) => item.id === report.auditoria_id
+                ) || {}
+              ).years
+            : '';
+        const dependencies =
+          catalog &&
+          catalog.audits &&
+          report.auditoria_id &&
+          catalog.audits.find((item: any) => item.id === report.auditoria_id)
+            ? (
+                catalog.audits.find(
+                  (item: any) => item.id === report.auditoria_id
+                ) || {}
+              ).dependency_ids
+                .map((dependency: number) =>
+                  catalog.dependencies.find(
+                    (item: any) => item.id === dependency
+                  )
+                )
+                .map((item: any) => item.title)
+                .join(', ')
+            : '';
+        let direccion_id_title: any = catalog.divisions.find(
+          (item: any) => item.id === report.direccion_id
+        );
+        let auditoria_id_title: any = catalog.audits.find(
+          (item: any) => item.id === report.auditoria_id
+        );
+        let programa_social_id_title: any = catalog.social_programs.find(
+          (item: any) => item.id === report.programa_social_id
+        );
+        direccion_id_title = direccion_id_title
+          ? direccion_id_title.title
+          : null;
+        auditoria_id_title = auditoria_id_title
+          ? auditoria_id_title.title
+          : null;
+        programa_social_id_title = programa_social_id_title
+          ? programa_social_id_title.title
+          : null;
+        return {
+          ...report,
+          anio_auditoria,
+          direccion_id_title,
+          auditoria_id_title,
+          programa_social_id_title,
+          dependencies,
+        };
+      })
+    );
+  }
 );
 
 export const pagingSelector = createSelector(
@@ -117,7 +138,7 @@ export const preObservationsSelector = createSelector(
   catalogSelector,
   (slice: any, catalog: any) => {
     const { observations } = slice.observacion_pre;
-    return observations
+    return observations && catalog.audits && catalog.audits.length
       ? observations.map((item: any) => {
           const audit = catalog.audits.find(
             (audit_item: any) => audit_item.id === item.auditoria_id

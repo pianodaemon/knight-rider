@@ -19,6 +19,8 @@ import { ResultsReportTableContainer } from '../../results-report/views/results-
 import { ResultsReportFormContainer } from '../../results-report/views/results-report-form.container';
 import { ResultsReportASENLTableContainer } from '../../results-report-asenl/views/results-report-asenl-table.container';
 import { ResultsReportASENLFormContainer } from '../../results-report-asenl/views/results-report-asenl-form.container';
+import { ObservationCYTGTableContainer } from '../../observations-cytg/views/observation-cytg-table.container';
+import { ObservationCYTGFormContainer } from '../../observations-cytg/views/observation-cytg-form.container';
 
 type Props = {
   history: History,
@@ -30,6 +32,7 @@ type Props = {
   loadUsersCatalogAction: Function,
   loadCatalogObsASENLAction: Function,
   loadCatalogResultsReportASENLAction: Function,
+  loadCatalogObsCYTGAction: Function,
 };
 
 export const AppRoutes = (props: Props) => {
@@ -42,6 +45,7 @@ export const AppRoutes = (props: Props) => {
     props.loadCatalogResultsReportAction();
     props.loadCatalogObsASENLAction();
     props.loadCatalogResultsReportASENLAction();
+    props.loadCatalogObsCYTGAction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -106,6 +110,15 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route exact path={['/', '/results-report-asenl/list']}>
           <ResultsReportASENLTableContainer />
+        </Route>
+        <Route exact path={['/', '/observation-cytg/list']}>
+          <ObservationCYTGTableContainer />
+        </Route>
+        <Route
+          exact
+          path={['/observation-cytg/create', '/observation-cytg/:id/:action']}
+        >
+          <ObservationCYTGFormContainer />
         </Route>
         <Route exact path={['/user/create', '/user/:id/edit']}>
           <UsersFormContainer />

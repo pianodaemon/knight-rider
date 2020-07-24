@@ -216,6 +216,19 @@ export function AppBarComponent() {
         },
       ],
     },
+    observationCytg: {
+      url: '/observation-cytg/list',
+      text: 'Observaciones Preliminares CyTG',
+      icon: <ImageSearchIcon />,
+      open: true,
+      childrenList: [
+        {
+          url: '/observation-cytg/create',
+          text: 'Crear',
+          icon: <NoteAddIcon />,
+        },
+      ],
+    },
     user: {
       url: '/user/list',
       text: 'Usuarios',

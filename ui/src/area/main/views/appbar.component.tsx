@@ -28,7 +28,7 @@ import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import { Link, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 // import ListSubheader from '@material-ui/core/ListSubheader';
-import Collapse from '@material-ui/core/Collapse';
+// import Collapse from '@material-ui/core/Collapse';
 // import ExpandLess from '@material-ui/icons/ExpandLess';
 // import ExpandMore from '@material-ui/icons/ExpandMore';
 import { AppRoutesContainer } from './app-routes.container';
@@ -322,7 +322,7 @@ export function AppBarComponent() {
                   <ListItemIcon>{breadcrumbNameMap[route].icon}</ListItemIcon>
                   <ListItemText primary={breadcrumbNameMap[route].text} />
                 </ListItem>
-
+                {/*
                 {breadcrumbNameMap[route].childrenList.length > 0 && (
                   <Collapse in timeout="auto" unmountOnExit>
                     <>
@@ -362,6 +362,7 @@ export function AppBarComponent() {
                     </>
                   </Collapse>
                 )}
+                */}
               </React.Fragment>
             ))}
           </List>

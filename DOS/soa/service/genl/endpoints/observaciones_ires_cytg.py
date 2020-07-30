@@ -53,6 +53,9 @@ obs_ires_cytg_ns_captions = {
     'monto_pendiente_solventar': 'Monto pendiente de solventar',
     
     'seguimientos': 'Seguimientos (lista de cédulas)',
+    'direccion_id': 'Id de la dirección (según obs preliminar)',
+    'auditoria_id': 'Id de la auditoría (según obs preliminar)',
+    'programa_social_id': 'Id del programa social (según obs preliminar)',
 }
 
 ns = api.namespace("obs_ires_cytg", description="Servicios disponibles para Observaciones de la CyTG (Informe de Resultados)")
@@ -103,6 +106,9 @@ obs_ires_cytg = api.model('Observación CyTG (resultados)', {
     'num_oficio_resp_dependencia': fields.String(description=obs_ires_cytg_ns_captions['num_oficio_resp_dependencia']),
     'fecha_oficio_resp_dependencia': fields.Date(description=obs_ires_cytg_ns_captions['fecha_oficio_resp_dependencia']),
     'seguimientos': fields.List(fields.Nested(seguimiento), description=obs_ires_cytg_ns_captions['seguimientos']),
+    'direccion_id': fields.Integer(description=obs_ires_cytg_ns_captions['direccion_id']),
+    'auditoria_id': fields.Integer(description=obs_ires_cytg_ns_captions['auditoria_id']),
+    'programa_social_id': fields.Integer(description=obs_ires_cytg_ns_captions['programa_social_id']),
 })
 
 

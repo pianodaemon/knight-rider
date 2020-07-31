@@ -229,6 +229,19 @@ export function AppBarComponent() {
         },
       ],
     },
+    resultsReportCytg: {
+      url: '/results-report-cytg/list',
+      text: 'Observaciones de la CYTG (Informe de Resultados)',
+      icon: <ImageSearchIcon />,
+      open: true,
+      childrenList: [
+        {
+          url: '/results-report-cytg/create',
+          text: 'Crear',
+          icon: <NoteAddIcon />,
+        },
+      ],
+    },
     user: {
       url: '/user/list',
       text: 'Usuarios',

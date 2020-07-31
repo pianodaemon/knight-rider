@@ -325,18 +325,22 @@ def add_observacion_data(ent):
 
 
 def add_preliminar_data(ent):
-    sql = '''
-        SELECT direccion_id, auditoria_id
-        FROM observaciones_pre_asenl
-        WHERE id = {}
-        AND NOT blocked;
-    '''.format(ent['observacion_pre_id'])
+    if ent['observacion_pre_id'] < 1:
+        ent['direccion_id'] = None
+        ent['auditoria_id'] = None
+    else:
+        sql = '''
+            SELECT direccion_id, auditoria_id
+            FROM observaciones_pre_asenl
+            WHERE id = {}
+            AND NOT blocked;
+        '''.format(ent['observacion_pre_id'])
 
-    rows = exec_steady(sql)
+        rows = exec_steady(sql)
 
-    row = dict(rows[0])
-    ent['direccion_id'] = row['direccion_id']
-    ent['auditoria_id'] = row['auditoria_id']
+        row = dict(rows[0])
+        ent['direccion_id'] = row['direccion_id']
+        ent['auditoria_id'] = row['auditoria_id']
 
 
 def transform_list_into_dict(input_list):

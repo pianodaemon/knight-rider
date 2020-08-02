@@ -47,6 +47,14 @@ services:
           - ./DOS/keys:/pem
         networks:
           - operational_network
+    cache_obs:
+        container_name: 'cache_obs'
+        image: redis:buster
+        ports:
+          - "6379:6379"
+        environment: *commonEnv
+        networks:
+          - operational_network
 
 networks:
     operational_network:

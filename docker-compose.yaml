@@ -11,7 +11,7 @@ services:
     ui_obs:
         container_name: 'ui_obs'
         build:
-          context: './ui'
+          context: './DOS/ui'
           args:
             NODE_ENV: 'production'
             REACT_APP_HOST_API: 'http://localhost:8080/api/v1'
@@ -44,7 +44,7 @@ services:
           - '10090:10090'
         environment: *commonEnv
         volumes:
-          - ~/dev/keys:/pem
+          - ./DOS/keys:/pem
         networks:
           - operational_network
 

@@ -1,12 +1,13 @@
 from dal.helper import exec_steady
+from misc.helperpg import EmptySetError, ServerError
 
 
-def get(**kwargs):
+def get(ej_ini, ej_fin):
     ''' Returns an instance of Reporte 53 '''
     
     # Tratamiento de filtros
-    ej_ini = kwargs['ejercicio_ini']
-    ej_fin = kwargs['ejercicio_fin']
+    ej_ini = int(ej_ini)
+    ej_fin = int(ej_fin)
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
@@ -23,8 +24,10 @@ def get(**kwargs):
     '''
     try:
         rows = exec_steady(sql)
-    except:
+    except EmptySetError:
         rows = []
+    except Exception:
+        raise ServerError('Hay un problema con el servidor de base de datos')
 
     for row in rows:
         if row[0] > 1:
@@ -40,7 +43,7 @@ def get(**kwargs):
     '''
     try:
         rows = exec_steady(sql)
-    except:
+    except EmptySetError:
         rows = []
 
     for row in rows:
@@ -69,7 +72,7 @@ def get(**kwargs):
 
     try:
         rows = exec_steady(sql)
-    except:
+    except EmptySetError:
         rows = []
     
     for row in rows:
@@ -95,7 +98,7 @@ def get(**kwargs):
     
     try:
         rows = exec_steady(sql)
-    except:
+    except EmptySetError:
         rows = []
 
     for row in rows:
@@ -122,7 +125,7 @@ def get(**kwargs):
     
     try:
         rows = exec_steady(sql)
-    except:
+    except EmptySetError:
         rows = []
 
     for row in rows:
@@ -147,7 +150,7 @@ def get(**kwargs):
 
     try:
         rows = exec_steady(sql)
-    except:
+    except EmptySetError:
         rows = []
 
     for row in rows:

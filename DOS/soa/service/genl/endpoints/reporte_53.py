@@ -1,9 +1,10 @@
 from flask_restplus import Resource, fields
+from flask import request
 from psycopg2 import Error as pg_err
 
 from genl.restplus import api
 from dal import reporte_53
-from misc.helperpg import get_msg_pgerror, EmptySetError
+from misc.helperpg import ServerError
 
 
 reporte_53_ns_captions = {
@@ -17,18 +18,13 @@ reporte_53_ns_captions = {
     'monto_asenl': 'Monto (ASENL)',
     'cant_obs_cytg': 'Cant. Obs. (CyTG)',
     'monto_cytg': 'Monto (CyTG)',
-    'ejercicio_ini': 'Ejercicio (de)',
-    'ejercicio_fin': 'Ejercicio (a)',
+    'ejercicio_ini': 'Ejercicio (desde)',
+    'ejercicio_fin': 'Ejercicio (hasta)',
 }
 
 ns = api.namespace("reporte_53", description="Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados")
 
-filters = api.model('Filtros del reporte)', {
-    'ejercicio_ini': fields.Integer(description=reporte_53_ns_captions['ejercicio_ini']),
-    'ejercicio_fin': fields.Integer(description=reporte_53_ns_captions['ejercicio_fin']),
-})
-
-data_row = api.model('Data row)', {
+data_row = api.model('Data row (Reporte 53)', {
     'dep': fields.String(description=reporte_53_ns_captions['dependencia']),
     'ej': fields.Integer(description=reporte_53_ns_captions['ejercicio']),
     'c_asf': fields.Integer(description=reporte_53_ns_captions['cant_obs_asf']),
@@ -48,21 +44,23 @@ report = api.model('Reporte 53', {
 
 
 @ns.route('/')
-@ns.response(404, 'Data not found')
-@ns.response(400, 'There is a problem with your request data')
+@ns.response(400, 'Client error')
+@ns.response(500, 'Server error')
 class Reporte53(Resource):
-    data_not_found = 'Datos no encontrados'
 
-    @ns.expect(filters)
     @ns.marshal_with(report)
+    @ns.param('ejercicio_ini', reporte_53_ns_captions['ejercicio_ini'], required=True)
+    @ns.param('ejercicio_fin', reporte_53_ns_captions['ejercicio_fin'], required=True)
     def get(self):
         ''' To fetch an instance of Reporte 53 '''
+
+        ejercicio_ini = request.args.get('ejercicio_ini', '2000')
+        ejercicio_fin = request.args.get('ejercicio_fin', '2040')
+
         try:
-            rep = reporte_53.get(**api.payload)
-        except pg_err as err:
-            ns.abort(400, message=get_msg_pgerror(err))
-        except EmptySetError:
-            ns.abort(404, message=Reporte53.data_not_found)
+            rep = reporte_53.get(ejercicio_ini, ejercicio_fin)
+        except ServerError as err:
+            ns.abort(500, message=err)
         except Exception as err:
             ns.abort(400, message=err)
         

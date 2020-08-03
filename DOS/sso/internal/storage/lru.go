@@ -3,6 +3,9 @@ package storage
 import (
 	"context"
 	"os"
+	"time"
+
+	ton "immortalcrab.com/sso/internal/token"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-redis/redis/v8"
@@ -21,13 +24,22 @@ func getEnv(key, fallback string) string {
 // Expires a token by placement of at cache (latter resouce usage)
 func Expire(tokenStr string, token *jwt.Token) error {
 
-	/*	var cli *redis.Client
+	remValidity := time.Second * time.Duration(ton.RemainingValidity(token))
 
-		if err := setRedisClientUp(cli); err != nil {
+	var ctx = context.Background()
+	var cli *redis.Client
 
-			return err
-		}
-	*/
+	if err := setRedisClientUp(&cli); err != nil {
+
+		return err
+	}
+
+	defer cli.Close()
+
+	if err := cli.Set(ctx, tokenStr, tokenStr, remValidity).Err(); err != nil {
+
+		return err
+	}
 
 	return nil
 }

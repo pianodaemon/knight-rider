@@ -3,7 +3,6 @@ import logging
 from flask import Blueprint, Flask
 
 from genl.endpoints import (
-    observations,
     audits,
     users,
     observaciones_sfp,
@@ -23,7 +22,6 @@ def setup_app(flask_app):
     blueprint = Blueprint("api", __name__, url_prefix="/api/v1")
     api.init_app(blueprint)
     
-    api.add_namespace(observations.ns)
     api.add_namespace(audits.ns)
     api.add_namespace(users.ns)
     api.add_namespace(observaciones_sfp.ns)

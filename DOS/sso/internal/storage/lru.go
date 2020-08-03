@@ -51,8 +51,11 @@ func setRedisClientUp(rcli **redis.Client) error {
 	var cli *redis.Client
 	var ctx = context.Background()
 
+	host := getEnv("REDIS_HOST", "localhost")
+	port := getEnv("REDIS_PORT", "6379")
+
 	cli = redis.NewClient(&redis.Options{
-		Addr:     getEnv("REDIS_ADDRS", "localhost:6379"),
+		Addr:     (host + ":" + port),
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})

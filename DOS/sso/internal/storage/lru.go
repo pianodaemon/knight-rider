@@ -44,6 +44,32 @@ func Expire(tokenStr string, token *jwt.Token) error {
 	return nil
 }
 
+// Inquiries cache blacklist whether token exist or not
+func IsInBlackList(tokenStr string) (bool, error) {
+
+	var ctx = context.Background()
+	var cli *redis.Client
+
+	if err := setRedisClientUp(&cli); err != nil {
+		return false, err
+	}
+
+	defer cli.Close()
+
+	_, err := cli.Get(ctx, tokenStr).Result()
+
+	if err == redis.Nil {
+		/* token is not in */
+		return false, nil
+	} else if err != nil {
+		/* Oops something went bad */
+		return false, err
+	}
+
+	/* Sadness.. token is in */
+	return true, nil
+}
+
 // Sets up a steady redis connection
 func setRedisClientUp(rcli **redis.Client) error {
 

@@ -98,7 +98,7 @@ func Engage(logger *logrus.Logger) (merr error) {
 				negroni.HandlerFunc(
 					func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
-						co.SingOff(clerk.CeaseToken)(w, r)
+						co.SignOff(clerk.CeaseToken)(w, r)
 					},
 				),
 			)).Methods("GET")

@@ -79,7 +79,7 @@ func Engage(logger *logrus.Logger) (merr error) {
 				if err != nil {
 
 					logger.Println("Issue detected at data abstraction layer: %s", err.Error())
-					logger.Println("Perhaps token ( %s ) is not blacklisted")
+					logger.Println("Perhaps token ( %s ) is not blacklisted", tokenStr)
 					return true
 				}
 

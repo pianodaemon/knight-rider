@@ -8,8 +8,11 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+// Fetches trivially an enviroment variable
 func getEnv(key, fallback string) string {
+
 	if value, ok := os.LookupEnv(key); ok {
+
 		return value
 	}
 	return fallback
@@ -18,19 +21,26 @@ func getEnv(key, fallback string) string {
 // Expires a token by placement of at cache (latter resouce usage)
 func Expire(tokenStr string, token *jwt.Token) error {
 
+	/*	var cli *redis.Client
+
+		if err := setRedisClientUp(cli); err != nil {
+
+			return err
+		}
+	*/
+
 	return nil
 }
 
+// Sets up a steady redis connection
 func setRedisClientUp(rcli **redis.Client) error {
 
 	var err error = nil
-	var cli *redis.Client = nil
+	var cli *redis.Client
 	var ctx = context.Background()
 
-	redisAddr := getEnv("REDIS_ADDRS", "localhost:6379")
-
 	cli = redis.NewClient(&redis.Options{
-		Addr:     redisAddr,
+		Addr:     getEnv("REDIS_ADDRS", "localhost:6379"),
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})

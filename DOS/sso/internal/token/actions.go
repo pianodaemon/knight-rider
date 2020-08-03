@@ -10,6 +10,27 @@ import (
 	request "github.com/dgrijalva/jwt-go/request"
 )
 
+func RemainingValidity(token *jwt.Token) int {
+
+	const (
+		expireOffset = 3600
+	)
+
+	var timestamp interface{} = token.Claims.(jwt.MapClaims)["exp"]
+
+	if validity, ok := timestamp.(float64); ok {
+
+		tm := time.Unix(int64(validity), 0)
+		remainer := tm.Sub(time.Now())
+
+		if remainer > 0 {
+			return int(remainer.Seconds() + expireOffset)
+		}
+	}
+
+	return expireOffset
+}
+
 // Extracts token from a http resquest by involving public key
 func ExtractFromReq(publicKey *rsa.PublicKey, req *http.Request, checkSignMethod bool) (*jwt.Token, error) {
 

@@ -1,6 +1,8 @@
 version: '3.6'
 
 x-shared-environment: &commonEnv
+    REDIS_HOST: "cache_obs"
+    REDIS_PORT: 6379
     POSTGRES_USER: "postgres"
     POSTGRES_PASSWORD: "postgres"
     POSTGRES_PORT: 5432
@@ -46,6 +48,14 @@ services:
         environment: *commonEnv
         volumes:
           - ./DOS/keys:/pem
+        networks:
+          - operational_network
+    cache_obs:
+        container_name: 'cache_obs'
+        image: redis:buster
+        ports:
+          - "6379:6379"
+        environment: *commonEnv
         networks:
           - operational_network
 

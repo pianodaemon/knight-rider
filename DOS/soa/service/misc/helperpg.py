@@ -8,6 +8,10 @@ class EmptySetError(Exception):
     pass
 
 
+class ServerError(Exception):
+    pass
+
+
 def _connect():
     """Opens a connection to database"""
     # order here matters

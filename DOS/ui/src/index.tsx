@@ -12,6 +12,10 @@ const initialState: any = {};
 const store: any = configureStore(initialState, {});
 const theme: Theme = createMuiTheme();
 const appSettings = {
+  auth:
+    process.env.NODE_ENV === 'production'
+      ? `${process.env.REACT_APP_HOST_API}`
+      : 'http://localhost:10090/v1/sso/token-auth', // @todo this should be fetch from docker image container env vars
   baseUrl:
     process.env.NODE_ENV === 'production'
       ? `${process.env.REACT_APP_HOST_API}`

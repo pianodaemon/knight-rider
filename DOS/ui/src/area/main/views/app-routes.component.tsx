@@ -7,6 +7,7 @@ import { UsersTableContainer } from '../../users/views/users-table.container';
 // import { FormContainer } from '../../auditories/views/form.container';
 import { ObservationsSFPFormContainer } from '../../observations-sfp/views/observation-sfp-form.container';
 import { ObservationsASFFormContainer } from '../../observations-asf/views/observation-asf-form.container';
+import { LoginFormContainer } from '../../auth/views/login-form.container';
 import { AuditContainer } from '../../auditories/views/audit-form.container';
 import { UsersFormContainer } from '../../users/views/users-form.container';
 import { ResultsReportFormContainer as RForm } from '../../auditories/views/results-report-form.container';
@@ -55,6 +56,9 @@ export const AppRoutes = (props: Props) => {
   return (
     <Router history={props.history}>
       <Switch>
+        <Route exact path={['/sign-in']}>
+          <LoginFormContainer />
+        </Route>
         <Route exact path={['/audit/create', '/audit/:id/edit']}>
           <AuditContainer />
         </Route>

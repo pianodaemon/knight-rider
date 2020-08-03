@@ -68,6 +68,7 @@ func Engage(logger *logrus.Logger) (merr error) {
 	}
 
 	{
+		// Authentication middleware
 		requireTokenAut := func(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
 			isNotBlackListed := func() bool {

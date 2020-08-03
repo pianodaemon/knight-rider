@@ -11,6 +11,7 @@ import (
 
 	co "immortalcrab.com/sso/internal/controllers"
 	"immortalcrab.com/sso/internal/rsapi"
+	dal "immortalcrab.com/sso/internal/storage"
 	ton "immortalcrab.com/sso/internal/token"
 	aut "immortalcrab.com/sso/pkg/authentication"
 )
@@ -69,9 +70,25 @@ func Engage(logger *logrus.Logger) (merr error) {
 	{
 		requireTokenAut := func(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
+			isNotBlackListed := func() bool {
+
+				tokenStr := req.Header.Get("Authorization")
+
+				answer, err := dal.IsInBlackList(tokenStr)
+
+				if err != nil {
+
+					logger.Println("Issue detected at data abstraction layer: %s", err.Error())
+					logger.Println("Perhaps token ( %s ) is not blacklisted")
+					return true
+				}
+
+				return !answer
+			}
+
 			tokenReq, err := ton.ExtractFromReq(pub, req, true)
 
-			if err == nil && tokenReq.Valid {
+			if err == nil && tokenReq.Valid && isNotBlackListed() {
 				next(rw, req)
 			} else {
 				rw.WriteHeader(http.StatusUnauthorized)

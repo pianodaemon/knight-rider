@@ -48,7 +48,7 @@ func SignOn(logIn LogInHandler) func(w http.ResponseWriter, r *http.Request) {
 
 type LogOutHandler func(req *http.Request) error
 
-func SingOff(logOut LogOutHandler) func(w http.ResponseWriter, r *http.Request) {
+func SignOff(logOut LogOutHandler) func(w http.ResponseWriter, r *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 

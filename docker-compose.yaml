@@ -52,7 +52,7 @@ services:
           - operational_network
     cache_obs:
         container_name: 'cache_obs'
-        image: redis:buster
+        image: redis:alpine
         ports:
           - "6379:6379"
         environment: *commonEnv

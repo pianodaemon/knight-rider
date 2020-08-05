@@ -1,10 +1,10 @@
 server {
-    listen 80;
+    listen 10080;
     server_name _;
 
     location / {
         include proxy_params;
-        proxy_pass http://unix:/app/rproxy.sock;
+        proxy_pass http://localhost:10090/;
 
         add_header 'Access-Control-Allow-Origin' '*' always;
         add_header 'Access-Control-Allow-Credentials' 'true' always;

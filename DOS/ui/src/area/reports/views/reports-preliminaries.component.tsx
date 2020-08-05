@@ -36,7 +36,7 @@ const useStyles = makeStyles(() =>
       },
       '& tr:nth-child(odd)': {
         border: 'solid 1px #fafafa',
-        background: '#fff',
+        background: '#fbfbfb',
       },
     },
     tableWhole: {
@@ -75,11 +75,14 @@ export const ReportPreliminaries = (props: Props) => {
   } = props;
   const [year, setYear] = useState<any>('2020');
   useEffect(() => {
-    loadReportsAction({ ejercicio_fin: year, ejercicio_ini: "2000"});
+    console.log(year);
+    loadReportsAction({ ejercicio_fin: year, ejercicio_ini: "2012"});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [year]);
   const classes = useStyles();
   const options = [
+    { value: '2012', label: '2012' },
+    { value: '2013', label: '2013' },
     { value: '2014', label: '2014' },
     { value: '2015', label: '2015' },
     { value: '2016', label: '2016' },
@@ -90,92 +93,90 @@ export const ReportPreliminaries = (props: Props) => {
   ];
   return (
     <div className={classes.Container}>
-    <div className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados</div>
+      <div className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados</div>
 
-    <div className={classes.filters}>
-      <div className={classes.selectYearContainer}>
-        <InputLabel className={classes.labelSelectYear}>Desde:</InputLabel>
-        <Select
-          labelId="desde"
-          id="desde"
-          value="2014"
-        >
-          {options.map((item) => {
-            return (
-              <MenuItem
-                value={item.value}
-              >
-                {item.label}
-              </MenuItem>
-            );
-          })}
-        </Select>
+      <div className={classes.filters}>
+        <div className={classes.selectYearContainer}>
+          <InputLabel className={classes.labelSelectYear}>Desde:</InputLabel>
+          <Select
+            labelId="desde"
+            value="2012"
+          >
+            {options.map((item) => {
+              return (
+                <MenuItem
+                  value={item.value}
+                >
+                  {item.label}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </div>
+        <div className={classes.selectYearContainer}>
+          <InputLabel className={classes.labelSelectYear}>Hasta:</InputLabel>
+          <Select
+            labelId="hasta"
+            value={year}
+            onChange={(e)=> {setYear(e.target.value);}}
+          >
+            {options.map((item) => {
+              return (
+                <MenuItem
+                  value={item.value}
+                >
+                  {item.label}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </div>
       </div>
-      <div className={classes.selectYearContainer}>
-        <InputLabel className={classes.labelSelectYear}>Hasta:</InputLabel>
-        <Select
-          labelId="hasta"
-          id="hasta"
-          value="2020"
-          onChange={(e)=>setYear(e.target.value)}
-        >
-          {options.map((item) => {
-            return (
-              <MenuItem
-                value={item.value}
-              >
-                {item.label}
-              </MenuItem>
-            );
-          })}
-        </Select>
-      </div>
-    </div>
 
 
-    <table className={classes.tableWhole}> 
-      <tbody className={classes.tableReports} >
-        <tr className={classes.titrow}>    
-          <th rowSpan={2} style={{backgroundColor: "#fff", color: "#000"}}>Secreataría/Entidad/Municipio</th> 
-          <th rowSpan={2} style={{backgroundColor: "#fff", color: "#000"}}>Ejercicio</th> 
-          <th colSpan={2}>ASF</th> 
-          <th colSpan={2}>SFP</th> 
-          <th colSpan={2}>ASENL</th> 
-          <th colSpan={2}>CyTG</th> 
-          <th colSpan={2}>Total</th> 
-        </tr> 
-        <tr style={{ fontWeight: "bold"}}> 
-          <td>Cant. Obs.</td> 
-          <td>Monto</td> 
-          <td>Cant. Obs.</td> 
-          <td>Monto</td> 
-          <td>Cant. Obs.</td> 
-          <td>Monto</td> 
-          <td>Cant. Obs.</td> 
-          <td>Monto</td> 
-          <td>Cant. Obs.</td> 
-          <td>Monto</td> 
-        </tr> 
-
-        {report53 && report53.data_rows && report53.data_rows.map((dep: any) =>
-           <tr> 
-             <td>{dep.dep}</td> 
-             <td>{dep.ej}</td>
-             <td>{dep.c_asf}</td>
-             <td>{dep.m_asf.toFixed( 2 )}</td>
-             <td>{dep.c_sfp}</td>
-             <td>{dep.m_sfp.toFixed( 2 )}</td>
-             <td>{dep.c_asenl}</td>
-             <td>{dep.m_asenl.toFixed( 2 )}</td>
-             <td>{dep.c_cytg}</td>
-             <td>{dep.m_cytg.toFixed( 2 )}</td>
-             <td> { dep.c_asf + dep.c_sfp + dep.c_asenl + dep.c_cytg } </td>
-             <td> { (dep.m_asf + dep.m_sfp + dep.m_asenl + dep.m_cytg).toFixed( 2 )  } </td>
-           </tr>
-        )
-        }
-      </tbody>
-    </table>
+      <table className={classes.tableWhole}> 
+        <tbody className={classes.tableReports} >
+          <tr className={classes.titrow}>    
+            <th rowSpan={2} style={{backgroundColor: "#fff", color: "#000"}}>Secretaría/Entidad/Municipio</th> 
+            <th rowSpan={2} style={{backgroundColor: "#fff", color: "#000"}}>Ejercicio</th> 
+            <th colSpan={2}>ASF</th> 
+            <th colSpan={2}>SFP</th> 
+            <th colSpan={2}>ASENL</th> 
+            <th colSpan={2}>CyTG</th> 
+            <th colSpan={2}>Total</th> 
+          </tr> 
+          <tr style={{ fontWeight: "bold"}}> 
+            <td>Cant. Obs.</td> 
+            <td>Monto</td> 
+            <td>Cant. Obs.</td> 
+            <td>Monto</td> 
+            <td>Cant. Obs.</td> 
+            <td>Monto</td> 
+            <td>Cant. Obs.</td> 
+            <td>Monto</td> 
+            <td>Cant. Obs.</td> 
+            <td>Monto</td> 
+          </tr> 
+            {console.log("sssssssssssssss")}
+          {report53 && report53.data_rows && report53.data_rows.map((dep: any) =>
+             <tr> 
+               <td>{dep.dep}</td> 
+               <td>{dep.ej}</td>
+               <td>{dep.c_asf}</td>
+               <td>{dep.m_asf.toFixed( 2 )}</td>
+               <td>{dep.c_sfp}</td>
+               <td>{dep.m_sfp.toFixed( 2 )}</td>
+               <td>{dep.c_asenl}</td>
+               <td>{dep.m_asenl.toFixed( 2 )}</td>
+               <td>{dep.c_cytg}</td>
+               <td>{dep.m_cytg.toFixed( 2 )}</td>
+               <td> { dep.c_asf + dep.c_sfp + dep.c_asenl + dep.c_cytg } </td>
+               <td> { (dep.m_asf + dep.m_sfp + dep.m_asenl + dep.m_cytg).toFixed( 2 )  } </td>
+             </tr>
+          )
+          }
+        </tbody>
+      </table>
     </div>
   );
 };

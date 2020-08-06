@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { ReportPreliminaries } from './reports-preliminaries.component';
+import { Report52Preliminaries } from './reports52-preliminaries.component';
 import { loadReportsAction } from '../state/usecases/load-reports.usecase';
 import {
   isLoadingSelector,
@@ -17,7 +17,7 @@ function mapStateToProps(state: any) {
   };
 }
 
-export const ReportsPreliminariesContainer = connect(
+export const Reports52PreliminariesContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(ReportPreliminaries);
+)(Report52Preliminaries);

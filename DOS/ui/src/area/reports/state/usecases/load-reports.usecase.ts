@@ -2,7 +2,8 @@ import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, /*select, */ takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { getReports } from '../../service/reports.service';
-import { results53Reducer } from '../reports.reducer';
+import { resultsReducer } from '../reports.reducer';
+import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
 // import { pagingSelector } from '../results-report.selectors';
 
 const postfix = '/app';
@@ -22,20 +23,41 @@ export const loadReportsActionErrorAction: ActionFunctionAny<
 
 function* loadResultsReportWorker(action?: any): Generator<any, any, any> {
   try {
-    // const { per_page, page, order, order_by } = action.payload || {};
+    const { ejercicio_fin, ejercicio_ini } = action.payload || {};
     // const paging = yield select(pagingSelector);
-    /*
+
     const options = {
       ...action.payload,
-      per_page: per_page || paging.per_page,
-      page: page || paging.page,
-      pages: paging.pages,
-      order: order || paging.order,
+      ejercicio_fin: ejercicio_fin,
+      ejercicio_ini: ejercicio_ini,
     };
-    */
-    const result = yield call(getReports, {});
-    //console.log(result.data);
-    yield put(loadReportsSuccessAction(result.data));
+
+    if(ejercicio_fin < ejercicio_ini){
+      yield put(
+        notificationAction({
+          message: `La fecha inicial debe ser menor`,
+        }),
+      );
+      return;
+    }
+
+    const result = yield call(getReports, options);
+
+    var dat = result.data;
+    var sum_obj = {c_asf:0, m_asf:0, c_sfp:0, m_sfp:0, c_asenl:0, m_asenl:0, c_cytg:0, m_cytg:0 };
+    dat.data_rows.map(function(x: any) {
+      sum_obj.c_asf   += x.c_asf   ;
+      sum_obj.m_asf   += x.m_asf   ;
+      sum_obj.c_sfp   += x.c_sfp   ;
+      sum_obj.m_sfp   += x.m_sfp   ;
+      sum_obj.c_asenl += x.c_asenl ;
+      sum_obj.m_asenl += x.m_asenl ;
+      sum_obj.c_cytg  += x.c_cytg  ;
+      sum_obj.m_cytg  += x.m_cytg  ;
+    } )
+
+    var sendData = {data_rows: result.data.data_rows, sum_rows: sum_obj};
+    yield put(loadReportsSuccessAction( sendData ));
   } catch (e) {
     yield put(loadReportsActionErrorAction());
   }
@@ -56,7 +78,7 @@ const resultsReportReducerHandlers = {
     return {
       ...state,
       loading: false,
-      report53: action.payload,
+      report: action.payload,
     };
   },
   [LOAD_REPORTS_ERROR]: (state: any) => {
@@ -69,4 +91,4 @@ const resultsReportReducerHandlers = {
 };
 
 mergeSaga(loadResultsReportWatcher);
-results53Reducer.addHandlers(resultsReportReducerHandlers);
+resultsReducer.addHandlers(resultsReportReducerHandlers);

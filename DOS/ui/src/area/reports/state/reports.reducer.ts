@@ -1,7 +1,7 @@
 import { createAndMergeSliceReducer } from 'src/redux-utils/create-and-merge-slice-reducer';
 
-// Base Reporte 53 Interface
-export interface Reporte53 {
+// Base Reporte  Interface
+export interface Reporte {
   data_rows: Array<DataRow>;
   ignored_audit_ids: Array<number>;
 }
@@ -19,18 +19,18 @@ type DataRow = {
   m_cytg: number; // Monto (CyTG)
 };
 
-interface Reporte53Slice {
-  report53: Reporte53 | null;
+interface ReporteSlice {
+  report: Reporte | null;
   loading: boolean;
 }
 
-const initialState: Reporte53Slice = {
-  report53: null,
+const initialState: ReporteSlice = {
+  report: null,
   loading: false,
 };
 
-export const sliceName = 'results53Slice';
-export const results53Reducer = createAndMergeSliceReducer(
+export const sliceName = 'resultsSlice';
+export const resultsReducer = createAndMergeSliceReducer(
   sliceName,
   initialState,
   null

@@ -17,6 +17,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import GridOnIcon from '@material-ui/icons/GridOn';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -241,6 +242,12 @@ export function AppBarComponent() {
           icon: <NoteAddIcon />,
         },
       ],
+    },
+    reports: {
+      url: '/reports-53',
+      text: 'Reportes',
+      icon: <GridOnIcon />,
+      open: true,
     },
     user: {
       url: '/user/list',

@@ -29,7 +29,7 @@ import { Reports52PreliminariesContainer } from '../../reports/views/reports52-p
 
 type Props = {
   history: History,
-  loadCatalogAction: Function,
+  // loadCatalogAction: Function,
   loadCatalogObsSFPAction: Function,
   loadCatalogObsASFAction: Function,
   loadCatalogResultsReportAction: Function,
@@ -45,7 +45,7 @@ export const AppRoutes = (props: Props) => {
   useEffect(() => {
     props.loadCatalogObsSFPAction();
     props.loadCatalogObsASFAction();
-    props.loadCatalogAction();
+    // props.loadCatalogAction();
     props.loadAuditCatalogAction();
     props.loadUsersCatalogAction();
     props.loadCatalogResultsReportAction();

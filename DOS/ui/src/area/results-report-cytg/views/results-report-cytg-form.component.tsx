@@ -439,8 +439,8 @@ export const ResultsReportCYTGForm = (props: Props) => {
                       )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12}>
+                    <FormControl className={classes.formControlFull}>
                       <AutoCompleteLoadMoreDropdown
                         disabled={disabledModeOn}
                         fieldLabel="observation"
@@ -526,7 +526,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                         disabled
                         fieldLabel="title"
                         fieldValue="id"
-                        label="Programa"
+                        label="Programa / Rubro"
                         name="programa"
                         onChange={(value: any) => {
                           return setFieldValue('programa_social_id', value);
@@ -862,167 +862,6 @@ export const ResultsReportCYTGForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto a reintegrar"
-                        value={values.monto_a_reintegrar}
-                        onChange={handleChange('monto_a_reintegrar')}
-                        name="monto_a_reintegrar"
-                        id="monto_a_reintegrar"
-                        placeholder="0"
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                      />
-                      {errors.monto_a_reintegrar &&
-                        touched.monto_a_reintegrar &&
-                        errors.monto_a_reintegrar && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto a reintegrar
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        label="Monto Reintegrado (miles de pesos)"
-                        value={values.monto_reintegrado}
-                        onChange={handleChange('monto_reintegrado')}
-                        name="monto_reintegrado"
-                        id="monto_reintegrado"
-                        placeholder="0"
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                        disabled={(action === 'view')}
-                      />
-                      {errors.monto_reintegrado &&
-                        touched.monto_reintegrado &&
-                        errors.monto_reintegrado && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto Reintegrado
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <Field
-                        disabled={disabledModeOn}
-                        component={FormikDatePicker}
-                        label="Fecha del reintegro"
-                        name="fecha_reintegro"
-                        id="fecha_reintegro"
-                      />
-                      {errors.fecha_reintegro &&
-                        touched.fecha_reintegro && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            {errors.fecha_reintegro}
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        label="Monto por Reintegrar (miles de pesos)"
-                        value={sub(values.monto_a_reintegrar || 0, values.monto_reintegrado || 0).toString() || "0"}
-                        onChange={handleChange('monto_por_reintegrar')}
-                        name="monto_por_reintegrar"
-                        id="monto_por_reintegrar"
-                        placeholder="0"
-                        variant="filled"
-                        disabled
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                          readOnly: true,
-                        }}
-                      />
-                      {errors.monto_por_reintegrar &&
-                        touched.monto_por_reintegrar &&
-                        errors.monto_por_reintegrar && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto por Reintegrar
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        id="num_oficio_cytg_aut_invest"
-                        label="# de Oficio de la CyTG para la Autoridad investigadora"
-                        value={values.num_oficio_cytg_aut_invest || ''}
-                        onChange={handleChange('num_oficio_cytg_aut_invest')}
-                      />
-                      {errors.num_oficio_cytg_aut_invest && touched.num_oficio_cytg_aut_invest && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese # de Oficio de la CyTG para la Autoridad investigadora
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <Field
-                        disabled={disabledModeOn}
-                        component={FormikDatePicker}
-                        label="Fecha de Oficio de la CyTG para la Autoridad investigadora"
-                        name="fecha_oficio_cytg_aut_invest"
-                        id="fecha_oficio_cytg_aut_invest"
-                      />
-                      {errors.fecha_oficio_cytg_aut_invest &&
-                        touched.fecha_oficio_cytg_aut_invest && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            {errors.fecha_oficio_cytg_aut_invest}
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        id="num_carpeta_investigacion"
-                        label="# de carpeta de investigación"
-                        value={values.num_carpeta_investigacion || ''}
-                        onChange={handleChange('num_carpeta_investigacion')}
-                      />
-                      {errors.num_carpeta_investigacion && touched.num_carpeta_investigacion && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese # de carpeta de investigación
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
                         id="num_oficio_vai_municipio"
                         label="# de Oficio VAI a municipio"
                         value={values.num_oficio_vai_municipio || ''}
@@ -1101,7 +940,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                       <Field
                         disabled={disabledModeOn}
                         component={FormikDatePicker}
-                        label="Fecha de Oficio de respuesta de la Dependencia"
+                        label="Fecha de oficio (acuse)"
                         name="fecha_oficio_resp_dependencia"
                         id="fecha_oficio_resp_dependencia"
                       />
@@ -1506,6 +1345,182 @@ export const ResultsReportCYTGForm = (props: Props) => {
                     )}
                   />
                 </fieldset>
+
+
+                <hr className={classes.hrSpacer} />
+                <hr className={classes.hrDivider} />
+                
+                <fieldset className={classes.fieldset}>
+                  <legend className={classes.containerLegend}>
+                    <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                      Fin Seguimientos
+                    </Typography>
+                  </legend>
+                </fieldset>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        disabled={disabledModeOn}
+                        label="Monto a reintegrar"
+                        value={values.monto_a_reintegrar}
+                        onChange={handleChange('monto_a_reintegrar')}
+                        name="monto_a_reintegrar"
+                        id="monto_a_reintegrar"
+                        placeholder="0"
+                        InputProps={{
+                          inputComponent: NumberFormatCustom as any,
+                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        }}
+                      />
+                      {errors.monto_a_reintegrar &&
+                        touched.monto_a_reintegrar &&
+                        errors.monto_a_reintegrar && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Monto a reintegrar
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        label="Monto Reintegrado (miles de pesos)"
+                        value={values.monto_reintegrado}
+                        onChange={handleChange('monto_reintegrado')}
+                        name="monto_reintegrado"
+                        id="monto_reintegrado"
+                        placeholder="0"
+                        InputProps={{
+                          inputComponent: NumberFormatCustom as any,
+                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        }}
+                        disabled={(action === 'view')}
+                      />
+                      {errors.monto_reintegrado &&
+                        touched.monto_reintegrado &&
+                        errors.monto_reintegrado && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Monto Reintegrado
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <Field
+                        disabled={disabledModeOn}
+                        component={FormikDatePicker}
+                        label="Fecha del reintegro"
+                        name="fecha_reintegro"
+                        id="fecha_reintegro"
+                      />
+                      {errors.fecha_reintegro &&
+                        touched.fecha_reintegro && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            {errors.fecha_reintegro}
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        label="Monto por Reintegrar (miles de pesos)"
+                        value={sub(values.monto_a_reintegrar || 0, values.monto_reintegrado || 0).toString() || "0"}
+                        onChange={handleChange('monto_por_reintegrar')}
+                        name="monto_por_reintegrar"
+                        id="monto_por_reintegrar"
+                        placeholder="0"
+                        variant="filled"
+                        disabled
+                        InputProps={{
+                          inputComponent: NumberFormatCustom as any,
+                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                          readOnly: true,
+                        }}
+                      />
+                      {errors.monto_por_reintegrar &&
+                        touched.monto_por_reintegrar &&
+                        errors.monto_por_reintegrar && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Monto por Reintegrar
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        disabled={disabledModeOn}
+                        id="num_oficio_cytg_aut_invest"
+                        label="# de Oficio de la CyTG para la Autoridad investigadora"
+                        value={values.num_oficio_cytg_aut_invest || ''}
+                        onChange={handleChange('num_oficio_cytg_aut_invest')}
+                      />
+                      {errors.num_oficio_cytg_aut_invest && touched.num_oficio_cytg_aut_invest && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese # de Oficio de la CyTG para la Autoridad investigadora
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <Field
+                        disabled={disabledModeOn}
+                        component={FormikDatePicker}
+                        label="Fecha de Oficio de la CyTG para la Autoridad investigadora"
+                        name="fecha_oficio_cytg_aut_invest"
+                        id="fecha_oficio_cytg_aut_invest"
+                      />
+                      {errors.fecha_oficio_cytg_aut_invest &&
+                        touched.fecha_oficio_cytg_aut_invest && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            {errors.fecha_oficio_cytg_aut_invest}
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        disabled={disabledModeOn}
+                        id="num_carpeta_investigacion"
+                        label="# de carpeta de investigación"
+                        value={values.num_carpeta_investigacion || ''}
+                        onChange={handleChange('num_carpeta_investigacion')}
+                      />
+                      {errors.num_carpeta_investigacion && touched.num_carpeta_investigacion && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese # de carpeta de investigación
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                </Grid>
 
                 {action !== 'view' && (
                   <Button

@@ -78,7 +78,7 @@ const useStyles = makeStyles(() =>
   })
 );
 
-export const ReportPreliminaries = (props: Props) => {
+export const Report52Preliminaries = (props: Props) => {
   const {
     report,
     // loading,
@@ -105,10 +105,10 @@ export const ReportPreliminaries = (props: Props) => {
   return (
     <div className={classes.Container}>
       <div>
-        <span className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados</span>
-        <Link to="/reports-52">
+        <span className={classes.titlereport}>Reporte Ejecutivo Concentrado Total de Observaciones por Ente Fiscalizador Informe de Resultados</span>
+        <Link to="/reports-53">
           <button type="button" className={classes.buttonTodos} >
-            <span>&rarr; Todos</span>
+            <span>&rarr; Por Entidad</span>
           </button>
         </Link>
       </div>
@@ -156,8 +156,6 @@ export const ReportPreliminaries = (props: Props) => {
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
           <tr className={classes.titrow}>    
-            <th rowSpan={2} style={{backgroundColor: "#fff", color: "#000"}}>Secretaría/Entidad/Municipio</th> 
-            <th rowSpan={2} style={{backgroundColor: "#fff", color: "#000"}}>Ejercicio</th> 
             <th colSpan={2}>ASF</th> 
             <th colSpan={2}>SFP</th> 
             <th colSpan={2}>ASENL</th> 
@@ -176,23 +174,24 @@ export const ReportPreliminaries = (props: Props) => {
             <td>Cant. Obs.</td> 
             <td>Monto</td> 
           </tr> 
-          {report && report.data_rows && report.data_rows.map((dep: any) =>
+             { report && report.sum_rows &&
              <tr> 
-               <td>{dep.dep}</td> 
-               <td>{dep.ej}</td>
-               <td>{dep.c_asf}</td>
-               <td>{dep.m_asf.toFixed( 2 )}</td>
-               <td>{dep.c_sfp}</td>
-               <td>{dep.m_sfp.toFixed( 2 )}</td>
-               <td>{dep.c_asenl}</td>
-               <td>{dep.m_asenl.toFixed( 2 )}</td>
-               <td>{dep.c_cytg}</td>
-               <td>{dep.m_cytg.toFixed( 2 )}</td>
-               <td> { dep.c_asf + dep.c_sfp + dep.c_asenl + dep.c_cytg } </td>
-               <td> { (dep.m_asf + dep.m_sfp + dep.m_asenl + dep.m_cytg).toFixed( 2 )  } </td>
+               
+               <td>{report.sum_rows.c_asf}</td>
+               <td>{report.sum_rows.m_asf}</td>
+               <td>{report.sum_rows.c_sfp}</td>
+               <td>{report.sum_rows.m_sfp}</td>
+               <td>{report.sum_rows.c_asenl}</td>
+               <td>{report.sum_rows.m_asenl}</td>
+               <td>{report.sum_rows.c_cytg}</td>
+               <td>{report.sum_rows.m_cytg}</td>
+               <td> { report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg } </td>
+               <td> { (report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  } </td>
              </tr>
-          )
-          }
+               
+             }
+            
+          
         </tbody>
       </table>
     </div>

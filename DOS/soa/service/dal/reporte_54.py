@@ -1,7 +1,6 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-
 def get(ej_ini, ej_fin):
     ''' Returns an instance of Reporte 53 '''
     
@@ -76,12 +75,18 @@ def get(ej_ini, ej_fin):
     except EmptySetError:
         rows = []
     
+    #for row in rows:
+    #    aux_dict[(row[0], row[1], row[2])] = {'asenl' : (row[3], row[4])}
+ 
     for row in rows:
         if (row[0], row[1]) in aux_dict:
-            aux_dict[(row[0], row[1])]['e_asenl_' + str(row[2])] = (row[3], row[4])
+            aux_dict[(row[0], row[1])][ 'to' + str(row[2])] = ( 'asenl', row[3], row[4])
         else:
-            aux_dict[(row[0], row[1])] = {'e_asenl_' + str(row[2]) : (row[3], row[4])}
+            aux_dict[(row[0], row[1])] = { 'to' + str(row[2]): ( 'asenl', row[3], row[4])}
 
+
+
+ 
     
     # ASF
     ignored_audit_str = ignored_audit_str.replace('pre.', 'pre.')
@@ -103,12 +108,14 @@ def get(ej_ini, ej_fin):
     except EmptySetError:
         rows = []
 
-    for row in rows:
-        if (row[0], 'no_obs') in aux_dict:
-            aux_dict[(row[0], 'no_obs')]['e_asf_' + str(row[1])] = (row[2], row[3])
-        else:
-            aux_dict[(row[0], 'no_obs')] = {'e_asf_' + str(row[1]) : (row[2], row[3])}
+    #for row in rows:
+    #    aux_dict[(row[0], 'no_data', row[1] )] = {'asf' : (row[2], row[3])}
 
+    for row in rows:
+        if (row[0], 'no_data') in aux_dict:
+            aux_dict[(row[0], 'no_data')]['to' + str(row[1])] = ('asf', row[2], row[3])
+        else:
+            aux_dict[(row[0], 'no_data')] = {'to' + str(row[1]): ('asf', row[2], row[3])}
         
     aux_l = sorted(aux_dict.items())
 
@@ -123,75 +130,42 @@ def get(ej_ini, ej_fin):
             'dep': k[0],
         }
 
-        if k[1] == 'no_obs': 
-            r['tipo_obs'] = ''
 
-            if 'e_asenl_1' in v:
-                r['c_analisis'] = v['e_asenl_1'][0]
-                r['m_analisis'] = v['e_asenl_1'][1]
-            else: 
-                r['c_analisis'] = 0
-                r['m_analisis'] = 0.0
+        r['tipo_obs'] = '' if k[1] == 'no_data' else k[1]
 
-            if 'e_asenl_2' in v:
-                r['c_analisis'] = v['e_asenl_2'][0]
-                r['m_analisis'] = v['e_asenl_2'][1]
-            else: 
-                r['c_analisis'] = 0
-                r['m_analisis'] = 0.
+        r['c_analisis'] = 0
+        r['m_analisis'] = 0.0
+        r['c_sol'] = 0
+        r['m_sol'] = 0.0
+        r['c_no_sol'] = 0
+        r['m_no_sol'] = 0.0
 
-            if 'e_asenl_3' in v:
-                r['c_analisis'] = v['e_asenl_3'][0]
-                r['m_analisis'] = v['e_asenl_3'][1]
-            else: 
-                r['c_analisis'] = 0
-                r['m_analisis'] = 0.0       
+        # estatus_pre_asenl no tiene las opciones solventadas ni no solventadas (Las primeras 3 se consideraran en analisis)
+        # -En análisis de la CYTG
+        # -En análisis del organismo/dependencia
+        # -En análisis del ente fiscalizador
+        # Todas en analisis
 
-            if 'e_asenl_4' in v:
-                r['c_sol'] = v['e_asenl_4'][0]
-                r['m_sol'] = v['e_asenl_4'][1]
-            else: 
-                r['c_sol'] = 0
-                r['m_sol'] = 0.0
-      
+        # estatus_pre_asf (Las primeras 3 se consideraran en analisis)
+        # -Observaciones Preliminares
+        # -Respuestas atendida a Preliminares
+        # -En análisis del ente fiscalizador
+        # -Solventada
+        # -No solventada
 
-            if 'e_asenl_5' in v:
-                r['c_no_sol'] = v['e_asenl_5'][0]
-                r['m_no_sol'] = v['e_asenl_5'][1]
-            else: 
-                r['c_no_sol'] = 0
-                r['m_no_sol'] = 0.0
-       
-
-        
-        else:
-            r['tipo_obs'] = k[1]
-
-            if 'e_asenl_1' in v:
-                r['c_sol'] = v['e_asenl_1'][0]
-                r['m_sol'] = v['e_asenl_1'][1]
-            else: 
-                r['c_sol'] = 0
-                r['m_sol'] = 0.0
-
-            if 'e_asenl_2' in v:
-                r['c_no_sol'] = v['e_asenl_2'][0]
-                r['m_no_sol'] = v['e_asenl_2'][1]
-            else: 
-                r['c_no_sol'] = 0
-                r['m_no_sol'] = 0.0
-
-
-            if 'e_asenl_3' in v:
-                r['c_analisis'] = v['e_asenl_3'][0]
-                r['m_analisis'] = v['e_asenl_3'][1]
-            else: 
-                r['c_analisis'] = 0
-                r['m_analisis'] = 0.0
-
+        for ob in v:
+            if ob == 'to1' or ob == 'to2' or ob == 'to3' :
+                r['c_analisis'] = v[ob][1]
+                r['m_analisis'] = v[ob][2]
+            elif ob == 'to4':
+                r['c_sol'] = v[ob][1]
+                r['m_sol'] = v[ob][2]
+            elif ob == 'to5':
+                r['c_no_sol'] = v[ob][1]
+                r['m_no_sol'] = v[ob][2]
 
         data_rows.append(r)
-
+    
     return {
         'data_rows': data_rows,
         'ignored_audit_ids': ignored_audit_ids

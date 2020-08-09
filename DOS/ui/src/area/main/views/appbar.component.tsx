@@ -245,7 +245,13 @@ export function AppBarComponent() {
     },
     reports: {
       url: '/reports-53',
-      text: 'Reportes',
+      text: 'Reporte 53',
+      icon: <GridOnIcon />,
+      open: true,
+    },
+    report54: {
+      url: '/reports-54',
+      text: 'Reporte 54',
       icon: <GridOnIcon />,
       open: true,
     },

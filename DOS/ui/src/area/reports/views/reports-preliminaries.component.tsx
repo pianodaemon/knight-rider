@@ -75,6 +75,12 @@ const useStyles = makeStyles(() =>
       borderRadius: '5px',
       border: 'solid #128aba 1px',
     },
+    montos: {
+      textAlign: 'right',
+    },
+    cantObs: {
+      textAlign: 'center',
+    },
   })
 );
 
@@ -102,13 +108,29 @@ export const ReportPreliminaries = (props: Props) => {
     { value: '2019', label: '2019' },
     { value: '2020', label: '2020' },
   ];
+  const formatMoney = ( monto: number): string =>  {
+    let valueStringFixed2 = monto.toFixed(2);
+    let valueArray = valueStringFixed2.split('');
+    let arrayReverse = valueArray.reverse();
+    let valueString = '';
+    for(let i in arrayReverse ) {
+      let st:number = Number(i);
+      valueString = arrayReverse[i] + valueString;
+      let sti:number;
+      sti = (st - 2);
+      if( (sti%3)===0 && st !== 2 && st !== (arrayReverse.length - 1) ){
+        valueString = ',' + valueString
+      }
+    }
+    return valueString;
+  };
   return (
     <div className={classes.Container}>
       <div>
         <span className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados</span>
         <Link to="/reports-52">
           <button type="button" className={classes.buttonTodos} >
-            <span>&rarr; Todos</span>
+            <span>&rarr; Totales</span>
           </button>
         </Link>
       </div>
@@ -165,33 +187,48 @@ export const ReportPreliminaries = (props: Props) => {
             <th colSpan={2}>Total</th> 
           </tr> 
           <tr style={{ fontWeight: "bold"}}> 
-            <td>Cant. Obs.</td> 
-            <td>Monto</td> 
-            <td>Cant. Obs.</td> 
-            <td>Monto</td> 
-            <td>Cant. Obs.</td> 
-            <td>Monto</td> 
-            <td>Cant. Obs.</td> 
-            <td>Monto</td> 
-            <td>Cant. Obs.</td> 
-            <td>Monto</td> 
+            <td className={classes.cantObs} >Cant. Obs.</td> 
+            <td className={classes.montos} >Monto</td> 
+            <td className={classes.cantObs} >Cant. Obs.</td> 
+            <td className={classes.montos} >Monto</td> 
+            <td className={classes.cantObs} >Cant. Obs.</td> 
+            <td className={classes.montos} >Monto</td> 
+            <td className={classes.cantObs} >Cant. Obs.</td> 
+            <td className={classes.montos} >Monto</td> 
+            <td className={classes.cantObs} >Cant. Obs.</td> 
+            <td className={classes.montos} >Monto</td> 
           </tr> 
           {report && report.data_rows && report.data_rows.map((dep: any) =>
              <tr> 
                <td>{dep.dep}</td> 
                <td>{dep.ej}</td>
-               <td>{dep.c_asf}</td>
-               <td>{dep.m_asf.toFixed( 2 )}</td>
-               <td>{dep.c_sfp}</td>
-               <td>{dep.m_sfp.toFixed( 2 )}</td>
-               <td>{dep.c_asenl}</td>
-               <td>{dep.m_asenl.toFixed( 2 )}</td>
-               <td>{dep.c_cytg}</td>
-               <td>{dep.m_cytg.toFixed( 2 )}</td>
-               <td> { dep.c_asf + dep.c_sfp + dep.c_asenl + dep.c_cytg } </td>
-               <td> { (dep.m_asf + dep.m_sfp + dep.m_asenl + dep.m_cytg).toFixed( 2 )  } </td>
+               <td className={classes.cantObs} >{dep.c_asf}</td>
+               <td className={classes.montos} >{formatMoney(dep.m_asf)}</td>
+               <td className={classes.cantObs} >{dep.c_sfp}</td>
+               <td className={classes.montos} >{formatMoney(dep.m_sfp)}</td>
+               <td className={classes.cantObs} >{dep.c_asenl}</td>
+               <td className={classes.montos} >{formatMoney(dep.m_asenl)}</td>
+               <td className={classes.cantObs} >{dep.c_cytg}</td>
+               <td className={classes.montos} >{formatMoney(dep.m_cytg)}</td>
+               <td className={classes.cantObs} > { dep.c_asf + dep.c_sfp + dep.c_asenl + dep.c_cytg } </td>
+               <td className={classes.montos} > {  formatMoney(dep.m_asf + dep.m_sfp + dep.m_asenl + dep.m_cytg)  } </td>
              </tr>
           )
+          }
+          { report && report.sum_rows &&
+            <tr> 
+              <td style={{fontWeight: "bold"}} colSpan={2}>Total</td> 
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_asf}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_asf)}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_sfp}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_sfp)}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_asenl}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_asenl)}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_cytg}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_cytg)}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}> { report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg } </td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> {  formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  } </td>
+            </tr>
           }
         </tbody>
       </table>

@@ -398,8 +398,8 @@ export const ResultsReportASENLForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12} sm={12}>
+                    <FormControl className={classes.formControlFull}>
                       <AutoCompleteLoadMoreDropdown
                         disabled={disabledModeOn}
                         fieldLabel="observation"
@@ -559,14 +559,30 @@ export const ResultsReportASENLForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12} sm={12} md={6}>
+                    <FormControl className={classes.formControlFull}>
                       <TextField
                         disabled={disabledModeOn}
                         id="observacion_final"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <IconButton
+                                aria-label="toggle visibility"
+                                onClick={() => setModalField({...modalField, open: true, field: "Texto de la observación final (análisis)", text: values.observacion_final })}
+                                onMouseDown={() => {}}
+                              >
+                                <ZoomInIcon />
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
                         label="Texto de la observación final (análisis)"
-                        value={values.observacion_final || ''}
+                        multiline
                         onChange={handleChange('observacion_final')}
+                        rows={5}
+                        rowsMax={5}
+                        value={values.observacion_final || ''}
                       />
                       {errors.observacion_final &&
                         touched.observacion_final && (
@@ -745,6 +761,114 @@ export const ResultsReportASENLForm = (props: Props) => {
                         }
                         value={catalog && values && values.clasif_final_cytg ? values.clasif_final_cytg : ''}
                       />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        disabled={disabledModeOn}
+                        label="Monto Observado"
+                        value={values.monto_observado}
+                        onChange={handleChange('monto_observado')}
+                        name="monto_observado"
+                        id="monto_observado"
+                        placeholder="0"
+                        InputProps={{
+                          inputComponent: NumberFormatCustom as any,
+                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        }}
+                      />
+                      {errors.monto_observado &&
+                        touched.monto_observado &&
+                        errors.monto_observado && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Monto Observado
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        disabled={disabledModeOn}
+                        label="Monto solventado"
+                        value={values.monto_solventado}
+                        onChange={handleChange('monto_solventado')}
+                        name="monto_solventado"
+                        id="monto_solventado"
+                        placeholder="0"
+                        InputProps={{
+                          inputComponent: NumberFormatCustom as any,
+                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        }}
+                      />
+                      {errors.monto_solventado &&
+                        touched.monto_solventado &&
+                        errors.monto_solventado && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Monto solventado
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        disabled={disabledModeOn}
+                        label="Monto pendiente de solventar"
+                        value={values.monto_pendiente_solventar}
+                        onChange={handleChange('monto_pendiente_solventar')}
+                        name="monto_pendiente_solventar"
+                        id="monto_pendiente_solventar"
+                        placeholder="0"
+                        InputProps={{
+                          inputComponent: NumberFormatCustom as any,
+                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        }}
+                      />
+                      {errors.monto_pendiente_solventar &&
+                        touched.monto_pendiente_solventar &&
+                        errors.monto_pendiente_solventar && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Monto pendiente de solventar
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        disabled={disabledModeOn}
+                        label="Monto a reintegrar"
+                        value={values.monto_a_reintegrar}
+                        onChange={handleChange('monto_a_reintegrar')}
+                        name="monto_a_reintegrar"
+                        id="monto_a_reintegrar"
+                        placeholder="0"
+                        InputProps={{
+                          inputComponent: NumberFormatCustom as any,
+                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        }}
+                      />
+                      {errors.monto_a_reintegrar &&
+                        touched.monto_a_reintegrar &&
+                        errors.monto_a_reintegrar && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Monto a reintegrar
+                          </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -1090,114 +1214,6 @@ export const ResultsReportASENLForm = (props: Props) => {
                             classes={{ error: classes.textErrorHelper }}
                           >
                             Ingrese # VAI
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        label="Monto Observado"
-                        value={values.monto_observado}
-                        onChange={handleChange('monto_observado')}
-                        name="monto_observado"
-                        id="monto_observado"
-                        placeholder="0"
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                      />
-                      {errors.monto_observado &&
-                        touched.monto_observado &&
-                        errors.monto_observado && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto Observado
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        label="Monto solventado"
-                        value={values.monto_solventado}
-                        onChange={handleChange('monto_solventado')}
-                        name="monto_solventado"
-                        id="monto_solventado"
-                        placeholder="0"
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                      />
-                      {errors.monto_solventado &&
-                        touched.monto_solventado &&
-                        errors.monto_solventado && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto solventado
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        label="Monto pendiente de solventar"
-                        value={values.monto_pendiente_solventar}
-                        onChange={handleChange('monto_pendiente_solventar')}
-                        name="monto_pendiente_solventar"
-                        id="monto_pendiente_solventar"
-                        placeholder="0"
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                      />
-                      {errors.monto_pendiente_solventar &&
-                        touched.monto_pendiente_solventar &&
-                        errors.monto_pendiente_solventar && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto pendiente de solventar
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        label="Monto a reintegrar"
-                        value={values.monto_a_reintegrar}
-                        onChange={handleChange('monto_a_reintegrar')}
-                        name="monto_a_reintegrar"
-                        id="monto_a_reintegrar"
-                        placeholder="0"
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                      />
-                      {errors.monto_a_reintegrar &&
-                        touched.monto_a_reintegrar &&
-                        errors.monto_a_reintegrar && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto a reintegrar
                           </FormHelperText>
                         )}
                     </FormControl>

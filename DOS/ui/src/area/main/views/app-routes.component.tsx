@@ -30,7 +30,7 @@ import { Reports54Container } from '../../reports/views/reports54.container';
 
 type Props = {
   history: History,
-  loadCatalogAction: Function,
+  // loadCatalogAction: Function,
   loadCatalogObsSFPAction: Function,
   loadCatalogObsASFAction: Function,
   loadCatalogResultsReportAction: Function,
@@ -46,7 +46,7 @@ export const AppRoutes = (props: Props) => {
   useEffect(() => {
     props.loadCatalogObsSFPAction();
     props.loadCatalogObsASFAction();
-    props.loadCatalogAction();
+    // props.loadCatalogAction();
     props.loadAuditCatalogAction();
     props.loadUsersCatalogAction();
     props.loadCatalogResultsReportAction();

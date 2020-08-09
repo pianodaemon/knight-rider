@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { Formik, Field } from 'formik';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
@@ -7,10 +7,13 @@ import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import ZoomInIcon from '@material-ui/icons/ZoomIn';
@@ -153,6 +156,13 @@ export const ObservationsASENLForm = (props: Props) => {
   const classes = useStyles();
   const history = useHistory();
   const { action, id } = useParams<any>();
+  const [compartida, setCompartida] = useState(Boolean(observation && observation.compartida_observacion));
+  const disabledModeOn = action === 'view';
+  const [modalField, setModalField] = useState({
+    field: '',
+    text: '',
+    open: false,
+  });
   const fechaCaptura = new Date();
   const initialValues = {
     id: '',
@@ -198,8 +208,19 @@ export const ObservationsASENLForm = (props: Props) => {
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> =
       fields.filter((item: string) => /^fecha_/i.test(item)) || [];
-    const noMandatoryFields: Array<string> = ['id', 'tipo_observacion_id'];
-
+    const observacionCompartidaFields = [
+      "compartida_observacion",
+      "compartida_tipo_observacion_id",
+      "compartida_monto"
+    ];
+    const noMandatoryFields: Array<string> = [
+      "id",
+      "tipo_observacion_id",
+      ...observacionCompartidaFields,
+    ];
+    const direccion: () => string = (): string => (
+      (catalog && catalog.divisions && catalog.divisions.find((division: any) => division.id === values.direccion_id)) || {}
+    ).title || '';
     // Mandatory fields (not empty)
     fields
       .filter((field) => !noMandatoryFields.includes(field))
@@ -223,14 +244,19 @@ export const ObservationsASENLForm = (props: Props) => {
           'Revise que el año de la fecha que ingresó sea posterior al Año de la Auditoría';
       }
     });
+    // Campos observación compartida
+    observacionCompartidaFields.forEach((field: string) => {
+      console.log(compartida, ((Boolean(values.compartida_observacion)) && (direccion()).toLocaleLowerCase() === 'central'));
+      if (
+        (compartida || ((Boolean(values.compartida_observacion)) && (direccion()).toLocaleLowerCase() === 'central')) &&
+        !values[field].toString()
+      ) {
+        errors[field] = !values[field] ? 'Required' : '';
+      }
+    });
+    console.log(errors);
     return errors;
   };
-  const disabledModeOn = action === 'view';
-  const [modalField, setModalField] = React.useState({
-    field: '',
-    text: '',
-    open: false,
-  });
   return (
     <Paper className={classes.paper}>
       <Formik
@@ -303,6 +329,11 @@ export const ObservationsASENLForm = (props: Props) => {
                   : ''
               )
               .join(', ');
+          const direccion = ((
+            catalog &&
+            catalog.divisions &&
+            catalog.divisions.find((division: any) => division.id === values.direccion_id)
+          ) || {}).title || '';
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>
@@ -447,6 +478,35 @@ export const ObservationsASENLForm = (props: Props) => {
                       )}
                     </FormControl>
                   </Grid>
+                  {(direccion).toLocaleLowerCase() === 'central' && (
+                    <>
+                      <Grid item xs={12} sm={6}>
+                        <FormGroup row>
+                          <FormControlLabel
+                            disabled={disabledModeOn}
+                            control={
+                              <Checkbox
+                                checked={Boolean(values.compartida_observacion) || compartida}
+                                onChange={(event: any) => {
+                                  if (!event.currentTarget.checked) {
+                                    setFieldValue('compartida_observacion', '');
+                                    setFieldValue('compartida_tipo_observacion_id', 0);
+                                    setFieldValue('compartida_monto', 0);
+                                  }
+                                  setCompartida(event.currentTarget.checked);
+                                }}
+                                name="compartida"
+                              />
+                            }
+                            label="Observación compartida (Sí/No)"
+                          />
+                        </FormGroup>
+                      </Grid>
+                      <Grid item xs={12} sm={6}></Grid>
+                    </>
+                  )}
+                  {(compartida || Boolean(values.compartida_observacion)) && (direccion).toLocaleLowerCase() === 'central' && (
+                  <>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -524,6 +584,8 @@ export const ObservationsASENLForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
+                  </>
+                  )}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
@@ -672,7 +734,7 @@ export const ObservationsASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto Observado"
+                        label="Monto Observado (Proyección)"
                         value={values.monto_observado}
                         onChange={handleChange('monto_observado')}
                         name="monto_observado"

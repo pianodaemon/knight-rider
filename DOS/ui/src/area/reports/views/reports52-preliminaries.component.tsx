@@ -199,16 +199,16 @@ export const Report52Preliminaries = (props: Props) => {
              { report && report.sum_rows &&
              <tr> 
                
-               <td className={classes.cantObs} >{report.sum_rows.c_asf}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asf)}</td>
-               <td className={classes.cantObs} >{report.sum_rows.c_sfp}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_sfp)}</td>
-               <td className={classes.cantObs} >{report.sum_rows.c_asenl}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asenl)}</td>
-               <td className={classes.cantObs} >{report.sum_rows.c_cytg}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_cytg)}</td>
-               <td className={classes.cantObs} > { report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg } </td>
-               <td className={classes.montos} > {  formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  } </td>
+               <td>{report.sum_rows.c_asf}</td>
+               <td>{report.sum_rows.m_asf}</td>
+               <td>{report.sum_rows.c_sfp}</td>
+               <td>{report.sum_rows.m_sfp}</td>
+               <td>{report.sum_rows.c_asenl}</td>
+               <td>{report.sum_rows.m_asenl}</td>
+               <td>{report.sum_rows.c_cytg}</td>
+               <td>{report.sum_rows.m_cytg}</td>
+               <td> { report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg } </td>
+               <td> { (report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  } </td>
              </tr>
                
              }

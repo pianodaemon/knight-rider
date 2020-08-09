@@ -201,7 +201,17 @@ export const Report54 = (props: Props) => {
              </tr>
           )
           }   
-            
+          { report && report.sum_rows &&
+            <tr> 
+              <td style={{fontWeight: "bold"}} colSpan={2}> Totales</td> 
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_sol}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_sol)}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_analisis}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_analisis)}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_no_sol}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_no_sol)}</td>
+            </tr>
+          }           
           
         </tbody>
       </table>

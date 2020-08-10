@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { loadCatalogAction } from 'src/area/auditories/state/usecases/load-catalog.usecase';
+// import { loadCatalogAction } from 'src/area/auditories/state/usecases/load-catalog.usecase';
 import { loadCatalogAction as loadCatalogObsSFPAction } from 'src/area/observations-sfp/state/usecases/load-catalog.usecase';
 import { loadCatalogAction as loadCatalogObsASFAction } from 'src/area/observations-asf/state/usecases/load-catalog.usecase';
 import { loadCatalogAction as loadCatalogObsASENLAction } from 'src/area/observations-asenl/state/usecases/load-catalog.usecase';
@@ -14,7 +14,7 @@ import { AppRoutes } from './app-routes.component';
 
 const mapDispatchToProps = {
   loadAuditCatalogAction,
-  loadCatalogAction,
+  // loadCatalogAction,
   loadCatalogObsSFPAction,
   loadCatalogObsASFAction,
   loadCatalogResultsReportAction,

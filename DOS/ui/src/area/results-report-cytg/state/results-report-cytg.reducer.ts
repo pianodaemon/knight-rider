@@ -24,7 +24,7 @@ export interface ResultsReportCYTG {
   fecha_oficio_vai_municipio: string; // Fecha de Oficio VAI a municipio [DONE]
   num_oficio_pras_cytg_dependencia: string; // Num. de Oficio PRAS/PFRA de la CyTG para la Dependencia [DONE]
   num_oficio_resp_dependencia: string; // Num. de Oficio de respuesta de la Dependencia [DONE]
-  fecha_oficio_resp_dependencia: string; // Fecha de Oficio de respuesta de la Dependencia [DONE]
+  fecha_oficio_resp_dependencia: string; // Fecha de Oficio de respuesta de la Dependencia => Fecha de oficio (acuse) [DONE]
   seguimientos: Array<Seguimiento>; // Seguimientos
   direccion_id: number; // Id de la dirección (según obs preliminar) [DONE]
   auditoria_id: number; // Id de la auditoría (según obs preliminar) [DONE]

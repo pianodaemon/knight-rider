@@ -9,7 +9,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 type Props = {
   loading: boolean,
-  loadReportsAction: Function,
+  loadReport54Action: Function,
   report: any,
 };
 
@@ -84,18 +84,19 @@ const useStyles = makeStyles(() =>
   })
 );
 
-export const Report52Preliminaries = (props: Props) => {
+export const Report54 = (props: Props) => {
   const {
     report,
     // loading,
-    loadReportsAction,
+    loadReport54Action,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
+  const [fiscal , setFiscal ] = useState<any>('');
   useEffect(() => {
-    loadReportsAction({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni});
+    loadReport54Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni]);
+  }, [yearEnd, yearIni, fiscal]);
   const classes = useStyles();
   const options = [
     { value: '2012', label: '2012' },
@@ -107,6 +108,11 @@ export const Report52Preliminaries = (props: Props) => {
     { value: '2018', label: '2018' },
     { value: '2019', label: '2019' },
     { value: '2020', label: '2020' },
+  ];
+  const optionsFiscals = [
+    { value: 'asf',   label: 'ASF' },
+    { value: 'asenl', label: 'ASENL' },
+    { value: '',      label: 'Todas' },
   ];
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
@@ -127,12 +133,7 @@ export const Report52Preliminaries = (props: Props) => {
   return (
     <div className={classes.Container}>
       <div>
-        <span className={classes.titlereport}>Reporte Ejecutivo Concentrado Total de Observaciones por Ente Fiscalizador Informe de Resultados</span>
-        <Link to="/reports-53">
-          <button type="button" className={classes.buttonTodos} >
-            <span>&rarr; Por Entidad</span>
-          </button>
-        </Link>
+        <span className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Estatus de la Observación del Informe Preliminar</span>
       </div>
 
       <div className={classes.filters}>
@@ -172,17 +173,36 @@ export const Report52Preliminaries = (props: Props) => {
             })}
           </Select>
         </div>
+        <div className={classes.selectYearContainer}>
+          <InputLabel className={classes.labelSelectYear}>Ente Fiscalizador:</InputLabel>
+          <Select
+            labelId="fiscal"
+            value={fiscal}
+            onChange={(e)=> {setFiscal(e.target.value);}}
+          >
+            {optionsFiscals.map((item) => {
+              return (
+                <MenuItem
+                  value={item.value}
+                >
+                  {item.label}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </div>
+
       </div>
 
 
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
           <tr className={classes.titrow}>    
-            <th colSpan={2}>ASF</th> 
-            <th colSpan={2}>SFP</th> 
-            <th colSpan={2}>ASENL</th> 
-            <th colSpan={2}>CyTG</th> 
-            <th colSpan={2}>Total</th> 
+            <th rowSpan={2} style={{background:'#ffffff', color: '#333333',}}>Secretaría/Entidad/Municipio</th> 
+            <th rowSpan={2} style={{background:'#ffffff', color: '#333333',}}>Tipo de Observación</th> 
+            <th colSpan={2}>SOLVENTADAS</th> 
+            <th colSpan={2}>EN ANÁLISIS</th> 
+            <th colSpan={2}>NO SOLVENTADAS</th> 
           </tr> 
           <tr style={{ fontWeight: "bold"}}> 
             <td className={classes.cantObs} >Cant. Obs.</td> 
@@ -191,28 +211,32 @@ export const Report52Preliminaries = (props: Props) => {
             <td className={classes.montos} >Monto</td> 
             <td className={classes.cantObs} >Cant. Obs.</td> 
             <td className={classes.montos} >Monto</td> 
-            <td className={classes.cantObs} >Cant. Obs.</td> 
-            <td className={classes.montos} >Monto</td> 
-            <td className={classes.cantObs} >Cant. Obs.</td> 
-            <td className={classes.montos} >Monto</td> 
           </tr> 
-             { report && report.sum_rows &&
+             {console.log(report)}
+           {report && report.data_rows && report.data_rows.map((dep: any) =>
              <tr> 
-               
-               <td>{report.sum_rows.c_asf}</td>
-               <td>{report.sum_rows.m_asf}</td>
-               <td>{report.sum_rows.c_sfp}</td>
-               <td>{report.sum_rows.m_sfp}</td>
-               <td>{report.sum_rows.c_asenl}</td>
-               <td>{report.sum_rows.m_asenl}</td>
-               <td>{report.sum_rows.c_cytg}</td>
-               <td>{report.sum_rows.m_cytg}</td>
-               <td> { report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg } </td>
-               <td> { (report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  } </td>
+               <td>{dep.dep}</td> 
+               <td style={{textAlign: 'center'}} >{dep.tipo_obs}</td>
+               <td className={classes.cantObs} >{dep.c_sol}</td>
+               <td className={classes.montos} >{formatMoney(dep.m_sol)}</td>
+               <td className={classes.cantObs} >{dep.c_analisis}</td>
+               <td className={classes.montos} >{formatMoney(dep.m_analisis)}</td>
+               <td className={classes.cantObs} >{dep.c_no_sol}</td>
+               <td className={classes.montos} >{formatMoney(dep.m_no_sol)}</td>
              </tr>
-               
-             }
-            
+          )
+          }   
+          { report && report.sum_rows &&
+            <tr> 
+              <td style={{fontWeight: "bold"}} colSpan={2}> Totales</td> 
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_sol}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_sol)}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_analisis}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_analisis)}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_no_sol}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_no_sol)}</td>
+            </tr>
+          }           
           
         </tbody>
       </table>

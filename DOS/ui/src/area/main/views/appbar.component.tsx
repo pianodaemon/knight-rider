@@ -13,23 +13,26 @@ import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import GridOnIcon from '@material-ui/icons/GridOn';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import NoteAddIcon from '@material-ui/icons/NoteAdd';
-import PersonIcon from '@material-ui/icons/Person';
-import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
-import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import { Link, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
+import { AppRoutesContainer } from './app-routes.container';
+//Icons
+import MenuIcon from '@material-ui/icons/Menu';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import GridOnIcon from '@material-ui/icons/GridOn';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import PersonIcon from '@material-ui/icons/Person';
 import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import { AppRoutesContainer } from './app-routes.container';
+import ImageSearchIcon from '@material-ui/icons/ImageSearch';
+import ImportContactsIcon from '@material-ui/icons/ImportContacts';
+import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 
 const customHistory = createBrowserHistory();
 const drawerWidth = 240;
@@ -144,54 +147,59 @@ export function AppBarComponent() {
     observationAsf: {
       url: '/observation-asf/list',
       text: 'Observaciones Preliminares ASF',
-      icon: <ImageSearchIcon />,
+      icon: <DeveloperBoardIcon />,
       open: true,
     },
     resultsReport: {
       url: '/results-report/list',
       text: 'Observaciones de la ASF (Informe de Resultados)',
-      icon: <ImageSearchIcon />,
+      icon: <ImportContactsIcon />,
       open: true,
     },
     observationAsenl: {
       url: '/observation-asenl/list',
       text: 'Observaciones Preliminares ASENL',
-      icon: <ImageSearchIcon />,
+      icon: <DeveloperBoardIcon />,
       open: true,
     },
     resultsReportAsenl: {
       url: '/results-report-asenl/list',
       text: 'Observaciones de la ASENL (Informe de Resultados)',
-      icon: <ImageSearchIcon />,
+      icon: <ImportContactsIcon />,
       open: true,
     },
     observationCytg: {
       url: '/observation-cytg/list',
       text: 'Observaciones Preliminares CyTG',
-      icon: <ImageSearchIcon />,
+      icon: <DeveloperBoardIcon />,
       open: true,
     },
     resultsReportCytg: {
       url: '/results-report-cytg/list',
       text: 'Observaciones de la CYTG (Informe de Resultados)',
-      icon: <ImageSearchIcon />,
+      icon: <ImportContactsIcon />,
       open: true,
     },
     reports: {
-      url: '/reports',
+      url: '/reports-52',
       text: 'Reportes',
-      icon: <GridOnIcon />,
-      open: false,
+      icon: <LibraryBooksIcon />,
+      open: true,
       childrenList: [
         {
+          url: '/reports-52',
+          text: 'Total Informe de Resultados',
+          icon: <GridOnIcon />,
+        },
+        {
           url: '/reports-53',
-          text: 'Reporte 53',
-          icon: <NoteAddIcon />,
+          text: 'Informe de Resultados',
+          icon: <GridOnIcon />,
         },
         {
           url: '/reports-54',
-          text: 'Reporte 54',
-          icon: <NoteAddIcon />,
+          text: 'Informe Preliminar',
+          icon: <GridOnIcon />,
         },
       ],
     },
@@ -285,43 +293,41 @@ export function AppBarComponent() {
                   <ListItemText primary={breadcrumbNameMap[route].text} />
                   { breadcrumbNameMap[route].childrenList && (menuItems[route] ? <ExpandLess /> : <ExpandMore />)}
                 </ListItem>
-                  {breadcrumbNameMap[route].childrenList && breadcrumbNameMap[route].childrenList.length > 0 && (
+                {breadcrumbNameMap[route].childrenList && breadcrumbNameMap[route].childrenList.length > 0 && (
                   <Collapse in={menuItems[route]} timeout="auto" unmountOnExit>
-                    <>
-                      {Object.keys(breadcrumbNameMap[route].childrenList).map(
-                        (route2, index2) => (
-                          <List
-                            component="div"
-                            disablePadding
-                            key={`${index2 + 1}`}
+                    {Object.keys(breadcrumbNameMap[route].childrenList).map(
+                      (route2, index2) => (
+                        <List
+                          component="div"
+                          disablePadding
+                          key={`${index2 + 1}`}
+                        >
+                          <ListItem
+                            button
+                            className={classes.nested}
+                            component={Link}
+                            to={
+                              breadcrumbNameMap[route].childrenList[index2]
+                                .url
+                            }
+                            onClick={handleDrawerClose}
                           >
-                            <ListItem
-                              button
-                              className={classes.nested}
-                              component={Link}
-                              to={
+                            <ListItemIcon>
+                              {
                                 breadcrumbNameMap[route].childrenList[index2]
-                                  .url
+                                  .icon
                               }
-                              onClick={handleDrawerClose}
-                            >
-                              <ListItemIcon>
-                                {
-                                  breadcrumbNameMap[route].childrenList[index2]
-                                    .icon
-                                }
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={
-                                  breadcrumbNameMap[route].childrenList[index2]
-                                    .text
-                                }
-                              />
-                            </ListItem>
-                          </List>
-                        ),
-                      )}
-                    </>
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={
+                                breadcrumbNameMap[route].childrenList[index2]
+                                  .text
+                              }
+                            />
+                          </ListItem>
+                        </List>
+                      ),
+                    )}
                   </Collapse>
                   )}
               </React.Fragment>

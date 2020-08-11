@@ -11,7 +11,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
-// import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -22,16 +21,14 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
-// import ListAltIcon from '@material-ui/icons/ListAlt';
 import PersonIcon from '@material-ui/icons/Person';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import { Link, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
-// import ListSubheader from '@material-ui/core/ListSubheader';
-// import Collapse from '@material-ui/core/Collapse';
-// import ExpandLess from '@material-ui/icons/ExpandLess';
-// import ExpandMore from '@material-ui/icons/ExpandMore';
+import Collapse from '@material-ui/core/Collapse';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import { AppRoutesContainer } from './app-routes.container';
 
 const customHistory = createBrowserHistory();
@@ -137,140 +134,80 @@ export function AppBarComponent() {
       text: 'Auditorías',
       icon: <AccountBalanceIcon />,
       open: true,
-      childrenList: [
-        { url: '/audit/create', text: 'Crear', icon: <NoteAddIcon /> },
-      ],
     },
-    /*
-    observation: {
-      url: '/observation/list',
-      text: 'Observaciones',
-      icon: <ImageSearchIcon />,
-      open: true,
-      childrenList: [
-        { url: '/observation/create', text: 'Crear', icon: <NoteAddIcon /> },
-      ],
-    },
-    */
     observationSfp: {
       url: '/observation-sfp/list',
       text: 'Observaciones SFP',
       icon: <ImageSearchIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/observation-sfp/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
     },
     observationAsf: {
       url: '/observation-asf/list',
       text: 'Observaciones Preliminares ASF',
       icon: <ImageSearchIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/observation-asf/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
     },
     resultsReport: {
       url: '/results-report/list',
       text: 'Observaciones de la ASF (Informe de Resultados)',
       icon: <ImageSearchIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/results-report/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
     },
     observationAsenl: {
       url: '/observation-asenl/list',
       text: 'Observaciones Preliminares ASENL',
       icon: <ImageSearchIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/observation-asenl/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
     },
     resultsReportAsenl: {
       url: '/results-report-asenl/list',
       text: 'Observaciones de la ASENL (Informe de Resultados)',
       icon: <ImageSearchIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/results-report-asenl/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
     },
     observationCytg: {
       url: '/observation-cytg/list',
       text: 'Observaciones Preliminares CyTG',
       icon: <ImageSearchIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/observation-cytg/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
     },
     resultsReportCytg: {
       url: '/results-report-cytg/list',
       text: 'Observaciones de la CYTG (Informe de Resultados)',
       icon: <ImageSearchIcon />,
       open: true,
+    },
+    reports: {
+      url: '/reports',
+      text: 'Reportes',
+      icon: <GridOnIcon />,
+      open: false,
       childrenList: [
         {
-          url: '/results-report-cytg/create',
-          text: 'Crear',
+          url: '/reports-53',
+          text: 'Reporte 53',
+          icon: <NoteAddIcon />,
+        },
+        {
+          url: '/reports-54',
+          text: 'Reporte 54',
           icon: <NoteAddIcon />,
         },
       ],
-    },
-    reports: {
-      url: '/reports-53',
-      text: 'Reportes',
-      icon: <GridOnIcon />,
-      open: true,
     },
     user: {
       url: '/user/list',
       text: 'Usuarios',
       icon: <PersonIcon />,
-      open: true,
-      childrenList: [
-        { url: '/user/create', text: 'Crear', icon: <NoteAddIcon /> },
-      ],
+      open: false,
     },
-    /*
-    preliminary: {
-      url: '/results_report/create',
-      text: 'Crear Reporte de Resultados',
-      icon: <ImageSearchIcon />,
-      open: true,
-      childrenList: [],
-    },
-    */
   };
 
-  // const [openn, setOpenn] = React.useState(false);
-  // const handleClickItemDrawer = (index: string) => {};
+  const [menuItems, setMenuItemOpen] = React.useState<{[key: string]: boolean}>(
+    Object.keys(breadcrumbNameMap).reduce((acc, next) => {
+      return { ...acc, [next]: !!breadcrumbNameMap[next].open }
+    }, {})
+  );
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -300,11 +237,6 @@ export function AppBarComponent() {
             <MenuIcon />
           </IconButton>
           <img className={classes.imageGobMx} src="/nlgobmx.png" alt="Inicio" />
-          {/*
-          <Typography variant="h6" noWrap>
-            Gobierno Nuevo Le&oacute;n
-          </Typography>
-          */}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -337,14 +269,24 @@ export function AppBarComponent() {
                   component={Link}
                   to={breadcrumbNameMap[route].url}
                   // key={route}
-                  onClick={handleDrawerClose}
+                  onClick={(event: any) =>{
+                    if (!breadcrumbNameMap[route].childrenList) {
+                      handleDrawerClose();
+                    } else {
+                      event.preventDefault();
+                    }
+                    setMenuItemOpen({
+                      ...menuItems,
+                      [route]: !menuItems[route],
+                    })
+                  }}
                 >
                   <ListItemIcon>{breadcrumbNameMap[route].icon}</ListItemIcon>
                   <ListItemText primary={breadcrumbNameMap[route].text} />
+                  { breadcrumbNameMap[route].childrenList && (menuItems[route] ? <ExpandLess /> : <ExpandMore />)}
                 </ListItem>
-                {/*
-                {breadcrumbNameMap[route].childrenList.length > 0 && (
-                  <Collapse in timeout="auto" unmountOnExit>
+                  {breadcrumbNameMap[route].childrenList && breadcrumbNameMap[route].childrenList.length > 0 && (
+                  <Collapse in={menuItems[route]} timeout="auto" unmountOnExit>
                     <>
                       {Object.keys(breadcrumbNameMap[route].childrenList).map(
                         (route2, index2) => (
@@ -381,8 +323,7 @@ export function AppBarComponent() {
                       )}
                     </>
                   </Collapse>
-                )}
-                */}
+                  )}
               </React.Fragment>
             ))}
           </List>

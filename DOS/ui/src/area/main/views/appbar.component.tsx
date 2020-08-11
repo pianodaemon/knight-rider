@@ -14,25 +14,29 @@ import List from '@material-ui/core/List';
 // import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import GridOnIcon from '@material-ui/icons/GridOn';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import NoteAddIcon from '@material-ui/icons/NoteAdd';
-// import ListAltIcon from '@material-ui/icons/ListAlt';
-import PersonIcon from '@material-ui/icons/Person';
-import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
-import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import { Link, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
-// import ListSubheader from '@material-ui/core/ListSubheader';
-// import Collapse from '@material-ui/core/Collapse';
-// import ExpandLess from '@material-ui/icons/ExpandLess';
-// import ExpandMore from '@material-ui/icons/ExpandMore';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import Collapse from '@material-ui/core/Collapse';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import { AppRoutesContainer } from './app-routes.container';
+//Icons
+import PersonIcon from '@material-ui/icons/Person';
+import MenuIcon from '@material-ui/icons/Menu';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import GridOnIcon from '@material-ui/icons/GridOn';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import NoteAddIcon from '@material-ui/icons/NoteAdd';
+// import ListAltIcon from '@material-ui/icons/ListAlt';
+import ImageSearchIcon from '@material-ui/icons/ImageSearch';
+import ImportContactsIcon from '@material-ui/icons/ImportContacts';
+import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 
 const customHistory = createBrowserHistory();
 const drawerWidth = 240;
@@ -137,132 +141,86 @@ export function AppBarComponent() {
       text: 'Auditorías',
       icon: <AccountBalanceIcon />,
       open: true,
-      childrenList: [
-        { url: '/audit/create', text: 'Crear', icon: <NoteAddIcon /> },
-      ],
+      childrenList: [],
     },
-    /*
-    observation: {
-      url: '/observation/list',
-      text: 'Observaciones',
-      icon: <ImageSearchIcon />,
-      open: true,
-      childrenList: [
-        { url: '/observation/create', text: 'Crear', icon: <NoteAddIcon /> },
-      ],
-    },
-    */
     observationSfp: {
       url: '/observation-sfp/list',
       text: 'Observaciones SFP',
       icon: <ImageSearchIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/observation-sfp/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
+      childrenList: [],
     },
     observationAsf: {
       url: '/observation-asf/list',
       text: 'Observaciones Preliminares ASF',
-      icon: <ImageSearchIcon />,
+      icon: <DeveloperBoardIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/observation-asf/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
+      childrenList: [],
     },
     resultsReport: {
       url: '/results-report/list',
       text: 'Observaciones de la ASF (Informe de Resultados)',
-      icon: <ImageSearchIcon />,
+      icon: <ImportContactsIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/results-report/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
+      childrenList: [],
     },
     observationAsenl: {
       url: '/observation-asenl/list',
       text: 'Observaciones Preliminares ASENL',
-      icon: <ImageSearchIcon />,
+      icon: <DeveloperBoardIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/observation-asenl/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
+      childrenList: [],
     },
     resultsReportAsenl: {
       url: '/results-report-asenl/list',
       text: 'Observaciones de la ASENL (Informe de Resultados)',
-      icon: <ImageSearchIcon />,
+      icon: <ImportContactsIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/results-report-asenl/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
+      childrenList: [],
     },
     observationCytg: {
       url: '/observation-cytg/list',
       text: 'Observaciones Preliminares CyTG',
-      icon: <ImageSearchIcon />,
+      icon: <DeveloperBoardIcon />,
       open: true,
-      childrenList: [
-        {
-          url: '/observation-cytg/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
-        },
-      ],
+      childrenList: [],
     },
     resultsReportCytg: {
       url: '/results-report-cytg/list',
       text: 'Observaciones de la CYTG (Informe de Resultados)',
-      icon: <ImageSearchIcon />,
+      icon: <ImportContactsIcon />,
+      open: true,
+      childrenList: [],
+    },
+    reports: {
+      url: '/reports-52',
+      text: 'Reportes',
+      icon: <LibraryBooksIcon />,
       open: true,
       childrenList: [
         {
-          url: '/results-report-cytg/create',
-          text: 'Crear',
-          icon: <NoteAddIcon />,
+          url: '/reports-52',
+          text: 'Total Informe de Resultados',
+          icon: <GridOnIcon />,
+        },
+        {
+          url: '/reports-53',
+          text: 'Informe de Resultados',
+          icon: <GridOnIcon />,
+        },
+        {
+          url: '/reports-54',
+          text: 'Informe Preliminar',
+          icon: <GridOnIcon />,
         },
       ],
-    },
-    reports: {
-      url: '/reports-53',
-      text: 'Reporte 53',
-      icon: <GridOnIcon />,
-      open: true,
-    },
-    report54: {
-      url: '/reports-54',
-      text: 'Reporte 54',
-      icon: <GridOnIcon />,
-      open: true,
     },
     user: {
       url: '/user/list',
       text: 'Usuarios',
       icon: <PersonIcon />,
       open: true,
-      childrenList: [
-        { url: '/user/create', text: 'Crear', icon: <NoteAddIcon /> },
-      ],
+      childrenList: [],
     },
     /*
     preliminary: {
@@ -348,47 +306,43 @@ export function AppBarComponent() {
                   <ListItemIcon>{breadcrumbNameMap[route].icon}</ListItemIcon>
                   <ListItemText primary={breadcrumbNameMap[route].text} />
                 </ListItem>
-                {/*
                 {breadcrumbNameMap[route].childrenList.length > 0 && (
                   <Collapse in timeout="auto" unmountOnExit>
-                    <>
-                      {Object.keys(breadcrumbNameMap[route].childrenList).map(
-                        (route2, index2) => (
-                          <List
-                            component="div"
-                            disablePadding
-                            key={`${index2 + 1}`}
+                    {Object.keys(breadcrumbNameMap[route].childrenList).map(
+                      (route2, index2) => (
+                        <List
+                          component="div"
+                          disablePadding
+                          key={`${index2 + 1}`}
+                        >
+                          <ListItem
+                            button
+                            className={classes.nested}
+                            component={Link}
+                            to={
+                              breadcrumbNameMap[route].childrenList[index2]
+                                .url
+                            }
+                            onClick={handleDrawerClose}
                           >
-                            <ListItem
-                              button
-                              className={classes.nested}
-                              component={Link}
-                              to={
+                            <ListItemIcon>
+                              {
                                 breadcrumbNameMap[route].childrenList[index2]
-                                  .url
+                                  .icon
                               }
-                              onClick={handleDrawerClose}
-                            >
-                              <ListItemIcon>
-                                {
-                                  breadcrumbNameMap[route].childrenList[index2]
-                                    .icon
-                                }
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={
-                                  breadcrumbNameMap[route].childrenList[index2]
-                                    .text
-                                }
-                              />
-                            </ListItem>
-                          </List>
-                        ),
-                      )}
-                    </>
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={
+                                breadcrumbNameMap[route].childrenList[index2]
+                                  .text
+                              }
+                            />
+                          </ListItem>
+                        </List>
+                      ),
+                    )}
                   </Collapse>
                 )}
-                */}
               </React.Fragment>
             ))}
           </List>

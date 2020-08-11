@@ -92,10 +92,11 @@ export const Report54 = (props: Props) => {
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
+  const [fiscal , setFiscal ] = useState<any>('');
   useEffect(() => {
-    loadReport54Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni});
+    loadReport54Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni]);
+  }, [yearEnd, yearIni, fiscal]);
   const classes = useStyles();
   const options = [
     { value: '2012', label: '2012' },
@@ -107,6 +108,11 @@ export const Report54 = (props: Props) => {
     { value: '2018', label: '2018' },
     { value: '2019', label: '2019' },
     { value: '2020', label: '2020' },
+  ];
+  const optionsFiscals = [
+    { value: 'asf',   label: 'ASF' },
+    { value: 'asenl', label: 'ASENL' },
+    { value: '',      label: 'Todas' },
   ];
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
@@ -167,6 +173,25 @@ export const Report54 = (props: Props) => {
             })}
           </Select>
         </div>
+        <div className={classes.selectYearContainer}>
+          <InputLabel className={classes.labelSelectYear}>Ente Fiscalizador:</InputLabel>
+          <Select
+            labelId="fiscal"
+            value={fiscal}
+            onChange={(e)=> {setFiscal(e.target.value);}}
+          >
+            {optionsFiscals.map((item) => {
+              return (
+                <MenuItem
+                  value={item.value}
+                >
+                  {item.label}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </div>
+
       </div>
 
 

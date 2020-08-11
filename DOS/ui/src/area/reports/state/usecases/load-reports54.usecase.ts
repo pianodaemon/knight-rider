@@ -22,12 +22,13 @@ export const loadReport54ActionErrorAction: ActionFunctionAny<
 
 function* loadReport54Worker(action?: any): Generator<any, any, any> {
   try {
-    const { ejercicio_fin, ejercicio_ini } = action.payload || {};
+    const { ejercicio_fin, ejercicio_ini, fiscal } = action.payload || {};
 
     const options = {
       ...action.payload,
       ejercicio_fin: ejercicio_fin,
       ejercicio_ini: ejercicio_ini,
+      fiscal       : fiscal,
     };
 
     if(ejercicio_fin < ejercicio_ini){
@@ -43,8 +44,6 @@ function* loadReport54Worker(action?: any): Generator<any, any, any> {
 
     var dat = result.data;
     
-    console.log(dat);
-
     var sum_obj = {c_sol:0, m_sol:0, c_analisis:0, m_analisis:0, c_no_sol:0, m_no_sol:0 };
     dat.data_rows.map(function(x: any) {
       sum_obj.c_sol      += x.c_sol      ;
@@ -54,7 +53,7 @@ function* loadReport54Worker(action?: any): Generator<any, any, any> {
       sum_obj.c_no_sol   += x.c_no_sol   ;
       sum_obj.m_no_sol   += x.m_no_sol   ;
     } )
-    console.log(  result.data.data_rows  );
+
     var sendData = {data_rows: result.data.data_rows, sum_rows: sum_obj};
     yield put(loadReport54SuccessAction( sendData ));
   } catch (e) {

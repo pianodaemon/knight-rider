@@ -1,7 +1,7 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin):
+def get(ej_ini, ej_fin, fiscal):
     ''' Returns an instance of Reporte 53 '''
     
     # Tratamiento de filtros
@@ -57,66 +57,62 @@ def get(ej_ini, ej_fin):
     # Retrieve de cant. obs y montos por cada ente, empezando por ASENL
     aux_dict = {}
     
-    sql = '''
-        select dep_cat.title as dependencia, tipos.title as tipo_obs, pre.estatus_proceso_id as estatus, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto_observado_pre
-        from observaciones_pre_asenl as pre
-            join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
-            join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
-            join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-			join observation_types as tipos on pre.tipo_observacion_id = tipos.id
-        where not pre.blocked {}
-            and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-        group by dep_cat.title, tipos.title, pre.estatus_proceso_id
-        order by dep_cat.title, tipos.title, pre.estatus_proceso_id;
-    '''.format(ignored_audit_str, ej_ini, ej_fin)
+    if fiscal == '' or fiscal == 'asenl':
+        sql = '''
+            select dep_cat.title as dependencia, tipos.title as tipo_obs, pre.estatus_proceso_id as estatus, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto_observado_pre
+            from observaciones_pre_asenl as pre
+                join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
+                join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
+                join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
+	    		join observation_types as tipos on pre.tipo_observacion_id = tipos.id
+            where not pre.blocked {}
+                and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            group by dep_cat.title, tipos.title, pre.estatus_proceso_id
+            order by dep_cat.title, tipos.title, pre.estatus_proceso_id;
+        '''.format(ignored_audit_str, ej_ini, ej_fin)
 
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
-    
-    #for row in rows:
-    #    aux_dict[(row[0], row[1], row[2])] = {'asenl' : (row[3], row[4])}
+        try:
+            rows = exec_steady(sql)
+        except EmptySetError:
+            rows = []
+        
  
-    for row in rows:
-        if (row[0], row[1]) in aux_dict:
-            aux_dict[(row[0], row[1])][ 'to' + str(row[2])] = ( 'asenl', row[3], row[4])
-        else:
-            aux_dict[(row[0], row[1])] = { 'to' + str(row[2]): ( 'asenl', row[3], row[4])}
+        for row in rows:
+            if (row[0], row[1]) in aux_dict:
+                aux_dict[(row[0], row[1])][ 'to' + str(row[2])] = ( 'asenl', row[3], row[4])
+            else:
+                aux_dict[(row[0], row[1])] = { 'to' + str(row[2]): ( 'asenl', row[3], row[4])}
 
 
-
- 
-    
     # ASF
     ignored_audit_str = ignored_audit_str.replace('pre.', 'pre.')
 
-    sql = '''
-        select dep_cat.title as dependencia, pre.estatus_criterio_int_id as estatus, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto_observado_pre
-        from observaciones_pre_asf as pre
-            join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
-            join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
-            join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        where not pre.blocked {}
-            and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-        group by dep_cat.title, pre.estatus_criterio_int_id
-        order by dep_cat.title, pre.estatus_criterio_int_id;
-    '''.format(ignored_audit_str, ej_ini, ej_fin)
-    
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
-
-    #for row in rows:
-    #    aux_dict[(row[0], 'no_data', row[1] )] = {'asf' : (row[2], row[3])}
-
-    for row in rows:
-        if (row[0], 'no_data') in aux_dict:
-            aux_dict[(row[0], 'no_data')]['to' + str(row[1])] = ('asf', row[2], row[3])
-        else:
-            aux_dict[(row[0], 'no_data')] = {'to' + str(row[1]): ('asf', row[2], row[3])}
+    if fiscal == '' or fiscal == 'asf':
+        sql = '''
+            select dep_cat.title as dependencia, pre.estatus_criterio_int_id as estatus, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto_observado_pre
+            from observaciones_pre_asf as pre
+                join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
+                join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
+                join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
+            where not pre.blocked {}
+                and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            group by dep_cat.title, pre.estatus_criterio_int_id
+            order by dep_cat.title, pre.estatus_criterio_int_id;
+        '''.format(ignored_audit_str, ej_ini, ej_fin)
         
+        try:
+            rows = exec_steady(sql)
+        except EmptySetError:
+            rows = []
+
+
+        for row in rows:
+            if (row[0], 'no_data') in aux_dict:
+                aux_dict[(row[0], 'no_data')]['to' + str(row[1])] = ('asf', row[2], row[3])
+            else:
+                aux_dict[(row[0], 'no_data')] = {'to' + str(row[1]): ('asf', row[2], row[3])}
+
+
     aux_l = sorted(aux_dict.items())
 
     
@@ -130,7 +126,6 @@ def get(ej_ini, ej_fin):
             'dep': k[0],
         }
 
-
         r['tipo_obs'] = '' if k[1] == 'no_data' else k[1]
 
         r['c_analisis'] = 0
@@ -140,11 +135,10 @@ def get(ej_ini, ej_fin):
         r['c_no_sol'] = 0
         r['m_no_sol'] = 0.0
 
-        # estatus_pre_asenl no tiene las opciones solventadas ni no solventadas (Las primeras 3 se consideraran en analisis)
+        # estatus_pre_asenl no tiene las opciones solventadas ni no solventadas (Las 3 se consideraran en analisis)
         # -En análisis de la CYTG
         # -En análisis del organismo/dependencia
         # -En análisis del ente fiscalizador
-        # Todas en analisis
 
         # estatus_pre_asf (Las primeras 3 se consideraran en analisis)
         # -Observaciones Preliminares

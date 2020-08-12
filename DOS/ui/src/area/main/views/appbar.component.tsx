@@ -11,20 +11,14 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
-// import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import { Link, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import Collapse from '@material-ui/core/Collapse';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
 import { AppRoutesContainer } from './app-routes.container';
 //Icons
-import PersonIcon from '@material-ui/icons/Person';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
@@ -32,8 +26,10 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import NoteAddIcon from '@material-ui/icons/NoteAdd';
-// import ListAltIcon from '@material-ui/icons/ListAlt';
+import PersonIcon from '@material-ui/icons/Person';
+import Collapse from '@material-ui/core/Collapse';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
@@ -141,56 +137,48 @@ export function AppBarComponent() {
       text: 'Auditorías',
       icon: <AccountBalanceIcon />,
       open: true,
-      childrenList: [],
     },
     observationSfp: {
       url: '/observation-sfp/list',
       text: 'Observaciones SFP',
       icon: <ImageSearchIcon />,
       open: true,
-      childrenList: [],
     },
     observationAsf: {
       url: '/observation-asf/list',
       text: 'Observaciones Preliminares ASF',
       icon: <DeveloperBoardIcon />,
       open: true,
-      childrenList: [],
     },
     resultsReport: {
       url: '/results-report/list',
       text: 'Observaciones de la ASF (Informe de Resultados)',
       icon: <ImportContactsIcon />,
       open: true,
-      childrenList: [],
     },
     observationAsenl: {
       url: '/observation-asenl/list',
       text: 'Observaciones Preliminares ASENL',
       icon: <DeveloperBoardIcon />,
       open: true,
-      childrenList: [],
     },
     resultsReportAsenl: {
       url: '/results-report-asenl/list',
       text: 'Observaciones de la ASENL (Informe de Resultados)',
       icon: <ImportContactsIcon />,
       open: true,
-      childrenList: [],
     },
     observationCytg: {
       url: '/observation-cytg/list',
       text: 'Observaciones Preliminares CyTG',
       icon: <DeveloperBoardIcon />,
       open: true,
-      childrenList: [],
     },
     resultsReportCytg: {
       url: '/results-report-cytg/list',
       text: 'Observaciones de la CYTG (Informe de Resultados)',
       icon: <ImportContactsIcon />,
       open: true,
-      childrenList: [],
     },
     reports: {
       url: '/reports-52',
@@ -219,22 +207,15 @@ export function AppBarComponent() {
       url: '/user/list',
       text: 'Usuarios',
       icon: <PersonIcon />,
-      open: true,
-      childrenList: [],
+      open: false,
     },
-    /*
-    preliminary: {
-      url: '/results_report/create',
-      text: 'Crear Reporte de Resultados',
-      icon: <ImageSearchIcon />,
-      open: true,
-      childrenList: [],
-    },
-    */
   };
 
-  // const [openn, setOpenn] = React.useState(false);
-  // const handleClickItemDrawer = (index: string) => {};
+  const [menuItems, setMenuItemOpen] = React.useState<{[key: string]: boolean}>(
+    Object.keys(breadcrumbNameMap).reduce((acc, next) => {
+      return { ...acc, [next]: !!breadcrumbNameMap[next].open }
+    }, {})
+  );
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -264,11 +245,6 @@ export function AppBarComponent() {
             <MenuIcon />
           </IconButton>
           <img className={classes.imageGobMx} src="/nlgobmx.png" alt="Inicio" />
-          {/*
-          <Typography variant="h6" noWrap>
-            Gobierno Nuevo Le&oacute;n
-          </Typography>
-          */}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -301,13 +277,24 @@ export function AppBarComponent() {
                   component={Link}
                   to={breadcrumbNameMap[route].url}
                   // key={route}
-                  onClick={handleDrawerClose}
+                  onClick={(event: any) =>{
+                    if (!breadcrumbNameMap[route].childrenList) {
+                      handleDrawerClose();
+                    } else {
+                      event.preventDefault();
+                    }
+                    setMenuItemOpen({
+                      ...menuItems,
+                      [route]: !menuItems[route],
+                    })
+                  }}
                 >
                   <ListItemIcon>{breadcrumbNameMap[route].icon}</ListItemIcon>
                   <ListItemText primary={breadcrumbNameMap[route].text} />
+                  { breadcrumbNameMap[route].childrenList && (menuItems[route] ? <ExpandLess /> : <ExpandMore />)}
                 </ListItem>
-                {breadcrumbNameMap[route].childrenList.length > 0 && (
-                  <Collapse in timeout="auto" unmountOnExit>
+                {breadcrumbNameMap[route].childrenList && breadcrumbNameMap[route].childrenList.length > 0 && (
+                  <Collapse in={menuItems[route]} timeout="auto" unmountOnExit>
                     {Object.keys(breadcrumbNameMap[route].childrenList).map(
                       (route2, index2) => (
                         <List
@@ -342,7 +329,7 @@ export function AppBarComponent() {
                       ),
                     )}
                   </Collapse>
-                )}
+                  )}
               </React.Fragment>
             ))}
           </List>

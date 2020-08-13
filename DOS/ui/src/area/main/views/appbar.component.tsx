@@ -201,6 +201,11 @@ export function AppBarComponent() {
           text: 'Informe Preliminar',
           icon: <GridOnIcon />,
         },
+        {
+          url: '/reports-56',
+          text: 'Pendientes de Solventar',
+          icon: <GridOnIcon />,
+        },
       ],
     },
     user: {

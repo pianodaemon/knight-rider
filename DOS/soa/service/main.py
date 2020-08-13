@@ -14,6 +14,7 @@ from genl.endpoints import (
     observaciones_ires_cytg,
     reporte_53,
     reporte_54,
+    reporte_56,
 )
 from genl.restplus import api
 
@@ -34,6 +35,7 @@ def setup_app(flask_app):
     api.add_namespace(observaciones_ires_cytg.ns)
     api.add_namespace(reporte_53.ns)
     api.add_namespace(reporte_54.ns)
+    api.add_namespace(reporte_56.ns)
 
     flask_app.register_blueprint(blueprint)
 

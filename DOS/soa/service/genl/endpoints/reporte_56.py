@@ -50,11 +50,7 @@ class Reporte56(Resource):
 
         ejercicio_ini = request.args.get('ejercicio_ini', '2000')
         ejercicio_fin = request.args.get('ejercicio_fin', '2040')
-<<<<<<< HEAD
         fiscal        = request.args.get('fiscal',        'SFP')
-=======
-        fiscal        = request.args.get('fiscal',        '')
->>>>>>> master
 
         try:
             rep = reporte_56.get(ejercicio_ini, ejercicio_fin, fiscal)

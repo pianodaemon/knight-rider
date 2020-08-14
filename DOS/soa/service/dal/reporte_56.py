@@ -301,8 +301,6 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
 
 
 
-
-
 def get_ignored_audit_structs(ignored_audit_set, prefix):
     s = ''
     l = []

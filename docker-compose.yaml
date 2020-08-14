@@ -44,7 +44,7 @@ services:
         container_name: 'sso_obs'
         build: './DOS/sso'
         ports:
-          - '10090:10090'
+          - '10090:10080'
         environment: *commonEnv
         volumes:
           - ./DOS/keys:/pem

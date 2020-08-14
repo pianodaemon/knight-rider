@@ -206,6 +206,16 @@ export function AppBarComponent() {
           text: 'Pendientes de Solventar',
           icon: <GridOnIcon />,
         },
+        {
+          url: '/reports-57',
+          text: 'Observaciones por su Tipo',
+          icon: <GridOnIcon />,
+        },
+        {
+          url: '/reports-59',
+          text: 'Obras Públicas',
+          icon: <GridOnIcon />,
+        },
       ],
     },
     user: {

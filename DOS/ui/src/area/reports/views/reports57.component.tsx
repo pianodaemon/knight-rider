@@ -9,7 +9,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 type Props = {
   loading: boolean,
-  loadReport56Action: Function,
+  loadReport57Action: Function,
   report: any,
 };
 
@@ -83,17 +83,17 @@ const useStyles = makeStyles(() =>
   })
 );
 
-export const Report56 = (props: Props) => {
+export const Report57 = (props: Props) => {
   const {
     report,
     // loading,
-    loadReport56Action,
+    loadReport57Action,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
   const [fiscal , setFiscal ] = useState<any>('SFP');
   useEffect(() => {
-    loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal});
+    loadReport57Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, fiscal]);
   const classes = useStyles();
@@ -137,7 +137,7 @@ export const Report56 = (props: Props) => {
   return (
     <div className={classes.Container}>
       <div>
-        <span className={classes.titlereport}>Reporte Ejecutivo de Observaciones Pendientes de Solventar por Ente Fiscalizador</span>
+        <span className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Tipo de Observación</span>
       </div>
 
       <div className={classes.filters}>
@@ -201,14 +201,9 @@ export const Report56 = (props: Props) => {
 
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
-          <tr >    
-            <th colSpan={8} style={{background:'#fafafa', boxShadow: 'none',}} >Pendientes de Solventar</th> 
-          </tr> 
           <tr className={classes.titrow}>    
             <th  style={{background:'#ffffff', color: '#333333',}}>Secretaría/Entidad/Municipio</th> 
-            <th  style={{background:'#ffffff', color: '#333333',}}>Ejercicio</th> 
             <th >Tipo</th> 
-            <th >Clasificación</th> 
             <th >Cantidad Obs.</th> 
             <th >% Obs.</th> 
             <th >Monto</th> 
@@ -217,9 +212,7 @@ export const Report56 = (props: Props) => {
           {report && report.data_rows && report.data_rows.map((dep: any) =>
             <tr> 
               <td>{dep.dep}</td> 
-              <td style={{textAlign: 'center'}} >{dep.ej}</td>
               <td style={{textAlign: 'center'}} >{dep.tipo}</td>
-              <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
               <td className={classes.cantObs} >{dep.c_obs}</td>
               <td style={{textAlign: "right", whiteSpace: "nowrap"}} > {formatPercent( dep.c_obs, report.sum_rows.c_obs ) } </td>
               <td className={classes.montos} >{ formatMoney(dep.monto) }</td>
@@ -230,8 +223,6 @@ export const Report56 = (props: Props) => {
           { report && report.sum_rows &&
             <tr> 
               <td style={{fontWeight: "bold"}} > Totales</td> 
-              <td style={{fontWeight: "bold", textAlign: "center"}}></td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
               <td style={{fontWeight: "bold", textAlign: "center"}}></td>
               <td style={{fontWeight: "bold", textAlign: "center"}}> { report.sum_rows.c_obs }</td>
               <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>

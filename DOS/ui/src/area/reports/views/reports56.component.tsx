@@ -29,8 +29,6 @@ const useStyles = makeStyles(() =>
         padding: '5px 10px;',
         borderTopLeftRadius: '6px;',
         borderTopRightRadius: '6px;',
-        background: '#374fc0;',
-        color: 'white;',
       },
       '& td': {
         border: 'solid 1px #fafafa',
@@ -48,6 +46,7 @@ const useStyles = makeStyles(() =>
     },
     titrow: {
       background: '#fff !important',
+      boxShadow: '0 2px 15px 0 rgba(0,0,0,0.15)',
     },
     titlereport: {
       fontSize: '1.25rem',
@@ -111,6 +110,8 @@ export const Report56 = (props: Props) => {
   ];
   const optionsFiscals = [
     { value: 'SFP',   label: 'SFP' },
+    { value: 'ASF',   label: 'ASF' },
+    { value: 'CYTG',  label: 'CYTG' },
   ];
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
@@ -128,10 +129,15 @@ export const Report56 = (props: Props) => {
     }
     return valueString;
   };
+  const formatPercent = (monto:number, total:number): string => {
+    let v = ((monto*100)/total).toFixed(1);
+    let vr = v[v.length-1] == '0' ? ((monto*100)/total).toFixed(0) : v;
+    return vr + ' %';
+  };
   return (
     <div className={classes.Container}>
       <div>
-        <span className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Estatus de la Observación del Informe Preliminar</span>
+        <span className={classes.titlereport}>Reporte Ejecutivo de Observaciones Pendientes de Solventar por Ente Fiscalizador</span>
       </div>
 
       <div className={classes.filters}>
@@ -195,6 +201,9 @@ export const Report56 = (props: Props) => {
 
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
+          <tr >    
+            <th colSpan={8} style={{background:'#fafafa', boxShadow: 'none',}} >Pendientes de Solventar</th> 
+          </tr> 
           <tr className={classes.titrow}>    
             <th  style={{background:'#ffffff', color: '#333333',}}>Secretaría/Entidad/Municipio</th> 
             <th  style={{background:'#ffffff', color: '#333333',}}>Ejercicio</th> 
@@ -205,7 +214,6 @@ export const Report56 = (props: Props) => {
             <th >Monto</th> 
             <th >% Monto</th> 
           </tr> 
-          {console.log(report)}
           {report && report.data_rows && report.data_rows.map((dep: any) =>
             <tr> 
               <td>{dep.dep}</td> 
@@ -213,9 +221,9 @@ export const Report56 = (props: Props) => {
               <td style={{textAlign: 'center'}} >{dep.tipo}</td>
               <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
               <td className={classes.cantObs} >{dep.c_obs}</td>
-              <td ></td>
+              <td style={{textAlign: "right", whiteSpace: "nowrap"}} > {formatPercent( dep.c_obs, report.sum_rows.c_obs ) } </td>
               <td className={classes.montos} >{ formatMoney(dep.monto) }</td>
-              <td ></td>
+              <td style={{textAlign: "right", whiteSpace: "nowrap"}} >{formatPercent( dep.monto, report.sum_rows.monto ) }</td>
             </tr>
           )
           }   
@@ -226,8 +234,9 @@ export const Report56 = (props: Props) => {
               <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
               <td style={{fontWeight: "bold", textAlign: "center"}}></td>
               <td style={{fontWeight: "bold", textAlign: "center"}}> { report.sum_rows.c_obs }</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}></td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
               <td style={{fontWeight: "bold", textAlign: "right"}}> { formatMoney( report.sum_rows.monto )}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
             </tr>
           }           
           

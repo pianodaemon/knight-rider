@@ -137,7 +137,7 @@ export const Report57 = (props: Props) => {
   return (
     <div className={classes.Container}>
       <div>
-        <span className={classes.titlereport}>Reporte Ejecutivo de Observaciones Pendientes de Solventar por Ente Fiscalizador</span>
+        <span className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Tipo de Observación</span>
       </div>
 
       <div className={classes.filters}>
@@ -201,9 +201,6 @@ export const Report57 = (props: Props) => {
 
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
-          <tr >    
-            <th colSpan={6} style={{background:'#fafafa', boxShadow: 'none',}} >Pendientes de Solventar</th> 
-          </tr> 
           <tr className={classes.titrow}>    
             <th  style={{background:'#ffffff', color: '#333333',}}>Secretaría/Entidad/Municipio</th> 
             <th >Tipo</th> 

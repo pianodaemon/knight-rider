@@ -79,6 +79,9 @@ def get(ej_ini, ej_fin, fiscal):
     elif fiscal == 'CYTG':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
         data_rows = getDataCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'] )
+    elif fiscal == 'ASENL':
+        ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
+        data_rows = getDataASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'] )
 
     return {
         'data_rows': data_rows,
@@ -283,7 +286,7 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
             data_rowsl[key]['cant_obs'] += 1
             data_rowsl[key]['monto'] += i['monto']
         else:
-            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'clasif_name': i['clasif_name']}
+            data_rowsl[key] = { 'cant_obs': 1, 'monto': i['monto'] }
 
     for item in data_rowsl:
         value = data_rowsl[item]
@@ -300,6 +303,58 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
 
 
 
+def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
+    
+    data_rows = []
+    sql = '''
+        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
+        from observaciones_ires_asenl as ires
+        join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
+        join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
+        join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
+        join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
+        join observation_types as tipos on ires.tipo_observacion_id = tipos.id
+        where not pre.blocked {}
+            and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+        group by dependencia, ejercicio, tipo_observacion, pre_id, direccion_id, clasif_final_cytg, monto_pendiente_solventar
+        order by dependencia, ejercicio, tipo_observacion, pre_id;
+    '''.format( ignored_audit_str, ej_ini, ej_fin)
+        
+    try:
+        rows = exec_steady(sql)
+    except EmptySetError:
+        rows = []
+    
+    l = []
+    for row in rows:
+        r = dict(row)
+ 
+        r['clasif_id']   = r['clasif_final_cytg']
+        r['monto']       = r['monto_pendiente_solventar']
+        l.append(r)
+    
+    data_rowsl = {}
+    
+    for i in l:
+        key = (i['dependencia'], i['tipo_observacion'] )
+        if key in data_rowsl:
+            data_rowsl[key]['cant_obs'] += 1
+            data_rowsl[key]['monto'] += i['monto']
+        else:
+            data_rowsl[key] = { 'cant_obs': 1, 'monto': i['monto'] }
+    
+    for item in data_rowsl:
+        value = data_rowsl[item]
+        
+        o = {}
+        o['dep']              = item[0]
+        o['tipo']             = item[1]
+        o['c_obs']            = value['cant_obs']
+        o['monto']            = value['monto']
+    
+        data_rows.append(o)
+    
+    return data_rows
 
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):

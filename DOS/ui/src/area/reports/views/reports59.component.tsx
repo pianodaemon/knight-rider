@@ -111,6 +111,7 @@ export const Report59 = (props: Props) => {
   const optionsFiscals = [
     { value: 'SFP',   label: 'SFP' },
     { value: 'ASF',   label: 'ASF' },
+    { value: 'ASENL', label: 'ASENL' },
     { value: 'CYTG',  label: 'CYTG' },
   ];
   const formatMoney = ( monto: number): string =>  {

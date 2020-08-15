@@ -1,12 +1,13 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal):
+def get(ej_ini, ej_fin, fiscal, onlyObras):
     ''' Returns an instance of Reporte 57 '''
     
     # Tratamiento de filtros
-    ej_ini = int(ej_ini)
-    ej_fin = int(ej_fin)
+    ej_ini     = int(ej_ini)
+    ej_fin     = int(ej_fin)
+    only_obras = True if onlyObras else False
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
@@ -55,15 +56,7 @@ def get(ej_ini, ej_fin, fiscal):
     
     
     #Organos fiscalizadores
-    entesSql = "select * from fiscals;"
-    try:
-        entesRows = exec_steady(entesSql)
-    except EmptySetError:
-        rows = []
-
-    entes = {}
-    for e in entesRows:
-        entes[e[1]] = e[0]
+    entes = setEntesIds()
 
 
     # Retrieve de cant. obs y montos por cada ente, empezando por ASENL
@@ -72,16 +65,16 @@ def get(ej_ini, ej_fin, fiscal):
     data_rows = []
     
     if fiscal == 'SFP':
-        data_rows = getDataSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'] )
+        data_rows = getDataSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'], only_obras )
     elif fiscal == 'ASF':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASF( 'observaciones_pre_asf', 'observaciones_ires_asf', ignored_audit_str, ej_ini, ej_fin, 'seguimientos_obs_asf', entes['ASF'] )
+        data_rows = getDataASF( 'observaciones_pre_asf', 'observaciones_ires_asf', ignored_audit_str, ej_ini, ej_fin, 'seguimientos_obs_asf', entes['ASF'], only_obras )
     elif fiscal == 'CYTG':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'] )
+        data_rows = getDataCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'], only_obras )
     elif fiscal == 'ASENL':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'] )
+        data_rows = getDataASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'], only_obras )
 
     return {
         'data_rows': data_rows,
@@ -90,8 +83,11 @@ def get(ej_ini, ej_fin, fiscal):
 
 
 
-def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, seguimientos, ente ):
+def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, seguimientos, ente, only_obras ):
     data_rows = []
+
+    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
+
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id
         from {} as pre
@@ -103,11 +99,12 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
         where not pre.blocked
     	    and not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dependencia, tipo_observacion, ejercicio, ires_id, direccion_id
         order by dependencia, tipo_observacion, ejercicio, ires_id;
-    '''.format( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin)
-        
-  
+    '''.format( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion)
+
+    
     try:
         rows = exec_steady(sql)
     except EmptySetError:
@@ -162,8 +159,11 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
     return data_rows
 
 
-def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
+def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras):
     data_rows = []
+
+    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
+
     sql = '''
         select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
         from observaciones_ires_cytg as ires
@@ -174,9 +174,10 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
         join observation_types as tipos on ires.tipo_observacion_id = tipos.id
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dependencia, tipo_observacion, ejercicio, pre_id, direccion_id, clasif_final_cytg
         order by dependencia, tipo_observacion, ejercicio, pre_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
         
     try:
         rows = exec_steady(sql)
@@ -232,8 +233,11 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
 
 
 
-def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
+def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
     data_rows = []
+
+    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
+
     sql = '''
         select ires.id as ires_id, dep_cat.title, anio.anio_cuenta_pub, tipos.title as tipo_observacion, ires.direccion_id
         from observaciones_sfp as ires
@@ -243,9 +247,10 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
         join observation_types          as tipos    on ires.tipo_observacion_id = tipos.id
         where not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dep_cat.title, tipos.title, anio.anio_cuenta_pub, ires_id
         order by dep_cat.title, tipos.title, anio.anio_cuenta_pub, ires_id;
-    '''.format(ignored_audit_str, ej_ini, ej_fin)
+    '''.format(ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
         
   
     try:
@@ -303,9 +308,12 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
 
 
 
-def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
+def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
     
     data_rows = []
+
+    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
+
     sql = '''
         select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
         from observaciones_ires_asenl as ires
@@ -316,9 +324,10 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
         join observation_types as tipos on ires.tipo_observacion_id = tipos.id
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dependencia, ejercicio, tipo_observacion, pre_id, direccion_id, clasif_final_cytg, monto_pendiente_solventar
         order by dependencia, ejercicio, tipo_observacion, pre_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
         
     try:
         rows = exec_steady(sql)
@@ -355,6 +364,30 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
         data_rows.append(o)
     
     return data_rows
+
+
+def setEntesIds():
+    entesSql = "select * from fiscals;"
+    try:
+        entesRows = exec_steady(entesSql)
+    except EmptySetError:
+        rows = []
+
+    entes = {}
+    for e in entesRows:
+        entes[e[1]] = e[0]
+
+    return entes
+
+
+def getObraPublicaId():
+    sql = "select id from divisions where title = 'OBRAS';"
+    try:
+        rows = exec_steady(sql)
+    except EmptySetError:
+        rows = []
+    
+    return rows[0][0]
 
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):

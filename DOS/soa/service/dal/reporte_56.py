@@ -120,7 +120,7 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
             where observacion_id = {}
             order by seguimiento_id desc
             limit 1;
-        '''.format( seguimientos, row[4], ente, row[0])
+        '''.format( seguimientos, r['direccion_id'], ente, r['ires_id'])
 
         try:
             seg = exec_steady(sql)
@@ -128,9 +128,10 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
             seg = []            
             
         if seg:
-            r['clasif_id'] = seg[0][0]
-            r['monto'] = seg[0][1]
-            r['clasif_name'] = seg[0][2]
+            segd = dict(seg[0])
+            r['clasif_id']   = segd['clasif_final_interna_cytg']
+            r['monto']       = segd['monto_pendiente_solventar']
+            r['clasif_name'] = segd['title']
             l.append(r)
 
     data_rowsl = {}
@@ -198,9 +199,10 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
             seg = []            
             
         if seg:
-            r['clasif_id'] = r['clasif_final_cytg']
-            r['monto'] = seg[0][0]
-            r['clasif_name'] = seg[0][1]
+            segd = dict(seg[0])
+            r['clasif_id']   = r['clasif_final_cytg']
+            r['monto']       = segd['monto_pendiente_solventar']
+            r['clasif_name'] = segd['title']
             l.append(r)
     
     data_rowsl = {}
@@ -261,7 +263,7 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
             where observacion_id = {}
             order by seguimiento_id desc
             limit 1;
-        '''.format(row[4], ente, row[0])
+        '''.format(r['direccion_id'], ente, r['id'])
 
 
         try:
@@ -270,9 +272,10 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
             seg = []              
             
         if seg:
-            r['clasif_id'] = seg[0][0]
-            r['monto'] = seg[0][1]
-            r['clasif_name'] = seg[0][2]
+            segd = dict(seg[0])
+            r['clasif_id']   = segd['clasif_final_interna_cytg']
+            r['monto']       = segd['monto_pendiente_solventar']
+            r['clasif_name'] = segd['title']
             l.append(r)
 
     data_rowsl = {}

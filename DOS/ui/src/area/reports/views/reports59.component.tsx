@@ -93,7 +93,7 @@ export const Report59 = (props: Props) => {
   const [yearIni, setYearIni] = useState<any>('2012');
   const [fiscal , setFiscal ] = useState<any>('SFP');
   useEffect(() => {
-    loadReport57Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal});
+    loadReport57Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, only_obras: 'True'});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, fiscal]);
   const classes = useStyles();

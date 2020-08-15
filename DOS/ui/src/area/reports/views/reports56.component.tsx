@@ -25,18 +25,16 @@ const useStyles = makeStyles(() =>
     tableReports: {
       border: 'solid 1px #fafafa',
       '& th': {
-        border: 'solid 1px #fafafa',
+        border: '1px solid rgba(0,0,0,0.02)',
         padding: '5px 10px;',
-        borderTopLeftRadius: '6px;',
-        borderTopRightRadius: '6px;',
       },
       '& td': {
         border: 'solid 1px #fafafa',
         padding: '3px 10px',
       },
       '& tr:nth-child(odd)': {
-        border: 'solid 1px #fafafa',
-        background: '#f4f4f4',
+        borderRigth: '1px solid rgba(0,0,0,0.02)',
+        background: 'rgba(0,0,0,0.03)',
       },
     },
     tableWhole: {
@@ -199,15 +197,14 @@ export const Report56 = (props: Props) => {
 
       </div>
 
-
+      <div style={{background: "rgba(0,0,0,0.03)", borderBottom: "1px solid rgba(0,0,0,0.05)", textAlign: "center", padding: "5px 0", fontWeight: "bold", marginBottom: "0px" }}>
+        Pendientes de Solventar
+      </div>
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
-          <tr >    
-            <th colSpan={8} style={{background:'#fafafa', boxShadow: 'none',}} >Pendientes de Solventar</th> 
-          </tr> 
           <tr className={classes.titrow}>    
-            <th  style={{background:'#ffffff', color: '#333333',}}>Secretaría/Entidad/Municipio</th> 
-            <th  style={{background:'#ffffff', color: '#333333',}}>Ejercicio</th> 
+            <th >Secretaría/Entidad/Municipio</th> 
+            <th >Ejercicio</th> 
             <th >Tipo</th> 
             <th >Clasificación</th> 
             <th >Cantidad Obs.</th> 

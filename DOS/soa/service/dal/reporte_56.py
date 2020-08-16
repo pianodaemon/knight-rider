@@ -91,7 +91,6 @@ def get(ej_ini, ej_fin, fiscal):
 
 
 def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, seguimientos, ente ):
-    data_rows = []
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id
         from {} as pre
@@ -137,34 +136,10 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
             r['clasif_name'] = segd['title']
             l.append(r)
 
-    data_rowsl = {}
-
-    for i in l:
-        key = (i['dependencia'], i['ejercicio'], i['tipo_observacion'], i['clasif_id'])
-        if key in data_rowsl:
-            data_rowsl[key]['cant_obs'] += 1
-            data_rowsl[key]['monto'] += i['monto']
-        else:
-            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'clasif_name': i['clasif_name']}
-
-    for item in data_rowsl:
-        value = data_rowsl[item]
-        
-        o = {}
-        o['dep']              = item[0]
-        o['ej']               = item[1]
-        o['tipo']             = item[2]
-        o['clasif_name']      = value['clasif_name']
-        o['c_obs']            = value['cant_obs']
-        o['monto']            = value['monto']
-    
-        data_rows.append(o)
-
-    return data_rows
+    return setDataObj56(l)
 
 
 def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
-    data_rows = []
     sql = '''
         select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
         from observaciones_ires_cytg as ires
@@ -208,37 +183,13 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
             r['clasif_name'] = segd['title']
             l.append(r)
     
-    data_rowsl = {}
-    
-    for i in l:
-        key = (i['dependencia'], i['ejercicio'], i['tipo_observacion'], i['clasif_id'])
-        if key in data_rowsl:
-            data_rowsl[key]['cant_obs'] += 1
-            data_rowsl[key]['monto'] += i['monto']
-        else:
-            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'clasif_name': i['clasif_name']}
-    
-    for item in data_rowsl:
-        value = data_rowsl[item]
-        
-        o = {}
-        o['dep']              = item[0]
-        o['ej']               = item[1]
-        o['tipo']             = item[2]
-        o['clasif_name']      = value['clasif_name']
-        o['c_obs']            = value['cant_obs']
-        o['monto']            = value['monto']
-    
-        data_rows.append(o)
-    
-    return data_rows
+    return setDataObj56(l)
 
 
 
 def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
-    data_rows = []
     sql = '''
-        select ires.id, dep_cat.title, anio.anio_cuenta_pub, tipos.title as tipo_observacion, ires.direccion_id
+        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, ires.direccion_id as direccion_id
         from observaciones_sfp as ires
         join auditoria_dependencias     as dep      on ires.auditoria_id        = dep.auditoria_id
         join dependencies               as dep_cat  on dep.dependencia_id       = dep_cat.id
@@ -246,8 +197,8 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
         join observation_types          as tipos    on ires.tipo_observacion_id = tipos.id
         where not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-        group by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires.id
-        order by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires.id;
+        group by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires_id
+        order by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires_id;
     '''.format(ignored_audit_str, ej_ini, ej_fin)
         
   
@@ -266,7 +217,7 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
             where observacion_id = {}
             order by seguimiento_id desc
             limit 1;
-        '''.format(r['direccion_id'], ente, r['id'])
+        '''.format(r['direccion_id'], ente, r['ires_id'])
 
 
         try:
@@ -281,34 +232,10 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
             r['clasif_name'] = segd['title']
             l.append(r)
 
-    data_rowsl = {}
-    for i in l:
-        key = (i['title'], i['anio_cuenta_pub'], i['tipo_observacion'], i['clasif_id'])
-        if key in data_rowsl:
-            data_rowsl[key]['cant_obs'] += 1
-            data_rowsl[key]['monto'] += i['monto']
-        else:
-            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'clasif_name': i['clasif_name']}
-
-    for item in data_rowsl:
-        value = data_rowsl[item]
-        
-        o = {}
-        o['dep']              = item[0]
-        o['ej']               = item[1]
-        o['tipo']             = item[2]
-        o['clasif_name']      = value['clasif_name']
-        o['c_obs']            = value['cant_obs']
-        o['monto']            = value['monto']
-    
-        data_rows.append(o)
-
-    return data_rows
+    return setDataObj56(l)
 
 
 def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
-    
-    data_rows = []
     sql = '''
         select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
         from observaciones_ires_asenl as ires
@@ -350,8 +277,12 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
             r['clasif_name'] = segd['title']
             l.append(r)
     
+    return setDataObj56(l)
+
+
+def setDataObj56(l):
+    data_rows = []
     data_rowsl = {}
-    
     for i in l:
         key = (i['dependencia'], i['ejercicio'], i['tipo_observacion'], i['clasif_id'])
         if key in data_rowsl:
@@ -359,10 +290,8 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
             data_rowsl[key]['monto'] += i['monto']
         else:
             data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'clasif_name': i['clasif_name']}
-    
     for item in data_rowsl:
         value = data_rowsl[item]
-        
         o = {}
         o['dep']              = item[0]
         o['ej']               = item[1]
@@ -370,9 +299,7 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
         o['clasif_name']      = value['clasif_name']
         o['c_obs']            = value['cant_obs']
         o['monto']            = value['monto']
-    
         data_rows.append(o)
-    
     return data_rows
 
 

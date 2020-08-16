@@ -27,6 +27,10 @@ import { ResultsReportCYTGFormContainer } from '../../results-report-cytg/views/
 import { ReportsPreliminariesContainer } from '../../reports/views/reports-preliminaries.container';
 import { Reports52PreliminariesContainer } from '../../reports/views/reports52-preliminaries.container';
 import { Reports54Container } from '../../reports/views/reports54.container';
+import { Reports56Container } from '../../reports/views/reports56.container';
+import { Reports57Container } from '../../reports/views/reports57.container';
+import { Reports58Container } from '../../reports/views/reports58.container';
+import { Reports59Container } from '../../reports/views/reports59.container';
 
 type Props = {
   history: History,
@@ -163,6 +167,18 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route exact path={['/reports-54']}>
           <Reports54Container />
+        </Route>
+        <Route exact path={['/reports-56']}>
+          <Reports56Container />
+        </Route>
+        <Route exact path={['/reports-57']}>
+          <Reports57Container />
+        </Route>
+        <Route exact path={['/reports-58']}>
+          <Reports58Container />
+        </Route>
+        <Route exact path={['/reports-59']}>
+          <Reports59Container />
         </Route>
         <Route path="*">
           <NotFound />

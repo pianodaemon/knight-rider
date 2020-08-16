@@ -221,6 +221,26 @@ export function AppBarComponent(props: Props) {
           text: 'Informe Preliminar',
           icon: <GridOnIcon />,
         },
+        {
+          url: '/reports-56',
+          text: 'Pendientes de Solventar',
+          icon: <GridOnIcon />,
+        },
+        {
+          url: '/reports-57',
+          text: 'Observaciones por su Tipo',
+          icon: <GridOnIcon />,
+        },
+        {
+          url: '/reports-58',
+          text: 'Observaciones por su Clasificación',
+          icon: <GridOnIcon />,
+        },
+        {
+          url: '/reports-59',
+          text: 'Obras Públicas',
+          icon: <GridOnIcon />,
+        },
       ],
     },
     user: {

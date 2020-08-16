@@ -16,6 +16,7 @@ from genl.endpoints import (
     reporte_54,
     reporte_56,
     reporte_57,
+    reporte_58,
 )
 from genl.restplus import api
 
@@ -38,6 +39,7 @@ def setup_app(flask_app):
     api.add_namespace(reporte_54.ns)
     api.add_namespace(reporte_56.ns)
     api.add_namespace(reporte_57.ns)
+    api.add_namespace(reporte_58.ns)
 
     flask_app.register_blueprint(blueprint)
 

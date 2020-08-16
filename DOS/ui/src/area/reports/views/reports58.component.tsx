@@ -81,7 +81,7 @@ const useStyles = makeStyles(() =>
   })
 );
 
-export const Report56 = (props: Props) => {
+export const Report58 = (props: Props) => {
   const {
     report,
     // loading,
@@ -91,7 +91,7 @@ export const Report56 = (props: Props) => {
   const [yearIni, setYearIni] = useState<any>('2012');
   const [fiscal , setFiscal ] = useState<any>('SFP');
   useEffect(() => {
-    loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal});
+    loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, reporte_num: 'reporte58'});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, fiscal]);
   const classes = useStyles();
@@ -197,31 +197,20 @@ export const Report56 = (props: Props) => {
 
       </div>
 
-      <div style={{background: "rgba(0,0,0,0.03)", borderBottom: "1px solid rgba(0,0,0,0.05)", textAlign: "center", padding: "5px 0", fontWeight: "bold", marginBottom: "0px" }}>
-        Pendientes de Solventar
-      </div>
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
           <tr className={classes.titrow}>    
             <th >Secretaría/Entidad/Municipio</th> 
-            <th >Ejercicio</th> 
-            <th >Tipo</th> 
             <th >Clasificación</th> 
             <th >Cantidad Obs.</th> 
-            <th >% Obs.</th> 
             <th >Monto</th> 
-            <th >% Monto</th> 
           </tr> 
           {report && report.data_rows && report.data_rows.map((dep: any) =>
             <tr> 
               <td>{dep.dep}</td> 
-              <td style={{textAlign: 'center'}} >{dep.ej}</td>
-              <td style={{textAlign: 'center'}} >{dep.tipo}</td>
               <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
               <td className={classes.cantObs} >{dep.c_obs}</td>
-              <td style={{textAlign: "right", whiteSpace: "nowrap"}} > {formatPercent( dep.c_obs, report.sum_rows.c_obs ) } </td>
               <td className={classes.montos} >{ formatMoney(dep.monto) }</td>
-              <td style={{textAlign: "right", whiteSpace: "nowrap"}} >{formatPercent( dep.monto, report.sum_rows.monto ) }</td>
             </tr>
           )
           }   
@@ -229,12 +218,8 @@ export const Report56 = (props: Props) => {
             <tr> 
               <td style={{fontWeight: "bold"}} > Totales</td> 
               <td style={{fontWeight: "bold", textAlign: "center"}}></td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}></td>
               <td style={{fontWeight: "bold", textAlign: "center"}}> { report.sum_rows.c_obs }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
               <td style={{fontWeight: "bold", textAlign: "right"}}> { formatMoney( report.sum_rows.monto )}</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
             </tr>
           }           
           

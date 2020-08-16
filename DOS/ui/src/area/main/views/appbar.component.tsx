@@ -212,6 +212,11 @@ export function AppBarComponent() {
           icon: <GridOnIcon />,
         },
         {
+          url: '/reports-58',
+          text: 'Observaciones por su Clasificación',
+          icon: <GridOnIcon />,
+        },
+        {
           url: '/reports-59',
           text: 'Obras Públicas',
           icon: <GridOnIcon />,

@@ -29,6 +29,7 @@ import { Reports52PreliminariesContainer } from '../../reports/views/reports52-p
 import { Reports54Container } from '../../reports/views/reports54.container';
 import { Reports56Container } from '../../reports/views/reports56.container';
 import { Reports57Container } from '../../reports/views/reports57.container';
+import { Reports58Container } from '../../reports/views/reports58.container';
 import { Reports59Container } from '../../reports/views/reports59.container';
 
 type Props = {
@@ -169,6 +170,9 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route exact path={['/reports-57']}>
           <Reports57Container />
+        </Route>
+        <Route exact path={['/reports-58']}>
+          <Reports58Container />
         </Route>
         <Route exact path={['/reports-59']}>
           <Reports59Container />

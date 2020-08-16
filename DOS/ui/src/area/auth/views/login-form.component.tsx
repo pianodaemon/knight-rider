@@ -18,6 +18,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 type Props = {
   authTokenAction: Function,
   isLoading: boolean,
+  checked: boolean,
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -93,6 +94,8 @@ const useStyles = makeStyles((theme: Theme) =>
         background: '#008aba',
         color: '#FFF',
       },
+      display: 'block',
+      margin: '2em auto auto'
     },
     hrDivider: {
       borderTop: 0,
@@ -122,7 +125,22 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     textField: {
       backgroundColor: '#FFF',
-      width: '50ch',
+      // width: '50ch',
+      [theme.breakpoints.down('xs')]: {
+        display: 'flex',
+        minWidth: 'auto',
+        width: '140px',
+      },
+      [theme.breakpoints.up('xs')]: {
+        display: 'flex',
+        minWidth: 'auto',
+        width: '23ch',
+      },
+      [theme.breakpoints.up('sm')]: {
+        display: 'flex',
+        minWidth: '200px',
+        width: '50ch',
+      },
     },
     progress: {
       marginLeft: '10px',
@@ -134,6 +152,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const LoginForm = (props: Props) => {
   const {
     authTokenAction,
+    checked,
     isLoading,
   } = props;
   const classes = useStyles();
@@ -173,111 +192,115 @@ export const LoginForm = (props: Props) => {
     event.preventDefault();
   };
   return (
-    <Paper elevation={3} className={classes.paper}>
-      <Formik
-        initialValues={initialValues}
-        validate={validate}
-        onSubmit={(values, { setSubmitting }) => {
-          const releaseForm: () => void = () => setSubmitting(false);
-          const fields: any = { ...values };
-          console.log('fields', fields);
-          authTokenAction({ credentials: fields, history, releaseForm});
-        }}
-        enableReinitialize
-      >
-        {({
-          values,
-          errors,
-          touched,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          setFieldValue,
-        }: any) => {
-          return (
-            <>
-              <h1 style={{ color: '#128aba' }}>
-              Iniciar sesión
-              </h1>
-              <hr className={classes.hrDivider} />
-              <form onSubmit={handleSubmit} className={classes.form}>
-                <Grid container alignItems="center" justify="center" direction="column">
-                  <Grid item xs={12}>
-                    <FormControl className={clsx(classes.margin, classes.textField)} variant="outlined">
-                      <TextField
-                        id="username"
-                        label="Usuario"
-                        type="text"
-                        value={values.username}
-                        onChange={handleChange('username')}
-                        placeholder="Usuario"
-                        variant="outlined"
-                      />
-                      {errors.username && touched.username && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese Usuario
-                        </FormHelperText>
-                      )}
-                    </FormControl>
+    checked ? (
+    <>
+      <Paper elevation={3} className={classes.paper}>
+        <Formik
+          initialValues={initialValues}
+          validate={validate}
+          onSubmit={(values, { setSubmitting }) => {
+            const releaseForm: () => void = () => setSubmitting(false);
+            const fields: any = { ...values };
+            console.log('fields', fields);
+            authTokenAction({ credentials: fields, history, releaseForm});
+          }}
+          enableReinitialize
+        >
+          {({
+            values,
+            errors,
+            touched,
+            handleChange,
+            handleSubmit,
+            isSubmitting,
+            setFieldValue,
+          }: any) => {
+            return (
+              <>
+                <h1 style={{ color: '#128aba' }}>
+                Iniciar sesión
+                </h1>
+                <hr className={classes.hrDivider} />
+                <form onSubmit={handleSubmit} className={classes.form}>
+                  <Grid container alignItems="center" justify="center" direction="column">
+                    <Grid item xs={12}>
+                      <FormControl className={clsx(classes.margin, classes.textField)} variant="outlined">
+                        <TextField
+                          id="username"
+                          label="Usuario"
+                          type="text"
+                          value={values.username}
+                          onChange={handleChange('username')}
+                          placeholder="Usuario"
+                          variant="outlined"
+                        />
+                        {errors.username && touched.username && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Usuario
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormControl className={clsx(classes.margin, classes.textField)} variant="outlined">
+                        <TextField
+                          autoComplete="on"
+                          id="password"
+                          label="Contraseña"
+                          type={data.showPassword ? 'text' : 'password'}
+                          value={values.password}
+                          onChange={handleChange('password')}
+                          placeholder="Contraseña"
+                          InputProps={{
+                            endAdornment:
+                              <InputAdornment position="end">
+                                <IconButton
+                                  aria-label="toggle password visibility"
+                                  onClick={handleClickShowPassword}
+                                  onMouseDown={handleMouseDownPassword}
+                                  edge="end"
+                                >
+                                  {data.showPassword ? <Visibility /> : <VisibilityOff />}
+                                </IconButton>
+                              </InputAdornment>
+                          }}
+                          variant="outlined"
+                        />
+                        {errors.password && touched.password && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Contraseña
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12}>
-                    <FormControl className={clsx(classes.margin, classes.textField)} variant="outlined">
-                      <TextField
-                        autoComplete="on"
-                        id="password"
-                        label="Contraseña"
-                        type={data.showPassword ? 'text' : 'password'}
-                        value={values.password}
-                        onChange={handleChange('password')}
-                        placeholder="Contraseña"
-                        InputProps={{
-                          endAdornment:
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={handleClickShowPassword}
-                                onMouseDown={handleMouseDownPassword}
-                                edge="end"
-                              >
-                                {data.showPassword ? <Visibility /> : <VisibilityOff />}
-                              </IconButton>
-                            </InputAdornment>
-                        }}
-                        variant="outlined"
-                      />
-                      {errors.password && touched.password && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese Contraseña
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                </Grid>
 
-                {action !== 'view' && (
-                  <>
-                    <Button
-                      variant="contained"
-                      className={classes.submitInput}
-                      disabled={isSubmitting}
-                      type="submit"
-                    >
-                      {'Enviar'}
-                    </Button>
-                    {(isSubmitting || isLoading) && <CircularProgress className={classes.progress} size={20} /> }
-                  </>
-                )}
-              </form>
-            </>
-          );
-        }}
-      </Formik>
-    </Paper>
+                  {action !== 'view' && (
+                    <>
+                      <Button
+                        variant="contained"
+                        className={classes.submitInput}
+                        disabled={isSubmitting}
+                        type="submit"
+                      >
+                        {'Enviar'}
+                      </Button>
+                      {(isSubmitting || isLoading) && <CircularProgress className={classes.progress} size={20} /> }
+                    </>
+                  )}
+                </form>
+              </>
+            );
+          }}
+        </Formik>
+      </Paper>
+    </>
+    ) : null
   );
 };

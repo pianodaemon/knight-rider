@@ -7,18 +7,23 @@ export interface Credentials {
 }
 
 export interface JWT {
-  token: string
+  token: string; // raw Base64 encoded token
+  header?: { [key: string]: string }; // decoded header
+  payload?: { [key: string]: string }; // decoded payload
+  signature?: string; // decoded signature
 }
 
 interface AuthSlice {
   error: any;
   loading: boolean;
+  signedIn: boolean,
   token: JWT | null;
 }
 
 const initialState: AuthSlice = {
   error: null,
   loading: false,
+  signedIn: false,
   token: null,
 };
 

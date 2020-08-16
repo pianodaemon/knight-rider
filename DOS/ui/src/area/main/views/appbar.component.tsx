@@ -13,12 +13,16 @@ import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import { Link, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import { AppRoutesContainer } from './app-routes.container';
 //Icons
+import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
@@ -34,6 +38,12 @@ import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 
+type Props = {
+  logoutAction: Function,
+  isLoggedIn: boolean,
+  checked: boolean,
+};
+
 const customHistory = createBrowserHistory();
 const drawerWidth = 240;
 
@@ -41,6 +51,9 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       display: 'flex',
+    },
+    toolbar: {
+      justifyContent: 'space-between',
     },
     appBar: {
       background: 'linear-gradient(to left,#038bbb,#5232C2)',
@@ -56,6 +69,10 @@ const useStyles = makeStyles((theme: Theme) =>
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
       }),
+    },
+    menuAndImage: {
+      display: 'flex',
+      alignItems: 'center',
     },
     menuButton: {
       marginRight: theme.spacing(2),
@@ -126,10 +143,13 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export function AppBarComponent() {
+export function AppBarComponent(props: Props) {
+  const { checked, isLoggedIn, logoutAction } = props;
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const openProfileMenu = Boolean(anchorEl);
 
   const breadcrumbNameMap: { [key: string]: { [key: string]: any } } = {
     audit: {
@@ -245,6 +265,14 @@ export function AppBarComponent() {
     setOpen(false);
   };
 
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -254,17 +282,56 @@ export function AppBarComponent() {
           [classes.appBarShift]: open,
         })}
       >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            className={clsx(classes.menuButton, open && classes.hide)}
-          >
-            <MenuIcon />
-          </IconButton>
-          <img className={classes.imageGobMx} src="/nlgobmx.png" alt="Inicio" />
+        <Toolbar className={classes.toolbar}>
+          <div className={classes.menuAndImage}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              className={clsx(classes.menuButton, open && classes.hide)}
+            >
+              <MenuIcon />
+            </IconButton>
+            <img className={classes.imageGobMx} src="/nlgobmx.png" alt="Inicio" />
+          </div>
+          <div>
+            {(!isLoggedIn && checked) && <Button onClick={() => customHistory.push('/sign-in')} color="inherit">ACCEDER</Button>}
+            {isLoggedIn && (
+            <>
+              <IconButton
+                  edge="end"
+                  aria-label="account of current user"
+                  // aria-controls={menuId}
+                  aria-haspopup="true"
+                  onClick={handleMenu}
+                  color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={openProfileMenu}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={() => {
+                    logoutAction({history: customHistory});
+                    handleClose();
+                  }}>Terminar Sesión</MenuItem>
+              </Menu>
+            </>
+            )}
+            </div>
         </Toolbar>
       </AppBar>
       <Drawer

@@ -1,11 +1,12 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
-import { call, put, takeLatest, delay } from 'redux-saga/effects';
+import { call, put, takeLatest } from 'redux-saga/effects';
+import Cookies from 'universal-cookie';
+import jwt_decode from 'jwt-decode';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
 import { translations } from 'src/shared/translations/translations.util';
 import { login } from '../../service/auth.service';
 import { authReducer } from '../auth.reducer';
-// import { loadResultsReportCYTGAction } from './load-results-report-cytg.usecase';
 
 const postfix = '/app';
 const AUTH_TOKEN = `AUTH_TOKEN${postfix}`;
@@ -24,11 +25,12 @@ export const authTokenErrorAction: ActionFunctionAny<
 
 function* authTokenWorker(action: any): Generator<any, any, any> {
   try {
-    yield delay(1000);
     const { credentials, history } = action.payload;
     const result = yield call(login, credentials);
-    yield put(authTokenSuccessAction(result));
-    yield history.push('/audits/list');
+    const { token } = result.data;
+    yield setAuthCookie(token);
+    yield put(authTokenSuccessAction(token));
+    yield history.push('/audit/list');
     yield put(
       notificationAction({
         message: `¡Bienvenido!`,
@@ -47,7 +49,7 @@ function* authTokenWorker(action: any): Generator<any, any, any> {
       ? translations.observation.error_responses.unique_error
       : message;
     yield releaseForm();
-    yield put(authTokenErrorAction());
+    yield put(authTokenErrorAction(e));
     yield put(
       notificationAction({
         message,
@@ -62,20 +64,34 @@ function* authTokenWatcher(): Generator<any, any, any> {
   yield takeLatest(AUTH_TOKEN, authTokenWorker);
 }
 
+function setAuthCookie(token: string): void {
+  const cookies = new Cookies();
+  const jwt: any = jwt_decode(token);
+  cookies.set(
+    'token',
+    token,
+    { 
+      path: '/',
+      expires: new Date(jwt.exp * 1000)
+    }
+  );
+}
+
 const authReducerHandlers = {
   [AUTH_TOKEN]: (state: any) => {
     return {
       ...state,
       loading: true,
-      token: null,
+      // token: null,
+      signedIn: false,
     };
   },
   [AUTH_TOKEN_SUCCESS]: (state: any, action: any) => {
-    const { token } = action.payload;
+    // const { token } = action.payload;
     return {
       ...state,
       loading: false,
-      token,
+      signedIn: true,
     };
   },
   [AUTH_TOKEN_ERROR]: (state: any, action: any) => {
@@ -83,6 +99,7 @@ const authReducerHandlers = {
       ...state,
       error: action.payload,
       loading: false,
+      signedIn: false,
     };
   },
 };

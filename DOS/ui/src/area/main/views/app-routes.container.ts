@@ -9,7 +9,8 @@ import { loadCatalogResultsReportASENLAction } from 'src/area/results-report-ase
 import { loadCatalogResultsReportCYTGAction } from 'src/area/results-report-cytg/state/usecases/load-catalog.usecase';
 import { loadAuditCatalogAction } from 'src/area/auditories/state/usecases/load-audit-catalog.usecase';
 import { loadUsersCatalogAction } from 'src/area/users/state/usecases/load-users-catalog.usecase';
-
+import { checkAuthAction } from 'src/area/auth/state/usecases/check-auth.usecase';
+import { isLoggedInSelector } from 'src/area/auth/state/auth.selectors';
 import { AppRoutes } from './app-routes.component';
 
 const mapDispatchToProps = {
@@ -23,6 +24,13 @@ const mapDispatchToProps = {
   loadCatalogResultsReportASENLAction,
   loadCatalogObsCYTGAction,
   loadCatalogResultsReportCYTGAction,
+  checkAuthAction,
 };
 
-export const AppRoutesContainer = connect(null, mapDispatchToProps)(AppRoutes);
+function mapStateToProps(state: any) {
+  return {
+    isLoggedIn: isLoggedInSelector(state)
+  };
+}
+
+export const AppRoutesContainer = connect(mapStateToProps, mapDispatchToProps)(AppRoutes);

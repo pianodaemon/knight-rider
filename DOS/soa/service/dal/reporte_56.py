@@ -1,13 +1,14 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal):
+def get(ej_ini, ej_fin, fiscal, reporte_num):
     ''' Returns an instance of Reporte 56 '''
     
     # Tratamiento de filtros
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
-
+    reporte_num = str(reporte_num)
+    reporte_num = 'reporte56'
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
 
@@ -70,18 +71,22 @@ def get(ej_ini, ej_fin, fiscal):
     aux_dict = {}
 
     data_rows = []
-    
+
     if fiscal == 'SFP':
-        data_rows = getDataSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'] )
+        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'SFP')
+        data_rows = getDataSFP( sql, entes['SFP'] )
     elif fiscal == 'ASF':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASF( 'observaciones_pre_asf', 'observaciones_ires_asf', ignored_audit_str, ej_ini, ej_fin, 'seguimientos_obs_asf', entes['ASF'] )
+        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'ASF')
+        data_rows = getDataASF( sql, entes['ASF'] )
     elif fiscal == 'CYTG':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'] )
+        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'CYTG')
+        data_rows = getDataCYTG( sql, entes['CyTG'] )
     elif fiscal == 'ASENL':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'] )
+        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'ASENL')
+        data_rows = getDataASENL( sql, entes['ASENL'] )
 
     return {
         'data_rows': data_rows,
@@ -90,23 +95,7 @@ def get(ej_ini, ej_fin, fiscal):
 
 
 
-def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, seguimientos, ente ):
-    sql = '''
-        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id
-        from {} as pre
-        join {} as ires on pre.observacion_ires_id = ires.id
-        join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
-        join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
-        join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        join observation_types as tipos on ires.tipo_observacion_id = tipos.id
-        where not pre.blocked
-    	    and not ires.blocked {}
-            and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-        group by dependencia, ejercicio, tipo_observacion, ires_id, direccion_id
-        order by dependencia, ejercicio, tipo_observacion, ires_id;
-    '''.format( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin)
-        
-  
+def getDataASF( sql, ente ):
     try:
         rows = exec_steady(sql)
     except EmptySetError:
@@ -117,12 +106,12 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
         r = dict(row)
         sql = '''
             select seg.clasif_final_interna_cytg, seg.monto_pendiente_solventar, clas.title
-            from {} as seg 
+            from seguimientos_obs_asf as seg 
             join clasifs_internas_cytg as clas on seg.clasif_final_interna_cytg = clas.sorting_val and {} = clas.direccion_id and {} = clas.org_fiscal_id
             where observacion_id = {}
             order by seguimiento_id desc
             limit 1;
-        '''.format( seguimientos, r['direccion_id'], ente, r['ires_id'])
+        '''.format( r['direccion_id'], ente, r['ires_id'])
 
         try:
             seg = exec_steady(sql)
@@ -139,21 +128,7 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
     return setDataObj56(l)
 
 
-def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
-    sql = '''
-        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
-        from observaciones_ires_cytg as ires
-        join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
-        join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
-        join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
-        join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        join observation_types as tipos on ires.tipo_observacion_id = tipos.id
-        where not pre.blocked {}
-            and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-        group by dependencia, ejercicio, tipo_observacion, pre_id, direccion_id, clasif_final_cytg
-        order by dependencia, ejercicio, tipo_observacion, pre_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
-        
+def getDataCYTG( sql, ente ):
     try:
         rows = exec_steady(sql)
     except EmptySetError:
@@ -187,21 +162,7 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
 
 
 
-def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
-    sql = '''
-        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, ires.direccion_id as direccion_id
-        from observaciones_sfp as ires
-        join auditoria_dependencias     as dep      on ires.auditoria_id        = dep.auditoria_id
-        join dependencies               as dep_cat  on dep.dependencia_id       = dep_cat.id
-        join auditoria_anios_cuenta_pub as anio     on ires.auditoria_id        = anio.auditoria_id
-        join observation_types          as tipos    on ires.tipo_observacion_id = tipos.id
-        where not ires.blocked {}
-            and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-        group by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires_id
-        order by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires_id;
-    '''.format(ignored_audit_str, ej_ini, ej_fin)
-        
-  
+def getDataSFP( sql, ente ):
     try:
         rows = exec_steady(sql)
     except EmptySetError:
@@ -235,21 +196,7 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
     return setDataObj56(l)
 
 
-def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
-    sql = '''
-        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
-        from observaciones_ires_asenl as ires
-        join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
-        join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
-        join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
-        join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        join observation_types as tipos on ires.tipo_observacion_id = tipos.id
-        where not pre.blocked {}
-            and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-        group by dependencia, ejercicio, tipo_observacion, pre_id, direccion_id, clasif_final_cytg, monto_pendiente_solventar
-        order by dependencia, ejercicio, tipo_observacion, pre_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
-        
+def getDataASENL( sql, ente ):
     try:
         rows = exec_steady(sql)
     except EmptySetError:
@@ -302,6 +249,115 @@ def setDataObj56(l):
         data_rows.append(o)
     return data_rows
 
+
+def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
+    sqls = {
+        'reporte56': {
+            'ASF': '''
+                select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id
+                from observaciones_pre_asf as pre
+                join observaciones_ires_asf as ires on pre.observacion_ires_id = ires.id
+                join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
+                join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
+                join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
+                join observation_types as tipos on ires.tipo_observacion_id = tipos.id
+                where not pre.blocked
+    	            and not ires.blocked {}
+                    and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                group by dependencia, ejercicio, tipo_observacion, ires_id, direccion_id
+                order by dependencia, ejercicio, tipo_observacion, ires_id;
+            '''.format( ignored_audit_str, ej_ini, ej_fin),
+            'SFP': '''
+                select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, ires.direccion_id as direccion_id
+                from observaciones_sfp as ires
+                join auditoria_dependencias     as dep      on ires.auditoria_id        = dep.auditoria_id
+                join dependencies               as dep_cat  on dep.dependencia_id       = dep_cat.id
+                join auditoria_anios_cuenta_pub as anio     on ires.auditoria_id        = anio.auditoria_id
+                join observation_types          as tipos    on ires.tipo_observacion_id = tipos.id
+                where not ires.blocked {}
+                    and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                group by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires_id
+                order by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires_id;
+            '''.format( ignored_audit_str, ej_ini, ej_fin),
+            'CYTG': '''
+                select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
+                from observaciones_ires_cytg as ires
+                join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
+                join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
+                join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
+                join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
+                join observation_types as tipos on ires.tipo_observacion_id = tipos.id
+                where not pre.blocked {}
+                    and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                group by dependencia, ejercicio, tipo_observacion, pre_id, direccion_id, clasif_final_cytg
+                order by dependencia, ejercicio, tipo_observacion, pre_id;
+            '''.format( ignored_audit_str, ej_ini, ej_fin),
+            'ASENL': '''
+                select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
+                from observaciones_ires_asenl as ires
+                join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
+                join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
+                join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
+                join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
+                join observation_types as tipos on ires.tipo_observacion_id = tipos.id
+                where not pre.blocked {}
+                    and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                group by dependencia, ejercicio, tipo_observacion, pre_id, direccion_id, clasif_final_cytg, monto_pendiente_solventar
+                order by dependencia, ejercicio, tipo_observacion, pre_id;
+            '''.format( ignored_audit_str, ej_ini, ej_fin),
+        },
+        'reporte58': {
+            'ASF': '''
+                select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.direccion_id as direccion_id
+                from observaciones_pre_asf as pre
+                join observaciones_ires_asf as ires on pre.observacion_ires_id = ires.id
+                join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
+                join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
+                join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
+                where not pre.blocked
+    	            and not ires.blocked {}
+                    and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                group by dependencia, ires_id, direccion_id, ejercicio
+                order by dependencia, ires_id;
+            '''.format( ignored_audit_str, ej_ini, ej_fin),
+            'SFP': '''
+                select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, ires.direccion_id as direccion_id
+                from observaciones_sfp as ires
+                join auditoria_dependencias     as dep      on ires.auditoria_id        = dep.auditoria_id
+                join dependencies               as dep_cat  on dep.dependencia_id       = dep_cat.id
+                join auditoria_anios_cuenta_pub as anio     on ires.auditoria_id        = anio.auditoria_id
+                where not ires.blocked {}
+                    and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                group by dependencia, ires_id, ejercicio
+                order by dependencia, ires_id;
+            '''.format( ignored_audit_str, ej_ini, ej_fin),
+            'CYTG': '''
+                select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
+                from observaciones_ires_cytg as ires
+                join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
+                join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
+                join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
+                join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
+                where not pre.blocked {}
+                    and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                group by dependencia, clasif_final_cytg, pre_id, direccion_id, ejercicio
+                order by dependencia, pre_id;
+            '''.format( ignored_audit_str, ej_ini, ej_fin),
+            'ASENL': '''
+                select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
+                from observaciones_ires_asenl as ires
+                join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
+                join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
+                join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
+                join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
+                where not pre.blocked {}
+                    and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                group by dependencia, pre_id, ejercicio, clasif_final_cytg, monto_pendiente_solventar
+                order by dependencia, pre_id;
+            '''.format( ignored_audit_str, ej_ini, ej_fin),
+        }
+    }
+    return sqls[repNum][ent]
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):
     s = ''

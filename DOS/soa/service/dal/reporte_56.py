@@ -8,7 +8,7 @@ def get(ej_ini, ej_fin, fiscal, reporte_num):
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
     reporte_num = str(reporte_num)
-    reporte_num = 'reporte56'
+
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
 
@@ -220,7 +220,7 @@ def getDataASENL( sql, ente ):
             seg = exec_steady(sql)
         except EmptySetError:
             seg = []            
-            
+
         if seg:
             segd = dict(seg[0])
             r['clasif_id']   = r['clasif_final_cytg']
@@ -367,7 +367,7 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
                 join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
                 where not pre.blocked {}
                     and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-                group by dependencia, clasif_final_cytg, pre_id, direccion_id, ejercicio
+                group by dependencia, pre_id, clasif_final_cytg, direccion_id, ejercicio
                 order by dependencia, pre_id;
             '''.format( ignored_audit_str, ej_ini, ej_fin),
             'ASENL': '''

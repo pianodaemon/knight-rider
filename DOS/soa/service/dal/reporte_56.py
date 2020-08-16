@@ -74,19 +74,23 @@ def get(ej_ini, ej_fin, fiscal, reporte_num):
 
     if fiscal == 'SFP':
         sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'SFP')
-        data_rows = getDataSFP( sql, entes['SFP'] )
+        l = getDataSFP( sql, entes['SFP'] )
+        data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
     elif fiscal == 'ASF':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
         sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'ASF')
-        data_rows = getDataASF( sql, entes['ASF'] )
+        l = getDataASF( sql, entes['ASF'] )
+        data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
     elif fiscal == 'CYTG':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
         sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'CYTG')
-        data_rows = getDataCYTG( sql, entes['CyTG'] )
+        l = getDataCYTG( sql, entes['CyTG'] )
+        data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
     elif fiscal == 'ASENL':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
         sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'ASENL')
-        data_rows = getDataASENL( sql, entes['ASENL'] )
+        l = getDataASENL( sql, entes['ASENL'] )
+        data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
 
     return {
         'data_rows': data_rows,
@@ -125,7 +129,7 @@ def getDataASF( sql, ente ):
             r['clasif_name'] = segd['title']
             l.append(r)
 
-    return setDataObj56(l)
+    return l
 
 
 def getDataCYTG( sql, ente ):
@@ -158,7 +162,7 @@ def getDataCYTG( sql, ente ):
             r['clasif_name'] = segd['title']
             l.append(r)
     
-    return setDataObj56(l)
+    return l
 
 
 
@@ -193,7 +197,7 @@ def getDataSFP( sql, ente ):
             r['clasif_name'] = segd['title']
             l.append(r)
 
-    return setDataObj56(l)
+    return l
 
 
 def getDataASENL( sql, ente ):
@@ -224,7 +228,7 @@ def getDataASENL( sql, ente ):
             r['clasif_name'] = segd['title']
             l.append(r)
     
-    return setDataObj56(l)
+    return l
 
 
 def setDataObj56(l):
@@ -243,6 +247,29 @@ def setDataObj56(l):
         o['dep']              = item[0]
         o['ej']               = item[1]
         o['tipo']             = item[2]
+        o['clasif_name']      = value['clasif_name']
+        o['c_obs']            = value['cant_obs']
+        o['monto']            = value['monto']
+        data_rows.append(o)
+    return data_rows
+
+
+def setDataObj58(l):
+    data_rows = []
+    data_rowsl = {}
+    for i in l:
+        key = (i['dependencia'], i['clasif_id'])
+        if key in data_rowsl:
+            data_rowsl[key]['cant_obs'] += 1
+            data_rowsl[key]['monto'] += i['monto']
+        else:
+            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'clasif_name': i['clasif_name']}
+    for item in data_rowsl:
+        value = data_rowsl[item]
+        o = {}
+        o['dep']              = item[0]
+        o['ej']               = 0
+        o['tipo']             = ''
         o['clasif_name']      = value['clasif_name']
         o['c_obs']            = value['cant_obs']
         o['monto']            = value['monto']

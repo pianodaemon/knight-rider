@@ -7,7 +7,7 @@ type Credentials = {
 };
 
 export function login(credentials: Credentials): Promise<any> {
-  const ENDPOINT = `${getAppSettings().auth}/`;
+  const ENDPOINT = `${getAppSettings().authUrl}/sso/token-auth`;
   return axiosApi(
     ENDPOINT,
     {
@@ -22,5 +22,20 @@ export function login(credentials: Credentials): Promise<any> {
   );
 }
 
+export function logout(): Promise<any> {
+  const ENDPOINT = `${getAppSettings().authUrl}/sso/logout`;
+  return axiosApi(
+    ENDPOINT,
+    {
+      method: 'get',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true,
+    },
+    false
+  );
+}
+
 // @todo refreshToken - get new token
-// @todo logout - revoke Token

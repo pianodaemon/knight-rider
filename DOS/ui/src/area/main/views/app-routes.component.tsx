@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { History } from 'history';
-import { Router, Switch, Route } from 'react-router-dom';
+import { Router, Switch, Route, Redirect } from 'react-router-dom';
 import { AuditTableContainer } from '../../auditories/views/audit-table.container';
 // import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
@@ -29,6 +29,7 @@ import { Reports52PreliminariesContainer } from '../../reports/views/reports52-p
 import { Reports54Container } from '../../reports/views/reports54.container';
 import { Reports56Container } from '../../reports/views/reports56.container';
 import { Reports57Container } from '../../reports/views/reports57.container';
+import { Reports58Container } from '../../reports/views/reports58.container';
 import { Reports59Container } from '../../reports/views/reports59.container';
 
 type Props = {
@@ -43,6 +44,8 @@ type Props = {
   loadCatalogResultsReportASENLAction: Function,
   loadCatalogObsCYTGAction: Function,
   loadCatalogResultsReportCYTGAction: Function,
+  checkAuthAction: Function,
+  isLoggedIn: boolean,
 };
 
 export const AppRoutes = (props: Props) => {
@@ -57,13 +60,14 @@ export const AppRoutes = (props: Props) => {
     props.loadCatalogResultsReportASENLAction();
     props.loadCatalogObsCYTGAction();
     props.loadCatalogResultsReportCYTGAction();
+    props.checkAuthAction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <Router history={props.history}>
       <Switch>
         <Route exact path={['/sign-in']}>
-          <LoginFormContainer />
+          {props.isLoggedIn ? <Redirect to="/audit/list" /> : <LoginFormContainer />}
         </Route>
         <Route exact path={['/audit/create', '/audit/:id/edit']}>
           <AuditContainer />
@@ -169,6 +173,9 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route exact path={['/reports-57']}>
           <Reports57Container />
+        </Route>
+        <Route exact path={['/reports-58']}>
+          <Reports58Container />
         </Route>
         <Route exact path={['/reports-59']}>
           <Reports59Container />

@@ -1,13 +1,12 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal, onlyObras):
-    ''' Returns an instance of Reporte 57 '''
+def get(ej_ini, ej_fin, fiscal):
+    ''' Returns an instance of Reporte 56 '''
     
     # Tratamiento de filtros
-    ej_ini     = int(ej_ini)
-    ej_fin     = int(ej_fin)
-    only_obras = True if onlyObras else False
+    ej_ini = int(ej_ini)
+    ej_fin = int(ej_fin)
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
@@ -56,7 +55,15 @@ def get(ej_ini, ej_fin, fiscal, onlyObras):
     
     
     #Organos fiscalizadores
-    entes = setEntesIds()
+    entesSql = "select * from fiscals;"
+    try:
+        entesRows = exec_steady(entesSql)
+    except EmptySetError:
+        rows = []
+
+    entes = {}
+    for e in entesRows:
+        entes[e[1]] = e[0]
 
 
     # Retrieve de cant. obs y montos por cada ente, empezando por ASENL
@@ -65,16 +72,16 @@ def get(ej_ini, ej_fin, fiscal, onlyObras):
     data_rows = []
     
     if fiscal == 'SFP':
-        data_rows = getDataSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'], only_obras )
+        data_rows = getDataSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'] )
     elif fiscal == 'ASF':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASF( 'observaciones_pre_asf', 'observaciones_ires_asf', ignored_audit_str, ej_ini, ej_fin, 'seguimientos_obs_asf', entes['ASF'], only_obras )
+        data_rows = getDataASF( 'observaciones_pre_asf', 'observaciones_ires_asf', ignored_audit_str, ej_ini, ej_fin, 'seguimientos_obs_asf', entes['ASF'] )
     elif fiscal == 'CYTG':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'], only_obras )
+        data_rows = getDataCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'] )
     elif fiscal == 'ASENL':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'], only_obras )
+        data_rows = getDataASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'] )
 
     return {
         'data_rows': data_rows,
@@ -83,28 +90,22 @@ def get(ej_ini, ej_fin, fiscal, onlyObras):
 
 
 
-def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, seguimientos, ente, only_obras ):
-    data_rows = []
-
-    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
-
+def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, seguimientos, ente ):
     sql = '''
-        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id
+        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.direccion_id as direccion_id
         from {} as pre
         join {} as ires on pre.observacion_ires_id = ires.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        join observation_types as tipos on ires.tipo_observacion_id = tipos.id
         where not pre.blocked
     	    and not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-            {}
-        group by dependencia, tipo_observacion, ejercicio, ires_id, direccion_id
-        order by dependencia, tipo_observacion, ejercicio, ires_id;
-    '''.format( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion)
-
-    
+        group by dependencia, ires_id, direccion_id, ejercicio
+        order by dependencia, ires_id;
+    '''.format( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin)
+        
+  
     try:
         rows = exec_steady(sql)
     except EmptySetError:
@@ -113,7 +114,6 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
     l = []
     for row in rows:
         r = dict(row)
-        
         sql = '''
             select seg.clasif_final_interna_cytg, seg.monto_pendiente_solventar, clas.title
             from {} as seg 
@@ -127,7 +127,7 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
             seg = exec_steady(sql)
         except EmptySetError:
             seg = []            
-        
+            
         if seg:
             segd = dict(seg[0])
             r['clasif_id']   = segd['clasif_final_interna_cytg']
@@ -135,49 +135,22 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
             r['clasif_name'] = segd['title']
             l.append(r)
 
-    data_rowsl = {}
-
-    for i in l:
-        key = (i['dependencia'], i['tipo_observacion'])
-        if key in data_rowsl:
-            data_rowsl[key]['cant_obs'] += 1
-            data_rowsl[key]['monto'] += i['monto']
-        else:
-            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'clasif_name': i['clasif_name']}
-
-    for item in data_rowsl:
-        value = data_rowsl[item]
-        
-        o = {}
-        o['dep']              = item[0]
-        o['tipo']             = item[1]
-        o['c_obs']            = value['cant_obs']
-        o['monto']            = value['monto']
-    
-        data_rows.append(o)
-
-    return data_rows
+    return setDataObj58(l)
 
 
-def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras):
-    data_rows = []
-
-    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
-
+def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
     sql = '''
-        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
+        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
         from observaciones_ires_cytg as ires
         join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        join observation_types as tipos on ires.tipo_observacion_id = tipos.id
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-            {}
-        group by dependencia, tipo_observacion, ejercicio, pre_id, direccion_id, clasif_final_cytg
-        order by dependencia, tipo_observacion, ejercicio, pre_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
+        group by dependencia, clasif_final_cytg, pre_id, direccion_id, ejercicio
+        order by dependencia, pre_id;
+    '''.format( ignored_audit_str, ej_ini, ej_fin)
         
     try:
         rows = exec_steady(sql)
@@ -208,49 +181,22 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras):
             r['clasif_name'] = segd['title']
             l.append(r)
     
-    data_rowsl = {}
-    
-    for i in l:
-        key = (i['dependencia'], i['tipo_observacion'])
-        if key in data_rowsl:
-            data_rowsl[key]['cant_obs'] += 1
-            data_rowsl[key]['monto'] += i['monto']
-        else:
-            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'clasif_name': i['clasif_name']}
-    
-    for item in data_rowsl:
-        value = data_rowsl[item]
-        
-        o = {}
-        o['dep']              = item[0]
-        o['tipo']             = item[1]
-        o['c_obs']            = value['cant_obs']
-        o['monto']            = value['monto']
-    
-        data_rows.append(o)
-    
-    return data_rows
+    return setDataObj58(l)
 
 
 
-def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
-    data_rows = []
-
-    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
-
+def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
     sql = '''
-        select ires.id as ires_id, dep_cat.title, anio.anio_cuenta_pub, tipos.title as tipo_observacion, ires.direccion_id
+        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, ires.direccion_id as direccion_id
         from observaciones_sfp as ires
         join auditoria_dependencias     as dep      on ires.auditoria_id        = dep.auditoria_id
         join dependencies               as dep_cat  on dep.dependencia_id       = dep_cat.id
         join auditoria_anios_cuenta_pub as anio     on ires.auditoria_id        = anio.auditoria_id
-        join observation_types          as tipos    on ires.tipo_observacion_id = tipos.id
         where not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-            {}
-        group by dep_cat.title, tipos.title, anio.anio_cuenta_pub, ires_id
-        order by dep_cat.title, tipos.title, anio.anio_cuenta_pub, ires_id;
-    '''.format(ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
+        group by dependencia, ires_id, ejercicio
+        order by dependencia, ires_id;
+    '''.format(ignored_audit_str, ej_ini, ej_fin)
         
   
     try:
@@ -261,7 +207,6 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
     l = []
     for row in rows:
         r = dict(row)
-        
         sql = '''
             select seg.clasif_final_interna_cytg, seg.monto_pendiente_solventar, clas.title
             from seguimientos_obs_sfp as seg 
@@ -284,50 +229,22 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
             r['clasif_name'] = segd['title']
             l.append(r)
 
-    data_rowsl = {}
-    for i in l:
-        key = (i['title'], i['tipo_observacion'])
-        if key in data_rowsl:
-            data_rowsl[key]['cant_obs'] += 1
-            data_rowsl[key]['monto'] += i['monto']
-        else:
-            data_rowsl[key] = { 'cant_obs': 1, 'monto': i['monto'] }
-
-    for item in data_rowsl:
-        value = data_rowsl[item]
-
-        o = {}
-        o['dep']              = item[0]
-        o['tipo']             = item[1]
-        o['c_obs']            = value['cant_obs']
-        o['monto']            = value['monto']
-    
-        data_rows.append(o)
-
-    return data_rows
+    return setDataObj58(l)
 
 
-
-def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
-    
-    data_rows = []
-
-    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
-
+def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
     sql = '''
-        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
+        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
         from observaciones_ires_asenl as ires
         join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        join observation_types as tipos on ires.tipo_observacion_id = tipos.id
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-            {}
-        group by dependencia, ejercicio, tipo_observacion, pre_id, direccion_id, clasif_final_cytg, monto_pendiente_solventar
-        order by dependencia, ejercicio, tipo_observacion, pre_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
+        group by dependencia, pre_id, ejercicio, clasif_final_cytg, monto_pendiente_solventar
+        order by dependencia, pre_id;
+    '''.format( ignored_audit_str, ej_ini, ej_fin)
         
     try:
         rows = exec_steady(sql)
@@ -337,57 +254,47 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
     l = []
     for row in rows:
         r = dict(row)
- 
-        r['clasif_id']   = r['clasif_final_cytg']
-        r['monto']       = r['monto_pendiente_solventar']
-        l.append(r)
+        sql = '''
+            select title 
+            from clasifs_internas_cytg as clas 
+            where {} = clas.sorting_val and {} = clas.direccion_id and {} = clas.org_fiscal_id
+            limit 1;
+        '''.format( r['clasif_final_cytg'], r['direccion_id'], ente, r['pre_id'])
     
+        try:
+            seg = exec_steady(sql)
+        except EmptySetError:
+            seg = []            
+            
+        if seg:
+            segd = dict(seg[0])
+            r['clasif_id']   = r['clasif_final_cytg']
+            r['monto']       = r['monto_pendiente_solventar']
+            r['clasif_name'] = segd['title']
+            l.append(r)
+    
+    return setDataObj58(l)
+
+
+def setDataObj58(l):
+    data_rows = []
     data_rowsl = {}
-    
     for i in l:
-        key = (i['dependencia'], i['tipo_observacion'] )
+        key = (i['dependencia'], i['clasif_id'])
         if key in data_rowsl:
             data_rowsl[key]['cant_obs'] += 1
             data_rowsl[key]['monto'] += i['monto']
         else:
-            data_rowsl[key] = { 'cant_obs': 1, 'monto': i['monto'] }
-    
+            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'clasif_name': i['clasif_name']}
     for item in data_rowsl:
         value = data_rowsl[item]
-        
         o = {}
         o['dep']              = item[0]
-        o['tipo']             = item[1]
+        o['clasif_name']      = value['clasif_name']
         o['c_obs']            = value['cant_obs']
         o['monto']            = value['monto']
-    
         data_rows.append(o)
-    
     return data_rows
-
-
-def setEntesIds():
-    entesSql = "select * from fiscals;"
-    try:
-        entesRows = exec_steady(entesSql)
-    except EmptySetError:
-        rows = []
-
-    entes = {}
-    for e in entesRows:
-        entes[e[1]] = e[0]
-
-    return entes
-
-
-def getObraPublicaId():
-    sql = "select id from divisions where title = 'OBRAS';"
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
-    
-    return rows[0][0]
 
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):

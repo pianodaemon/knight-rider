@@ -107,7 +107,6 @@ def setDataObj(l):
     data_rows = []
     data_rowsl = {}
     for item in l:
-        print(item)
         o = {}
         o['dep']      = item['dependencia']
         o['n_obs']    = item['num_observacion']

@@ -241,6 +241,11 @@ export function AppBarComponent(props: Props) {
           text: 'Obras Públicas',
           icon: <GridOnIcon />,
         },
+        {
+          url: '/reports-61',
+          text: 'Reporte de Detalle',
+          icon: <GridOnIcon />,
+        },
       ],
     },
     user: {

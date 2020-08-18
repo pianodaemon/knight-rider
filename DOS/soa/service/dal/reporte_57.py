@@ -100,7 +100,6 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
     	    and not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
-        group by dependencia, tipo_observacion, ejercicio, ires_id, direccion_id
         order by dependencia, tipo_observacion, ejercicio, ires_id;
     '''.format( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion)
 
@@ -175,7 +174,6 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras):
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
-        group by dependencia, tipo_observacion, ejercicio, pre_id, direccion_id, clasif_final_cytg
         order by dependencia, tipo_observacion, ejercicio, pre_id;
     '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
         
@@ -248,7 +246,6 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
         where not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
-        group by dep_cat.title, tipos.title, anio.anio_cuenta_pub, ires_id
         order by dep_cat.title, tipos.title, anio.anio_cuenta_pub, ires_id;
     '''.format(ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
         
@@ -325,7 +322,6 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
-        group by dependencia, ejercicio, tipo_observacion, pre_id, direccion_id, clasif_final_cytg, monto_pendiente_solventar
         order by dependencia, ejercicio, tipo_observacion, pre_id;
     '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
         

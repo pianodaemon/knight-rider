@@ -291,7 +291,6 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
                 where not pre.blocked
     	            and not ires.blocked {}
                     and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-                group by dependencia, ejercicio, tipo_observacion, ires_id, direccion_id
                 order by dependencia, ejercicio, tipo_observacion, ires_id;
             '''.format( ignored_audit_str, ej_ini, ej_fin),
             'SFP': '''
@@ -303,7 +302,6 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
                 join observation_types          as tipos    on ires.tipo_observacion_id = tipos.id
                 where not ires.blocked {}
                     and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-                group by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires_id
                 order by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires_id;
             '''.format( ignored_audit_str, ej_ini, ej_fin),
             'CYTG': '''
@@ -316,7 +314,6 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
                 join observation_types as tipos on ires.tipo_observacion_id = tipos.id
                 where not pre.blocked {}
                     and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-                group by dependencia, ejercicio, tipo_observacion, pre_id, direccion_id, clasif_final_cytg
                 order by dependencia, ejercicio, tipo_observacion, pre_id;
             '''.format( ignored_audit_str, ej_ini, ej_fin),
             'ASENL': '''
@@ -329,7 +326,6 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
                 join observation_types as tipos on ires.tipo_observacion_id = tipos.id
                 where not pre.blocked {}
                     and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-                group by dependencia, ejercicio, tipo_observacion, pre_id, direccion_id, clasif_final_cytg, monto_pendiente_solventar
                 order by dependencia, ejercicio, tipo_observacion, pre_id;
             '''.format( ignored_audit_str, ej_ini, ej_fin),
         },
@@ -344,7 +340,6 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
                 where not pre.blocked
     	            and not ires.blocked {}
                     and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-                group by dependencia, ires_id, direccion_id, ejercicio
                 order by dependencia, ires_id;
             '''.format( ignored_audit_str, ej_ini, ej_fin),
             'SFP': '''
@@ -355,7 +350,6 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
                 join auditoria_anios_cuenta_pub as anio     on ires.auditoria_id        = anio.auditoria_id
                 where not ires.blocked {}
                     and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-                group by dependencia, ires_id, ejercicio
                 order by dependencia, ires_id;
             '''.format( ignored_audit_str, ej_ini, ej_fin),
             'CYTG': '''
@@ -367,7 +361,6 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
                 join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
                 where not pre.blocked {}
                     and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-                group by dependencia, pre_id, clasif_final_cytg, direccion_id, ejercicio
                 order by dependencia, pre_id;
             '''.format( ignored_audit_str, ej_ini, ej_fin),
             'ASENL': '''
@@ -379,7 +372,6 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
                 join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
                 where not pre.blocked {}
                     and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-                group by dependencia, pre_id, ejercicio, clasif_final_cytg, monto_pendiente_solventar
                 order by dependencia, pre_id;
             '''.format( ignored_audit_str, ej_ini, ej_fin),
         }

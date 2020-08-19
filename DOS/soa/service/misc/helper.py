@@ -1,5 +1,6 @@
 import jwt
 import time
+from genl.restplus import public_key
 
 def get_search_params(args, fields):
     params = {}
@@ -17,11 +18,10 @@ def verify_token(headers):
     if 'Authorization' not in headers:
         raise Exception('No se encontró un token en el request')
     
-    auth = headers['Authorization']
-    auth = auth.replace('Bearer ', '')
+    auth = headers['Authorization'].replace('Bearer ', '')
 
-    with open('../pem/public_key.pub', 'rb') as f:
-        public_key = f.read()
+    if public_key is None:
+        raise Exception('Hay un problema con la llave pública')
 
     try:
         decoded = jwt.decode(auth, public_key, algorithms='RS512')

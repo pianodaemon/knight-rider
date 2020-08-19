@@ -28,6 +28,8 @@ services:
         ports:
           - '8080:80'
         environment: *commonEnv
+        volumes:
+          - ./DOS/keys:/pem
         networks:
           - operational_network
     rdbms_obs:

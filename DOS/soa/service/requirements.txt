@@ -2,3 +2,5 @@ flask-restplus
 gunicorn
 psycopg2
 Werkzeug==0.16.1
+PyJWT
+cryptography

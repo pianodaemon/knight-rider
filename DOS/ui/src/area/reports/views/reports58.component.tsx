@@ -90,9 +90,11 @@ export const Report58 = (props: Props) => {
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
   const [fiscal , setFiscal ] = useState<any>('SFP');
+  const [entidad , setEntidad ] = useState<any>(fiscal);
   useEffect(() => {
     loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, reporte_num: 'reporte58'});
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    setEntidad(fiscal);
   }, [yearEnd, yearIni, fiscal]);
   const classes = useStyles();
   const options = [
@@ -199,6 +201,9 @@ export const Report58 = (props: Props) => {
 
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
+          <tr >    
+            <th colSpan={4}> {entidad} </th> 
+          </tr> 
           <tr className={classes.titrow}>    
             <th >Secretaría/Entidad/Municipio</th> 
             <th >Clasificación</th> 

@@ -91,9 +91,11 @@ export const Report61 = (props: Props) => {
   const [yearIni, setYearIni] = useState<any>('2012');
   const [fiscal , setFiscal ] = useState<any>('SFP');
   const [pre_ires , setPreIres ] = useState<any>('pre');
+  const [entidad , setEntidad ] = useState<any>(fiscal);
   useEffect(() => {
     loadReport61Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, obs_c: pre_ires});
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    setEntidad(fiscal);
   }, [yearEnd, yearIni, fiscal, pre_ires]);
   const classes = useStyles();
   const options = [
@@ -223,6 +225,9 @@ export const Report61 = (props: Props) => {
 
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
+          <tr >    
+            <th colSpan={7}> {entidad} </th> 
+          </tr> 
           <tr className={classes.titrow}>    
             <th >Secretaría/Entidad/Municipio</th> 
             <th >Cant. Obs.</th> 

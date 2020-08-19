@@ -9,7 +9,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 type Props = {
   loading: boolean,
-  loadReport57Action: Function,
+  loadReport61Action: Function,
   report: any,
 };
 
@@ -25,17 +25,15 @@ const useStyles = makeStyles(() =>
     tableReports: {
       border: 'solid 1px #fafafa',
       '& th': {
-        border: 'solid 1px #fafafa',
+        border: '1px solid rgba(0,0,0,0.02)',
         padding: '5px 10px;',
-        borderTopLeftRadius: '6px;',
-        borderTopRightRadius: '6px;',
       },
       '& td': {
         border: 'solid 1px #fafafa',
         padding: '3px 10px',
       },
       '& tr:nth-child(odd)': {
-        border: 'solid 1px #fafafa',
+        borderRigth: '1px solid rgba(0,0,0,0.02)',
         background: 'rgba(0,0,0,0.03)',
       },
     },
@@ -83,21 +81,22 @@ const useStyles = makeStyles(() =>
   })
 );
 
-export const Report57 = (props: Props) => {
+export const Report63 = (props: Props) => {
   const {
     report,
     // loading,
-    loadReport57Action,
+    loadReport61Action,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
   const [fiscal , setFiscal ] = useState<any>('SFP');
+  const [pre_ires, setPreIres ] = useState<any>('pre');
   const [entidad , setEntidad ] = useState<any>(fiscal);
   useEffect(() => {
-    loadReport57Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal});
+    loadReport61Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, obs_c: pre_ires});
     // eslint-disable-next-line react-hooks/exhaustive-deps
     setEntidad(fiscal);
-  }, [yearEnd, yearIni, fiscal]);
+  }, [yearEnd, yearIni, fiscal, pre_ires]);
   const classes = useStyles();
   const options = [
     { value: '2012', label: '2012' },
@@ -115,6 +114,10 @@ export const Report57 = (props: Props) => {
     { value: 'ASF',   label: 'ASF' },
     { value: 'ASENL', label: 'ASENL' },
     { value: 'CYTG',  label: 'CYTG' },
+  ];
+  const optionsPreIres = [
+    { value: 'pre',   label: 'Preliminares' },
+    { value: 'ires',  label: 'Informe de Resultados' },
   ];
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
@@ -140,7 +143,7 @@ export const Report57 = (props: Props) => {
   return (
     <div className={classes.Container}>
       <div>
-        <span className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Tipo de Observación</span>
+        <span className={classes.titlereport}>Reporte de Detalle de la Observación, Estatus, Entidad, Tipo de Observación y Ente Fiscalizador</span>
       </div>
 
       <div className={classes.filters}>
@@ -199,8 +202,26 @@ export const Report57 = (props: Props) => {
           </Select>
         </div>
 
-      </div>
+        <div className={classes.selectYearContainer}>
+          <InputLabel className={classes.labelSelectYear}>Observación:</InputLabel>
+          <Select
+            labelId="pre_ires"
+            value={pre_ires}
+            onChange={(e)=> { setPreIres(e.target.value); }}
+          >
+            {optionsPreIres.map((item) => {
+              return (
+                <MenuItem
+                  value={item.value}
+                >
+                  {item.label}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </div>
 
+      </div>
 
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
@@ -208,21 +229,21 @@ export const Report57 = (props: Props) => {
             <th colSpan={6}> {entidad} </th> 
           </tr> 
           <tr className={classes.titrow}>    
-            <th  style={{background:'#ffffff', color: '#333333',}}>Secretaría/Entidad/Municipio</th> 
-            <th >Tipo</th> 
-            <th >Cantidad Obs.</th> 
-            <th >% Obs.</th> 
-            <th >Monto</th> 
-            <th >% Monto</th> 
+            <th >Secretaría/Entidad/Municipio</th> 
+            <th >Cant. Obs.</th> 
+            <th >Número de Obs.</th> 
+            <th >Observación</th> 
+            <th >Tipo de Observación</th> 
+            <th >Estatus</th> 
           </tr> 
           {report && report.data_rows && report.data_rows.map((dep: any) =>
             <tr> 
               <td>{dep.dep}</td> 
-              <td style={{textAlign: 'center'}} >{dep.tipo}</td>
-              <td className={classes.cantObs} >{dep.c_obs}</td>
-              <td style={{textAlign: "right", whiteSpace: "nowrap"}} > {formatPercent( dep.c_obs, report.sum_rows.c_obs ) } </td>
-              <td className={classes.montos} >{ formatMoney(dep.monto) }</td>
-              <td style={{textAlign: "right", whiteSpace: "nowrap"}} >{formatPercent( dep.monto, report.sum_rows.monto ) }</td>
+              <td style={{textAlign: 'center'}} >{dep.c_obs}</td>
+              <td style={{textAlign: 'center'}} >{dep.n_obs}</td>
+              <td style={{textAlign: 'center', overflow:'hidden',textOverflow:'ellipsis',display:'-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient:'vertical'}} >{dep.obs}</td>
+              <td className={classes.cantObs} >{dep.tipo}</td>
+              <td style={{textAlign: "center", whiteSpace: "nowrap"}} > { dep.estatus } </td>
             </tr>
           )
           }   
@@ -230,10 +251,10 @@ export const Report57 = (props: Props) => {
             <tr> 
               <td style={{fontWeight: "bold"}} > Totales</td> 
               <td style={{fontWeight: "bold", textAlign: "center"}}></td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}> { report.sum_rows.c_obs }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}> { formatMoney( report.sum_rows.monto )}</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}></td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}></td>
             </tr>
           }           
           

@@ -36,7 +36,7 @@ const useStyles = makeStyles(() =>
       },
       '& tr:nth-child(odd)': {
         border: 'solid 1px #fafafa',
-        background: '#f4f4f4',
+        background: 'rgba(0,0,0,0.03)',
       },
     },
     tableWhole: {
@@ -92,9 +92,11 @@ export const Report57 = (props: Props) => {
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
   const [fiscal , setFiscal ] = useState<any>('SFP');
+  const [entidad , setEntidad ] = useState<any>(fiscal);
   useEffect(() => {
     loadReport57Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal});
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    setEntidad(fiscal);
   }, [yearEnd, yearIni, fiscal]);
   const classes = useStyles();
   const options = [
@@ -202,6 +204,9 @@ export const Report57 = (props: Props) => {
 
       <table className={classes.tableWhole}> 
         <tbody className={classes.tableReports} >
+          <tr >    
+            <th colSpan={6}> {entidad} </th> 
+          </tr> 
           <tr className={classes.titrow}>    
             <th  style={{background:'#ffffff', color: '#333333',}}>Secretaría/Entidad/Municipio</th> 
             <th >Tipo</th> 

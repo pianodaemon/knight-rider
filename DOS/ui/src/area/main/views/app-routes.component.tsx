@@ -31,6 +31,7 @@ import { Reports56Container } from '../../reports/views/reports56.container';
 import { Reports57Container } from '../../reports/views/reports57.container';
 import { Reports58Container } from '../../reports/views/reports58.container';
 import { Reports59Container } from '../../reports/views/reports59.container';
+import { Reports61Container } from '../../reports/views/reports61.container';
 
 type Props = {
   history: History,
@@ -179,6 +180,9 @@ export const AppRoutes = (props: Props) => {
         </Route>
         <Route exact path={['/reports-59']}>
           <Reports59Container />
+        </Route>
+        <Route exact path={['/reports-61']}>
+          <Reports61Container />
         </Route>
         <Route path="*">
           <NotFound />

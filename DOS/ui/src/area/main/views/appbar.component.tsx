@@ -246,6 +246,11 @@ export function AppBarComponent(props: Props) {
           text: 'Reporte de Detalle',
           icon: <GridOnIcon />,
         },
+        {
+          url: '/reports-63',
+          text: 'Reporte de Detalle (No montos)',
+          icon: <GridOnIcon />,
+        },
       ],
     },
     user: {

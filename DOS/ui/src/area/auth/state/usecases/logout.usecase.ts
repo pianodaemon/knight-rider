@@ -1,5 +1,5 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
-import { call, put, takeLatest, delay } from 'redux-saga/effects';
+import { call, put, takeLatest } from 'redux-saga/effects';
 import Cookies from 'universal-cookie';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
@@ -45,6 +45,19 @@ function* logoutWorker(action: any): Generator<any, any, any> {
     )
       ? translations.observation.error_responses.unique_error
       : message;
+    /* @todo add below code to axios response interceptor
+    let httpCode = e.response?.status ? e.response.status  : 0;
+    if (httpCode === 401) {
+      yield removeAuthCookie();
+      yield put(
+        notificationAction({
+          message: 'Petición inválida. Su sesión ha sido terminada. Ingrese por favor sus credenciales.',
+          type: 'error',
+        })
+      );
+      return;
+    }
+    */
     yield put(logoutErrorAction(e));
     yield put(
       notificationAction({
@@ -62,7 +75,7 @@ function* logoutWatcher(): Generator<any, any, any> {
 
 function removeAuthCookie(): void {
   const cookies = new Cookies();
-  cookies.remove('token');
+  cookies.remove('token', { path: '/' });
 }
 
 const authReducerHandlers = {

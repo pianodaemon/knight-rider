@@ -12,6 +12,7 @@ export function getUsers(options: any): Promise<any> {
     {
       method: 'get',
       headers: { accept: 'application/json' },
+      withCredentials: true,
     },
     false
   );
@@ -20,6 +21,7 @@ export function getUsers(options: any): Promise<any> {
 export function removeUser(id: number | string): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/users/${id}`, {
     method: 'delete',
+    withCredentials: true,
   });
 }
 
@@ -31,6 +33,7 @@ export function createUser(fields: User): Promise<any> {
       'Content-Type': 'application/json',
     },
     data: fields,
+    withCredentials: true,
   });
 }
 
@@ -41,6 +44,7 @@ export function readUser(id: number | string): Promise<any> {
       accept: 'application/json',
       'Content-Type': 'application/json',
     },
+    withCredentials: true,
   });
 }
 
@@ -52,5 +56,6 @@ export function updateUser(id: number | string, fields: User): Promise<any> {
       'Content-Type': 'application/json',
     },
     data: fields,
+    withCredentials: true,
   });
 }

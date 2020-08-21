@@ -45,7 +45,7 @@ function* loadReport57Worker(action?: any): Generator<any, any, any> {
     var dat = result.data;
     
     var sum_obj = { c_obs:0, monto:0 };
-    dat.data_rows.map(function(x: any) {
+    dat.data_rows.forEach(function(x: any) {
       sum_obj.c_obs      += x.c_obs      ;
       sum_obj.monto      += x.monto      ;
     } )

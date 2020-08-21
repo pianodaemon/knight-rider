@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Link } from 'react-router-dom';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 type Props = {
@@ -130,7 +128,7 @@ export const Report56 = (props: Props) => {
   };
   const formatPercent = (monto:number, total:number): string => {
     let v = ((monto*100)/total).toFixed(1);
-    let vr = v[v.length-1] == '0' ? ((monto*100)/total).toFixed(0) : v;
+    let vr = v[v.length-1] === '0' ? ((monto*100)/total).toFixed(0) : v;
     return vr + ' %';
   };
   return (

@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Link } from 'react-router-dom';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 type Props = {
@@ -86,7 +84,6 @@ const useStyles = makeStyles(() =>
 export const Report59 = (props: Props) => {
   const {
     report,
-    // loading,
     loadReport57Action,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
@@ -95,8 +92,8 @@ export const Report59 = (props: Props) => {
   const [entidad , setEntidad ] = useState<any>(fiscal);
   useEffect(() => {
     loadReport57Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, only_obras: 'True'});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     setEntidad(fiscal);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, fiscal]);
   const classes = useStyles();
   const options = [
@@ -131,11 +128,6 @@ export const Report59 = (props: Props) => {
       }
     }
     return valueString;
-  };
-  const formatPercent = (monto:number, total:number): string => {
-    let v = ((monto*100)/total).toFixed(1);
-    let vr = v[v.length-1] == '0' ? ((monto*100)/total).toFixed(0) : v;
-    return vr + ' %';
   };
   return (
     <div className={classes.Container}>

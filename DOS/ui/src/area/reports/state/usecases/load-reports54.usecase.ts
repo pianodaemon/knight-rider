@@ -45,7 +45,7 @@ function* loadReport54Worker(action?: any): Generator<any, any, any> {
     var dat = result.data;
     
     var sum_obj = {c_sol:0, m_sol:0, c_analisis:0, m_analisis:0, c_no_sol:0, m_no_sol:0 };
-    dat.data_rows.map(function(x: any) {
+    dat.data_rows.forEach(function(x: any) {
       sum_obj.c_sol      += x.c_sol      ;
       sum_obj.m_sol      += x.m_sol      ;
       sum_obj.c_analisis += x.c_analisis ;

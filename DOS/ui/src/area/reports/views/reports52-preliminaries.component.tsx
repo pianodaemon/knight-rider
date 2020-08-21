@@ -4,7 +4,6 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { Link } from 'react-router-dom';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 type Props = {
@@ -108,22 +107,6 @@ export const Report52Preliminaries = (props: Props) => {
     { value: '2019', label: '2019' },
     { value: '2020', label: '2020' },
   ];
-  const formatMoney = ( monto: number): string =>  {
-    let valueStringFixed2 = monto.toFixed(2);
-    let valueArray = valueStringFixed2.split('');
-    let arrayReverse = valueArray.reverse();
-    let valueString = '';
-    for(let i in arrayReverse ) {
-      let st:number = Number(i);
-      valueString = arrayReverse[i] + valueString;
-      let sti:number;
-      sti = (st - 2);
-      if( (sti%3)===0 && st !== 2 && st !== (arrayReverse.length - 1) ){
-        valueString = ',' + valueString
-      }
-    }
-    return valueString;
-  };
   return (
     <div className={classes.Container}>
       <div>

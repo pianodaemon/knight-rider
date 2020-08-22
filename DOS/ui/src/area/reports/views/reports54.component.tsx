@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Link } from 'react-router-dom';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 type Props = {

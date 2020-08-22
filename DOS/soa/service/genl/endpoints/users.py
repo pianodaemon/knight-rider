@@ -72,10 +72,7 @@ class UserList(Resource):
     def get(self):
         ''' To fetch several users. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
 
-        try:
-            verify_token(request.headers)
-        except Exception as err:
-            ns.abort(401, message=err)
+
 
         offset = request.args.get('offset', '0')
         limit = request.args.get('limit', '10')
@@ -108,10 +105,7 @@ class UserList(Resource):
     def post(self):
         ''' To create a user. Key \'disabled\' is ignored as this is automatically set to false at creation '''
 
-        try:
-            verify_token(request.headers)
-        except Exception as err:
-            ns.abort(401, message=err)
+
 
         try:
             usr = users.create(**api.payload)
@@ -138,10 +132,7 @@ class User(Resource):
     def get(self, id):
         ''' To fetch a user '''
 
-        try:
-            verify_token(request.headers)
-        except Exception as err:
-            ns.abort(401, message=err)
+
 
         try:
             usr = users.read(id)
@@ -160,10 +151,7 @@ class User(Resource):
     def put(self, id):
         ''' To update a user '''
         
-        try:
-            verify_token(request.headers)
-        except Exception as err:
-            ns.abort(401, message=err)
+
 
         try:
             usr = users.update(id, **api.payload)
@@ -183,10 +171,7 @@ class User(Resource):
     def delete(self, id):
         ''' To delete a user '''
 
-        try:
-            verify_token(request.headers)
-        except Exception as err:
-            ns.abort(401, message=err)
+
 
         try:
             usr = users.delete(id)
@@ -210,10 +195,7 @@ class Catalog(Resource):
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
 
-        try:
-            verify_token(request.headers)
-        except Exception as err:
-            ns.abort(401, message=err)
+
 
         try:
             field_catalog = users.get_catalogs(['divisions', 'orgchart_roles', 'authorities'])

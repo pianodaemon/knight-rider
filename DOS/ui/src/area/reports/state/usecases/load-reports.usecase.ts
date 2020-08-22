@@ -45,7 +45,7 @@ function* loadResultsReportWorker(action?: any): Generator<any, any, any> {
 
     var dat = result.data;
     var sum_obj = {c_asf:0, m_asf:0, c_sfp:0, m_sfp:0, c_asenl:0, m_asenl:0, c_cytg:0, m_cytg:0 };
-    dat.data_rows.map(function(x: any) {
+    dat.data_rows.forEach(function(x: any) {
       sum_obj.c_asf   += x.c_asf   ;
       sum_obj.m_asf   += x.m_asf   ;
       sum_obj.c_sfp   += x.c_sfp   ;

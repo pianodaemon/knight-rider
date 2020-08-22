@@ -96,7 +96,9 @@ func (self *TokenClerk) RefreshToken(userID string) ([]byte, error) {
 
 	response, err := json.Marshal(TokenAuthentication{Token: token})
 
-	if err != nil { return []byte{}, err }
+	if err != nil {
+		return []byte{}, err
+	}
 
 	return response, nil
 }

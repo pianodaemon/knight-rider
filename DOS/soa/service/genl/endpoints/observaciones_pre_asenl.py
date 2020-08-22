@@ -4,7 +4,7 @@ import psycopg2
 
 from genl.restplus import api
 from dal import observaciones_pre_asenl
-from misc.helper import get_search_params
+from misc.helper import get_search_params, verify_token
 from misc.helperpg import get_msg_pgerror, EmptySetError
 
 
@@ -115,6 +115,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASENL (P
 })
 
 @ns.route('/')
+@ns.response(401, 'Unauthorized')
 class ObservacionPreAsenlList(Resource):
 
     @ns.marshal_list_with(obs_pre_asenl)
@@ -130,6 +131,10 @@ class ObservacionPreAsenlList(Resource):
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations (preliminares de la ASENL). On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
 
         offset = request.args.get('offset', '0')
         limit = request.args.get('limit', '10')
@@ -161,6 +166,11 @@ class ObservacionPreAsenlList(Resource):
     def post(self):
         ''' To create an observation (preliminar de la ASENL). '''
         try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
+        try:
             obs = observaciones_pre_asenl.create(**api.payload)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
@@ -177,12 +187,18 @@ class ObservacionPreAsenlList(Resource):
 @ns.param('id', 'Id de una observación (preliminar de la ASENL)')
 @ns.response(404, 'Observation not found')
 @ns.response(400, 'There is a problem with your request data')
+@ns.response(401, 'Unauthorized')
 class ObservacionPreAsenl(Resource):
     obs_not_found = 'Observación no encontrada'
 
     @ns.marshal_with(obs_pre_asenl)
     def get(self, id):
         ''' To fetch an observation (preliminar de la ASENL) '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
         try:
             obs = observaciones_pre_asenl.read(id)
         except psycopg2.Error as err:
@@ -199,6 +215,11 @@ class ObservacionPreAsenl(Resource):
     @ns.marshal_with(obs_pre_asenl)
     def put(self, id):
         ''' To update an observation (preliminar de la ASENL) '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
         try:
             obs = observaciones_pre_asenl.update(id, **api.payload)
         except psycopg2.Error as err:
@@ -217,6 +238,11 @@ class ObservacionPreAsenl(Resource):
     def delete(self, id):
         ''' To delete an observation (preliminar de la ASENL) '''
         try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
+        try:
             obs = observaciones_pre_asenl.delete(id)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
@@ -231,11 +257,17 @@ class ObservacionPreAsenl(Resource):
 
 @ns.route('/catalog')
 @ns.response(500, 'Server error')
+@ns.response(401, 'Unauthorized')
 class Catalog(Resource):
 
     @ns.marshal_with(catalog)
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
         try:
             field_catalog = observaciones_pre_asenl.get_catalogs([
                 'divisions',

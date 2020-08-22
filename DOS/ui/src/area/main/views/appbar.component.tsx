@@ -294,6 +294,7 @@ export function AppBarComponent(props: Props) {
       >
         <Toolbar className={classes.toolbar}>
           <div className={classes.menuAndImage}>
+            {(isLoggedIn && checked) && (
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -303,6 +304,7 @@ export function AppBarComponent(props: Props) {
             >
               <MenuIcon />
             </IconButton>
+            )}
             <img className={classes.imageGobMx} src="/nlgobmx.png" alt="Inicio" />
           </div>
           <div>

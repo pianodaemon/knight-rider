@@ -19,9 +19,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const NotFound = () => {
   const classes = useStyles();
-  const image =
-    'http://www.nl.gob.mx/sites/nl.gob.mx/themes/gobierno/img/404.png';
-
   return (
     <>
       <Grid container spacing={3}>
@@ -33,9 +30,6 @@ export const NotFound = () => {
             <Typography variant="h6" component="h2" gutterBottom>
               Lo sentimos, la página que estas buscando no existe.
             </Typography>
-            <span>
-              <img src={image} alt="" />
-            </span>
           </Paper>
         </Grid>
       </Grid>

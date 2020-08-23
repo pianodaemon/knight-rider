@@ -82,3 +82,23 @@ func (self *TokenClerk) IssueToken(username, password string) ([]byte, error) {
 
 	return response, nil
 }
+
+// Allow the application to ask sso to issue a newer
+// access token without having to re-authenticate the user
+func (self *TokenClerk) RefreshToken(userID string) ([]byte, error) {
+
+	token, err := ton.Generate(self.config.PrivateKey, self.config.ExpirationDelta, userID)
+
+	if err != nil {
+
+		return nil, err
+	}
+
+	response, err := json.Marshal(TokenAuthentication{Token: token})
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return response, nil
+}

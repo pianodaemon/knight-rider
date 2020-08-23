@@ -10,7 +10,7 @@ import { loadCatalogResultsReportCYTGAction } from 'src/area/results-report-cytg
 import { loadAuditCatalogAction } from 'src/area/auditories/state/usecases/load-audit-catalog.usecase';
 import { loadUsersCatalogAction } from 'src/area/users/state/usecases/load-users-catalog.usecase';
 import { checkAuthAction } from 'src/area/auth/state/usecases/check-auth.usecase';
-import { isLoggedInSelector } from 'src/area/auth/state/auth.selectors';
+import { checkedSelector, isLoggedInSelector } from 'src/area/auth/state/auth.selectors';
 import { AppRoutes } from './app-routes.component';
 
 const mapDispatchToProps = {
@@ -29,7 +29,8 @@ const mapDispatchToProps = {
 
 function mapStateToProps(state: any) {
   return {
-    isLoggedIn: isLoggedInSelector(state)
+    isLoggedIn: isLoggedInSelector(state),
+    checked: checkedSelector(state)
   };
 }
 

@@ -12,6 +12,7 @@ export function getObservations(options: any): Promise<any> {
     {
       method: 'get',
       headers: { accept: 'application/json' },
+      withCredentials: true,
     },
     false
   );
@@ -20,6 +21,7 @@ export function getObservations(options: any): Promise<any> {
 export function removeObservation(id: number | string): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/observations/${id}`, {
     method: 'delete',
+    withCredentials: true,
   });
 }
 
@@ -31,6 +33,7 @@ export function createObservation(fields: Observation): Promise<any> {
       'Content-Type': 'application/json',
     },
     data: fields,
+    withCredentials: true,
   });
 }
 
@@ -41,6 +44,7 @@ export function readObservation(id: number | string): Promise<any> {
       accept: 'application/json',
       'Content-Type': 'application/json',
     },
+    withCredentials: true,
   });
 }
 
@@ -55,5 +59,6 @@ export function updateObservation(
       'Content-Type': 'application/json',
     },
     data: fields,
+    withCredentials: true,
   });
 }

@@ -5,5 +5,6 @@ export function getCatalog(): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/obs_pre_asenl/catalog`, {
     method: 'get',
     headers: { accept: 'application/json' },
+    withCredentials: true,
   });
 }

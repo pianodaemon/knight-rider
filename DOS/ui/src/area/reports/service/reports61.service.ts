@@ -15,6 +15,7 @@ export function getReport61(options: any): Promise<any> {
     {
       method: 'get',
       headers: { accept: 'application/json' },
+      withCredentials: true,
     },
     false
   );

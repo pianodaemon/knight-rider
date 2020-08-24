@@ -15,6 +15,7 @@ export function getResultReportsASENL(options: any): Promise<any> {
     {
       method: 'get',
       headers: { accept: 'application/json' },
+      withCredentials: true,
     },
     false
   );
@@ -30,6 +31,7 @@ export function createResultsReportASENL(
       'Content-Type': 'application/json',
     },
     data: fields,
+    withCredentials: true,
   });
 }
 
@@ -40,6 +42,7 @@ export function readResultsReportASENL(id: number | string): Promise<any> {
       accept: 'application/json',
       'Content-Type': 'application/json',
     },
+    withCredentials: true,
   });
 }
 
@@ -54,11 +57,13 @@ export function updateResultsReportASENL(
       'Content-Type': 'application/json',
     },
     data: fields,
+    withCredentials: true,
   });
 }
 
 export function deletResultsReportASENL(id: number | string): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/${PREFIX}/${id}`, {
     method: 'delete',
+    withCredentials: true,
   });
 }

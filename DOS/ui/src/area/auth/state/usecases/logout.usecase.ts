@@ -1,9 +1,9 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, takeLatest } from 'redux-saga/effects';
-import Cookies from 'universal-cookie';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
 import { translations } from 'src/shared/translations/translations.util';
+import { TokenStorage } from 'src/shared/utils/token-storage.util';
 import { logout } from '../../service/auth.service';
 import { authReducer } from '../auth.reducer';
 
@@ -26,7 +26,7 @@ function* logoutWorker(action: any): Generator<any, any, any> {
   try {
     const { history } = action.payload;
     yield call(logout);
-    yield removeAuthCookie();
+    yield TokenStorage.clear();
     yield put(logoutSuccessAction());
     yield history.push('/sign-in');
     yield put(
@@ -73,11 +73,6 @@ function* logoutWatcher(): Generator<any, any, any> {
   yield takeLatest(LOGOUT, logoutWorker);
 }
 
-function removeAuthCookie(): void {
-  const cookies = new Cookies();
-  cookies.remove('token', { path: '/' });
-}
-
 const authReducerHandlers = {
   [LOGOUT]: (state: any) => {
     return {
@@ -88,6 +83,7 @@ const authReducerHandlers = {
   [LOGOUT_SUCCESS]: (state: any) => {
     return {
       ...state,
+      claims: null,
       loading: false,
       token: null,
       signedIn: false,
@@ -98,7 +94,7 @@ const authReducerHandlers = {
       ...state,
       error: action.payload,
       loading: false,
-      signedIn: false,
+      // signedIn: false,
     };
   },
 };

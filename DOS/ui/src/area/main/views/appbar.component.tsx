@@ -222,6 +222,11 @@ export function AppBarComponent(props: Props) {
           icon: <GridOnIcon />,
         },
         {
+          url: '/reports-55',
+          text: 'Atendidas y Por Atender',
+          icon: <GridOnIcon />,
+        },
+        {
           url: '/reports-56',
           text: 'Pendientes de Solventar',
           icon: <GridOnIcon />,

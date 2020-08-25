@@ -27,6 +27,7 @@ import { ResultsReportCYTGFormContainer } from '../../results-report-cytg/views/
 import { ReportsPreliminariesContainer } from '../../reports/views/reports-preliminaries.container';
 import { Reports52PreliminariesContainer } from '../../reports/views/reports52-preliminaries.container';
 import { Reports54Container } from '../../reports/views/reports54.container';
+import { Reports55Container } from '../../reports/views/reports55.container';
 import { Reports56Container } from '../../reports/views/reports56.container';
 import { Reports57Container } from '../../reports/views/reports57.container';
 import { Reports58Container } from '../../reports/views/reports58.container';
@@ -35,16 +36,6 @@ import { Reports61Container } from '../../reports/views/reports61.container';
 
 type Props = {
   history: History,
-  // loadCatalogAction: Function,
-  loadCatalogObsSFPAction: Function,
-  loadCatalogObsASFAction: Function,
-  loadCatalogResultsReportAction: Function,
-  loadAuditCatalogAction: Function,
-  loadUsersCatalogAction: Function,
-  loadCatalogObsASENLAction: Function,
-  loadCatalogResultsReportASENLAction: Function,
-  loadCatalogObsCYTGAction: Function,
-  loadCatalogResultsReportCYTGAction: Function,
   checkAuthAction: Function,
   isLoggedIn: boolean,
   checked: boolean,
@@ -52,16 +43,6 @@ type Props = {
 
 export const AppRoutes = (props: Props) => {
   useEffect(() => {
-    props.loadCatalogObsSFPAction();
-    props.loadCatalogObsASFAction();
-    // props.loadCatalogAction();
-    props.loadAuditCatalogAction();
-    props.loadUsersCatalogAction();
-    props.loadCatalogResultsReportAction();
-    props.loadCatalogObsASENLAction();
-    props.loadCatalogResultsReportASENLAction();
-    props.loadCatalogObsCYTGAction();
-    props.loadCatalogResultsReportCYTGAction();
     props.checkAuthAction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -174,6 +155,9 @@ export const AppRoutes = (props: Props) => {
             </Route>
             <Route exact path={['/reports-54']}>
               <Reports54Container />
+            </Route>
+            <Route exact path={['/reports-55']}>
+              <Reports55Container />
             </Route>
             <Route exact path={['/reports-56']}>
               <Reports56Container />

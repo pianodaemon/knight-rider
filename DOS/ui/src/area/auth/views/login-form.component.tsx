@@ -1,5 +1,5 @@
 import React /*, { useEffect }*/ from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import clsx from 'clsx';
 import { Formik } from 'formik';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
@@ -156,20 +156,11 @@ export const LoginForm = (props: Props) => {
     isLoading,
   } = props;
   const classes = useStyles();
-  const history = useHistory();
   const { action } = useParams<any>();
   const initialValues = {
     username: '',
     password: '',
   };
-  /*
-  useEffect(() => {
-    if (id) {
-      props.readResultsReportCYTGAction({ id, history });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  */
   const validate = (values: any) => {
     const errors: any = {};
     const fields = Object.keys(initialValues);
@@ -201,8 +192,7 @@ export const LoginForm = (props: Props) => {
           onSubmit={(values, { setSubmitting }) => {
             const releaseForm: () => void = () => setSubmitting(false);
             const fields: any = { ...values };
-            console.log('fields', fields);
-            authTokenAction({ credentials: fields, history, releaseForm});
+            authTokenAction({ credentials: fields, releaseForm});
           }}
           enableReinitialize
         >
@@ -213,7 +203,6 @@ export const LoginForm = (props: Props) => {
             handleChange,
             handleSubmit,
             isSubmitting,
-            setFieldValue,
           }: any) => {
             return (
               <>

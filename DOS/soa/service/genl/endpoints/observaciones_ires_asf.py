@@ -4,7 +4,7 @@ import psycopg2
 
 from genl.restplus import api
 from dal import observaciones_ires_asf
-from misc.helper import get_search_params
+from misc.helper import get_search_params, verify_token
 from misc.helperpg import get_msg_pgerror, EmptySetError
 
 
@@ -186,6 +186,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASF (Inf
 })
 
 @ns.route('/')
+@ns.response(401, 'Unauthorized')
 class ObservacionIResASFList(Resource):
 
     @ns.marshal_list_with(obs_ires_asf)
@@ -200,6 +201,10 @@ class ObservacionIResASFList(Resource):
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations (Informes de Resultados de la ASF). On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
 
         offset = request.args.get('offset', '0')
         limit = request.args.get('limit', '10')
@@ -231,6 +236,11 @@ class ObservacionIResASFList(Resource):
     def post(self):
         ''' To create an observation (Informe de Resultados de la ASF). '''
         try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
+        try:
             obs = observaciones_ires_asf.create(**api.payload)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
@@ -247,12 +257,18 @@ class ObservacionIResASFList(Resource):
 @ns.param('id', 'Id de una observacion (Informe de Resultados de la ASF)')
 @ns.response(404, 'Observation not found')
 @ns.response(400, 'There is a problem with your request data')
+@ns.response(401, 'Unauthorized')
 class ObservacionIResASF(Resource):
     obs_not_found = 'Observación no encontrada'
 
     @ns.marshal_with(obs_ires_asf)
     def get(self, id):
         ''' To fetch an observation (Informe de Resultados de la ASF) '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
         try:
             obs = observaciones_ires_asf.read(id)
         except psycopg2.Error as err:
@@ -269,6 +285,11 @@ class ObservacionIResASF(Resource):
     @ns.marshal_with(obs_ires_asf)
     def put(self, id):
         ''' To update an observation (Informe de Resultados de la ASF) '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
         try:
             obs = observaciones_ires_asf.update(id, **api.payload)
         except psycopg2.Error as err:
@@ -287,6 +308,11 @@ class ObservacionIResASF(Resource):
     def delete(self, id):
         ''' To delete an observation (Informe de Resultados de la ASF) '''
         try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
+        try:
             obs = observaciones_ires_asf.delete(id)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
@@ -301,11 +327,17 @@ class ObservacionIResASF(Resource):
 
 @ns.route('/catalog')
 @ns.response(500, 'Server error')
+@ns.response(401, 'Unauthorized')
 class Catalog(Resource):
 
     @ns.marshal_with(catalog)
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
         try:
             field_catalog = observaciones_ires_asf.get_catalogs([
                 'medios_notif_seguimiento_asf',

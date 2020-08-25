@@ -94,6 +94,10 @@ def getData( ignored_audit_str, ej_ini, ej_fin, str_no_atendidas ):
             'm_na_cytg':  aux_di['m_na_cytg'],
             'c_a_cytg':   aux_di['c_a_cytg'],
             'm_a_cytg':   aux_di['m_a_cytg'],
+            'c_na_total': aux_di['c_na_asf'] + aux_di['c_na_asenl'] + aux_di['c_na_cytg'],
+            'm_na_total': aux_di['m_na_asf'] + aux_di['m_na_asenl'] + aux_di['m_na_cytg'],
+            'c_a_total':  aux_di['c_a_asf'] + aux_di['c_a_asenl'] + aux_di['c_a_cytg'],
+            'm_a_total':  aux_di['m_a_asf'] + aux_di['m_a_asenl'] + aux_di['m_a_cytg'],
         }
         l.append(ob)
     return l

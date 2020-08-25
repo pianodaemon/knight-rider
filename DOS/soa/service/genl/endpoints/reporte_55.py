@@ -41,6 +41,10 @@ data_row = api.model('Data row (Reporte 55)', {
     'm_na_cytg':   fields.Float(description=reporte_55_ns_captions['monto_no_aten']),
     'c_a_cytg':    fields.Integer(description=reporte_55_ns_captions['cant_obs_aten']),
     'm_a_cytg':    fields.Float(description=reporte_55_ns_captions['monto_aten']),
+    'c_na_total':  fields.Integer(description=reporte_55_ns_captions['cant_obs_no_aten']),
+    'm_na_total':  fields.Float(description=reporte_55_ns_captions['monto_no_aten']),
+    'c_a_total':   fields.Integer(description=reporte_55_ns_captions['cant_obs_aten']),
+    'm_a_total':   fields.Float(description=reporte_55_ns_captions['monto_aten']),
 })
 
 report = api.model('Reporte 55', {

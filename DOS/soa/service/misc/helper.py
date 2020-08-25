@@ -3,6 +3,7 @@ import redis
 import time
 from genl.restplus import public_key
 
+
 def get_search_params(args, fields):
     params = {}
     for key in fields:
@@ -14,7 +15,7 @@ def get_search_params(args, fields):
 
     return params
 
-# Nada
+
 def verify_token(headers):
     if 'Authorization' not in headers:
         raise Exception('No se encontró un token en el request')

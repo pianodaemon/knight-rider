@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/rsa"
+	"fmt"
 	"net/http"
 
 	"github.com/codegangsta/negroni"
@@ -120,6 +121,20 @@ func Engage(logger *logrus.Logger) (merr error) {
 					},
 				),
 			)).Methods("GET")
+
+			{
+				const userIDMask string = "[[:alnum:]\\-]+"
+
+				mgmt.Handle(fmt.Sprintf("/{user_id:%s}/refresh-token-auth", userIDMask), negroni.New(
+					negroni.HandlerFunc(requireTokenAut),
+					negroni.HandlerFunc(
+						func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+
+							co.Revive(clerk.RefreshToken)(w, r)
+						},
+					),
+				)).Methods("POST")
+			}
 
 			return router
 		}

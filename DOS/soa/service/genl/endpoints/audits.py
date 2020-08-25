@@ -4,7 +4,7 @@ import psycopg2
 
 from genl.restplus import api
 from dal import audits
-from misc.helper import get_search_params
+from misc.helper import get_search_params, verify_token
 from misc.helperpg import get_msg_pgerror, EmptySetError
 
 
@@ -30,6 +30,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones SFP', {
 
 
 @ns.route('/')
+@ns.response(401, 'Unauthorized')
 class AuditList(Resource):
 
     @ns.marshal_list_with(audit)
@@ -43,6 +44,10 @@ class AuditList(Resource):
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several audits. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
 
         offset = request.args.get('offset', '0')
         limit = request.args.get('limit', '10')
@@ -74,6 +79,11 @@ class AuditList(Resource):
     def post(self):
         ''' To create an audit '''
         try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
+        try:
             aud = audits.create(**api.payload)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
@@ -90,12 +100,18 @@ class AuditList(Resource):
 @ns.param('id', 'Audit identifier')
 @ns.response(404, 'Audit not found')
 @ns.response(400, 'There is a problem with your request data')
+@ns.response(401, 'Unauthorized')
 class Audit(Resource):
     audit_not_found = 'Audit not found'
 
     @ns.marshal_with(audit)
     def get(self, id):
         ''' To fetch an audit '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
         try:
             aud = audits.read(id)
         except psycopg2.Error as err:
@@ -112,6 +128,11 @@ class Audit(Resource):
     @ns.marshal_with(audit)
     def put(self, id):
         ''' To update an audit '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
         try:
             aud = audits.update(id, **api.payload)
         except psycopg2.Error as err:
@@ -130,6 +151,11 @@ class Audit(Resource):
     def delete(self, id):
         ''' To delete an audit '''
         try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
+        try:
             aud = audits.delete(id)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
@@ -144,11 +170,17 @@ class Audit(Resource):
 
 @ns.route('/catalog')
 @ns.response(500, 'Server error')
+@ns.response(401, 'Unauthorized')
 class Catalog(Resource):
 
     @ns.marshal_with(catalog)
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
+
         try:
             field_catalog = audits.get_catalogs(['dependencies'])
         except psycopg2.Error as err:

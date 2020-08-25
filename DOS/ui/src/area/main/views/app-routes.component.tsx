@@ -32,166 +32,153 @@ import { Reports57Container } from '../../reports/views/reports57.container';
 import { Reports58Container } from '../../reports/views/reports58.container';
 import { Reports59Container } from '../../reports/views/reports59.container';
 import { Reports61Container } from '../../reports/views/reports61.container';
-import { Reports63Container } from '../../reports/views/reports63.container';
 
 type Props = {
   history: History,
-  // loadCatalogAction: Function,
-  loadCatalogObsSFPAction: Function,
-  loadCatalogObsASFAction: Function,
-  loadCatalogResultsReportAction: Function,
-  loadAuditCatalogAction: Function,
-  loadUsersCatalogAction: Function,
-  loadCatalogObsASENLAction: Function,
-  loadCatalogResultsReportASENLAction: Function,
-  loadCatalogObsCYTGAction: Function,
-  loadCatalogResultsReportCYTGAction: Function,
   checkAuthAction: Function,
   isLoggedIn: boolean,
+  checked: boolean,
 };
 
 export const AppRoutes = (props: Props) => {
   useEffect(() => {
-    props.loadCatalogObsSFPAction();
-    props.loadCatalogObsASFAction();
-    // props.loadCatalogAction();
-    props.loadAuditCatalogAction();
-    props.loadUsersCatalogAction();
-    props.loadCatalogResultsReportAction();
-    props.loadCatalogObsASENLAction();
-    props.loadCatalogResultsReportASENLAction();
-    props.loadCatalogObsCYTGAction();
-    props.loadCatalogResultsReportCYTGAction();
     props.checkAuthAction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <Router history={props.history}>
-      <Switch>
-        <Route exact path={['/sign-in']}>
-          {props.isLoggedIn ? <Redirect to="/audit/list" /> : <LoginFormContainer />}
-        </Route>
-        <Route exact path={['/audit/create', '/audit/:id/edit']}>
-          <AuditContainer />
-        </Route>
-        <Route exact path={['/audit/list']}>
-          <AuditTableContainer />
-        </Route>
-        <Route exact path={['/', '/observation/list']}>
-          <AuditTableContainer />
-        </Route>
-        <Route exact path={['/observation/create', '/observation/:id/edit']}>
-          <NotFound />
-        </Route>
-        <Route exact path={['/', '/observation-asf/list']}>
-          <ObservationASFTableContainer />
-        </Route>
-        <Route
-          exact
-          path={['/observation-asf/create', '/observation-asf/:id/:action']}
-        >
-          <ObservationsASFFormContainer />
-        </Route>
-        <Route exact path={['/', '/observation-sfp/list']}>
-          <ObservationSFPTableContainer />
-        </Route>
-        <Route
-          exact
-          path={['/observation-sfp/create', '/observation-sfp/:id/:action']}
-        >
-          <ObservationsSFPFormContainer />
-        </Route>
-        <Route exact path={['/', '/observation-asenl/list']}>
-          <ObservationASENLTableContainer />
-        </Route>
-        <Route
-          exact
-          path={['/observation-asenl/create', '/observation-asenl/:id/:action']}
-        >
-          <ObservationASENLFormContainer />
-        </Route>
-        <Route
-          exact
-          path={['/results-report/create', '/results-report/:id/:action']}
-        >
-          <ResultsReportFormContainer />
-        </Route>
-        <Route exact path={['/', '/results-report/list']}>
-          <ResultsReportTableContainer />
-        </Route>
-        <Route
-          exact
-          path={[
-            '/results-report-asenl/create',
-            '/results-report-asenl/:id/:action',
-          ]}
-        >
-          <ResultsReportASENLFormContainer />
-        </Route>
-        <Route exact path={['/', '/results-report-asenl/list']}>
-          <ResultsReportASENLTableContainer />
-        </Route>
-        <Route exact path={['/', '/observation-cytg/list']}>
-          <ObservationCYTGTableContainer />
-        </Route>
-        <Route
-          exact
-          path={['/observation-cytg/create', '/observation-cytg/:id/:action']}
-        >
-          <ObservationCYTGFormContainer />
-        </Route>
-        <Route
-          exact
-          path={[
-            '/results-report-cytg/create',
-            '/results-report-cytg/:id/:action',
-          ]}
-        >
-          <ResultsReportCYTGFormContainer />
-        </Route>
-        <Route exact path={['/', '/results-report-cytg/list']}>
-          <ResultsReportCYTGTableContainer />
-        </Route>
-        <Route exact path={['/user/create', '/user/:id/edit']}>
-          <UsersFormContainer />
-        </Route>
-        <Route exact path={['/', '/user/list']}>
-          <UsersTableContainer />
-        </Route>
-        <Route exact path={['/results_report/create']}>
-          <RForm />
-        </Route>
-        <Route exact path={['/reports-53']}>
-          <ReportsPreliminariesContainer />
-        </Route>
-        <Route exact path={['/reports-52']}>
-          <Reports52PreliminariesContainer />
-        </Route>
-        <Route exact path={['/reports-54']}>
-          <Reports54Container />
-        </Route>
-        <Route exact path={['/reports-56']}>
-          <Reports56Container />
-        </Route>
-        <Route exact path={['/reports-57']}>
-          <Reports57Container />
-        </Route>
-        <Route exact path={['/reports-58']}>
-          <Reports58Container />
-        </Route>
-        <Route exact path={['/reports-59']}>
-          <Reports59Container />
-        </Route>
-        <Route exact path={['/reports-61']}>
-          <Reports61Container />
-        </Route>
-        <Route exact path={['/reports-63']}>
-          <Reports63Container />
-        </Route>
-        <Route path="*">
-          <NotFound />
-        </Route>
-      </Switch>
+        {props.checked && (
+          !props.isLoggedIn ? (
+          <>
+            <Route path="*">
+              <LoginFormContainer />
+            </Route>
+          </>
+          ) : (
+          <Switch>
+            <Route exact path={['/audit/create', '/audit/:id/edit']}>
+              <AuditContainer />
+            </Route>
+            <Route exact path={['/audit/list']}>
+              <AuditTableContainer />
+            </Route>
+            <Route exact path={['/observation/list']}>
+              <AuditTableContainer />
+            </Route>
+            <Route exact path={['/observation/create', '/observation/:id/edit']}>
+              <NotFound />
+            </Route>
+            <Route exact path={['/observation-asf/list']}>
+              <ObservationASFTableContainer />
+            </Route>
+            <Route
+              exact
+              path={['/observation-asf/create', '/observation-asf/:id/:action']}
+            >
+              <ObservationsASFFormContainer />
+            </Route>
+            <Route exact path={['/observation-sfp/list']}>
+              <ObservationSFPTableContainer />
+            </Route>
+            <Route
+              exact
+              path={['/observation-sfp/create', '/observation-sfp/:id/:action']}
+            >
+              <ObservationsSFPFormContainer />
+            </Route>
+            <Route exact path={['/observation-asenl/list']}>
+              <ObservationASENLTableContainer />
+            </Route>
+            <Route
+              exact
+              path={['/observation-asenl/create', '/observation-asenl/:id/:action']}
+            >
+              <ObservationASENLFormContainer />
+            </Route>
+            <Route
+              exact
+              path={['/results-report/create', '/results-report/:id/:action']}
+            >
+              <ResultsReportFormContainer />
+            </Route>
+            <Route exact path={['/results-report/list']}>
+              <ResultsReportTableContainer />
+            </Route>
+            <Route
+              exact
+              path={[
+                '/results-report-asenl/create',
+                '/results-report-asenl/:id/:action',
+              ]}
+            >
+              <ResultsReportASENLFormContainer />
+            </Route>
+            <Route exact path={['/results-report-asenl/list']}>
+              <ResultsReportASENLTableContainer />
+            </Route>
+            <Route exact path={['/observation-cytg/list']}>
+              <ObservationCYTGTableContainer />
+            </Route>
+            <Route
+              exact
+              path={['/observation-cytg/create', '/observation-cytg/:id/:action']}
+            >
+              <ObservationCYTGFormContainer />
+            </Route>
+            <Route
+              exact
+              path={[
+                '/results-report-cytg/create',
+                '/results-report-cytg/:id/:action',
+              ]}
+            >
+              <ResultsReportCYTGFormContainer />
+            </Route>
+            <Route exact path={['/results-report-cytg/list']}>
+              <ResultsReportCYTGTableContainer />
+            </Route>
+            <Route exact path={['/user/create', '/user/:id/edit']}>
+              <UsersFormContainer />
+            </Route>
+            <Route exact path={['/user/list']}>
+              <UsersTableContainer />
+            </Route>
+            <Route exact path={['/results_report/create']}>
+              <RForm />
+            </Route>
+            <Route exact path={['/reports-53']}>
+              <ReportsPreliminariesContainer />
+            </Route>
+            <Route exact path={['/reports-52']}>
+              <Reports52PreliminariesContainer />
+            </Route>
+            <Route exact path={['/reports-54']}>
+              <Reports54Container />
+            </Route>
+            <Route exact path={['/reports-56']}>
+              <Reports56Container />
+            </Route>
+            <Route exact path={['/reports-57']}>
+              <Reports57Container />
+            </Route>
+            <Route exact path={['/reports-58']}>
+              <Reports58Container />
+            </Route>
+            <Route exact path={['/reports-59']}>
+              <Reports59Container />
+            </Route>
+            <Route exact path={['/reports-61']}>
+              <Reports61Container />
+            </Route>
+            <Route path="/sign-in">
+              <Redirect to='/audit/list' />
+            </Route>
+            <Route path="*">
+              <NotFound />
+            </Route>
+          </Switch>
+          )
+        )}
     </Router>
   );
 };

@@ -38,4 +38,18 @@ export function logout(): Promise<any> {
   );
 }
 
-// @todo refreshToken - get new token
+export function refreshToken(userID: string): Promise<any> {
+  const ENDPOINT = `${getAppSettings().authUrl}/sso/${userID}/refresh-token-auth`;
+  return axiosApi(
+    ENDPOINT,
+    {
+      method: 'post',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true,
+    },
+    false
+  );
+}

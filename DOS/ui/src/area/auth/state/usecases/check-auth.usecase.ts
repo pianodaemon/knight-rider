@@ -1,11 +1,17 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { put, takeLatest } from 'redux-saga/effects';
-import Cookies from 'universal-cookie';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
-// import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
-// import { translations } from 'src/shared/translations/translations.util';
-// import { logoutAction } from './logout.usecase';
+import { TokenStorage } from 'src/shared/utils/token-storage.util';
 import { authReducer } from '../auth.reducer';
+import { loadCatalogAction as loadCatalogObsSFPAction } from 'src/area/observations-sfp/state/usecases/load-catalog.usecase';
+import { loadCatalogAction as loadCatalogObsASFAction } from 'src/area/observations-asf/state/usecases/load-catalog.usecase';
+import { loadCatalogAction as loadCatalogObsASENLAction } from 'src/area/observations-asenl/state/usecases/load-catalog.usecase';
+import { loadCatalogAction as loadCatalogObsCYTGAction } from 'src/area/observations-cytg/state/usecases/load-catalog.usecase';
+import { loadCatalogAction as loadCatalogResultsReportAction } from 'src/area/results-report/state/usecases/load-catalog.usecase';
+import { loadCatalogResultsReportASENLAction } from 'src/area/results-report-asenl/state/usecases/load-catalog.usecase';
+import { loadCatalogResultsReportCYTGAction } from 'src/area/results-report-cytg/state/usecases/load-catalog.usecase';
+import { loadAuditCatalogAction } from 'src/area/auditories/state/usecases/load-audit-catalog.usecase';
+import { loadUsersCatalogAction } from 'src/area/users/state/usecases/load-users-catalog.usecase';
 
 const postfix = '/app';
 const CHECK_AUTH = `CHECK_AUTH${postfix}`;
@@ -18,26 +24,25 @@ export const checkAuthLoggedInAction: ActionFunctionAny<
   Action<any>
 > = createAction(CHECK_AUTH_LOGGED_IN);
 
-function* checkAuthWorker(action: any): Generator<any, any, any> {
-  // const { history } = action.payload;
+function* checkAuthWorker(): Generator<any, any, any> {
   try {
-    const cookies = new Cookies();
-    const token = yield cookies.get('token');
-    if (token) {
+    if (TokenStorage.isAuthenticated()) {
       yield put(checkAuthLoggedInAction());
+      // Load all Form Catalogs
+      yield put(loadCatalogObsSFPAction());
+      yield put(loadCatalogObsASFAction());
+      yield put(loadAuditCatalogAction());
+      yield put(loadUsersCatalogAction());
+      yield put(loadCatalogResultsReportAction());
+      yield put(loadCatalogObsASENLAction());
+      yield put(loadCatalogResultsReportASENLAction());
+      yield put(loadCatalogObsCYTGAction());
+      yield put(loadCatalogResultsReportCYTGAction());
+      return;
     }
     throw new Error('Not Logged In!');
-    /*
-    yield put(
-      notificationAction({
-        message: `¡Sesión terminada con éxito!`,
-        type: 'success',
-      })
-    );
-    */
   } catch (e) {
     // yield console.log(e);
-    // return history.push('/sign-in');
   }
 }
 

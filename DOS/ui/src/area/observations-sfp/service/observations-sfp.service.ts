@@ -12,6 +12,7 @@ export function getObservations(options: any): Promise<any> {
     {
       method: 'get',
       headers: { accept: 'application/json' },
+      withCredentials: true,
     },
     false
   );
@@ -25,6 +26,7 @@ export function createObservationSFP(fields: ObservationSFP): Promise<any> {
       'Content-Type': 'application/json',
     },
     data: fields,
+    withCredentials: true,
   });
 }
 
@@ -35,6 +37,7 @@ export function readObservationSFP(id: number | string): Promise<any> {
       accept: 'application/json',
       'Content-Type': 'application/json',
     },
+    withCredentials: true,
   });
 }
 
@@ -49,11 +52,13 @@ export function updateObservationSFP(
       'Content-Type': 'application/json',
     },
     data: fields,
+    withCredentials: true,
   });
 }
 
 export function deleteObservationSFP(id: number | string): Promise<any> {
   return axiosApi(`${getAppSettings().baseUrl}/obs_sfp/${id}`, {
     method: 'delete',
+    withCredentials: true,
   });
 }

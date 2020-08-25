@@ -1,36 +1,36 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, takeLatest } from 'redux-saga/effects';
+import Cookies from 'universal-cookie';
+import jwt_decode from 'jwt-decode';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
-import { checkAuthAction } from './check-auth.usecase';
 import { translations } from 'src/shared/translations/translations.util';
-import { TokenStorage } from 'src/shared/utils/token-storage.util';
-import { login } from '../../service/auth.service';
+import { refreshToken } from '../../service/auth.service';
 import { authReducer } from '../auth.reducer';
 
 const postfix = '/app';
-const AUTH_TOKEN = `AUTH_TOKEN${postfix}`;
-const AUTH_TOKEN_SUCCESS = `AUTH_TOKEN_SUCCESS${postfix}`;
-const AUTH_TOKEN_ERROR = `AUTH_TOKEN_ERROR${postfix}`;
+const REFRESH_TOKEN_AUTH = `REFRESH_TOKEN_AUTH${postfix}`;
+const REFRESH_TOKEN_AUTH_SUCCESS = `REFRESH_TOKEN_AUTH_SUCCESS${postfix}`;
+const REFRESH_TOKEN_AUTH_ERROR = `REFRESH_TOKEN_AUTH_ERROR${postfix}`;
 
-export const authTokenAction: ActionFunctionAny<
+export const refreshTokenAuthAction: ActionFunctionAny<
   Action<any>
-> = createAction(AUTH_TOKEN);
-export const authTokenSuccessAction: ActionFunctionAny<
+> = createAction(REFRESH_TOKEN_AUTH);
+export const refreshTokenAuthSuccessAction: ActionFunctionAny<
   Action<any>
-> = createAction(AUTH_TOKEN_SUCCESS);
-export const authTokenErrorAction: ActionFunctionAny<
+> = createAction(REFRESH_TOKEN_AUTH_SUCCESS);
+export const refreshTokenAuthErrorAction: ActionFunctionAny<
   Action<any>
-> = createAction(AUTH_TOKEN_ERROR);
+> = createAction(REFRESH_TOKEN_AUTH_ERROR);
 
-function* authTokenWorker(action: any): Generator<any, any, any> {
+function* refreshTokenAuthWorker(action: any): Generator<any, any, any> {
   try {
-    const { credentials } = action.payload;
-    const result = yield call(login, credentials);
+    const { credentials, history } = action.payload;
+    const result = yield call(refreshToken, '');
     const { token } = result.data;
-    yield TokenStorage.storeToken(token);
-    yield put(authTokenSuccessAction(token));
-    yield put(checkAuthAction());
+    yield setAuthCookie(token);
+    yield put(refreshTokenAuthSuccessAction(token));
+    yield history.push('/audit/list');
     yield put(
       notificationAction({
         message: `¡Bienvenido!`,
@@ -49,7 +49,7 @@ function* authTokenWorker(action: any): Generator<any, any, any> {
       ? translations.observation.error_responses.unique_error
       : message;
     yield releaseForm();
-    yield put(authTokenErrorAction(e));
+    yield put(refreshTokenAuthErrorAction(e));
     yield put(
       notificationAction({
         message,
@@ -60,28 +60,41 @@ function* authTokenWorker(action: any): Generator<any, any, any> {
   }
 }
 
-function* authTokenWatcher(): Generator<any, any, any> {
-  yield takeLatest(AUTH_TOKEN, authTokenWorker);
+function* refreshTokenAuthWatcher(): Generator<any, any, any> {
+  yield takeLatest(REFRESH_TOKEN_AUTH, refreshTokenAuthWorker);
+}
+
+function setAuthCookie(token: string): void {
+  const cookies = new Cookies();
+  const jwt: any = jwt_decode(token);
+  cookies.set(
+    'token',
+    token,
+    { 
+      path: '/',
+      expires: new Date(jwt.exp * 1000)
+    }
+  );
 }
 
 const authReducerHandlers = {
-  [AUTH_TOKEN]: (state: any) => {
+  [REFRESH_TOKEN_AUTH]: (state: any) => {
     return {
       ...state,
       loading: true,
+      // token: null,
       signedIn: false,
     };
   },
-  [AUTH_TOKEN_SUCCESS]: (state: any, action: any) => {
+  [REFRESH_TOKEN_AUTH_SUCCESS]: (state: any, action: any) => {
     // const { token } = action.payload;
     return {
       ...state,
-      claims: TokenStorage.getTokenClaims(),
       loading: false,
       signedIn: true,
     };
   },
-  [AUTH_TOKEN_ERROR]: (state: any, action: any) => {
+  [REFRESH_TOKEN_AUTH_ERROR]: (state: any, action: any) => {
     return {
       ...state,
       error: action.payload,
@@ -91,5 +104,5 @@ const authReducerHandlers = {
   },
 };
 
-mergeSaga(authTokenWatcher);
+mergeSaga(refreshTokenAuthWatcher);
 authReducer.addHandlers(authReducerHandlers);

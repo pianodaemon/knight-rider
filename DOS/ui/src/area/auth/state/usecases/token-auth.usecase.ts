@@ -39,15 +39,13 @@ function* authTokenWorker(action: any): Generator<any, any, any> {
     );
   } catch (e) {
     const { releaseForm } = action.payload;
-    let message: string =
-      e.response && e.response.data && e.response.data.message
-        ? e.response.data.message
-        : '¡Error de inesperado! Por favor contacte al Administrador.';
-    message = message.includes(
-      translations.observation.error_responses.unique_constraint
-    )
-      ? translations.observation.error_responses.unique_error
-      : message;
+    let code: string =
+      e.response && e.response.data && e.response.data.errors.length
+        ? e.response.data.errors[0].code
+        : "UNEXPECTED";
+    let message = Object.keys(translations.auth.login.errorCodes).includes(code)
+      ? translations.auth.login.errorCodes[code]
+      : translations.auth.login.errorCodes.UNEXPECTED;
     yield releaseForm();
     yield put(authTokenErrorAction(e));
     yield put(

@@ -25,3 +25,8 @@ export const isLoadingSelector = createSelector(
   sliceSelector,
   (slice: any): boolean => slice.loading
 );
+
+export const refreshingSelector = createSelector(
+  sliceSelector,
+  (slice: any): boolean => slice.refreshing
+);

@@ -12,24 +12,9 @@ export class TokenStorage {
     return this.getToken() !== null;
   }
 
-  /*
-  public static getNewToken(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      axios
-        .post(ApiUrlService.refreshToken(), { refresh_token: this.getRefreshToken() })
-        .then(response => {
-
-          this.storeToken(response.data.token);
-          this.storeRefreshToken(response.data.refresh_token);
-
-          resolve(response.data.token);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+  public static getNewToken(): never {
+    throw new Error('Not Implemented');
   }
-  */
 
   public static storeToken(token: string): void {
     const jwt: any = jwt_decode(token);
@@ -48,7 +33,7 @@ export class TokenStorage {
     return cookies.get(TokenStorage.COOKIE_STORAGE_TOKEN) || null;
   }
 
-  public static getTokenClaims(): { [key: string]: string } | null {
+  public static getTokenClaims(): { [key: string]: string | number } | null {
     return jwt_decode(this.getToken() || '');
   }
 

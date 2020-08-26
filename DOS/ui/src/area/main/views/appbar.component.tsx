@@ -37,11 +37,14 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
+import { useRefreshToken } from 'src/shared/hooks/use-refresh-token.hook';
 
 type Props = {
   logoutAction: Function,
+  refreshTokenAuthAction: Function,
   isLoggedIn: boolean,
   checked: boolean,
+  refreshing: boolean,
 };
 
 const customHistory = createBrowserHistory();
@@ -144,12 +147,20 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export function AppBarComponent(props: Props) {
-  const { checked, isLoggedIn, logoutAction } = props;
+  const { checked, isLoggedIn, logoutAction, refreshing, refreshTokenAuthAction } = props;
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const openProfileMenu = Boolean(anchorEl);
+
+  useRefreshToken((isAuthenticated: boolean, canRefresh: boolean) => {
+    if (isAuthenticated) {
+      // Token is close to expiry, then try to refresh
+      // Token has expired, logout
+      return canRefresh ? refreshTokenAuthAction() : logoutAction();
+    }
+  }, [refreshing, isLoggedIn]);
 
   const breadcrumbNameMap: { [key: string]: { [key: string]: any } } = {
     audit: {

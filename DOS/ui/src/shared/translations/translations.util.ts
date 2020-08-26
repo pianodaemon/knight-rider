@@ -5,7 +5,7 @@ import esTranslationMessages from './es';
 // should take locale as param and return the correct config.
 const locale = 'es';
 
-const languages = {
+const languages: any = {
   en: enTranslationMessages,
   es: esTranslationMessages,
 };

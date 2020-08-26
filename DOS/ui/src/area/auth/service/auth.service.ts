@@ -38,7 +38,7 @@ export function logout(): Promise<any> {
   );
 }
 
-export function refreshToken(userID: string): Promise<any> {
+export function refreshToken(userID: string | number): Promise<any> {
   const ENDPOINT = `${getAppSettings().authUrl}/sso/${userID}/refresh-token-auth`;
   return axiosApi(
     ENDPOINT,

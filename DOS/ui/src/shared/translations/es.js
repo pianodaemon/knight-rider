@@ -21,5 +21,13 @@ export default {
       users_unique_username_message:
         'El nombre de usuario ingresado ya existe, por favor revisa el campo "Nombre del Usuario" e ingrese uno diferente.',
     },
+  },
+  auth: {
+    login: {
+      errorCodes: {
+        "UNEXPECTED": '¡Error de inesperado! Por favor contacte al Administrador.',
+        "1001": "Usuario o Contraseña no coinciden en los registros. Verifique sus credenciales."
+      }
+    }
   }
 };

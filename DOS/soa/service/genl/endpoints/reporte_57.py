@@ -5,6 +5,7 @@ from psycopg2 import Error as pg_err
 from genl.restplus import api
 from dal import reporte_57
 from misc.helperpg import ServerError
+from misc.helper import verify_token
 
 
 reporte_57_ns_captions = {
@@ -38,6 +39,7 @@ report = api.model('Reporte 57', {
 @ns.route('/')
 @ns.response(400, 'Client error')
 @ns.response(500, 'Server error')
+@ns.response(401, 'Unauthorized')
 class Reporte57(Resource):
 
     @ns.marshal_with(report)
@@ -47,6 +49,10 @@ class Reporte57(Resource):
     @ns.param('only_obras',    reporte_57_ns_captions['only_obras'],    required=False)
     def get(self):
         ''' To fetch an instance of Reporte 57 '''
+        try:
+            verify_token(request.headers)
+        except Exception as err:
+            ns.abort(401, message=err)
 
         ejercicio_ini = request.args.get('ejercicio_ini', '2000')
         ejercicio_fin = request.args.get('ejercicio_fin', '2040')

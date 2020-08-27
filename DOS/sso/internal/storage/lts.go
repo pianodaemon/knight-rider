@@ -60,11 +60,11 @@ func Authenticate(username, password string) (*User, error) {
 	defer db.Close()
 
 	{
-		var uid, passwordHash, username_ string
+		var uid, passwordHash, retUsername string
 		var disabled bool
 
 		err := db.QueryRow("SELECT id::character varying as uid, username, passwd, disabled FROM users WHERE username = $1",
-			username).Scan(&uid, &username_, &passwordHash, &disabled)
+			username).Scan(&uid, &retUsername, &passwordHash, &disabled)
 
 		if err != nil {
 
@@ -82,11 +82,60 @@ func Authenticate(username, password string) (*User, error) {
 
 		usr = &User{
 			UID:       uid,
-			Username:  username_,
+			Username:  retUsername,
 			IsActive:  !disabled,
 			CreatedAt: 12123123,
 		}
 	}
 
 	return usr, nil
+}
+
+// GetUserAuthorities retrieves a string representing all authorities for a user
+func GetUserAuthorities(userID string) (string, error) {
+
+	var auth, userAuths string
+	var firstRow = true
+
+	dbinfo := shapeConnStr()
+	db, err := sql.Open("postgres", dbinfo)
+
+	if err != nil {
+
+		return "", fmt.Errorf("Issues when connecting to the long term storage")
+	}
+
+	defer db.Close()
+
+	q := `SELECT auths.title
+			FROM user_authority AS usr_auth
+			JOIN authorities AS auths ON usr_auth.authority_id = auths.id
+			WHERE usr_auth.user_id = $1`
+
+	rows, err := db.Query(q, userID)
+
+	if err != nil {
+
+		return "", err
+	}
+
+	for rows.Next() {
+
+		if err := rows.Scan(&auth); err != nil {
+
+			return "", err
+		}
+
+		if firstRow {
+
+			userAuths += auth
+			firstRow = false
+
+		} else {
+
+			userAuths += "|" + auth
+		}
+	}
+
+	return userAuths, nil
 }

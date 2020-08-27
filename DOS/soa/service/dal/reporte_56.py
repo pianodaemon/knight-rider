@@ -281,9 +281,11 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
     if repNum == 'reporte56':
         strSelectTipo = ' tipos.title as tipo_observacion,'
         strJOINTipo = 'join observation_types as tipos on ires.tipo_observacion_id = tipos.id'
+        strOrderBy = ', ejercicio, tipo_observacion '
     else:
         strSelectTipo = ''
         strJOINTipo = ''
+        strOrderBy = ''
 
     sqls = {
         'ASF': '''
@@ -297,8 +299,8 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
             where not pre.blocked
     	        and not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-            order by dependencia;
-        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin),
+            order by dependencia {};
+        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, strOrderBy),
         'SFP': '''
             select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} ires.direccion_id as direccion_id
             from observaciones_sfp as ires
@@ -308,8 +310,8 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
             {}
             where not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-            order by dependencia;
-        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin),
+            order by dependencia {};
+        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, strOrderBy),
         'CYTG': '''
             select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
             from observaciones_ires_cytg as ires
@@ -321,8 +323,8 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
             where not pre.blocked
     	        and not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-            order by dependencia;
-        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin),
+            order by dependencia {};
+        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, strOrderBy),
         'ASENL': '''
             select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
             from observaciones_ires_asenl as ires
@@ -333,8 +335,8 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
             {}
             where not pre.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
-            order by dependencia;
-        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin),
+            order by dependencia {};
+        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, strOrderBy),
     }
     return sqls[ent]
 

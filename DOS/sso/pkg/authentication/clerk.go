@@ -71,7 +71,14 @@ func (self *TokenClerk) IssueToken(username, password string) ([]byte, error) {
 		return nil, err
 	}
 
-	token, err := ton.Generate(self.config.PrivateKey, self.config.ExpirationDelta, user.UID)
+	userAuths, err := dal.GetUserAuthorities(user.UID)
+
+	if err != nil {
+
+		return nil, err
+	}
+
+	token, err := ton.Generate(self.config.PrivateKey, self.config.ExpirationDelta, user.UID, userAuths)
 
 	if err != nil {
 
@@ -87,7 +94,14 @@ func (self *TokenClerk) IssueToken(username, password string) ([]byte, error) {
 // access token without having to re-authenticate the user
 func (self *TokenClerk) RefreshToken(userID string) ([]byte, error) {
 
-	token, err := ton.Generate(self.config.PrivateKey, self.config.ExpirationDelta, userID)
+	userAuths, err := dal.GetUserAuthorities(userID)
+
+	if err != nil {
+
+		return nil, err
+	}
+
+	token, err := ton.Generate(self.config.PrivateKey, self.config.ExpirationDelta, userID, userAuths)
 
 	if err != nil {
 

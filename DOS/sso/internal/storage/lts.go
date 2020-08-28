@@ -94,12 +94,12 @@ func Authenticate(username, password string) (*User, error) {
 // GetUserAuthorities retrieves a string representing all authorities for a user
 func GetUserAuthorities(userID string) (string, error) {
 
-	var auth, userAuths string
+	var auth, app, lastApp, appAuths, userAuths string
 	var firstRow = true
+	var authWeightPerApp = 0
 
 	dbinfo := shapeConnStr()
 	db, err := sql.Open("postgres", dbinfo)
-
 	if err != nil {
 
 		return "", fmt.Errorf("Issues when connecting to the long term storage")
@@ -107,13 +107,14 @@ func GetUserAuthorities(userID string) (string, error) {
 
 	defer db.Close()
 
-	q := `SELECT auths.title
+	q := `SELECT apps.nombre_app, auths.title
 			FROM user_authority AS usr_auth
 			JOIN authorities AS auths ON usr_auth.authority_id = auths.id
-			WHERE usr_auth.user_id = $1`
+			JOIN apps ON auths.app_id = apps.id
+			WHERE usr_auth.user_id = $1
+			ORDER BY apps.nombre_app, auths.title`
 
 	rows, err := db.Query(q, userID)
-
 	if err != nil {
 
 		return "", err
@@ -121,21 +122,60 @@ func GetUserAuthorities(userID string) (string, error) {
 
 	for rows.Next() {
 
-		if err := rows.Scan(&auth); err != nil {
+		if err := rows.Scan(&app, &auth); err != nil {
 
 			return "", err
 		}
 
-		if firstRow {
+		if app != lastApp && !firstRow {
 
-			userAuths += auth
-			firstRow = false
+			setUserAuths(&userAuths, authWeightPerApp, lastApp, appAuths)
 
-		} else {
-
-			userAuths += "|" + auth
+			authWeightPerApp = 0
+			appAuths = ""
 		}
+
+		switch auth {
+		case "F":
+			authWeightPerApp += 4
+
+		case "C", "R", "U", "D":
+			authWeightPerApp++
+
+			if appAuths == "" {
+				appAuths += auth
+			} else {
+				appAuths += "," + auth
+			}
+		}
+
+		firstRow = false
+		lastApp = app
+	}
+
+	if !firstRow {
+
+		setUserAuths(&userAuths, authWeightPerApp, lastApp, appAuths)
 	}
 
 	return userAuths, nil
+}
+
+func setUserAuths(userAuths *string, authWeightPerApp int, lastApp, appAuths string) {
+
+	if authWeightPerApp >= 4 {
+
+		if *userAuths == "" {
+			*userAuths += lastApp + "=F"
+		} else {
+			*userAuths += "|" + lastApp + "=F"
+		}
+	} else {
+
+		if *userAuths == "" {
+			*userAuths += lastApp + "=" + appAuths
+		} else {
+			*userAuths += "|" + lastApp + "=" + appAuths
+		}
+	}
 }

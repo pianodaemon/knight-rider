@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Link } from 'react-router-dom';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 type Props = {
@@ -127,11 +126,6 @@ export const ReportPreliminaries = (props: Props) => {
     <div className={classes.Container}>
       <div>
         <span className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados</span>
-        <Link to="/reports-52">
-          <button type="button" className={classes.buttonTodos} >
-            <span>&rarr; Totales</span>
-          </button>
-        </Link>
       </div>
 
       <div className={classes.filters}>

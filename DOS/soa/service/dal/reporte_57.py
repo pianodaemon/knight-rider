@@ -68,7 +68,7 @@ def get(ej_ini, ej_fin, fiscal, onlyObras):
         data_rows = getDataSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'], only_obras )
     elif fiscal == 'ASF':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASF( 'observaciones_pre_asf', 'observaciones_ires_asf', ignored_audit_str, ej_ini, ej_fin, 'seguimientos_obs_asf', entes['ASF'], only_obras )
+        data_rows = getDataASF( ignored_audit_str, ej_ini, ej_fin, entes['ASF'], only_obras )
     elif fiscal == 'CYTG':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
         data_rows = getDataCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'], only_obras )
@@ -83,15 +83,15 @@ def get(ej_ini, ej_fin, fiscal, onlyObras):
 
 
 
-def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, seguimientos, ente, only_obras ):
+def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
     data_rows = []
 
     obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
 
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id
-        from {} as pre
-        join {} as ires on pre.observacion_ires_id = ires.id
+        from observaciones_ires_asf as ires
+        join observaciones_pre_asf as pre on ires.id = pre.observacion_ires_id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
@@ -101,9 +101,8 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         order by dependencia, tipo_observacion, ejercicio, ires_id;
-    '''.format( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion)
 
-    
     try:
         rows = exec_steady(sql)
     except EmptySetError:
@@ -115,12 +114,12 @@ def getDataASF( preliminares, i_resultados, ignored_audit_str, ej_ini, ej_fin, s
         
         sql = '''
             select seg.clasif_final_interna_cytg, seg.monto_pendiente_solventar, clas.title
-            from {} as seg 
+            from seguimientos_obs_asf as seg 
             join clasifs_internas_cytg as clas on seg.clasif_final_interna_cytg = clas.sorting_val and {} = clas.direccion_id and {} = clas.org_fiscal_id
             where observacion_id = {}
             order by seguimiento_id desc
             limit 1;
-        '''.format( seguimientos, r['direccion_id'], ente, r['ires_id'])
+        '''.format( r['direccion_id'], ente, r['ires_id'])
 
         try:
             seg = exec_steady(sql)
@@ -164,7 +163,7 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras):
     obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
 
     sql = '''
-        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
+        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
         from observaciones_ires_cytg as ires
         join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
@@ -174,7 +173,7 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras):
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
-        order by dependencia, tipo_observacion, ejercicio, pre_id;
+        order by dependencia, tipo_observacion, ejercicio, ires_id;
     '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
         
     try:
@@ -192,7 +191,7 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras):
             where observacion_id = {}
             order by seguimiento_id desc
             limit 1;
-        '''.format( r['clasif_final_cytg'], r['direccion_id'], ente, r['pre_id'])
+        '''.format( r['clasif_final_cytg'], r['direccion_id'], ente, r['ires_id'])
     
         try:
             seg = exec_steady(sql)
@@ -312,9 +311,9 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
     obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
 
     sql = '''
-        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
+        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
         from observaciones_ires_asenl as ires
-        join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
+        join observaciones_pre_asenl as pre on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
@@ -322,7 +321,7 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
-        order by dependencia, ejercicio, tipo_observacion, pre_id;
+        order by dependencia, ejercicio, tipo_observacion, ires_id;
     '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
         
     try:

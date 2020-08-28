@@ -93,8 +93,8 @@ def get(ej_ini, ej_fin, fiscal, obs_c):
             l = iresCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG']  )
             data_rows = setDataObj(l)
         elif fiscal == 'ASENL':
-            ignored_audit_str = ignored_audit_str.replace('pre.', 'ires.')
-            l = iresSFP( ignored_audit_str, ej_ini, ej_fin, entes['ASENL']  )
+            ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
+            l = iresASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL']  )
             data_rows = setDataObj(l)
 
     return {
@@ -198,12 +198,13 @@ def preCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
 
 def preASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
     sql = '''
-        select dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, pre.num_observacion as num_observacion, pre.observacion as observacion, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto, pre.estatus_proceso_id as estatus
+        select dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, pre.num_observacion as num_observacion, pre.observacion as observacion, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto, estatus_pre_asenl.title as estatus
         from observaciones_pre_asenl as pre
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         join observation_types as tipos on pre.tipo_observacion_id = tipos.id
+        join estatus_pre_asenl as estatus_pre_asenl on pre.estatus_proceso_id = estatus_pre_asenl.id
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
         group by dependencia, pre.num_observacion, observacion, tipo_observacion, estatus, ejercicio, direccion_id

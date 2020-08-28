@@ -141,7 +141,7 @@ def preASF( ignored_audit_str, ej_ini, ej_fin, ente ):
     l = []
     for row in rows:
         r = dict(row)
-        r['tipo_observacion'] = ''
+        r['tipo_observacion'] = ''  #Pre no tiene este campo
         l.append(r)
 
     return l
@@ -260,12 +260,14 @@ def iresASF( ignored_audit_str, ej_ini, ej_fin, ente ):
         except EmptySetError:
             seg = []            
             
+        r['estatus']         = ''
+        r['num_observacion'] = ''   #No lo tiene como campo 
+        r['cant_obs']        = 1    #No se agrupa -> 1
         if seg:
             segd = dict(seg[0])
             r['estatus']         = segd['estatus']
-            r['num_observacion'] = ''
-            r['cant_obs']        = 1
-            l.append(r)
+        
+        l.append(r)
 
     return l
 
@@ -280,7 +282,8 @@ def iresCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         join observation_types as tipos on ires.tipo_observacion_id = tipos.id
-        where not ires.blocked {}
+        where not pre.blocked
+    	    and not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
         order by dependencia, ejercicio, tipo_observacion;
     '''.format( ignored_audit_str, ej_ini, ej_fin)
@@ -306,14 +309,14 @@ def iresCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
             seg = exec_steady(sql)
         except EmptySetError:
             seg = []            
-            
+
+        r['estatus']    = ''
+        r['cant_obs']  = 1
+        r['monto']     = 0
         if seg:
             segd = dict(seg[0])
             r['estatus']    = segd['estatus']
-            r['cant_obs']  = 1
-            r['monto']     = 0
-
-            l.append(r)
+        l.append(r)
 
     return l
 
@@ -327,7 +330,8 @@ def iresASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         join observation_types as tipos on ires.tipo_observacion_id = tipos.id
-        where not pre.blocked {}
+        where not pre.blocked
+    	    and not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
         group by dependencia, pre.num_observacion, observacion, tipo_observacion, ires_id, ejercicio, direccion_id
         order by dependencia, num_observacion, tipo_observacion;
@@ -380,14 +384,14 @@ def iresSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
             seg = exec_steady(sql)
         except EmptySetError:
             seg = []            
-            
+
+        r['estatus']  = ''
+        r['cant_obs'] = 1
         if seg:
             segd = dict(seg[0])
             r['estatus']    = segd['estatus']
-            r['cant_obs']  = 1
 
-            l.append(r)
-
+        l.append(r)
     return l
 
 def setEntesIds():

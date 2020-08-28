@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Link } from 'react-router-dom';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 type Props = {
@@ -107,15 +106,26 @@ export const Report52Preliminaries = (props: Props) => {
     { value: '2019', label: '2019' },
     { value: '2020', label: '2020' },
   ];
+  const formatMoney = ( monto: number): string =>  {
+    let valueStringFixed2 = monto.toFixed(2);
+    let valueArray = valueStringFixed2.split('');
+    let arrayReverse = valueArray.reverse();
+    let valueString = '';
+    for(let i in arrayReverse ) {
+      let st:number = Number(i);
+      valueString = arrayReverse[i] + valueString;
+      let sti:number;
+      sti = (st - 2);
+      if( (sti%3)===0 && st !== 2 && st !== (arrayReverse.length - 1) ){
+        valueString = ',' + valueString
+      }
+    }
+    return valueString;
+  };
   return (
     <div className={classes.Container}>
       <div>
         <span className={classes.titlereport}>Reporte Ejecutivo Concentrado Total de Observaciones por Ente Fiscalizador Informe de Resultados</span>
-        <Link to="/reports-53">
-          <button type="button" className={classes.buttonTodos} >
-            <span>&rarr; Por Entidad</span>
-          </button>
-        </Link>
       </div>
 
       <div className={classes.filters}>
@@ -182,16 +192,16 @@ export const Report52Preliminaries = (props: Props) => {
              { report && report.sum_rows &&
              <tr> 
                
-               <td>{report.sum_rows.c_asf}</td>
-               <td>{report.sum_rows.m_asf}</td>
-               <td>{report.sum_rows.c_sfp}</td>
-               <td>{report.sum_rows.m_sfp}</td>
-               <td>{report.sum_rows.c_asenl}</td>
-               <td>{report.sum_rows.m_asenl}</td>
-               <td>{report.sum_rows.c_cytg}</td>
-               <td>{report.sum_rows.m_cytg}</td>
-               <td> { report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg } </td>
-               <td> { (report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  } </td>
+               <td className={classes.cantObs}>{report.sum_rows.c_asf}</td>
+               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asf) }</td>
+               <td className={classes.cantObs}>{report.sum_rows.c_sfp}</td>
+               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_sfp )}</td>
+               <td className={classes.cantObs}>{report.sum_rows.c_asenl}</td>
+               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asenl) }</td>
+               <td className={classes.cantObs}>{report.sum_rows.c_cytg}</td>
+               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_cytg) }</td>
+               <td className={classes.cantObs}>{ report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg } </td>
+               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  } </td>
              </tr>
                
              }

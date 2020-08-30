@@ -131,7 +131,7 @@ export const Report58 = (props: Props) => {
   return (
     <div className={classes.Container}>
       <div>
-        <span className={classes.titlereport}>Reporte Ejecutivo de Observaciones Pendientes de Solventar por Ente Fiscalizador</span>
+        <span className={classes.titlereport}>Reporte Ejecutivo Concentrado de Observaciones por Clasificación de Observación CyTG</span>
       </div>
 
       <div className={classes.filters}>

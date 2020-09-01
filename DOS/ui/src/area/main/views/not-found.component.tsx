@@ -28,7 +28,7 @@ export const NotFound = () => {
               404
             </Typography>
             <Typography variant="h6" component="h2" gutterBottom>
-              Lo sentimos, la página que estas buscando no existe.
+              Lo sentimos, la página que estás buscando no existe.
             </Typography>
           </Paper>
         </Grid>

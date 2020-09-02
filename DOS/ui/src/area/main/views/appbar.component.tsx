@@ -311,7 +311,7 @@ export function AppBarComponent(props: Props) {
       >
         <Toolbar className={classes.toolbar}>
           <div className={classes.menuAndImage}>
-            {(isLoggedIn && checked) && (
+            {(isLoggedIn && checked) && false && (
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -459,7 +459,7 @@ export function AppBarComponent(props: Props) {
       >
         <div className={classes.drawerHeaderMargin} />
         <Router history={customHistory}>
-          <BreadcrumbsBar />
+          {(isLoggedIn && checked) && <BreadcrumbsBar />}
         </Router>
         <AppRoutesContainer history={customHistory} />
       </main>

@@ -5,21 +5,18 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
-
 import Grow from '@material-ui/core/Grow';
-
-import { MenuCard } from 'src/shared/components/menu-card.component';
-
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PersonIcon from '@material-ui/icons/Person';
-
+import { MenuCard } from 'src/shared/components/menu-card.component';
 
 interface TabPanelProps {
   children?: React.ReactNode;
+  classes: any,
   index: any;
   value: any;
 }
@@ -30,10 +27,19 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
     backgroundColor: theme.palette.background.paper,
   },
+  box: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    // '& div:nth-child(1)': { order: 1, },
+    [theme.breakpoints.down('md')]: {
+      justifyContent: 'center',
+    },
+  }
 }));
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, classes, value, index, ...other } = props;
 
   return (
     <div
@@ -44,7 +50,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box style={{display: 'flex', flexWrap: 'wrap', justifyContent: index === 1 ? 'flex-end' : 'left'}}>
+        <Box className={classes.box}>
           {children}
         </Box>
       )}
@@ -83,7 +89,7 @@ const tabCategories = {
     icon: "ListAltIcon",
     name: "Catálogos",
     menuItems: [
-      { 
+      {
         audits: {
           color: '#5232C2',
           icon: "AccountBalanceIcon",
@@ -98,7 +104,7 @@ const tabCategories = {
     icon: "DeveloperBoardIcon",
     name: "Captura",
     menuItems: [
-      { 
+      {
         sfp: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
@@ -106,7 +112,7 @@ const tabCategories = {
           path: "/observation-sfp/list"
         },
       },
-      { 
+      {
         asf: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
@@ -114,15 +120,7 @@ const tabCategories = {
           path: "/observation-asf/list"
         },
       },
-      { 
-        asfRes: {
-          color: '#2565BE',
-          icon: "DeveloperBoardIcon",
-          name: "Informe de Resultados ASF",
-          path: "/results-report/list"
-        },
-      },
-      { 
+      {
         asenl: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
@@ -130,15 +128,7 @@ const tabCategories = {
           path: "/observation-asenl/list"
         },
       },
-      { 
-        asenlRes: {
-          color: '#2565BE',
-          icon: "DeveloperBoardIcon",
-          name: "Informe de Resultados ASENL",
-          path: "/results-report-asenl/list"
-        },
-      },
-      { 
+      {
         cytg: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
@@ -146,7 +136,32 @@ const tabCategories = {
           path: "/observation-cytg/list"
         },
       },
-      { 
+      {
+        paddingElement: {
+          color: '#2565BE',
+          icon: "DeveloperBoardIcon",
+          name: "Hidden Item",
+          path: "/404",
+          hide: true,
+        },
+      },
+      {
+        asfRes: {
+          color: '#2565BE',
+          icon: "DeveloperBoardIcon",
+          name: "Informe de Resultados ASF",
+          path: "/results-report/list"
+        },
+      },
+      {
+        asenlRes: {
+          color: '#2565BE',
+          icon: "DeveloperBoardIcon",
+          name: "Informe de Resultados ASENL",
+          path: "/results-report-asenl/list"
+        },
+      },
+      {
         cytgRes: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
@@ -161,7 +176,7 @@ const tabCategories = {
     icon: "LibraryBooksIcon",
     name: "Reportes",
     menuItems: [
-      { 
+      {
         reports52: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
@@ -169,7 +184,7 @@ const tabCategories = {
           path: "/reports-52"
         },
       },
-      { 
+      {
         reports53: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
@@ -177,7 +192,7 @@ const tabCategories = {
           path: "/reports-53"
         },
       },
-      { 
+      {
         reports54: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
@@ -185,7 +200,7 @@ const tabCategories = {
           path: "/reports-54"
         },
       },
-      { 
+      {
         reports55: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
@@ -193,7 +208,7 @@ const tabCategories = {
           path: "/reports-55"
         },
       },
-      { 
+      {
         reports56: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
@@ -201,7 +216,7 @@ const tabCategories = {
           path: "/reports-56"
         },
       },
-      { 
+      {
         reports57: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
@@ -209,7 +224,7 @@ const tabCategories = {
           path: "/reports-57"
         },
       },
-      { 
+      {
         reports58: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
@@ -217,7 +232,7 @@ const tabCategories = {
           path: "/reports-58"
         },
       },
-      { 
+      {
         reports59: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
@@ -225,7 +240,7 @@ const tabCategories = {
           path: "/reports-59"
         },
       },
-      { 
+      {
         reports61: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
@@ -233,7 +248,7 @@ const tabCategories = {
           path: "/reports-61"
         },
       },
-      { 
+      {
         reports63: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
@@ -248,7 +263,7 @@ const tabCategories = {
     icon: "SettingsIcon",
     name: "Catálogos",
     menuItems: [
-      { 
+      {
         users: {
           color: '#038BBB',
           icon: "PersonIcon",
@@ -295,7 +310,7 @@ export const TabPanelMenu = () => {
           const [name, tabProps] = tab;
           return (
             <Grow in={value=== index} key={`${index}-${name}`}>
-              <TabPanel value={value} index={index} key={name}>
+              <TabPanel value={value} index={index} key={name} classes={classes}>
                 {
                   Object
                   .values(tabProps.menuItems)

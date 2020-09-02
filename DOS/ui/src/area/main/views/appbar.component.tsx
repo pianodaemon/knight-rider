@@ -38,6 +38,7 @@ import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import { useRefreshToken } from 'src/shared/hooks/use-refresh-token.hook';
+import { BreadcrumbsBar } from 'src/area/main/views/breadcrumbs.component';
 
 type Props = {
   logoutAction: Function,
@@ -457,7 +458,9 @@ export function AppBarComponent(props: Props) {
         })}
       >
         <div className={classes.drawerHeaderMargin} />
-        {/* @todo Breadcrum */}
+        <Router history={customHistory}>
+          <BreadcrumbsBar />
+        </Router>
         <AppRoutesContainer history={customHistory} />
       </main>
     </div>

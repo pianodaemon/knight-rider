@@ -18,6 +18,7 @@ RUN rm -rf /var/lib/apt/lists/*
 # replacement for default site enabled on distro
 RUN rm /etc/nginx/sites-enabled/default
 COPY ./nginx_site /etc/nginx/sites-enabled/default
+COPY ./nginx.conf /etc/nginx/
 
 RUN mkdir -p /root/resources/files; chmod 777 /root/resources/files
 

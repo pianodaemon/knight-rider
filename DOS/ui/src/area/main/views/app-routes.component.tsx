@@ -183,7 +183,7 @@ export const AppRoutes = (props: Props) => {
               <Reports63Container />
             </Route>
             <Route path="/sign-in">
-              <Redirect to='/audit/list' />
+              <Redirect to='/menu' />
             </Route>
             <Route path="*">
               <NotFound />

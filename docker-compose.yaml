@@ -30,6 +30,7 @@ services:
         environment: *commonEnv
         volumes:
           - ./DOS/keys:/pem
+          - ./DOS/uploads:/uploads
         networks:
           - operational_network
     rdbms_obs:

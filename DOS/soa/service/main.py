@@ -1,5 +1,4 @@
 import logging
-
 from flask import Blueprint, Flask
 
 from genl.endpoints import (
@@ -18,6 +17,7 @@ from genl.endpoints import (
     reporte_56,
     reporte_57,
     reporte_61,
+    file_services,
 )
 from genl.restplus import api
 
@@ -42,10 +42,11 @@ def setup_app(flask_app):
     api.add_namespace(reporte_56.ns)
     api.add_namespace(reporte_57.ns)
     api.add_namespace(reporte_61.ns)
+    api.add_namespace(file_services.ns)
 
     flask_app.register_blueprint(blueprint)
 
-    
+
 app = Flask(__name__)
 setup_app(app)
 

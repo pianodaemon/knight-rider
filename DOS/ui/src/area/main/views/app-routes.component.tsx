@@ -34,6 +34,7 @@ import { Reports58Container } from '../../reports/views/reports58.container';
 import { Reports59Container } from '../../reports/views/reports59.container';
 import { Reports61Container } from '../../reports/views/reports61.container';
 import { Reports63Container } from '../../reports/views/reports63.container';
+import { TabPanelMenu } from './home-screen.component';
 
 type Props = {
   history: History,
@@ -58,6 +59,9 @@ export const AppRoutes = (props: Props) => {
           </>
           ) : (
           <Switch>
+            <Route exact path={['/', '/menu', '/menu/:category']}>
+              <TabPanelMenu />
+            </Route>
             <Route exact path={['/audit/create', '/audit/:id/edit']}>
               <AuditContainer />
             </Route>
@@ -179,7 +183,7 @@ export const AppRoutes = (props: Props) => {
               <Reports63Container />
             </Route>
             <Route path="/sign-in">
-              <Redirect to='/audit/list' />
+              <Redirect to='/menu' />
             </Route>
             <Route path="*">
               <NotFound />

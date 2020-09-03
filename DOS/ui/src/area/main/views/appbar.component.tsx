@@ -159,8 +159,14 @@ export function AppBarComponent(props: Props) {
     if (isAuthenticated) {
       // Token is close to expiry, then try to refresh
       // Token has expired, logout
-      return canRefresh ? refreshTokenAuthAction() : logoutAction();
+      return canRefresh ? refreshTokenAuthAction() : logoutAction({history: customHistory});
     }
+    /*
+    // @todo de-authenticate use case
+    if (checked && !isAuthenticated) {
+      logoutAction({history: customHistory});
+    }
+    */
   }, [refreshing, isLoggedIn]);
 
   const breadcrumbNameMap: { [key: string]: { [key: string]: any } } = {

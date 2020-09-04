@@ -61,6 +61,7 @@ const authReducerHandlers = {
   [CHECK_AUTH_LOGGED_IN]: (state: any) => {
     return {
       ...state,
+      claims: TokenStorage.getTokenClaims(),
       signedIn: true,
       checked: true,
     };

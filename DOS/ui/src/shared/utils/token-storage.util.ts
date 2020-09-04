@@ -13,7 +13,7 @@ export class TokenStorage {
     try {
       validToken = Boolean(jwt_decode(this.getToken() || ''));
     } catch(e) {
-      console.log('Invalid Token.', e);
+      // console.log('Invalid Token.', e);
     }
     return validToken;
   }

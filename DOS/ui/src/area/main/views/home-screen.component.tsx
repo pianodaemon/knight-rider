@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -13,6 +14,7 @@ import ListAltIcon from '@material-ui/icons/ListAlt';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PersonIcon from '@material-ui/icons/Person';
 import { MenuCard } from 'src/shared/components/menu-card.component';
+import { resolvePermission } from 'src/shared/utils/permissions.util';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -90,7 +92,7 @@ const tabCategories = {
     name: "Catálogos",
     menuItems: [
       {
-        audits: {
+        AUD: {
           color: '#5232C2',
           icon: "AccountBalanceIcon",
           name: "Auditorías",
@@ -105,7 +107,7 @@ const tabCategories = {
     name: "Captura",
     menuItems: [
       {
-        sfp: {
+        SFPR: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
           name: "Observaciones SFP",
@@ -113,7 +115,7 @@ const tabCategories = {
         },
       },
       {
-        asf: {
+        ASFP: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
           name: "Observaciones Preliminares ASF",
@@ -121,7 +123,7 @@ const tabCategories = {
         },
       },
       {
-        asenl: {
+        ASEP: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
           name: "Observaciones Preliminares ASENL",
@@ -129,7 +131,7 @@ const tabCategories = {
         },
       },
       {
-        cytg: {
+        CYTP: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
           name: "Observaciones Preliminares CyTG",
@@ -146,7 +148,7 @@ const tabCategories = {
         },
       },
       {
-        asfRes: {
+        ASFR: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
           name: "Informe de Resultados ASF",
@@ -154,7 +156,7 @@ const tabCategories = {
         },
       },
       {
-        asenlRes: {
+        ASER: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
           name: "Informe de Resultados ASENL",
@@ -162,7 +164,7 @@ const tabCategories = {
         },
       },
       {
-        cytgRes: {
+        CYTR: {
           color: '#2565BE',
           icon: "DeveloperBoardIcon",
           name: "Informe de Resultados CYTG",
@@ -177,7 +179,7 @@ const tabCategories = {
     name: "Reportes",
     menuItems: [
       {
-        reports52: {
+        R52: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
           name: "Total Informe de Resultados",
@@ -185,7 +187,7 @@ const tabCategories = {
         },
       },
       {
-        reports53: {
+        R53: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
           name: "Informe de Resultados",
@@ -193,7 +195,7 @@ const tabCategories = {
         },
       },
       {
-        reports54: {
+        R54: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
           name: "Informe Preliminar",
@@ -201,7 +203,7 @@ const tabCategories = {
         },
       },
       {
-        reports55: {
+        R55: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
           name: "Atendidas y Por Atender",
@@ -209,7 +211,7 @@ const tabCategories = {
         },
       },
       {
-        reports56: {
+        R56: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
           name: "Pendientes de Solventar",
@@ -217,7 +219,7 @@ const tabCategories = {
         },
       },
       {
-        reports57: {
+        R57: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
           name: "Observaciones por su Tipo",
@@ -225,7 +227,7 @@ const tabCategories = {
         },
       },
       {
-        reports58: {
+        R58: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
           name: "Observaciones por su Clasificación",
@@ -233,7 +235,7 @@ const tabCategories = {
         },
       },
       {
-        reports59: {
+        R59: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
           name: "Obras Públicas",
@@ -241,7 +243,7 @@ const tabCategories = {
         },
       },
       {
-        reports61: {
+        R61: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
           name: "Reporte de Detalle",
@@ -249,7 +251,7 @@ const tabCategories = {
         },
       },
       {
-        reports63: {
+        R63: {
           color: '#0E7EBC',
           icon: "DeveloperBoardIcon",
           name: "Reporte de Detalle (No montos)",
@@ -264,7 +266,7 @@ const tabCategories = {
     name: "Catálogos",
     menuItems: [
       {
-        users: {
+        USR: {
           color: '#038BBB',
           icon: "PersonIcon",
           name: "Usuarios",
@@ -286,6 +288,8 @@ export const TabPanelMenu = () => {
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const isVisible = (app: string): boolean => resolvePermission(permissions.claims.authorities, app);
   return (
     <div className={classes.root}>
       <AppBar position="static" color="default">
@@ -301,7 +305,13 @@ export const TabPanelMenu = () => {
           {categories.map((tab: any, index: number) => {
               const [name, tabProps] = tab;
               const { icon } = tabProps;
-              return <Tab label={name} icon={renderIcon(icon)} {...a11yProps(index)} key={name} onClick={() => history.push(`/menu/${name}`)} />;
+              return <Tab
+                label={name}
+                icon={renderIcon(icon)}
+                {...a11yProps(index)}
+                key={name}
+                onClick={() => history.push(`/menu/${name}`)}
+              />;
             }
           )}
         </Tabs>
@@ -314,6 +324,7 @@ export const TabPanelMenu = () => {
                 {
                   Object
                   .values(tabProps.menuItems)
+                  .filter((menuItem: any) => isVisible(Object.keys(menuItem)[0]) || Object.keys(menuItem)[0] === 'paddingElement')
                   .map((item: any, index2: number) => { 
                     const [menuItem] = Object.values(item);
                     return <MenuCard item={menuItem} key={index2} />;

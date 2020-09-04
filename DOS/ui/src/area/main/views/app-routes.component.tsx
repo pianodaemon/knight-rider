@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux'
 import { History } from 'history';
 import { Router, Switch, Route, Redirect } from 'react-router-dom';
+import { resolvePermission } from 'src/shared/utils/permissions.util';
 import { AuditTableContainer } from '../../auditories/views/audit-table.container';
 // import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
@@ -12,6 +14,7 @@ import { AuditContainer } from '../../auditories/views/audit-form.container';
 import { UsersFormContainer } from '../../users/views/users-form.container';
 import { ResultsReportFormContainer as RForm } from '../../auditories/views/results-report-form.container';
 import { NotFound } from './not-found.component';
+import { Unauthorized } from './unauthorized.component';
 import { ObservationSFPTableContainer } from '../../observations-sfp/views/observation-sfp-table.container';
 import { ObservationASENLTableContainer } from '../../observations-asenl/views/observation-asenl-table.container';
 import { ObservationASENLFormContainer } from '../../observations-asenl/views/observation-asenl-form.container';
@@ -43,11 +46,297 @@ type Props = {
   checked: boolean,
 };
 
+type CustomRoute = {
+  props: {
+    path: Array<string> | string,
+    exact?: boolean,
+  },
+  component: JSX.Element,
+  app?: string,
+};
+
+const routes: Array<CustomRoute> = [
+  {
+    props: {
+      path: ['/', '/menu', '/menu/:category'],
+      exact: true,
+    },
+    component: <TabPanelMenu />,
+  },
+  {
+    props: {
+      path: ['/audit/create', '/audit/:id/edit'],
+      exact: true,
+    },
+    component: <AuditContainer />,
+    app: 'AUD',
+  },
+  {
+    props: {
+      path: ['/audit/list'],
+      exact: true,
+    },
+    component: <AuditTableContainer />,
+    app: 'AUD',
+  },
+  {
+    props: {
+      path: ['/observation/list'],
+      exact: true,
+    },
+    component: <NotFound />,
+  },
+  {
+    props: {
+      path: ['/observation/create', '/observation/:id/edit'],
+      exact: true,
+    },
+    component: <NotFound />,
+  },
+  {
+    props: {
+      path: ['/observation-asf/list'],
+      exact: true,
+    },
+    component: <ObservationASFTableContainer />,
+    app: 'ASFP',
+  },
+  {
+    props: {
+      path: ['/observation-asf/create', '/observation-asf/:id/:action'],
+      exact: true,
+    },
+    component: <ObservationsASFFormContainer />,
+    app: 'ASFP',
+  },
+  {
+    props: {
+      path: ['/observation-sfp/list'],
+      exact: true,
+    },
+    component: <ObservationSFPTableContainer />,
+    app: 'SFPR',
+  },
+  {
+    props: {
+      path: ['/observation-sfp/create', '/observation-sfp/:id/:action'],
+      exact: true,
+    },
+    component: <ObservationsSFPFormContainer />,
+    app: 'SFPR',
+  },
+  {
+    props: {
+      path: ['/observation-asenl/list'],
+      exact: true,
+    },
+    component: <ObservationASENLTableContainer />,
+    app: 'ASEP',
+  },
+  {
+    props: {
+      path: ['/observation-asenl/create', '/observation-asenl/:id/:action'],
+      exact: true,
+    },
+    component: <ObservationASENLFormContainer />,
+    app: 'ASEP',
+  },
+  {
+    props: {
+      path: ['/results-report/create', '/results-report/:id/:action'],
+      exact: true,
+    },
+    component: <ResultsReportFormContainer />,
+    app: 'ASFR',
+  },
+  {
+    props: {
+      path: ['/results-report/list'],
+      exact: true,
+    },
+    component: <ResultsReportTableContainer />,
+    app: 'ASFR',
+  },
+  {
+    props: {
+      path: [
+        '/results-report-asenl/create',
+        '/results-report-asenl/:id/:action',
+      ],
+      exact: true,
+    },
+    component: <ResultsReportASENLFormContainer />,
+    app: 'ASER',
+  },
+  {
+    props: {
+      path: ['/results-report-asenl/list'],
+      exact: true,
+    },
+    component: <ResultsReportASENLTableContainer />,
+    app: 'ASER',
+  },
+  {
+    props: {
+      path: ['/observation-cytg/list'],
+      exact: true,
+    },
+    component: <ObservationCYTGTableContainer />,
+    app: 'CYTP',
+  },
+  {
+    props: {
+      path: ['/observation-cytg/create', '/observation-cytg/:id/:action'],
+      exact: true,
+    },
+    component: <ObservationCYTGFormContainer />,
+    app: 'CYTP',
+  },
+  {
+    props: {
+      path: [
+        '/results-report-cytg/create',
+        '/results-report-cytg/:id/:action',
+      ],
+      exact: true,
+    },
+    component: <ResultsReportCYTGFormContainer />,
+    app: 'CYTR',
+  },
+  {
+    props: {
+      path: ['/results-report-cytg/list'],
+      exact: true,
+    },
+    component: <ResultsReportCYTGTableContainer />,
+    app: 'CYTR',
+  },
+  {
+    props: {
+      path: ['/user/create', '/user/:id/edit'],
+      exact: true,
+    },
+    component: <UsersFormContainer />,
+    app: 'USR',
+  },
+  {
+    props: {
+      path: ['/user/list'],
+      exact: true,
+    },
+    component: <UsersTableContainer />,
+    app: 'USR',
+  },
+  {
+    props: {
+      path: ['/results_report/create'],
+      exact: true,
+    },
+    component: <RForm />,
+  },
+  {
+    props: {
+      path: ['/reports-52'],
+      exact: true,
+    },
+    component: <Reports52PreliminariesContainer />,
+    app: 'R52',
+  },
+  {
+    props: {
+      path: ['/reports-53'],
+      exact: true,
+    },
+    component: <ReportsPreliminariesContainer />,
+    app: 'R53',
+  },
+  {
+    props: {
+      path: ['/reports-54'],
+      exact: true,
+    },
+    component: <Reports54Container />,
+    app: 'R54',
+  },
+  {
+    props: {
+      path: ['/reports-55'],
+      exact: true,
+    },
+    component: <Reports55Container />,
+    app: 'R55',
+  },
+  {
+    props: {
+      path: ['/reports-56'],
+      exact: true,
+    },
+    component: <Reports56Container />,
+    app: 'R56',
+  },
+  {
+    props: {
+      path: ['/reports-57'],
+      exact: true,
+    },
+    component: <Reports57Container />,
+    app: 'R57',
+  },
+  {
+    props: {
+      path: ['/reports-58'],
+      exact: true,
+    },
+    component: <Reports58Container />,
+    app: 'R58',
+  },
+  {
+    props: {
+      path: ['/reports-59'],
+      exact: true,
+    },
+    component: <Reports59Container />,
+    app: 'R59',
+  },
+  {
+    props: {
+      path: ['/reports-61'],
+      exact: true,
+    },
+    component: <Reports61Container />,
+    app: 'R61',
+  },
+  {
+    props: {
+      path: ['/reports-63'],
+      exact: true,
+    },
+    component: <Reports63Container />,
+    app: 'R63',
+  },
+  {
+    props: {
+      path: "/sign-in",
+      exact: true,
+    },
+    component: <Redirect to='/menu' />,
+  },
+  {
+    props: {
+      path: "*",
+      exact: true,
+    },
+    component: <NotFound />,
+  },
+];
+
 export const AppRoutes = (props: Props) => {
   useEffect(() => {
     props.checkAuthAction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const hasAccess = (app: string): boolean => resolvePermission(permissions.claims?.authorities, app);
   return (
     <Router history={props.history}>
         {props.checked && (
@@ -59,135 +348,13 @@ export const AppRoutes = (props: Props) => {
           </>
           ) : (
           <Switch>
-            <Route exact path={['/', '/menu', '/menu/:category']}>
-              <TabPanelMenu />
-            </Route>
-            <Route exact path={['/audit/create', '/audit/:id/edit']}>
-              <AuditContainer />
-            </Route>
-            <Route exact path={['/audit/list']}>
-              <AuditTableContainer />
-            </Route>
-            <Route exact path={['/observation/list']}>
-              <AuditTableContainer />
-            </Route>
-            <Route exact path={['/observation/create', '/observation/:id/edit']}>
-              <NotFound />
-            </Route>
-            <Route exact path={['/observation-asf/list']}>
-              <ObservationASFTableContainer />
-            </Route>
-            <Route
-              exact
-              path={['/observation-asf/create', '/observation-asf/:id/:action']}
-            >
-              <ObservationsASFFormContainer />
-            </Route>
-            <Route exact path={['/observation-sfp/list']}>
-              <ObservationSFPTableContainer />
-            </Route>
-            <Route
-              exact
-              path={['/observation-sfp/create', '/observation-sfp/:id/:action']}
-            >
-              <ObservationsSFPFormContainer />
-            </Route>
-            <Route exact path={['/observation-asenl/list']}>
-              <ObservationASENLTableContainer />
-            </Route>
-            <Route
-              exact
-              path={['/observation-asenl/create', '/observation-asenl/:id/:action']}
-            >
-              <ObservationASENLFormContainer />
-            </Route>
-            <Route
-              exact
-              path={['/results-report/create', '/results-report/:id/:action']}
-            >
-              <ResultsReportFormContainer />
-            </Route>
-            <Route exact path={['/results-report/list']}>
-              <ResultsReportTableContainer />
-            </Route>
-            <Route
-              exact
-              path={[
-                '/results-report-asenl/create',
-                '/results-report-asenl/:id/:action',
-              ]}
-            >
-              <ResultsReportASENLFormContainer />
-            </Route>
-            <Route exact path={['/results-report-asenl/list']}>
-              <ResultsReportASENLTableContainer />
-            </Route>
-            <Route exact path={['/observation-cytg/list']}>
-              <ObservationCYTGTableContainer />
-            </Route>
-            <Route
-              exact
-              path={['/observation-cytg/create', '/observation-cytg/:id/:action']}
-            >
-              <ObservationCYTGFormContainer />
-            </Route>
-            <Route
-              exact
-              path={[
-                '/results-report-cytg/create',
-                '/results-report-cytg/:id/:action',
-              ]}
-            >
-              <ResultsReportCYTGFormContainer />
-            </Route>
-            <Route exact path={['/results-report-cytg/list']}>
-              <ResultsReportCYTGTableContainer />
-            </Route>
-            <Route exact path={['/user/create', '/user/:id/edit']}>
-              <UsersFormContainer />
-            </Route>
-            <Route exact path={['/user/list']}>
-              <UsersTableContainer />
-            </Route>
-            <Route exact path={['/results_report/create']}>
-              <RForm />
-            </Route>
-            <Route exact path={['/reports-53']}>
-              <ReportsPreliminariesContainer />
-            </Route>
-            <Route exact path={['/reports-52']}>
-              <Reports52PreliminariesContainer />
-            </Route>
-            <Route exact path={['/reports-54']}>
-              <Reports54Container />
-            </Route>
-            <Route exact path={['/reports-55']}>
-              <Reports55Container />
-            </Route>
-            <Route exact path={['/reports-56']}>
-              <Reports56Container />
-            </Route>
-            <Route exact path={['/reports-57']}>
-              <Reports57Container />
-            </Route>
-            <Route exact path={['/reports-58']}>
-              <Reports58Container />
-            </Route>
-            <Route exact path={['/reports-59']}>
-              <Reports59Container />
-            </Route>
-            <Route exact path={['/reports-61']}>
-              <Reports61Container />
-            </Route>
-            <Route exact path={['/reports-63']}>
-              <Reports63Container />
-            </Route>
-            <Route path="/sign-in">
-              <Redirect to='/menu' />
-            </Route>
-            <Route path="*">
-              <NotFound />
-            </Route>
+            {routes.map((route: CustomRoute, index: number) => {
+              return (
+                <Route {...route.props} key={`${index}-${route.app}`}>
+                  {!route.app || hasAccess(route.app) ? route.component : <Unauthorized />}
+                </Route>
+              );
+            })}
           </Switch>
           )
         )}

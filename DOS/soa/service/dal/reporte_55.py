@@ -116,7 +116,7 @@ def setObjFiscal( fiscal, rows, aux_dict, str_no_atendidas ):
             }
         aux_dict[r['dependencia']]['c_' + fiscal ] += 1
         aux_dict[r['dependencia']]['m_' + fiscal ] += r['monto']
-        if r['resp_dependencia'] == str_no_atendidas:
+        if r['resp_dependencia'] == str_no_atendidas or r['resp_dependencia'] == '' :
             aux_dict[r['dependencia']]['c_na_' + fiscal ] += 1
             aux_dict[r['dependencia']]['m_na_' + fiscal ] += r['monto']
         else:

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
+import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 type Props = {
@@ -96,17 +97,6 @@ export const Report54 = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, fiscal]);
   const classes = useStyles();
-  const options = [
-    { value: '2012', label: '2012' },
-    { value: '2013', label: '2013' },
-    { value: '2014', label: '2014' },
-    { value: '2015', label: '2015' },
-    { value: '2016', label: '2016' },
-    { value: '2017', label: '2017' },
-    { value: '2018', label: '2018' },
-    { value: '2019', label: '2019' },
-    { value: '2020', label: '2020' },
-  ];
   const optionsFiscals = [
     { value: 'asf',   label: 'ASF' },
     { value: 'asenl', label: 'ASENL' },
@@ -142,15 +132,11 @@ export const Report54 = (props: Props) => {
             value={yearIni}
             onChange={(e)=> {setYearIni(e.target.value);}}
           >
-            {options.map((item) => {
-              return (
-                <MenuItem
-                  value={item.value}
-                >
-                  {item.label}
-                </MenuItem>
-              );
-            })}
+            {range(2000, new Date().getFullYear()).map((year) => (
+              <MenuItem key={year} value={year}>
+                {year}
+              </MenuItem>
+            ))}
           </Select>
         </div>
         <div className={classes.selectYearContainer}>
@@ -160,15 +146,11 @@ export const Report54 = (props: Props) => {
             value={yearEnd}
             onChange={(e)=> {setYearEnd(e.target.value);}}
           >
-            {options.map((item) => {
-              return (
-                <MenuItem
-                  value={item.value}
-                >
-                  {item.label}
-                </MenuItem>
-              );
-            })}
+            {range(2000, new Date().getFullYear()).map((year) => (
+              <MenuItem key={year} value={year}>
+                {year}
+              </MenuItem>
+            ))}
           </Select>
         </div>
         <div className={classes.selectYearContainer}>
@@ -210,7 +192,6 @@ export const Report54 = (props: Props) => {
             <td className={classes.cantObs} >Cant. Obs.</td> 
             <td className={classes.montos} >Monto</td> 
           </tr> 
-             {console.log(report)}
            {report && report.data_rows && report.data_rows.map((dep: any) =>
              <tr> 
                <td>{dep.dep}</td> 

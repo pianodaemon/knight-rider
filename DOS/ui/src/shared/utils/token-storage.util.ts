@@ -9,7 +9,13 @@ export class TokenStorage {
   private static readonly COOKIE_STORAGE_TOKEN = 'token';
 
   public static isAuthenticated(): boolean {
-    return this.getToken() !== null;
+    let validToken: boolean = false;
+    try {
+      validToken = Boolean(jwt_decode(this.getToken() || ''));
+    } catch(e) {
+      // console.log('Invalid Token.', e);
+    }
+    return validToken;
   }
 
   public static getNewToken(): never {

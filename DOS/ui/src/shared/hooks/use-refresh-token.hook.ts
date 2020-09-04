@@ -14,7 +14,7 @@ export const useRefreshToken = (fn: RefreshOrLogout, dependencyList?: any[]): vo
   const cb = useRef(fn);
   cb.current = fn;
   const isAuthenticated: boolean = TokenStorage.isAuthenticated();
-  const expirationTime: number = (Number(isAuthenticated ? TokenStorage.getTokenClaims()?.exp : 0) * 1000) - new Date().getTime();
+  const expirationTime: number = (Number(isAuthenticated ? TokenStorage.getTokenClaims()?.exp || 0 : 0) * 1000) - new Date().getTime();
   const canRefresh: boolean = expirationTime <= REFRESH_THRESHOLD_MS && expirationTime > REFRESH_TIMEOUT_MS;
   useEffect(() => {
     const [refreshing] = dl || [];

@@ -1,4 +1,5 @@
 import React from 'react';
+import clsx from 'clsx';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -51,6 +52,11 @@ const useStyles = makeStyles((theme: Theme) =>
         backgroundColor: 'rgb(0,0,0,.3)',
       },
     },
+    hideDownMd: {
+      [theme.breakpoints.down('lg')]: {
+        display: 'none',
+      },
+    }
   }),
 );
 
@@ -73,17 +79,13 @@ type Props = {
 };
 
 export const MenuCard: (props: Props) => any = (props: Props) => {
-  const classes = useStyles();
-  // const [expanded, setExpanded] = React.useState(false);
   const { item } = props;
-  /*
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-  */
-
+  const classes = useStyles();
   return (
-    <Card className={classes.root} style={{backgroundColor: item.color}}>
+    <Card
+      className={clsx(classes.root, Boolean(item.hide) && classes.hideDownMd)}
+      style={{backgroundColor: item.color, visibility: Boolean(item.hide) ? 'hidden' : 'visible' }}
+    >
       <CardHeader
         className={classes.cardHeaderRoot}
         avatar={

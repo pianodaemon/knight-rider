@@ -40,9 +40,9 @@ function* checkAuthWorker(): Generator<any, any, any> {
       yield put(loadCatalogResultsReportCYTGAction());
       return;
     }
-    throw new Error('Not Logged In!');
+    // throw new Error('Not Logged In!');
   } catch (e) {
-    // yield console.log(e);
+    yield console.log(e, 'Authentication Error.');
   }
 }
 
@@ -61,6 +61,7 @@ const authReducerHandlers = {
   [CHECK_AUTH_LOGGED_IN]: (state: any) => {
     return {
       ...state,
+      claims: TokenStorage.getTokenClaims(),
       signedIn: true,
       checked: true,
     };

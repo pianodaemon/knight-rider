@@ -32,7 +32,7 @@ function* updateAuditWorker(action: any): Generator<any, any, any> {
     yield put(loadCatalogObsSFPAction());
     yield put(
       notificationAction({
-        message: `Auditoría ${result.id} ha sido actualizada!`,
+        message: `¡Auditoría ${result.id} ha sido actualizada!`,
       })
     );
   } catch (e) {

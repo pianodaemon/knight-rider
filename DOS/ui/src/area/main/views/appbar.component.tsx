@@ -38,6 +38,7 @@ import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import { useRefreshToken } from 'src/shared/hooks/use-refresh-token.hook';
+import { BreadcrumbsBar } from 'src/area/main/views/breadcrumbs.component';
 
 type Props = {
   logoutAction: Function,
@@ -158,8 +159,14 @@ export function AppBarComponent(props: Props) {
     if (isAuthenticated) {
       // Token is close to expiry, then try to refresh
       // Token has expired, logout
-      return canRefresh ? refreshTokenAuthAction() : logoutAction();
+      return canRefresh ? refreshTokenAuthAction() : logoutAction({history: customHistory});
     }
+    /*
+    // @todo de-authenticate use case
+    if (checked && !isAuthenticated) {
+      logoutAction({history: customHistory});
+    }
+    */
   }, [refreshing, isLoggedIn]);
 
   const breadcrumbNameMap: { [key: string]: { [key: string]: any } } = {
@@ -310,7 +317,7 @@ export function AppBarComponent(props: Props) {
       >
         <Toolbar className={classes.toolbar}>
           <div className={classes.menuAndImage}>
-            {(isLoggedIn && checked) && (
+            {(isLoggedIn && checked) && false && (
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -457,7 +464,9 @@ export function AppBarComponent(props: Props) {
         })}
       >
         <div className={classes.drawerHeaderMargin} />
-        {/* @todo Breadcrum */}
+        <Router history={customHistory}>
+          {(isLoggedIn && checked) && <BreadcrumbsBar />}
+        </Router>
         <AppRoutesContainer history={customHistory} />
       </main>
     </div>

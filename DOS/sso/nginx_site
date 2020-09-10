@@ -7,7 +7,7 @@ server {
         proxy_pass http://localhost:10090/;
 
         set $cors '';
-        if ($http_origin ~ '^https?://(localhost|localhost:3000|ui_obs)') {
+        if ($http_origin ~ '^https?://(localhost|localhost:3000|ui_obs|.*\.ngrok\.io)') {
             set $cors 'true';
         }
         

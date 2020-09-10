@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { resolvePermission } from 'src/shared/utils/permissions.util';
 import {
   authReducer,
   JWT,
@@ -29,4 +30,17 @@ export const isLoadingSelector = createSelector(
 export const refreshingSelector = createSelector(
   sliceSelector,
   (slice: any): boolean => slice.refreshing
+);
+
+export const permissionSelector = createSelector(
+  sliceSelector,
+  permissions =>
+    (
+      app: string,
+      permission: string
+    ) => resolvePermission(
+      permissions.claims?.authorities,
+      app,
+      permission
+    )
 );

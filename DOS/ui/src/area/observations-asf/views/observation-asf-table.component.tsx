@@ -6,6 +6,7 @@ import MaterialTable, { MTableToolbar } from 'material-table';
 import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 import { ObservationASF } from '../state/observations-asf.reducer';
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
   removeObservationASFAction: Function,
   loading: boolean,
   paging: any,
+  isAllowed: Function,
 };
 
 const useStyles = makeStyles(() =>
@@ -36,6 +38,7 @@ export const ObservationASFTable = (props: Props) => {
     observations,
     paging,
     removeObservationASFAction,
+    isAllowed,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -148,6 +151,7 @@ export const ObservationASFTable = (props: Props) => {
                   startIcon={<PostAddIcon />}
                   size="medium"
                   onClick={() => history.push('/observation-asf/create')}
+                  disabled={!isAllowed('ASFP', PERMISSIONS.CREATE)}
                 >
                   Agregar Observaciones Preliminares ASF
                 </Button>
@@ -162,12 +166,14 @@ export const ObservationASFTable = (props: Props) => {
           tooltip: 'Visualizar Observación',
           onClick: (event, rowData: any) =>
             history.push(`/observation-asf/${rowData.id}/view`),
+          disabled: !isAllowed('ASFP', PERMISSIONS.READ),
         },
         {
           icon: 'edit',
           tooltip: 'Editar Observación',
           onClick: (event, rowData: any) =>
             history.push(`/observation-asf/${rowData.id}/edit`),
+          disabled: !isAllowed('ASFP', PERMISSIONS.UPDATE)
         },
         {
           icon: 'delete',
@@ -182,6 +188,7 @@ export const ObservationASFTable = (props: Props) => {
               removeObservationASFAction(rowData.id);
             }
           },
+          disabled: !isAllowed('ASFP', PERMISSIONS.DELETE)
         },
       ]}
       isLoading={loading}

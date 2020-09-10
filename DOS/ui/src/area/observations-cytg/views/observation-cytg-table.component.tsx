@@ -7,6 +7,7 @@ import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import { ObservationCYTG } from '../state/observations-cytg.reducer';
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 
 type Props = {
   observations: Array<ObservationCYTG>,
@@ -14,6 +15,7 @@ type Props = {
   removeObservationCYTGAction: Function,
   loading: boolean,
   paging: any,
+  isAllowed: Function,
 };
 
 const useStyles = makeStyles(() =>
@@ -36,6 +38,7 @@ export const ObservationCYTGTable = (props: Props) => {
     observations,
     paging,
     removeObservationCYTGAction,
+    isAllowed,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -142,6 +145,7 @@ export const ObservationCYTGTable = (props: Props) => {
                   startIcon={<PostAddIcon />}
                   size="medium"
                   onClick={() => history.push('/observation-cytg/create')}
+                  disabled={!isAllowed('CYTP', PERMISSIONS.CREATE)}
                 >
                   Agregar Observaciones Preliminares CyTG
                 </Button>
@@ -156,12 +160,14 @@ export const ObservationCYTGTable = (props: Props) => {
           tooltip: 'Visualizar Observación',
           onClick: (event, rowData: any) =>
             history.push(`/observation-cytg/${rowData.id}/view`),
+          disabled: !isAllowed('CYTP', PERMISSIONS.READ),
         },
         {
           icon: 'edit',
           tooltip: 'Editar Observación',
           onClick: (event, rowData: any) =>
             history.push(`/observation-cytg/${rowData.id}/edit`),
+          disabled: !isAllowed('CYTP', PERMISSIONS.UPDATE),
         },
         {
           icon: 'delete',
@@ -176,6 +182,7 @@ export const ObservationCYTGTable = (props: Props) => {
               removeObservationCYTGAction(rowData.id);
             }
           },
+          disabled: !isAllowed('CYTP', PERMISSIONS.DELETE),
         },
       ]}
       isLoading={loading}

@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import { ResultsReportASENLTable } from './results-report-asenl-table.component';
 import { loadResultsReportASENLAction } from '../state/usecases/load-results-report-asenl.usecase';
 import { removeResultsReportASENLAction } from '../state/usecases/remove-results-report-asenl.usecase';
+import { permissionSelector } from 'src/area/auth/state/auth.selectors';
 
 import {
   isLoadingSelector,
@@ -19,6 +20,7 @@ function mapStateToProps(state: any) {
     reports: reportsCatalogSelector(state),
     loading: isLoadingSelector(state),
     paging: pagingSelector(state),
+    isAllowed: permissionSelector(state),
   };
 }
 

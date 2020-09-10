@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import { UsersTable } from './users-table.component';
 import { loadUsersAction } from '../state/usecases/load-users.usecase';
 import { removeUserAction } from '../state/usecases/remove-user.usecase';
+import { permissionSelector } from 'src/area/auth/state/auth.selectors';
 
 import {
   isLoadingSelector,
@@ -19,6 +20,7 @@ function mapStateToProps(state: any) {
     users: usersCatalogSelector(state),
     loading: isLoadingSelector(state),
     paging: pagingSelector(state),
+    isAllowed: permissionSelector(state),
   };
 }
 

@@ -5,6 +5,7 @@ import MaterialTable, { MTableToolbar } from 'material-table';
 import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 import { ResultsReportASENL } from '../state/results-report-asenl.reducer';
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
   removeResultsReportASENLAction: Function,
   loading: boolean,
   paging: any,
+  isAllowed: Function,
 };
 
 export const ResultsReportASENLTable = (props: Props) => {
@@ -22,6 +24,7 @@ export const ResultsReportASENLTable = (props: Props) => {
     reports,
     paging,
     removeResultsReportASENLAction,
+    isAllowed,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -112,6 +115,7 @@ export const ResultsReportASENLTable = (props: Props) => {
                   startIcon={<PostAddIcon />}
                   size="medium"
                   onClick={() => history.push('/results-report-asenl/create')}
+                  disabled={!isAllowed('ASER', PERMISSIONS.CREATE)}
                 >
                   Agregar Informe de Resultados ASENL
                 </Button>
@@ -126,12 +130,14 @@ export const ResultsReportASENLTable = (props: Props) => {
           tooltip: 'Visualizar Informe de Resultados ASENL',
           onClick: (event, rowData: any) =>
             history.push(`/results-report-asenl/${rowData.id}/view`),
+          disabled: !isAllowed('ASER', PERMISSIONS.READ),
         },
         {
           icon: 'edit',
           tooltip: 'Editar Informe de Resultados ASENL',
           onClick: (event, rowData: any) =>
             history.push(`/results-report-asenl/${rowData.id}/edit`),
+          disabled: !isAllowed('ASER', PERMISSIONS.UPDATE),
         },
         {
           icon: 'delete',
@@ -146,6 +152,7 @@ export const ResultsReportASENLTable = (props: Props) => {
               removeResultsReportASENLAction(rowData.id);
             }
           },
+          disabled: !isAllowed('ASER', PERMISSIONS.DELETE),
         },
       ]}
       isLoading={loading}

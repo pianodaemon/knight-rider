@@ -289,7 +289,7 @@ export const TabPanelMenu = () => {
     setValue(newValue);
   };
   const permissions: any = useSelector((state: any) => state.authSlice);
-  const isVisible = (app: string): boolean => resolvePermission(permissions.claims.authorities, app);
+  const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   return (
     <div className={classes.root}>
       <AppBar position="static" color="default">

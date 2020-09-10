@@ -7,6 +7,7 @@ import { Observation } from 'src/area/auditories/state/observations.reducer';
 import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 
 type Props = {
   observations: Array<Observation>,
@@ -14,6 +15,7 @@ type Props = {
   removeObservationSFPAction: Function,
   loading: boolean,
   paging: any,
+  isAllowed: Function,
 };
 
 const useStyles = makeStyles(() =>
@@ -36,6 +38,7 @@ export const ObservationSFPTable = (props: Props) => {
     observations,
     paging,
     removeObservationSFPAction,
+    isAllowed,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -147,6 +150,7 @@ export const ObservationSFPTable = (props: Props) => {
                   startIcon={<PostAddIcon />}
                   size="medium"
                   onClick={() => history.push('/observation-sfp/create')}
+                  disabled={!isAllowed('SFPR', PERMISSIONS.CREATE)}
                 >
                   Agregar Observación SFP
                 </Button>
@@ -161,12 +165,14 @@ export const ObservationSFPTable = (props: Props) => {
           tooltip: 'Visualizar Observación',
           onClick: (event, rowData: any) =>
             history.push(`/observation-sfp/${rowData.id}/view`),
+          disabled: !isAllowed('SFPR', PERMISSIONS.READ),
         },
         {
           icon: 'edit',
           tooltip: 'Editar Observación',
           onClick: (event, rowData: any) =>
             history.push(`/observation-sfp/${rowData.id}/edit`),
+          disabled: !isAllowed('SFPR', PERMISSIONS.UPDATE),
         },
         {
           icon: 'delete',
@@ -181,6 +187,7 @@ export const ObservationSFPTable = (props: Props) => {
               removeObservationSFPAction(rowData.id);
             }
           },
+          disabled: !isAllowed('SFPR', PERMISSIONS.DELETE),
         },
       ]}
       isLoading={loading}

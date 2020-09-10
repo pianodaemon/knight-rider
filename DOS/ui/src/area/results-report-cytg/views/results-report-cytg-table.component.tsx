@@ -6,6 +6,7 @@ import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import { ResultsReportCYTG } from '../state/results-report-cytg.reducer';
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 
 type Props = {
   reports: Array<ResultsReportCYTG>,
@@ -13,6 +14,7 @@ type Props = {
   removeResultsReportCYTGAction: Function,
   loading: boolean,
   paging: any,
+  isAllowed: Function,
 };
 
 export const ResultsReportCYTGTable = (props: Props) => {
@@ -22,6 +24,7 @@ export const ResultsReportCYTGTable = (props: Props) => {
     reports,
     paging,
     removeResultsReportCYTGAction,
+    isAllowed,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -112,6 +115,7 @@ export const ResultsReportCYTGTable = (props: Props) => {
                   startIcon={<PostAddIcon />}
                   size="medium"
                   onClick={() => history.push('/results-report-cytg/create')}
+                  disabled={!isAllowed('CYTR', PERMISSIONS.CREATE)}
                 >
                   Agregar Informe de Resultados CYTG
                 </Button>
@@ -126,12 +130,14 @@ export const ResultsReportCYTGTable = (props: Props) => {
           tooltip: 'Visualizar Informe de Resultados CYTG',
           onClick: (event, rowData: any) =>
             history.push(`/results-report-cytg/${rowData.id}/view`),
+          disabled: !isAllowed('CYTR', PERMISSIONS.READ),
         },
         {
           icon: 'edit',
           tooltip: 'Editar Informe de Resultados CYTG',
           onClick: (event, rowData: any) =>
             history.push(`/results-report-cytg/${rowData.id}/edit`),
+          disabled: !isAllowed('CYTR', PERMISSIONS.UPDATE),
         },
         {
           icon: 'delete',
@@ -146,6 +152,7 @@ export const ResultsReportCYTGTable = (props: Props) => {
               removeResultsReportCYTGAction(rowData.id);
             }
           },
+          disabled: !isAllowed('CYTR', PERMISSIONS.DELETE),
         },
       ]}
       isLoading={loading}

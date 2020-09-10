@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import { ObservationASFTable } from './observation-asf-table.component';
 import { loadObservationsASFAction } from '../state/usecases/load-observations-asf.usecase';
 import { removeObservationASFAction } from '../state/usecases/remove-observation-asf.usecase';
+import { permissionSelector } from 'src/area/auth/state/auth.selectors';
 
 import {
   isLoadingSelector,
@@ -19,6 +20,7 @@ function mapStateToProps(state: any) {
     observations: observationsCatalogSelector(state),
     loading: isLoadingSelector(state),
     paging: pagingSelector(state),
+    isAllowed: permissionSelector(state),
   };
 }
 

@@ -6,6 +6,7 @@ import MaterialTable, { MTableToolbar } from 'material-table';
 import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 import { ObservationASENL } from '../state/observations-asenl.reducer';
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
   removeObservationASENLAction: Function,
   loading: boolean,
   paging: any,
+  isAllowed: Function,
 };
 
 const useStyles = makeStyles(() =>
@@ -36,6 +38,7 @@ export const ObservationASENLTable = (props: Props) => {
     observations,
     paging,
     removeObservationASENLAction,
+    isAllowed,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -142,6 +145,7 @@ export const ObservationASENLTable = (props: Props) => {
                   startIcon={<PostAddIcon />}
                   size="medium"
                   onClick={() => history.push('/observation-asenl/create')}
+                  disabled={!isAllowed('ASEP', PERMISSIONS.CREATE)}
                 >
                   Agregar Observaciones Preliminares ASENL
                 </Button>
@@ -156,12 +160,14 @@ export const ObservationASENLTable = (props: Props) => {
           tooltip: 'Visualizar Observación',
           onClick: (event, rowData: any) =>
             history.push(`/observation-asenl/${rowData.id}/view`),
+          disabled: !isAllowed('ASEP', PERMISSIONS.READ),
         },
         {
           icon: 'edit',
           tooltip: 'Editar Observación',
           onClick: (event, rowData: any) =>
             history.push(`/observation-asenl/${rowData.id}/edit`),
+          disabled: !isAllowed('ASEP', PERMISSIONS.UPDATE)
         },
         {
           icon: 'delete',
@@ -176,6 +182,7 @@ export const ObservationASENLTable = (props: Props) => {
               removeObservationASENLAction(rowData.id);
             }
           },
+          disabled: !isAllowed('ASEP', PERMISSIONS.DELETE)
         },
       ]}
       isLoading={loading}

@@ -1,9 +1,12 @@
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
+
 type Permissions = {
-  C: "CREATE",
-  R: "READ",
-  U: "UPDATE",
-  D: "DELETE",
-  F: "FULL ACCESS",
+  CREATE: "C",
+  READ: "R",
+  UPDATE: "U",
+  DELETE: "D",
+  FULLACCESS: "F",
+  [permission: string]: string,
 };
 
 type App = {
@@ -32,8 +35,12 @@ type App = {
   USR: "Usuarios",
 };
 
-// const sampleAuthorities: string = "ASEP=F|ASER=F|ASFP=F|ASFR=F|AUD=F|CYTP=F|CYTR=F|DEP=R,U|R52=R|R53=R|R54=R|R55=R|R56=R|R57=R|R58=R|R59=R|R60=R|R61=R|R62=R|R63=R|R64=R|SFPR=F|USR=F";
-
+/**
+ * Handling Permissions
+ * Backend Data: "MODULE=PERMISSION,PERMISSION..."
+ * Sample: "ASEP=F|ASER=F|ASFP=F|ASFR=F|AUD=F|CYTP=F|CYTR=F|DEP=R,U|R52=R|R53=R";
+ *
+ */
 function mapPermissions(authorities: string): Map<string, Set<string>> {
   const permissionsMap = new Map();
   authorities
@@ -56,7 +63,14 @@ export function resolvePermission(authorities: string, app: string, permission?:
   } else if (app && !permission) {
     return permissions.has(app);
   } else if (app && permission) {
-    return Boolean(permissions.has(app) && permissions.get(app)?.has(permission));
+    return Boolean(permissions.has(app)
+    && (
+      permissions.get(app)?.has(permission) ||
+      (
+        Object.values(PERMISSIONS).includes(permission) &&
+        permissions.get(app)?.has(PERMISSIONS.FULLACCESS)
+      )
+    ));
   }
   return false;
 }

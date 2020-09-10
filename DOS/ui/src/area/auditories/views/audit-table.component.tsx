@@ -5,6 +5,7 @@ import MaterialTable, { MTableToolbar } from 'material-table';
 import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 import { Audit } from '../state/audits.reducer';
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
   removeAuditAction: Function,
   loading: boolean,
   paging: any,
+  isAllowed: Function,
 };
 
 export const AuditTable = (props: Props) => {
@@ -22,6 +24,7 @@ export const AuditTable = (props: Props) => {
     removeAuditAction,
     loading,
     paging,
+    isAllowed,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -113,6 +116,7 @@ export const AuditTable = (props: Props) => {
                   startIcon={<PostAddIcon />}
                   size="medium"
                   onClick={() => history.push('/audit/create')}
+                  disabled={!isAllowed('AUD', PERMISSIONS.CREATE)}
                 >
                   Agregar Auditoría
                 </Button>
@@ -127,6 +131,7 @@ export const AuditTable = (props: Props) => {
           tooltip: 'Editar Auditoría',
           onClick: (event, rowData: any) =>
             history.push(`/audit/${rowData.id}/edit`),
+          disabled: !isAllowed('AUD', PERMISSIONS.UPDATE),
         },
         {
           icon: 'delete',
@@ -141,6 +146,7 @@ export const AuditTable = (props: Props) => {
               removeAuditAction(rowData.id);
             }
           },
+          disabled: !isAllowed('AUD', PERMISSIONS.DELETE),
         },
       ]}
       isLoading={loading}

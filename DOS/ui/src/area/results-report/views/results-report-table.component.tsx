@@ -7,6 +7,7 @@ import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import { ResultsReport } from '../state/results-report.reducer';
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 
 type Props = {
   reports: Array<ResultsReport>,
@@ -14,6 +15,7 @@ type Props = {
   removeResultsReportAction: Function,
   loading: boolean,
   paging: any,
+  isAllowed: Function,
 };
 
 const useStyles = makeStyles(() =>
@@ -36,6 +38,7 @@ export const ResultsReportTable = (props: Props) => {
     reports,
     paging,
     removeResultsReportAction,
+    isAllowed,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -143,6 +146,7 @@ export const ResultsReportTable = (props: Props) => {
                   startIcon={<PostAddIcon />}
                   size="medium"
                   onClick={() => history.push('/results-report/create')}
+                  disabled={!isAllowed('ASFR', PERMISSIONS.CREATE)}
                 >
                   Agregar Observación de Resultados ASF
                 </Button>
@@ -157,12 +161,14 @@ export const ResultsReportTable = (props: Props) => {
           tooltip: 'Visualizar Observación de Resultados ASF',
           onClick: (event, rowData: any) =>
             history.push(`/results-report/${rowData.id}/view`),
+          disabled: !isAllowed('ASFR', PERMISSIONS.READ),
         },
         {
           icon: 'edit',
           tooltip: 'Editar Observación de Resultados ASF',
           onClick: (event, rowData: any) =>
             history.push(`/results-report/${rowData.id}/edit`),
+          disabled: !isAllowed('ASFR', PERMISSIONS.UPDATE),
         },
         {
           icon: 'delete',
@@ -177,6 +183,7 @@ export const ResultsReportTable = (props: Props) => {
               removeResultsReportAction(rowData.id);
             }
           },
+          disabled: !isAllowed('ASFR', PERMISSIONS.DELETE),
         },
       ]}
       isLoading={loading}

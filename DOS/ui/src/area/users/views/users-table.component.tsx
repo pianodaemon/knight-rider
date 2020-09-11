@@ -6,6 +6,7 @@ import MaterialTable, { MTableToolbar } from 'material-table';
 import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 
 type Props = {
   users: Array<User>,
@@ -13,10 +14,11 @@ type Props = {
   removeUserAction: Function,
   loading: boolean,
   paging: any,
+  isAllowed: Function,
 };
 
 export const UsersTable = (props: Props) => {
-  const { users, loadUsersAction, removeUserAction, loading, paging } = props;
+  const { users, loadUsersAction, removeUserAction, loading, paging, isAllowed } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
   const customSort = () => 0;
@@ -122,6 +124,7 @@ export const UsersTable = (props: Props) => {
           tooltip: 'Editar Usuario',
           onClick: (event, rowData: any) =>
             history.push(`/user/${rowData.id}/edit`),
+          disabled: !isAllowed('USR', PERMISSIONS.UPDATE),
         },
         {
           icon: 'delete',
@@ -136,6 +139,7 @@ export const UsersTable = (props: Props) => {
               removeUserAction(rowData.id);
             }
           },
+          disabled: !isAllowed('USR', PERMISSIONS.DELETE),
         },
       ]}
       isLoading={loading}

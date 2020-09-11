@@ -466,8 +466,8 @@ export function AppBarComponent(props: Props) {
         <div className={classes.drawerHeaderMargin} />
         <Router history={customHistory}>
           {(isLoggedIn && checked) && <BreadcrumbsBar />}
+          <AppRoutesContainer history={customHistory} />
         </Router>
-        <AppRoutesContainer history={customHistory} />
       </main>
     </div>
   );

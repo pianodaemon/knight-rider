@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import { ResultsReportCYTGTable } from './results-report-cytg-table.component';
 import { loadResultsReportCYTGAction } from '../state/usecases/load-results-report-cytg.usecase';
 import { removeResultsReportCYTGAction } from '../state/usecases/remove-results-report-cytg.usecase';
+import { permissionSelector } from 'src/area/auth/state/auth.selectors';
 
 import {
   isLoadingSelector,
@@ -19,6 +20,7 @@ function mapStateToProps(state: any) {
     reports: reportsCatalogSelector(state),
     loading: isLoadingSelector(state),
     paging: pagingSelector(state),
+    isAllowed: permissionSelector(state),
   };
 }
 

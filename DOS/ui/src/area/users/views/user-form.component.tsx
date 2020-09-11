@@ -118,7 +118,7 @@ export const UserForm = (props: Props) => {
   } = props;
   const classes = useStyles();
   const history = useHistory();
-  const { id } = useParams();
+  const { id } = useParams<any>();
   const initialValues = {
     username: '',
     passwd: '',

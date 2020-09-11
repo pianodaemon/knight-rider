@@ -1,0 +1,116 @@
+App            Permisos posibles       Filtrar data según
+                                       Dirección del user?
+
+Auditorías     C,R,U,D,Full            No aplica
+Usuarios       C,R,U,D,Full            No aplica
+SFP   IRes     C,R,U,D,Full            Sí/No
+ASF   Pre      C,R,U,D,Full            Sí/No
+ASF   IRes     C,R,U,D,Full            Sí/No
+ASENL Pre      C,R,U,D,Full            Sí/No
+ASENL IRes     C,R,U,D,Full            Sí/No
+CyTG  Pre      C,R,U,D,Full            Sí/No
+CyTG  IRes     C,R,U,D,Full            Sí/No
+Reporte 53     R                       Sí/No
+Reporte n...   R                       Sí/No
+
+
+**********************************************************************
+*                               EJEMPLOS                             *
+**********************************************************************
+La finalidad de estos es verificar si es posible cubrir  todos los
+perfiles de usuarios con los permisos definidos arriba.
+
+
+--------------------------CONTRALOR-----------------------------------
+SFP IRes       R                       No
+ASF Pre        R                       No
+ASF IRes       R                       No
+ASENL Pre      R                       No
+ASENL IRes     R                       No
+CyTG Pre       R                       No
+CyTG IRes      R                       No
+Reporte 53     R                       No
+Reporte 54     R                       No
+Reporte 55     R                       No
+Reporte 56     R                       No
+Reporte 57     R                       No
+Reporte 58     R                       No
+Reporte 59     R                       No
+
+El Contralor puede consultar todas las apps (excepto Usuarios y
+Auditorías) y además puede ver data de Central, Paraestatal y Obras
+(no se aplica el filtro por Dirección).
+
+
+
+-----------------------AUDITOR-------------------------
+SFP IRes       Full                    Sí
+Reporte 53     Full                    Sí
+
+El Auditor tiene acceso total a dos apps pero únicamente
+puede ver data filtrada por su Dirección asignada.
+
+
+
+------------ADMINISTRADOR DE SISTEMA-----------------
+Usuarios       Full                    No aplica
+Auditorías     Full                    No aplica
+
+El Administrador de Sistema tiene acceso total a los
+Usuarios y Auditorías. En su caso no aplica el filtro por
+Dirección.
+
+
+
+--------------------DIRECTOR--------------------------
+SFP IRes       R                       Sí
+ASF Pre        R                       Sí
+ASF IRes       R                       Sí
+ASENL Pre      R                       Sí
+ASENL IRes     R                       Sí
+CyTG Pre       R                       Sí
+CyTG IRes      R                       Sí
+Reporte 53     R                       Sí
+Reporte 54     R                       Sí
+Reporte 55     R                       Sí
+Reporte 56     R                       Sí
+Reporte 57     R                       Sí
+Reporte 58     R                       Sí
+Reporte 59     R                       Sí
+
+El Director puede consultar todas las apps (excepto Usuarios y
+Auditorías) pero únicamente puede ver data de su Dirección asignada.
+
+
+
+------------------------COORDINADOR---------------------------
+SFP IRes       R,U                     Sí
+ASF Pre        R,U,D                   Sí
+ASF IRes       R,U,D                   Sí
+Reporte 53     R                       No
+Reporte 54     R                       No
+
+El Coordinador puede consultar y modificar algunas apps de SFP y ASF
+con data filtrada según su Dirección y puede también consultar un
+par de Reportes con data de las tres Direcciones.
+
+
+
+**********************************************************************
+*            HUELLA/RASTRO DEL USER QUE ALTERA BD                    *
+**********************************************************************
+Tablas a las que se agregará el user_id que CREA y/o MODIFICA una
+entidad de BD:
+
+audits
+users
+observaciones_sfp
+observaciones_pre_asf
+observaciones_ires_asf
+observaciones_pre_asenl
+observaciones_ires_asenl
+observaciones_pre_cytg
+observaciones_ires_cytg
+
+Además de actualizar el schema, tienen que modificarse los endpoints y
+stored procedures que crean/actualizan registros en esas tablas.

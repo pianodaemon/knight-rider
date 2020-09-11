@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux'
 import { History } from 'history';
-import { Router, Switch, Route, Redirect } from 'react-router-dom';
-import { resolvePermission } from 'src/shared/utils/permissions.util';
+import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom';
 import { AuditTableContainer } from '../../auditories/views/audit-table.container';
 // import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
@@ -38,12 +36,14 @@ import { Reports59Container } from '../../reports/views/reports59.container';
 import { Reports61Container } from '../../reports/views/reports61.container';
 import { Reports63Container } from '../../reports/views/reports63.container';
 import { TabPanelMenu } from './home-screen.component';
+import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 
 type Props = {
   history: History,
   checkAuthAction: Function,
   isLoggedIn: boolean,
   checked: boolean,
+  isAllowed: Function,
 };
 
 type CustomRoute = {
@@ -103,7 +103,7 @@ const routes: Array<CustomRoute> = [
   },
   {
     props: {
-      path: ['/observation-asf/create', '/observation-asf/:id/:action'],
+      path: ['/observation-asf/create', '/observation-asf/:id/:action(edit|view)'],
       exact: true,
     },
     component: <ObservationsASFFormContainer />,
@@ -119,7 +119,7 @@ const routes: Array<CustomRoute> = [
   },
   {
     props: {
-      path: ['/observation-sfp/create', '/observation-sfp/:id/:action'],
+      path: ['/observation-sfp/create', '/observation-sfp/:id/:action(edit|view)'],
       exact: true,
     },
     component: <ObservationsSFPFormContainer />,
@@ -135,7 +135,7 @@ const routes: Array<CustomRoute> = [
   },
   {
     props: {
-      path: ['/observation-asenl/create', '/observation-asenl/:id/:action'],
+      path: ['/observation-asenl/create', '/observation-asenl/:id/:action(edit|view)'],
       exact: true,
     },
     component: <ObservationASENLFormContainer />,
@@ -143,7 +143,7 @@ const routes: Array<CustomRoute> = [
   },
   {
     props: {
-      path: ['/results-report/create', '/results-report/:id/:action'],
+      path: ['/results-report/create', '/results-report/:id/:action(edit|view)'],
       exact: true,
     },
     component: <ResultsReportFormContainer />,
@@ -161,7 +161,7 @@ const routes: Array<CustomRoute> = [
     props: {
       path: [
         '/results-report-asenl/create',
-        '/results-report-asenl/:id/:action',
+        '/results-report-asenl/:id/:action(edit|view)',
       ],
       exact: true,
     },
@@ -186,7 +186,7 @@ const routes: Array<CustomRoute> = [
   },
   {
     props: {
-      path: ['/observation-cytg/create', '/observation-cytg/:id/:action'],
+      path: ['/observation-cytg/create', '/observation-cytg/:id/:action(edit|view)'],
       exact: true,
     },
     component: <ObservationCYTGFormContainer />,
@@ -196,7 +196,7 @@ const routes: Array<CustomRoute> = [
     props: {
       path: [
         '/results-report-cytg/create',
-        '/results-report-cytg/:id/:action',
+        '/results-report-cytg/:id/:action(edit|view)',
       ],
       exact: true,
     },
@@ -335,29 +335,55 @@ export const AppRoutes = (props: Props) => {
     props.checkAuthAction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const permissions: any = useSelector((state: any) => state.authSlice);
-  const hasAccess = (app: string): boolean => resolvePermission(permissions.claims?.authorities, app);
+  const { isAllowed } = props;
+  const match: any | null = useRouteMatch([
+    '/:module/:view(list|create)',
+    '/:module/:id/:action(edit|view)',
+  ]);
+  const hasAccess = (app: string | undefined) => {
+    if (!app) {
+      return true;
+    }
+    if (
+      !(match && match.params && (match.params.view || match.params.action))
+    ) {
+      return isAllowed(app);
+    }
+    const { action, view } = match.params;
+    const type = action || view;
+    switch(type) {
+      case 'create':
+        return isAllowed(app, PERMISSIONS.CREATE);
+      case 'list':
+      case 'view':
+        return isAllowed(app, PERMISSIONS.READ);
+      case 'edit':
+        return isAllowed(app, PERMISSIONS.UPDATE);
+      default:
+        return false;
+    }
+  };
   return (
-    <Router history={props.history}>
-        {props.checked && (
-          !props.isLoggedIn ? (
-          <>
-            <Route path="*">
-              <LoginFormContainer />
+    <>
+    {props.checked && (
+      !props.isLoggedIn ? (
+      <>
+        <Route path="*">
+          <LoginFormContainer />
+        </Route>
+      </>
+      ) : (
+      <Switch>
+        {routes.map((route: CustomRoute, index: number) => {
+          return (
+            <Route {...route.props} key={`${index}-${route.app}`}>
+              {hasAccess(route.app) ? route.component : <Unauthorized />}
             </Route>
-          </>
-          ) : (
-          <Switch>
-            {routes.map((route: CustomRoute, index: number) => {
-              return (
-                <Route {...route.props} key={`${index}-${route.app}`}>
-                  {!route.app || hasAccess(route.app) ? route.component : <Unauthorized />}
-                </Route>
-              );
-            })}
-          </Switch>
-          )
-        )}
-    </Router>
+          );
+        })}
+      </Switch>
+      )
+    )}
+    </>
   );
 };

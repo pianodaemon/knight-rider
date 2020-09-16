@@ -45,7 +45,7 @@ Auditorías) y además puede ver data de Central, Paraestatal y Obras
 
 -----------------------AUDITOR-------------------------
 SFP IRes       Full                    Sí
-Reporte 53     Full                    Sí
+Reporte 53     R                       Sí
 
 El Auditor tiene acceso total a dos apps pero únicamente
 puede ver data filtrada por su Dirección asignada.

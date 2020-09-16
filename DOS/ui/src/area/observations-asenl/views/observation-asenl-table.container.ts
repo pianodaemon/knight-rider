@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
+import { permissionSelector, currentUserDivisionIdSelector } from 'src/area/auth/state/auth.selectors';
 import { ObservationASENLTable } from './observation-asenl-table.component';
 import { loadObservationsASENLAction } from '../state/usecases/load-observations-asenl.usecase';
 import { removeObservationASENLAction } from '../state/usecases/remove-observation-asenl.usecase';
-import { permissionSelector } from 'src/area/auth/state/auth.selectors';
 
 import {
   isLoadingSelector,
@@ -20,6 +20,7 @@ function mapStateToProps(state: any) {
     observations: observationsCatalogSelector(state),
     loading: isLoadingSelector(state),
     paging: pagingSelector(state),
+    divisionId: currentUserDivisionIdSelector(state),
     isAllowed: permissionSelector(state),
   };
 }

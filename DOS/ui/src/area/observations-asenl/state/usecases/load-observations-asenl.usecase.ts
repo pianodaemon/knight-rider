@@ -1,6 +1,7 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
+import { currentUserDivisionIdSelector } from 'src/area/auth/state/auth.selectors';
 import { getObservations } from '../../service/observations-asenl.service';
 import { observationsASENLReducer } from '../observations-asenl.reducer';
 import { pagingSelector } from '../observations-asenl.selectors';
@@ -24,12 +25,14 @@ function* loadObservationsASENLWorker(action?: any): Generator<any, any, any> {
   try {
     const { per_page, page, order, order_by } = action.payload || {};
     const paging = yield select(pagingSelector);
+    const divisionId = yield select(currentUserDivisionIdSelector);
     const options = {
       ...action.payload,
       per_page: per_page || paging.per_page,
       page: page || paging.page,
       pages: paging.pages,
       order: order || paging.order,
+      ...(divisionId === 0 ? {} : {direccion_id: divisionId})
     };
     const result = yield call(getObservations, options);
     yield put(

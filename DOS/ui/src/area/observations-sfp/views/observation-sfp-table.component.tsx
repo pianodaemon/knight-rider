@@ -16,6 +16,7 @@ type Props = {
   loading: boolean,
   paging: any,
   isAllowed: Function,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -39,6 +40,7 @@ export const ObservationSFPTable = (props: Props) => {
     paging,
     removeObservationSFPAction,
     isAllowed,
+    divisionId,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -47,9 +49,11 @@ export const ObservationSFPTable = (props: Props) => {
   const sorting: boolean = false;
   const classes = useStyles();
   useEffect(() => {
-    loadObservationsSFPAction({ per_page: paging.per_page, order });
+    if (divisionId || divisionId === 0) {
+      loadObservationsSFPAction({ per_page: paging.per_page, order });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [divisionId]);
   const columns = [
     {
       title: 'ID',
@@ -93,6 +97,11 @@ export const ObservationSFPTable = (props: Props) => {
   ];
   return (
     <MaterialTable
+      localization={{
+        body: {
+          emptyDataSourceMessage: loading ? 'Cargando registros' : 'No hay registros para mostrar'
+        }
+      }}
       title="Observaciones de Resultados SFP"
       onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
         loadObservationsSFPAction({
@@ -112,6 +121,7 @@ export const ObservationSFPTable = (props: Props) => {
         actionsColumnIndex: columns.length,
         toolbar: true,
         toolbarButtonAlignment: 'right',
+        emptyRowsWhenPaging: false,
       }}
       components={{
         Pagination: (componentProps) => {

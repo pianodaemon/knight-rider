@@ -7,6 +7,11 @@ import {
 
 const sliceSelector = (state: any) => state[authReducer.sliceName];
 
+export const currentUserDivisionIdSelector = createSelector(
+  sliceSelector,
+  (slice: any) => slice.profile?.division_id
+);
+
 export const checkedSelector = createSelector(
   sliceSelector,
   (slice: any): boolean => slice.checked

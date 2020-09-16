@@ -12,6 +12,7 @@ import { loadCatalogResultsReportASENLAction } from 'src/area/results-report-ase
 import { loadCatalogResultsReportCYTGAction } from 'src/area/results-report-cytg/state/usecases/load-catalog.usecase';
 import { loadAuditCatalogAction } from 'src/area/auditories/state/usecases/load-audit-catalog.usecase';
 import { loadUsersCatalogAction } from 'src/area/users/state/usecases/load-users-catalog.usecase';
+import { loadUserProfileAction } from './load-user-profile.usecase';
 
 const postfix = '/app';
 const CHECK_AUTH = `CHECK_AUTH${postfix}`;
@@ -28,6 +29,8 @@ function* checkAuthWorker(): Generator<any, any, any> {
   try {
     if (TokenStorage.isAuthenticated()) {
       yield put(checkAuthLoggedInAction());
+      //User Profile
+      yield put(loadUserProfileAction());
       // Load all Form Catalogs
       yield put(loadCatalogObsSFPAction());
       yield put(loadCatalogObsASFAction());

@@ -16,6 +16,7 @@ type Props = {
   loading: boolean,
   paging: any,
   isAllowed: Function,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -39,6 +40,7 @@ export const ObservationASFTable = (props: Props) => {
     paging,
     removeObservationASFAction,
     isAllowed,
+    divisionId,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -47,9 +49,11 @@ export const ObservationASFTable = (props: Props) => {
   const sorting: boolean = false;
   const classes = useStyles();
   useEffect(() => {
-    loadObservationsASFAction({ per_page: paging.per_page, order });
+    if (divisionId || divisionId === 0) {
+      loadObservationsASFAction({ per_page: paging.per_page, order });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [divisionId]);
   const columns = [
     {
       title: 'ID',
@@ -94,6 +98,11 @@ export const ObservationASFTable = (props: Props) => {
   ];
   return (
     <MaterialTable
+      localization={{
+        body: {
+          emptyDataSourceMessage: loading ? 'Cargando registros' : 'No hay registros para mostrar'
+        }
+      }}
       title="Observaciones Preliminares ASF"
       onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
         loadObservationsASFAction({
@@ -113,6 +122,7 @@ export const ObservationASFTable = (props: Props) => {
         actionsColumnIndex: columns.length,
         toolbar: true,
         toolbarButtonAlignment: 'right',
+        emptyRowsWhenPaging: false,
       }}
       components={{
         Pagination: (componentProps) => {

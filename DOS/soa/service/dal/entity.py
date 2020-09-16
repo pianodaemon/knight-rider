@@ -77,8 +77,6 @@ def page_entities(table, offset, limit, order_by, order, search_params):
     entities = []
     for row in rows:
         r = dict(row)
-        if table == 'users':
-            del r['passwd']
         entities.append(r)
 
     return entities

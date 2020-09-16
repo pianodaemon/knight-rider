@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 9.6.17
--- Dumped by pg_dump version 12.3 (Ubuntu 12.3-1.pgdg18.04+1)
+-- Dumped by pg_dump version 12.4 (Ubuntu 12.4-1.pgdg18.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -88,6 +88,35 @@ ALTER TABLE public.seguimientos_obs_asf OWNER TO postgres;
 
 COMMENT ON TABLE public.seguimientos_obs_asf IS 'Seguimientos para una observacion de ASF';
 
+
+
+--
+-- Name: seguimientos_obs_cytg; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.seguimientos_obs_cytg (
+    observacion_id integer NOT NULL,
+    seguimiento_id integer DEFAULT 0 NOT NULL,
+    num_oficio_ires character varying NOT NULL,
+    fecha_notif_ires date NOT NULL,
+    fecha_vencimiento_ires date NOT NULL,
+    prorroga boolean DEFAULT false NOT NULL,
+    num_oficio_solic_prorroga character varying,
+    fecha_oficio_solic_prorroga date,
+    num_oficio_contest_prorroga character varying,
+    fecha_oficio_contest date,
+    fecha_vencimiento_ires_nueva date,
+    num_oficio_resp_dependencia character varying NOT NULL,
+    fecha_oficio_resp_dependencia date NOT NULL,
+    resp_dependencia text NOT NULL,
+    comentarios text NOT NULL,
+    estatus_seguimiento_id integer NOT NULL,
+    monto_solventado double precision DEFAULT 0 NOT NULL,
+    monto_pendiente_solventar double precision DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.seguimientos_obs_cytg OWNER TO postgres;
 
 
 
@@ -431,6 +460,18 @@ COMMENT ON TABLE public.estatus_ires_asf IS 'Catalogo de estatus para una obs de
 
 
 --
+-- Name: estatus_ires_cytg; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.estatus_ires_cytg (
+    id integer NOT NULL,
+    title character varying NOT NULL
+);
+
+
+ALTER TABLE public.estatus_ires_cytg OWNER TO postgres;
+
+--
 -- Name: estatus_pre_asenl; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -724,7 +765,8 @@ CREATE TABLE public.observaciones_pre_asenl (
     resultado_final_pub_id integer NOT NULL,
     blocked boolean DEFAULT false NOT NULL,
     hora_ult_cambio timestamp with time zone NOT NULL,
-    hora_creacion timestamp with time zone NOT NULL
+    hora_creacion timestamp with time zone NOT NULL,
+    observacion_ires_id integer DEFAULT 0 NOT NULL
 );
 
 
@@ -781,7 +823,8 @@ CREATE TABLE public.observaciones_pre_asf (
     estatus_criterio_int_id integer NOT NULL,
     blocked boolean DEFAULT false NOT NULL,
     hora_ult_cambio timestamp with time zone NOT NULL,
-    hora_creacion timestamp with time zone NOT NULL
+    hora_creacion timestamp with time zone NOT NULL,
+    observacion_ires_id integer DEFAULT 0 NOT NULL
 );
 
 
@@ -793,67 +836,6 @@ ALTER TABLE public.observaciones_pre_asf OWNER TO postgres;
 
 COMMENT ON TABLE public.observaciones_pre_asf IS 'Observaciones preliminares de ASF';
 
-
---
--- Name: observaciones_pre_cytg_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.observaciones_pre_cytg_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.observaciones_pre_cytg_seq OWNER TO postgres;
-
---
--- Name: observaciones_pre_cytg; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.observaciones_pre_cytg (
-    id integer DEFAULT nextval('public.observaciones_pre_cytg_seq'::regclass) NOT NULL,
-    periodo_revision_de date NOT NULL,
-    periodo_revision_a date NOT NULL,
-    direccion_id integer NOT NULL,
-    fecha_captura date NOT NULL,
-    programa_social_id integer NOT NULL,
-    auditoria_id integer NOT NULL,
-    tipo_auditoria_id integer NOT NULL,
-    num_oficio_inicio character varying NOT NULL,
-    fecha_notificacion_inicio date NOT NULL,
-    fecha_vencimiento_nombra_enlace date NOT NULL,
-    num_oficio_requerimiento character varying NOT NULL,
-    fecha_notificacion_requerimiento date NOT NULL,
-    fecha_vencimiento_requerimiento date NOT NULL,
-    fecha_vencimiento_nueva date NOT NULL,
-    tipo_observacion_id integer NOT NULL,
-    num_observacion character varying NOT NULL,
-    observacion text NOT NULL,
-    monto_observado double precision NOT NULL,
-    num_oficio_cytg_oic_pre character varying NOT NULL,
-    fecha_oficio_cytg_pre date NOT NULL,
-    fecha_recibido_dependencia date NOT NULL,
-    fecha_vencimiento_pre date NOT NULL,
-    prorroga boolean DEFAULT false NOT NULL,
-    num_oficio_solic_prorroga character varying,
-    fecha_oficio_solic_prorroga date,
-    num_oficio_contest_prorroga_cytg character varying,
-    fecha_oficio_contest_cytg date,
-    fecha_vencimiento_pre_nueva date,
-    clasif_pre_cytg integer NOT NULL,
-    num_oficio_resp_dependencia character varying NOT NULL,
-    fecha_oficio_resp date NOT NULL,
-    resp_dependencia text NOT NULL,
-    comentarios text NOT NULL,
-    blocked boolean DEFAULT false NOT NULL,
-    hora_ult_cambio timestamp with time zone NOT NULL,
-    hora_creacion timestamp with time zone NOT NULL
-);
-
-
-ALTER TABLE public.observaciones_pre_cytg OWNER TO postgres;
 
 --
 -- Name: observaciones_sfp_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -912,6 +894,181 @@ CREATE TABLE public.observaciones_sfp (
 
 
 ALTER TABLE public.observaciones_sfp OWNER TO postgres;
+
+--
+-- Name: obs; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.obs AS
+( SELECT ad.dependencia_id,
+    aa.anio_cuenta_pub,
+    'SFP'::text AS ente_fiscalizador,
+    count(obs.id) AS cant_observaciones,
+    sum(obs.monto_observado) AS total_monto_observado
+   FROM ((public.observaciones_sfp obs
+     JOIN public.auditoria_dependencias ad ON ((obs.auditoria_id = ad.auditoria_id)))
+     JOIN public.auditoria_anios_cuenta_pub aa ON ((obs.auditoria_id = aa.auditoria_id)))
+  WHERE (NOT obs.blocked)
+  GROUP BY ad.dependencia_id, aa.anio_cuenta_pub
+  ORDER BY ad.dependencia_id, aa.anio_cuenta_pub)
+UNION
+( SELECT ad.dependencia_id,
+    aa.anio_cuenta_pub,
+    'ASF'::text AS ente_fiscalizador,
+    count(obs_asf.id) AS cant_observaciones,
+    sum(obs_asf.monto_observado) AS total_monto_observado
+   FROM (((public.observaciones_ires_asf obs_asf
+     JOIN public.observaciones_pre_asf obs_pre ON ((obs_asf.observacion_pre_id = obs_pre.id)))
+     JOIN public.auditoria_dependencias ad ON ((obs_pre.auditoria_id = ad.auditoria_id)))
+     JOIN public.auditoria_anios_cuenta_pub aa ON ((obs_pre.auditoria_id = aa.auditoria_id)))
+  WHERE (NOT obs_asf.blocked)
+  GROUP BY ad.dependencia_id, aa.anio_cuenta_pub
+  ORDER BY ad.dependencia_id, aa.anio_cuenta_pub)
+UNION
+( SELECT ad.dependencia_id,
+    aa.anio_cuenta_pub,
+    'ASENL'::text AS ente_fiscalizador,
+    count(obs_ase.id) AS cant_observaciones,
+    sum(obs_ase.monto_observado) AS total_monto_observado
+   FROM (((public.observaciones_ires_asenl obs_ase
+     JOIN public.observaciones_pre_asenl obs_pre ON ((obs_ase.observacion_pre_id = obs_pre.id)))
+     JOIN public.auditoria_dependencias ad ON ((obs_pre.auditoria_id = ad.auditoria_id)))
+     JOIN public.auditoria_anios_cuenta_pub aa ON ((obs_pre.auditoria_id = aa.auditoria_id)))
+  WHERE (NOT obs_ase.blocked)
+  GROUP BY ad.dependencia_id, aa.anio_cuenta_pub
+  ORDER BY ad.dependencia_id, aa.anio_cuenta_pub);
+
+
+ALTER TABLE public.obs OWNER TO postgres;
+
+--
+-- Name: obs_1; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.obs_1 AS
+ SELECT dependencies.title AS dependencia,
+    obs.anio_cuenta_pub,
+    obs.ente_fiscalizador,
+    obs.cant_observaciones,
+    obs.total_monto_observado
+   FROM (public.obs
+     LEFT JOIN public.dependencies ON ((dependencies.id = obs.dependencia_id)))
+  ORDER BY dependencies.title, obs.anio_cuenta_pub, obs.ente_fiscalizador;
+
+
+ALTER TABLE public.obs_1 OWNER TO postgres;
+
+--
+-- Name: observaciones_ires_cytg_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.observaciones_ires_cytg_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.observaciones_ires_cytg_seq OWNER TO postgres;
+
+--
+-- Name: observaciones_ires_cytg; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.observaciones_ires_cytg (
+    id integer DEFAULT nextval('public.observaciones_ires_cytg_seq'::regclass) NOT NULL,
+    observacion_pre_id integer NOT NULL,
+    num_observacion character varying NOT NULL,
+    observacion text NOT NULL,
+    tipo_observacion_id integer NOT NULL,
+    estatus_info_resultados_id integer NOT NULL,
+    acciones_preventivas text NOT NULL,
+    acciones_correctivas text NOT NULL,
+    clasif_final_cytg integer NOT NULL,
+    monto_solventado double precision DEFAULT 0 NOT NULL,
+    monto_pendiente_solventar double precision DEFAULT 0 NOT NULL,
+    monto_a_reintegrar double precision DEFAULT 0 NOT NULL,
+    monto_reintegrado double precision DEFAULT 0 NOT NULL,
+    fecha_reintegro date NOT NULL,
+    monto_por_reintegrar double precision DEFAULT 0 NOT NULL,
+    num_oficio_cytg_aut_invest character varying NOT NULL,
+    fecha_oficio_cytg_aut_invest date NOT NULL,
+    num_carpeta_investigacion character varying NOT NULL,
+    num_oficio_vai_municipio character varying NOT NULL,
+    fecha_oficio_vai_municipio date NOT NULL,
+    num_oficio_pras_cytg_dependencia character varying NOT NULL,
+    num_oficio_resp_dependencia character varying NOT NULL,
+    fecha_oficio_resp_dependencia date NOT NULL,
+    blocked boolean DEFAULT false NOT NULL,
+    hora_ult_cambio timestamp with time zone NOT NULL,
+    hora_creacion timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.observaciones_ires_cytg OWNER TO postgres;
+
+--
+-- Name: observaciones_pre_cytg_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.observaciones_pre_cytg_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.observaciones_pre_cytg_seq OWNER TO postgres;
+
+--
+-- Name: observaciones_pre_cytg; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.observaciones_pre_cytg (
+    id integer DEFAULT nextval('public.observaciones_pre_cytg_seq'::regclass) NOT NULL,
+    periodo_revision_de date NOT NULL,
+    periodo_revision_a date NOT NULL,
+    direccion_id integer NOT NULL,
+    fecha_captura date NOT NULL,
+    programa_social_id integer NOT NULL,
+    auditoria_id integer NOT NULL,
+    tipo_auditoria_id integer NOT NULL,
+    num_oficio_inicio character varying NOT NULL,
+    fecha_notificacion_inicio date NOT NULL,
+    fecha_vencimiento_nombra_enlace date NOT NULL,
+    num_oficio_requerimiento character varying NOT NULL,
+    fecha_notificacion_requerimiento date NOT NULL,
+    fecha_vencimiento_requerimiento date NOT NULL,
+    fecha_vencimiento_nueva date NOT NULL,
+    tipo_observacion_id integer NOT NULL,
+    num_observacion character varying NOT NULL,
+    observacion text NOT NULL,
+    monto_observado double precision NOT NULL,
+    num_oficio_cytg_oic_pre character varying NOT NULL,
+    fecha_oficio_cytg_pre date NOT NULL,
+    fecha_recibido_dependencia date NOT NULL,
+    fecha_vencimiento_pre date NOT NULL,
+    prorroga boolean DEFAULT false NOT NULL,
+    num_oficio_solic_prorroga character varying,
+    fecha_oficio_solic_prorroga date,
+    num_oficio_contest_prorroga_cytg character varying,
+    fecha_oficio_contest_cytg date,
+    fecha_vencimiento_pre_nueva date,
+    clasif_pre_cytg integer NOT NULL,
+    num_oficio_resp_dependencia character varying NOT NULL,
+    fecha_oficio_resp date NOT NULL,
+    resp_dependencia text NOT NULL,
+    comentarios text NOT NULL,
+    blocked boolean DEFAULT false NOT NULL,
+    hora_ult_cambio timestamp with time zone NOT NULL,
+    hora_creacion timestamp with time zone NOT NULL,
+    observacion_ires_id integer DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.observaciones_pre_cytg OWNER TO postgres;
 
 --
 -- Name: observation_codes; Type: TABLE; Schema: public; Owner: postgres
@@ -1196,6 +1353,21 @@ COMMENT ON TABLE public.social_programs IS 'Alberga los programas sociales a los
 
 
 --
+-- Name: uploads; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.uploads (
+    org_fisc_id integer NOT NULL,
+    obs_stage_id integer NOT NULL,
+    obs_id integer NOT NULL,
+    upload_id integer NOT NULL,
+    filename character varying NOT NULL
+);
+
+
+ALTER TABLE public.uploads OWNER TO postgres;
+
+--
 -- Name: user_authority; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1391,14 +1563,6 @@ ALTER TABLE ONLY public.authorities
 
 
 --
--- Name: authorities authorities_title_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.authorities
-    ADD CONSTRAINT authorities_title_key UNIQUE (title);
-
-
---
 -- Name: autoridades_invest autoridades_invest_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1503,6 +1667,22 @@ ALTER TABLE ONLY public.estatus_ires_asf
 
 
 --
+-- Name: estatus_ires_cytg estatus_ires_cytg_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estatus_ires_cytg
+    ADD CONSTRAINT estatus_ires_cytg_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: estatus_ires_cytg estatus_ires_cytg_title_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estatus_ires_cytg
+    ADD CONSTRAINT estatus_ires_cytg_title_unique UNIQUE (title);
+
+
+--
 -- Name: estatus_pre_asenl estatus_pre_asenl_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1604,6 +1784,14 @@ ALTER TABLE ONLY public.observaciones_ires_asenl
 
 ALTER TABLE ONLY public.observaciones_ires_asf
     ADD CONSTRAINT observaciones_ires_asf_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: observaciones_ires_cytg observaciones_ires_cytg_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_ires_cytg
+    ADD CONSTRAINT observaciones_ires_cytg_pkey PRIMARY KEY (id);
 
 
 --
@@ -1799,6 +1987,14 @@ ALTER TABLE ONLY public.seguimientos_obs_asf
 
 
 --
+-- Name: seguimientos_obs_cytg seguimientos_obs_cytg_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_cytg
+    ADD CONSTRAINT seguimientos_obs_cytg_pkey PRIMARY KEY (observacion_id, seguimiento_id);
+
+
+--
 -- Name: seguimientos_obs_sfp seguimientos_obs_sfp_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1828,6 +2024,22 @@ ALTER TABLE ONLY public.social_programs
 
 ALTER TABLE ONLY public.geo_states
     ADD CONSTRAINT state_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: uploads uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.uploads
+    ADD CONSTRAINT uploads_pkey PRIMARY KEY (org_fisc_id, obs_stage_id, obs_id, upload_id);
+
+
+--
+-- Name: uploads uploads_unique_filename; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.uploads
+    ADD CONSTRAINT uploads_unique_filename UNIQUE (filename);
 
 
 --
@@ -1972,6 +2184,22 @@ ALTER TABLE ONLY public.observaciones_ires_asenl
 
 ALTER TABLE ONLY public.observaciones_ires_asf
     ADD CONSTRAINT observaciones_ires_asf_observation_types_fkey FOREIGN KEY (tipo_observacion_id) REFERENCES public.observation_types(id);
+
+
+--
+-- Name: observaciones_ires_cytg observaciones_ires_cytg_estatus_ires_cytg_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_ires_cytg
+    ADD CONSTRAINT observaciones_ires_cytg_estatus_ires_cytg_fkey FOREIGN KEY (estatus_info_resultados_id) REFERENCES public.estatus_ires_cytg(id);
+
+
+--
+-- Name: observaciones_ires_cytg observaciones_ires_cytg_observation_types_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.observaciones_ires_cytg
+    ADD CONSTRAINT observaciones_ires_cytg_observation_types_fkey FOREIGN KEY (tipo_observacion_id) REFERENCES public.observation_types(id);
 
 
 --
@@ -2207,6 +2435,22 @@ ALTER TABLE ONLY public.seguimientos_obs_asf
 
 
 --
+-- Name: seguimientos_obs_cytg seguimientos_obs_cytg_estatus_ires_cytg_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_cytg
+    ADD CONSTRAINT seguimientos_obs_cytg_estatus_ires_cytg_fkey FOREIGN KEY (estatus_seguimiento_id) REFERENCES public.estatus_ires_cytg(id);
+
+
+--
+-- Name: seguimientos_obs_cytg seguimientos_obs_cytg_observaciones_ires_cytg_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seguimientos_obs_cytg
+    ADD CONSTRAINT seguimientos_obs_cytg_observaciones_ires_cytg_fkey FOREIGN KEY (observacion_id) REFERENCES public.observaciones_ires_cytg(id);
+
+
+--
 -- Name: seguimientos_obs_sfp seguimientos_obs_sfp_estatus_sfp_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2231,6 +2475,22 @@ ALTER TABLE ONLY public.geo_states
 
 
 --
+-- Name: uploads uploads_fiscals_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.uploads
+    ADD CONSTRAINT uploads_fiscals_fkey FOREIGN KEY (org_fisc_id) REFERENCES public.fiscals(id);
+
+
+--
+-- Name: uploads uploads_observation_stages_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.uploads
+    ADD CONSTRAINT uploads_observation_stages_fkey FOREIGN KEY (obs_stage_id) REFERENCES public.observation_stages(id);
+
+
+--
 -- Name: user_authority user_authority_authority_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2244,14 +2504,6 @@ ALTER TABLE ONLY public.user_authority
 
 ALTER TABLE ONLY public.user_authority
     ADD CONSTRAINT user_authority_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
-
-
---
--- Name: users users_divisions_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_divisions_fkey FOREIGN KEY (division_id) REFERENCES public.divisions(id);
 
 
 --

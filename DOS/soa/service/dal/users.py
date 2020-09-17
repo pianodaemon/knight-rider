@@ -10,7 +10,10 @@ def _alter_user(**kwargs):
     """Calls the db function in charge of creating and editing a user"""    
     
     # Hashing the password
-    passwd = hashlib.sha256(kwargs["passwd"].encode("utf-8")).hexdigest()
+    if kwargs["id"] != 0 and (kwargs["passwd"] == '' or kwargs["passwd"] is None):
+        passwd = ''
+    else:
+        passwd = hashlib.sha256(kwargs["passwd"].encode("utf-8")).hexdigest()
 
     sql = """SELECT * FROM alter_user(
         {}::integer,
@@ -115,11 +118,12 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if target_items > per_page:
         target_items = per_page
 
-    return (
-        page_entities('users', offset + whole_pages_offset, target_items, order_by, order, search_params),
-        total_items,
-        total_pages
-    )
+    entities = page_entities('users', offset + whole_pages_offset, target_items, order_by, order, search_params)
+
+    for e in entities:
+        del e['passwd']
+
+    return (entities, total_items, total_pages)
 
 
 def get_catalogs(table_name_list):

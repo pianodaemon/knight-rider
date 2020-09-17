@@ -5,6 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { TokenStorage } from 'src/shared/utils/token-storage.util';
 
 type Props = {
   loading: boolean,
@@ -91,8 +92,9 @@ export const ReportPreliminaries = (props: Props) => {
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
+  const { sub: userId } = TokenStorage.getTokenClaims() || {};
   useEffect(() => {
-    loadReportsAction({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni});
+    loadReportsAction({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, user_id: userId});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni]);
   const classes = useStyles();

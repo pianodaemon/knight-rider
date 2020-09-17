@@ -18,10 +18,11 @@ reporte_57_ns_captions = {
     'ejercicio_ini': 'Ejercicio (desde)',
     'ejercicio_fin': 'Ejercicio (hasta)',
     'fiscal': 'Ente Fiscalizador (ASENL/ASF/SFP/CYTG)',
-    'only_obras': 'String'
+    'only_obras': 'String vacio si es falso (devuelve todas las direcciones)',
+    'user_id': 'Id de la direccion del usuario y la observacion',
 }
 
-ns = api.namespace("reporte_57", description="Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados")
+ns = api.namespace("reporte_57", description="Reporte Ejecutivo Concentrado de Observaciones por Tipo de Observacion")
 
 data_row = api.model('Data row (Reporte 57)', {
     'dep':          fields.String(description=reporte_57_ns_captions['dependencia']),
@@ -47,6 +48,7 @@ class Reporte57(Resource):
     @ns.param('ejercicio_fin', reporte_57_ns_captions['ejercicio_fin'], required=True)
     @ns.param('fiscal',        reporte_57_ns_captions['fiscal'],        required=False)
     @ns.param('only_obras',    reporte_57_ns_captions['only_obras'],    required=False)
+    @ns.param('user_id',       reporte_57_ns_captions['user_id'],       required=True)
     def get(self):
         ''' To fetch an instance of Reporte 57 '''
         try:
@@ -58,9 +60,10 @@ class Reporte57(Resource):
         ejercicio_fin = request.args.get('ejercicio_fin', '2040')
         fiscal        = request.args.get('fiscal',        'SFP')
         only_obras    = request.args.get('only_obras',    '')
+        user_id       = request.args.get('user_id',       '0')
 
         try:
-            rep = reporte_57.get(ejercicio_ini, ejercicio_fin, fiscal, only_obras)
+            rep = reporte_57.get(ejercicio_ini, ejercicio_fin, fiscal, only_obras, user_id)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

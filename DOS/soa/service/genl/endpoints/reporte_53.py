@@ -21,6 +21,7 @@ reporte_53_ns_captions = {
     'monto_cytg': 'Monto (CyTG)',
     'ejercicio_ini': 'Ejercicio (desde)',
     'ejercicio_fin': 'Ejercicio (hasta)',
+    'user_id': 'Id de la direccion del usuario y la observacion',
 }
 
 ns = api.namespace("reporte_53", description="Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados")
@@ -53,6 +54,7 @@ class Reporte53(Resource):
     @ns.marshal_with(report)
     @ns.param('ejercicio_ini', reporte_53_ns_captions['ejercicio_ini'], required=True)
     @ns.param('ejercicio_fin', reporte_53_ns_captions['ejercicio_fin'], required=True)
+    @ns.param('user_id', reporte_53_ns_captions['user_id'], required=True)
     def get(self):
         ''' To fetch an instance of Reporte 53 '''
         try:
@@ -62,9 +64,10 @@ class Reporte53(Resource):
 
         ejercicio_ini = request.args.get('ejercicio_ini', '2000')
         ejercicio_fin = request.args.get('ejercicio_fin', '2040')
+        user_id = request.args.get('user_id', '0')
 
         try:
-            rep = reporte_53.get(ejercicio_ini, ejercicio_fin)
+            rep = reporte_53.get(ejercicio_ini, ejercicio_fin, user_id)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

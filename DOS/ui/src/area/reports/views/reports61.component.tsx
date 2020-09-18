@@ -5,6 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { TokenStorage } from 'src/shared/utils/token-storage.util';
 
 type Props = {
   loading: boolean,
@@ -91,8 +92,9 @@ export const Report61 = (props: Props) => {
   const [fiscal , setFiscal ] = useState<any>('SFP');
   const [pre_ires , setPreIres ] = useState<any>('pre');
   const [entidad , setEntidad ] = useState<any>(fiscal);
+  const { sub: userId } = TokenStorage.getTokenClaims() || {};
   useEffect(() => {
-    loadReport61Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, obs_c: pre_ires});
+    loadReport61Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, obs_c: pre_ires, user_id: userId });
     setEntidad(fiscal);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, fiscal, pre_ires]);

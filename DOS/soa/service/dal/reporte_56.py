@@ -1,13 +1,14 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal, reporte_num):
-    ''' Returns an instance of Reporte 56 '''
+def get(ej_ini, ej_fin, fiscal, reporte_num, user_id):
+    ''' Returns an instance of Reporte 56 and 58'''
     
     # Tratamiento de filtros
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
     reporte_num = str(reporte_num)
+    str_filtro_direccion = get_direction_filter(user_id)
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
@@ -73,22 +74,22 @@ def get(ej_ini, ej_fin, fiscal, reporte_num):
     data_rows = []
 
     if fiscal == 'SFP':
-        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'SFP')
+        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'SFP', str_filtro_direccion)
         l = getDataSFP( sql, entes['SFP'] )
         data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
     elif fiscal == 'ASF':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'ASF')
+        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'ASF', str_filtro_direccion)
         l = getDataASF( sql, entes['ASF'] )
         data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
     elif fiscal == 'CYTG':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'CYTG')
+        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'CYTG', str_filtro_direccion)
         l = getDataCYTG( sql, entes['CyTG'] )
         data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
     elif fiscal == 'ASENL':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'ASENL')
+        sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'ASENL', str_filtro_direccion)
         l = getDataASENL( sql, entes['ASENL'] )
         data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
 
@@ -277,7 +278,7 @@ def setDataObj58(l):
     return data_rows
 
 
-def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
+def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccion ):
     if repNum == 'reporte56':
         strSelectTipo = ' tipos.title as tipo_observacion,'
         strJOINTipo = 'join observation_types as tipos on ires.tipo_observacion_id = tipos.id'
@@ -299,8 +300,9 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
             where not pre.blocked
     	        and not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                {}
             order by dependencia {};
-        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, strOrderBy),
+        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
         'SFP': '''
             select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} ires.direccion_id as direccion_id
             from observaciones_sfp as ires
@@ -310,8 +312,9 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
             {}
             where not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                {}
             order by dependencia {};
-        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, strOrderBy),
+        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
         'CYTG': '''
             select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
             from observaciones_ires_cytg as ires
@@ -323,8 +326,9 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
             where not pre.blocked
     	        and not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                {}
             order by dependencia {};
-        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, strOrderBy),
+        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
         'ASENL': '''
             select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
             from observaciones_ires_asenl as ires
@@ -335,10 +339,20 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent ):
             {}
             where not pre.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                {}
             order by dependencia {};
-        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, strOrderBy),
+        '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
     }
     return sqls[ent]
+
+def get_direction_filter(user_id):
+    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
+    try:
+        direccion_id = exec_steady(sql)[0][0]
+    except EmptySetError:
+        direccion_id = 0
+    str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
+    return str_filtro_direccion
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):
     s = ''

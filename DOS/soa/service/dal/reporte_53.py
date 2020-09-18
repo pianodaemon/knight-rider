@@ -2,17 +2,16 @@ from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
 
-def get(ej_ini, ej_fin):
+def get(ej_ini, ej_fin, user_id):
     ''' Returns an instance of Reporte 53 '''
-    
     # Tratamiento de filtros
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
+    str_filtro_direccion = get_direction_filter(user_id)
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
 
-    
     # Buscar las auditorias que seran ignoradas (multi-dependencia y multi-anio)
     ignored_audit_set = set()
 
@@ -53,8 +52,7 @@ def get(ej_ini, ej_fin):
             break
     
     ignored_audit_str, ignored_audit_ids = get_ignored_audit_structs(ignored_audit_set, 'ires.')
-    
-    
+
     # Retrieve de cant. obs y montos por cada ente, empezando por SFP
     aux_dict = {}
     
@@ -66,9 +64,10 @@ def get(ej_ini, ej_fin):
             join auditoria_anios_cuenta_pub as anio on ires.auditoria_id = anio.auditoria_id
         where not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dep_cat.title, anio.anio_cuenta_pub
         order by dep_cat.title, anio.anio_cuenta_pub;
-    '''.format(ignored_audit_str, ej_ini, ej_fin)
+    '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
 
     try:
         rows = exec_steady(sql)
@@ -92,9 +91,10 @@ def get(ej_ini, ej_fin):
         where not pre.blocked {}
             and pre.observacion_ires_id > 0
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dep_cat.title, anio.anio_cuenta_pub
         order by dep_cat.title, anio.anio_cuenta_pub;
-    '''.format(ignored_audit_str, ej_ini, ej_fin)
+    '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
     
     try:
         rows = exec_steady(sql)
@@ -119,9 +119,10 @@ def get(ej_ini, ej_fin):
         where not pre.blocked {}
             and pre.observacion_ires_id > 0
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dep_cat.title, anio.anio_cuenta_pub
         order by dep_cat.title, anio.anio_cuenta_pub;
-    '''.format(ignored_audit_str, ej_ini, ej_fin)
+    '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
     
     try:
         rows = exec_steady(sql)
@@ -146,9 +147,10 @@ def get(ej_ini, ej_fin):
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dep_cat.title, anio.anio_cuenta_pub
         order by dep_cat.title, anio.anio_cuenta_pub;
-    '''.format(ignored_audit_str, ej_ini, ej_fin)
+    '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
 
     try:
         rows = exec_steady(sql)
@@ -209,6 +211,15 @@ def get(ej_ini, ej_fin):
         'ignored_audit_ids': ignored_audit_ids
     }
 
+
+def get_direction_filter(user_id):
+    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
+    try:
+        direccion_id = exec_steady(sql)[0][0]
+    except EmptySetError:
+        direccion_id = 0
+    str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
+    return str_filtro_direccion
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):
     s = ''

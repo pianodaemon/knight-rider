@@ -1,17 +1,17 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin):
+def get(ej_ini, ej_fin, user_id):
     ''' Returns an instance of Reporte 55 '''
     
     # Tratamiento de filtros
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
+    str_filtro_direccion = get_direction_filter(user_id)
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
 
-    
     # Buscar las auditorias que seran ignoradas (multi-dependencia y multi-anio)
     ignored_audit_set = set()
 
@@ -53,7 +53,7 @@ def get(ej_ini, ej_fin):
     
     ignored_audit_str, ignored_audit_ids = get_ignored_audit_structs(ignored_audit_set, 'pre.')
 
-    data_rows = getData( ignored_audit_str, ej_ini, ej_fin, 'NO DATO' )
+    data_rows = getData( ignored_audit_str, ej_ini, ej_fin, 'NO DATO', str_filtro_direccion )
 
     return {
         'data_rows': data_rows,
@@ -62,10 +62,10 @@ def get(ej_ini, ej_fin):
 
 
 
-def getData( ignored_audit_str, ej_ini, ej_fin, str_no_atendidas ):
-    rows_asf   = getFiscalData( 'observaciones_pre_asf',   ignored_audit_str, ej_ini, ej_fin )
-    rows_asenl = getFiscalData( 'observaciones_pre_asenl', ignored_audit_str, ej_ini, ej_fin )
-    rows_cytg  = getFiscalData( 'observaciones_pre_cytg',  ignored_audit_str, ej_ini, ej_fin )
+def getData( ignored_audit_str, ej_ini, ej_fin, str_no_atendidas, str_filtro_direccion ):
+    rows_asf   = getFiscalData( 'observaciones_pre_asf',   ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
+    rows_asenl = getFiscalData( 'observaciones_pre_asenl', ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
+    rows_cytg  = getFiscalData( 'observaciones_pre_cytg',  ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
 
     aux_dict  = setObjFiscal( 'asf',   rows_asf,   {},        str_no_atendidas )
     aux_dict1 = setObjFiscal( 'asenl', rows_asenl, aux_dict,  str_no_atendidas )
@@ -126,7 +126,7 @@ def setObjFiscal( fiscal, rows, aux_dict, str_no_atendidas ):
     return aux_dict
 
 
-def getFiscalData(table_name, ignored_audit_str, ej_ini, ej_fin):
+def getFiscalData(table_name, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion):
     sql = '''
         select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.resp_dependencia as resp_dependencia, pre.monto_observado as monto
         from {} as pre
@@ -135,14 +135,23 @@ def getFiscalData(table_name, ignored_audit_str, ej_ini, ej_fin):
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         order by dependencia, pre_id;
-    '''.format( table_name, ignored_audit_str, ej_ini, ej_fin )
+    '''.format( table_name, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
     try:
         rows = exec_steady(sql)
     except EmptySetError:
         rows = []
     return rows
 
+def get_direction_filter(user_id):
+    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
+    try:
+        direccion_id = exec_steady(sql)[0][0]
+    except EmptySetError:
+        direccion_id = 0
+    str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
+    return str_filtro_direccion
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):
     s = ''

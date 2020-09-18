@@ -1,12 +1,13 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal, obs_c):
-    ''' Returns an instance of Reporte 61 '''
+def get(ej_ini, ej_fin, fiscal, obs_c, user_id):
+    ''' Returns an instance of Reporte 61 and 63'''
     
     # Tratamiento de filtros
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
+    str_filtro_direccion = get_direction_filter(user_id)
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
@@ -65,36 +66,36 @@ def get(ej_ini, ej_fin, fiscal, obs_c):
 
     if obs_c == 'pre':
         if fiscal == 'SFP':
-            l = preSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'] )
+            l = preSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'], str_filtro_direccion )
             data_rows = setDataObj(l)
         elif fiscal == 'ASF':
             ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-            l = preASF( ignored_audit_str, ej_ini, ej_fin, entes['ASF'] )
+            l = preASF( ignored_audit_str, ej_ini, ej_fin, entes['ASF'], str_filtro_direccion )
             data_rows = setDataObj(l)
         elif fiscal == 'CYTG':
             ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-            l = preCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'] )
+            l = preCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'], str_filtro_direccion )
             data_rows = setDataObj(l)
         elif fiscal == 'ASENL':
             ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-            l = preASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'] )
+            l = preASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'], str_filtro_direccion )
             data_rows = setDataObj(l)
     else:
         if fiscal == 'SFP':
             ignored_audit_str = ignored_audit_str.replace('pre.', 'ires.')
-            l = iresSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP']  )
+            l = iresSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'], str_filtro_direccion  )
             data_rows = setDataObj(l)
         elif fiscal == 'ASF':
             ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-            l = iresASF( ignored_audit_str, ej_ini, ej_fin, entes['ASF']  )
+            l = iresASF( ignored_audit_str, ej_ini, ej_fin, entes['ASF'], str_filtro_direccion  )
             data_rows = setDataObj(l)
         elif fiscal == 'CYTG':
             ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-            l = iresCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG']  )
+            l = iresCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'], str_filtro_direccion  )
             data_rows = setDataObj(l)
         elif fiscal == 'ASENL':
             ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-            l = iresASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL']  )
+            l = iresASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'], str_filtro_direccion  )
             data_rows = setDataObj(l)
 
     return {
@@ -120,7 +121,7 @@ def setDataObj(l):
     return data_rows
 
 
-def preASF( ignored_audit_str, ej_ini, ej_fin, ente ):
+def preASF( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion ):
     sql = '''
         select dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.direccion_id as direccion_id, pre.num_observacion as num_observacion, pre.observacion as observacion, estatus_pre_asf.title as estatus, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto
         from observaciones_pre_asf as pre
@@ -130,9 +131,10 @@ def preASF( ignored_audit_str, ej_ini, ej_fin, ente ):
         join estatus_pre_asf as estatus_pre_asf on pre.estatus_criterio_int_id = estatus_pre_asf.id
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dependencia, num_observacion, observacion, estatus, ejercicio, direccion_id
         order by dependencia, ejercicio;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
 
     try:
         rows = exec_steady(sql)
@@ -146,7 +148,7 @@ def preASF( ignored_audit_str, ej_ini, ej_fin, ente ):
 
     return l
 
-def preSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
+def preSFP( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion ):
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, ires.observacion, tipos.title as tipo_observacion, ires.direccion_id as direccion_id, ires.clave_observacion as num_observacion, ires.observacion, count(ires.id) as cant_obs, sum(ires.monto_observado) as monto
         from observaciones_sfp as ires
@@ -156,9 +158,10 @@ def preSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
         join observation_types          as tipos    on ires.tipo_observacion_id = tipos.id
         where not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dependencia, num_observacion, observacion, tipo_observacion, ejercicio, direccion_id, ires_id
         order by dep_cat.title, anio.anio_cuenta_pub, tipos.title, ires_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
     try:
         rows = exec_steady(sql)
     except EmptySetError:
@@ -171,7 +174,7 @@ def preSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
 
     return l
 
-def preCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
+def preCYTG( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion ):
     sql = '''
         select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, pre.num_observacion as num_observacion, pre.observacion as observacion, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto
         from observaciones_pre_cytg as pre
@@ -181,9 +184,10 @@ def preCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
         join observation_types as tipos on pre.tipo_observacion_id = tipos.id
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dependencia, pre.num_observacion, pre.observacion, tipo_observacion, pre_id, ejercicio, direccion_id
         order by dependencia, ejercicio, tipo_observacion;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
     try:
         rows = exec_steady(sql)
     except EmptySetError:
@@ -196,7 +200,7 @@ def preCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
 
     return l
 
-def preASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
+def preASENL( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion ):
     sql = '''
         select dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, pre.num_observacion as num_observacion, pre.observacion as observacion, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto, estatus_pre_asenl.title as estatus
         from observaciones_pre_asenl as pre
@@ -207,9 +211,10 @@ def preASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
         join estatus_pre_asenl as estatus_pre_asenl on pre.estatus_proceso_id = estatus_pre_asenl.id
         where not pre.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dependencia, pre.num_observacion, observacion, tipo_observacion, estatus, ejercicio, direccion_id
         order by dependencia, ejercicio, tipo_observacion;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
     try:
         rows = exec_steady(sql)
     except EmptySetError:
@@ -222,7 +227,7 @@ def preASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
     return l
 
 
-def iresASF( ignored_audit_str, ej_ini, ej_fin, ente ):
+def iresASF( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion ):
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, pre.num_observacion as num_observacion, ires.observacion_ir as observacion, ires.monto_observado as monto
         from observaciones_ires_asf as ires
@@ -234,8 +239,9 @@ def iresASF( ignored_audit_str, ej_ini, ej_fin, ente ):
         where not pre.blocked
     	    and not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         order by dependencia, num_observacion, tipo_observacion, ires_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
 
     try:
         rows = exec_steady(sql)
@@ -273,7 +279,7 @@ def iresASF( ignored_audit_str, ej_ini, ej_fin, ente ):
 
 
 
-def iresCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
+def iresCYTG( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion ):
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, ires.clasif_final_cytg as clasif_final_cytg, ires.num_observacion as num_observacion, ires.observacion as observacion
         from observaciones_ires_cytg as ires
@@ -285,8 +291,9 @@ def iresCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
         where not pre.blocked
     	    and not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         order by dependencia, ejercicio, tipo_observacion;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
 
     try:
         rows = exec_steady(sql)
@@ -321,7 +328,7 @@ def iresCYTG( ignored_audit_str, ej_ini, ej_fin, ente ):
     return l
 
 
-def iresASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
+def iresASENL( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion ):
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, ires.num_observacion as num_observacion, ires.observacion_final as observacion, count(pre.id) as cant_obs, sum(ires.monto_observado) as monto
         from observaciones_ires_asenl as ires
@@ -333,9 +340,10 @@ def iresASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
         where not pre.blocked
     	    and not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         group by dependencia, pre.num_observacion, observacion, tipo_observacion, ires_id, ejercicio, direccion_id
         order by dependencia, num_observacion, tipo_observacion;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
 
     try:
         rows = exec_steady(sql)
@@ -350,7 +358,7 @@ def iresASENL( ignored_audit_str, ej_ini, ej_fin, ente ):
     return l
 
 
-def iresSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
+def iresSFP( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion ):
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, ires.observacion, tipos.title as tipo_observacion, ires.direccion_id as direccion_id, ires.clave_observacion as num_observacion, ires.observacion, ires.monto_observado as monto
         from observaciones_sfp as ires
@@ -360,8 +368,9 @@ def iresSFP( ignored_audit_str, ej_ini, ej_fin, ente ):
         join observation_types          as tipos    on ires.tipo_observacion_id = tipos.id
         where not ires.blocked {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+            {}
         order by dep_cat.title, tipos.title, ires_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
 
     try:
         rows = exec_steady(sql)
@@ -406,6 +415,15 @@ def setEntesIds():
         entes[e[1]] = e[0]
 
     return entes
+
+def get_direction_filter(user_id):
+    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
+    try:
+        direccion_id = exec_steady(sql)[0][0]
+    except EmptySetError:
+        direccion_id = 0
+    str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
+    return str_filtro_direccion
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):
     s = ''

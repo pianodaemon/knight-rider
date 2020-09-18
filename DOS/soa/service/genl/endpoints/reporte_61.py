@@ -16,14 +16,15 @@ reporte_61_ns_captions = {
     'monto': 'Monto ',
     'ejercicio_ini': 'Ejercicio (desde)',
     'ejercicio_fin': 'Ejercicio (hasta)',
-    'fiscal': 'Ente Fiscalizador (ASENL/ASF)',
+    'fiscal': 'Ente Fiscalizador (ASENL/ASF/SFP/CYTG)',
     'obs_c': 'pre/ires',
     'n_obs': 'Num. observacion',
     'obs': 'Observacion',
     'estatus': 'Estatus de la observacion',
+    'user_id': 'Id de la direccion del usuario y la observacion',
 }
 
-ns = api.namespace("reporte_61", description="Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados")
+ns = api.namespace("reporte_61", description="Reporte de Detalle de la Observación, Estatus, Entidad, Tipo de Observación y Ente Fiscalizador")
 
 data_row = api.model('Data row (Reporte 61)', {
     'dep':          fields.String(description=reporte_61_ns_captions['dependencia']),
@@ -52,6 +53,7 @@ class Reporte61(Resource):
     @ns.param('ejercicio_fin', reporte_61_ns_captions['ejercicio_fin'], required=True)
     @ns.param('fiscal',        reporte_61_ns_captions['fiscal'],        required=False)
     @ns.param('obs_c',         reporte_61_ns_captions['obs_c'],         required=False)
+    @ns.param('user_id',       reporte_61_ns_captions['user_id'],       required=True)
     def get(self):
         ''' To fetch an instance of Reporte 61 '''
         try:
@@ -63,9 +65,10 @@ class Reporte61(Resource):
         ejercicio_fin = request.args.get('ejercicio_fin', '2040')
         fiscal        = request.args.get('fiscal',        'SFP')
         obs_c         = request.args.get('obs_c',         'pre')
+        user_id       = request.args.get('user_id',       '0')
 
         try:
-            rep = reporte_61.get(ejercicio_ini, ejercicio_fin, fiscal, obs_c)
+            rep = reporte_61.get(ejercicio_ini, ejercicio_fin, fiscal, obs_c, user_id)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

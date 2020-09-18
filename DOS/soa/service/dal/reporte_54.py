@@ -1,12 +1,13 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal):
-    ''' Returns an instance of Reporte 53 '''
+def get(ej_ini, ej_fin, fiscal, user_id):
+    ''' Returns an instance of Reporte 54 '''
     
     # Tratamiento de filtros
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
+    str_filtro_direccion = get_direction_filter(user_id)
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
@@ -67,9 +68,10 @@ def get(ej_ini, ej_fin, fiscal):
 	    		join observation_types as tipos on pre.tipo_observacion_id = tipos.id
             where not pre.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                {}
             group by dep_cat.title, tipos.title, pre.estatus_proceso_id
             order by dep_cat.title, tipos.title, pre.estatus_proceso_id;
-        '''.format(ignored_audit_str, ej_ini, ej_fin)
+        '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
 
         try:
             rows = exec_steady(sql)
@@ -96,9 +98,10 @@ def get(ej_ini, ej_fin, fiscal):
                 join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
             where not pre.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
+                {}
             group by dep_cat.title, pre.estatus_criterio_int_id
             order by dep_cat.title, pre.estatus_criterio_int_id;
-        '''.format(ignored_audit_str, ej_ini, ej_fin)
+        '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
         
         try:
             rows = exec_steady(sql)
@@ -165,6 +168,14 @@ def get(ej_ini, ej_fin, fiscal):
         'ignored_audit_ids': ignored_audit_ids
     }
 
+def get_direction_filter(user_id):
+    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
+    try:
+        direccion_id = exec_steady(sql)[0][0]
+    except EmptySetError:
+        direccion_id = 0
+    str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
+    return str_filtro_direccion
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):
     s = ''

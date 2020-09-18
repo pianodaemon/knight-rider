@@ -1,13 +1,14 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal, onlyObras):
-    ''' Returns an instance of Reporte 57 '''
+def get(ej_ini, ej_fin, fiscal, onlyObras, user_id):
+    ''' Returns an instance of Reporte 57 and 59'''
     
     # Tratamiento de filtros
     ej_ini     = int(ej_ini)
     ej_fin     = int(ej_fin)
     only_obras = True if onlyObras else False
+    str_filtro_direccion = get_direction_filter(user_id, only_obras)
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
@@ -65,16 +66,16 @@ def get(ej_ini, ej_fin, fiscal, onlyObras):
     data_rows = []
     
     if fiscal == 'SFP':
-        data_rows = getDataSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'], only_obras )
+        data_rows = getDataSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'], only_obras, str_filtro_direccion )
     elif fiscal == 'ASF':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASF( ignored_audit_str, ej_ini, ej_fin, entes['ASF'], only_obras )
+        data_rows = getDataASF( ignored_audit_str, ej_ini, ej_fin, entes['ASF'], only_obras, str_filtro_direccion )
     elif fiscal == 'CYTG':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'], only_obras )
+        data_rows = getDataCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'], only_obras, str_filtro_direccion )
     elif fiscal == 'ASENL':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'], only_obras )
+        data_rows = getDataASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'], only_obras, str_filtro_direccion )
 
     return {
         'data_rows': data_rows,
@@ -83,10 +84,8 @@ def get(ej_ini, ej_fin, fiscal, onlyObras):
 
 
 
-def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
+def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion ):
     data_rows = []
-
-    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
 
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id
@@ -101,7 +100,7 @@ def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         order by dependencia, tipo_observacion, ejercicio, ires_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion)
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
 
     try:
         rows = exec_steady(sql)
@@ -157,10 +156,8 @@ def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
     return data_rows
 
 
-def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras):
+def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion ):
     data_rows = []
-
-    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
 
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
@@ -174,7 +171,7 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras):
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         order by dependencia, tipo_observacion, ejercicio, ires_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
         
     try:
         rows = exec_steady(sql)
@@ -230,7 +227,7 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras):
 
 
 
-def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
+def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion ):
     data_rows = []
 
     obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
@@ -246,7 +243,7 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         order by dep_cat.title, tipos.title, anio.anio_cuenta_pub, ires_id;
-    '''.format(ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
+    '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
         
   
     try:
@@ -304,11 +301,9 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
 
 
 
-def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
+def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion ):
     
     data_rows = []
-
-    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
 
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
@@ -322,7 +317,7 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras ):
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         order by dependencia, ejercicio, tipo_observacion, ires_id;
-    '''.format( ignored_audit_str, ej_ini, ej_fin, obraPublicaCondicion )
+    '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
         
     try:
         rows = exec_steady(sql)
@@ -384,6 +379,23 @@ def getObraPublicaId():
     
     return rows[0][0]
 
+def get_direction_filter(user_id, only_obras):
+    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
+    try:
+        direccion_id = exec_steady(sql)[0][0]
+    except EmptySetError:
+        direccion_id = 0
+
+    if only_obras:
+        idObraPublica = getObraPublicaId()
+        if direccion_id == idObraPublica or direccion_id == 0:      #Condicion solo los usuarios con direccion de obra publica o el usuario que puede puede ver todas las direcciones
+            str_filtro_direccion = 'and direccion_id = %i' % idObraPublica
+        else:
+            str_filtro_direccion = 'and direccion_id = 0'
+    else: 
+        str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
+
+    return str_filtro_direccion
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):
     s = ''

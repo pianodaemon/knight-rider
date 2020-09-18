@@ -1246,7 +1246,7 @@ export const ObservationsSFPForm = (props: Props) => {
                   <FormControl className={classes.formControl}>
                     <Field
                       component={FormikDatePicker}
-                      label="Fecha oficio"
+                      label="Fecha Fecha de oficio que da vista a la CyTG"
                       name="fecha_oficio_of_vista_cytg"
                       disabled={(action === 'view')}
                     />
@@ -1286,7 +1286,7 @@ export const ObservationsSFPForm = (props: Props) => {
                   <FormControl className={classes.formControl}>
                     <Field
                       component={FormikDatePicker}
-                      label="Fecha oficio"
+                      label="Fecha de oficio de la CyTG a la autoridad investigadora"
                       name="fecha_oficio_cytg_aut_invest"
                       disabled={(action === 'view')}
                     />
@@ -1345,7 +1345,7 @@ export const ObservationsSFPForm = (props: Props) => {
                   <FormControl className={classes.formControl}>
                     <Field
                       component={FormikDatePicker}
-                      label="Fecha oficio"
+                      label="Fecha de oficio VAI a municipio"
                       name="fecha_oficio_vai_municipio"
                       disabled={(action === 'view')}
                     />
@@ -1420,7 +1420,7 @@ export const ObservationsSFPForm = (props: Props) => {
                   <FormControl className={classes.formControl}>
                     <Field
                       component={FormikDatePicker}
-                      label="Fecha oficio"
+                      label="Fecha de oficio PRAS del OF"
                       name="fecha_oficio_pras_of"
                       disabled={(action === 'view')}
                     />
@@ -1480,7 +1480,7 @@ export const ObservationsSFPForm = (props: Props) => {
                   <FormControl className={classes.formControl}>
                     <Field
                       component={FormikDatePicker}
-                      label="Fecha oficio"
+                      label="Fecha de oficio respuesta de la dependencia"
                       name="fecha_oficio_resp_dependencia"
                       disabled={(action === 'view')}
                     />

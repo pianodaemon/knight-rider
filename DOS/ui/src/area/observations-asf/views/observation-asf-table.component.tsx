@@ -73,6 +73,12 @@ export const ObservationASFTable = (props: Props) => {
       sorting,
     },
     {
+      title: 'Número o Clave de Observación',
+      field: 'num_observacion',
+      sorting,
+      customSort,
+    },
+    {
       title: 'Auditoría',
       field: 'auditoria_id_title',
       sorting,

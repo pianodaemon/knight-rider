@@ -1,5 +1,10 @@
 import { connect } from 'react-redux';
-import { checkedSelector, isLoggedInSelector, refreshingSelector } from 'src/area/auth/state/auth.selectors';
+import {
+  checkedSelector,
+  isLoggedInSelector,
+  refreshingSelector,
+  usernameSelector,
+} from 'src/area/auth/state/auth.selectors';
 import { AppBarComponent } from './appbar.component';
 import { logoutAction } from 'src/area/auth/state/usecases/logout.usecase';
 import { refreshTokenAuthAction } from 'src/area/auth/state/usecases/refresh-token-auth.usecase';
@@ -14,6 +19,7 @@ function mapStateToProps(state: any) {
     checked: checkedSelector(state),
     isLoggedIn: isLoggedInSelector(state),
     refreshing: refreshingSelector(state),
+    username: usernameSelector(state),
   };
 }
 

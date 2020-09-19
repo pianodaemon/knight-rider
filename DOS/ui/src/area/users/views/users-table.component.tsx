@@ -58,7 +58,7 @@ export const UsersTable = (props: Props) => {
           customSort,
         },
         {
-          title: 'División',
+          title: 'Dirección',
           field: 'division_id_title',
           sorting,
         },

@@ -145,7 +145,7 @@ export const UserForm = (props: Props) => {
             errors.username = 'Required';
           }
 
-          if (!values.passwd) {
+          if (!values.passwd && !id) {
             errors.passwd = 'Required';
           }
 
@@ -304,13 +304,17 @@ export const UserForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel>División</InputLabel>
+                      <InputLabel>Dirección</InputLabel>
                       <Select
                         labelId="division_id"
                         id="division_id"
-                        value={catalog ? values.division_id || '' : ''}
+                        value={catalog ? values.division_id || 0 : ''}
                         onChange={handleChange('division_id')}
                       >
+                        {/* @todo REMOVE ME. Hardcoded value */}
+                        <MenuItem value={"0"} key={`type-todas`}>
+                          TODAS
+                        </MenuItem>
                         {catalog &&
                           catalog.divisions &&
                           catalog.divisions.map((item) => {
@@ -326,7 +330,7 @@ export const UserForm = (props: Props) => {
                           error
                           classes={{ error: classes.textErrorHelper }}
                         >
-                          Seleccione una División
+                          Seleccione una Dirección
                         </FormHelperText>
                       )}
                     </FormControl>

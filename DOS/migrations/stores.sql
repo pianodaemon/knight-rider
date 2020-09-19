@@ -212,6 +212,24 @@ BEGIN
                 );
             
 			END LOOP;
+			
+			-- Actualizar links preliminar -> resultados y viceversa
+			update observaciones_ires_asenl
+			set	observacion_pre_id = 0
+			where not blocked and observacion_pre_id = _observacion_pre_id;
+			
+			update observaciones_ires_asenl
+			set observacion_pre_id = _observacion_pre_id
+			where id = ult_obs_id;
+			
+			update observaciones_pre_asenl
+			set observacion_ires_id = 0
+			where not blocked and observacion_ires_id = ult_obs_id;
+			
+			update observaciones_pre_asenl
+			set observacion_ires_id = ult_obs_id
+			where id = _observacion_pre_id;
+
 
         WHEN _observacion_id > 0 THEN
 
@@ -266,6 +284,23 @@ BEGIN
                 );
             
 			END LOOP;
+			
+			-- Actualizar links preliminar -> resultados y viceversa
+			update observaciones_ires_asenl
+			set	observacion_pre_id = 0
+			where not blocked and observacion_pre_id = _observacion_pre_id;
+			
+			update observaciones_ires_asenl
+			set observacion_pre_id = _observacion_pre_id
+			where id = _observacion_id;
+			
+			update observaciones_pre_asenl
+			set observacion_ires_id = 0
+			where not blocked and observacion_ires_id = _observacion_id;
+			
+			update observaciones_pre_asenl
+			set observacion_ires_id = _observacion_id
+			where id = _observacion_pre_id;
 			
 			ult_obs_id = _observacion_id;
 			
@@ -400,7 +435,23 @@ BEGIN
 				);
 				
 			end if;
-
+			
+			-- Actualizar links preliminar -> resultados y viceversa
+			update observaciones_ires_asf
+			set	observacion_pre_id = 0
+			where not blocked and observacion_pre_id = _observacion_pre_id;
+			
+			update observaciones_ires_asf
+			set observacion_pre_id = _observacion_pre_id
+			where id = ult_obs_id;
+			
+			update observaciones_pre_asf
+			set observacion_ires_id = 0
+			where not blocked and observacion_ires_id = ult_obs_id;
+			
+			update observaciones_pre_asf
+			set observacion_ires_id = ult_obs_id
+			where id = _observacion_pre_id;
 
         WHEN _observacion_id > 0 THEN
 
@@ -519,6 +570,23 @@ BEGIN
 			
 			end if;
 			
+			-- Actualizar links preliminar -> resultados y viceversa
+			update observaciones_ires_asf
+			set	observacion_pre_id = 0
+			where not blocked and observacion_pre_id = _observacion_pre_id;
+			
+			update observaciones_ires_asf
+			set observacion_pre_id = _observacion_pre_id
+			where id = _observacion_id;
+			
+			update observaciones_pre_asf
+			set observacion_ires_id = 0
+			where not blocked and observacion_ires_id = _observacion_id;
+			
+			update observaciones_pre_asf
+			set observacion_ires_id = _observacion_id
+			where id = _observacion_pre_id;
+			
 			ult_obs_id = _observacion_id;
 			
         ELSE
@@ -538,6 +606,228 @@ $$;
 
 
 ALTER FUNCTION public.alter_observacion_ires_asf(_observacion_id integer, _observacion_pre_id integer, _num_oficio_of character varying, _fecha_recibido date, _fecha_vencimiento date, _observacion_ir text, _tipo_observacion_id integer, _accion character varying, _clave_accion character varying, _monto_observado double precision, _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _tiene_pras boolean, _seguimientos public.seguimientos_obs_asf[], _pras public.pras_ires_asf) OWNER TO postgres;
+
+
+--
+-- Name: alter_observacion_ires_cytg(integer, integer, character varying, text, integer, integer, text, text, integer, double precision, double precision, double precision, double precision, date, double precision, character varying, date, character varying, character varying, date, character varying, character varying, date, public.seguimientos_obs_cytg[]); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.alter_observacion_ires_cytg(_observacion_id integer, _observacion_pre_id integer, _num_observacion character varying, _observacion text, _tipo_observacion_id integer, _estatus_info_resultados_id integer, _acciones_preventivas text, _acciones_correctivas text, _clasif_final_cytg integer, _monto_solventado double precision, _monto_pendiente_solventar double precision, _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _num_oficio_cytg_aut_invest character varying, _fecha_oficio_cytg_aut_invest date, _num_carpeta_investigacion character varying, _num_oficio_vai_municipio character varying, _fecha_oficio_vai_municipio date, _num_oficio_pras_cytg_dependencia character varying, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date, _seguimientos public.seguimientos_obs_cytg[]) RETURNS record
+    LANGUAGE plpgsql
+    AS $$
+
+DECLARE
+
+    current_moment timestamp with time zone = now();
+    ult_obs_id integer := 0;
+	seguimientos_arr_len integer := array_length(_seguimientos, 1);
+	idx integer := 0;
+	row_counter bigint := 0;
+	
+    -- dump of errors
+    rmsg text;
+
+BEGIN
+
+    CASE
+
+        WHEN _observacion_id = 0 THEN
+		
+            INSERT INTO observaciones_ires_cytg (
+				observacion_pre_id,
+				num_observacion,
+				observacion,
+				tipo_observacion_id,
+				estatus_info_resultados_id,
+				acciones_preventivas,
+				acciones_correctivas,
+				clasif_final_cytg,
+				monto_solventado,
+				monto_pendiente_solventar,
+				monto_a_reintegrar,
+				monto_reintegrado,
+				fecha_reintegro,
+				monto_por_reintegrar,
+				num_oficio_cytg_aut_invest,
+				fecha_oficio_cytg_aut_invest,
+				num_carpeta_investigacion,
+				num_oficio_vai_municipio,
+				fecha_oficio_vai_municipio,
+				num_oficio_pras_cytg_dependencia,
+				num_oficio_resp_dependencia,
+				fecha_oficio_resp_dependencia,
+				hora_ult_cambio,
+				hora_creacion
+            ) VALUES (
+				_observacion_pre_id,
+				_num_observacion,
+				_observacion,
+				_tipo_observacion_id,
+				_estatus_info_resultados_id,
+				_acciones_preventivas,
+				_acciones_correctivas,
+				_clasif_final_cytg,
+				_monto_solventado,
+				_monto_pendiente_solventar,
+				_monto_a_reintegrar,
+				_monto_reintegrado,
+				_fecha_reintegro,
+				_monto_por_reintegrar,
+				_num_oficio_cytg_aut_invest,
+				_fecha_oficio_cytg_aut_invest,
+				_num_carpeta_investigacion,
+				_num_oficio_vai_municipio,
+				_fecha_oficio_vai_municipio,
+				_num_oficio_pras_cytg_dependencia,
+				_num_oficio_resp_dependencia,
+				_fecha_oficio_resp_dependencia,
+				current_moment,
+				current_moment
+            ) RETURNING id INTO ult_obs_id;
+			
+            FOR idx IN 1 .. seguimientos_arr_len LOOP
+                _seguimientos[idx] = (
+					ult_obs_id,
+					_seguimientos[idx].seguimiento_id,
+					_seguimientos[idx].num_oficio_ires,
+					_seguimientos[idx].fecha_notif_ires,
+					_seguimientos[idx].fecha_vencimiento_ires,
+					_seguimientos[idx].prorroga,
+					_seguimientos[idx].num_oficio_solic_prorroga,
+					_seguimientos[idx].fecha_oficio_solic_prorroga,
+					_seguimientos[idx].num_oficio_contest_prorroga,
+					_seguimientos[idx].fecha_oficio_contest,
+					_seguimientos[idx].fecha_vencimiento_ires_nueva,
+					_seguimientos[idx].num_oficio_resp_dependencia,
+					_seguimientos[idx].fecha_oficio_resp_dependencia,
+					_seguimientos[idx].resp_dependencia,
+					_seguimientos[idx].comentarios,
+					_seguimientos[idx].estatus_seguimiento_id,
+					_seguimientos[idx].monto_solventado,
+					_seguimientos[idx].monto_pendiente_solventar
+				);
+			END LOOP;
+			
+			INSERT INTO seguimientos_obs_cytg
+			select *
+			from unnest(_seguimientos);
+			
+			-- Actualizar links preliminar -> resultados y viceversa
+			update observaciones_ires_cytg
+			set	observacion_pre_id = 0
+			where not blocked and observacion_pre_id = _observacion_pre_id;
+			
+			update observaciones_ires_cytg
+			set observacion_pre_id = _observacion_pre_id
+			where id = ult_obs_id;
+			
+			update observaciones_pre_cytg
+			set observacion_ires_id = 0
+			where not blocked and observacion_ires_id = ult_obs_id;
+			
+			update observaciones_pre_cytg
+			set observacion_ires_id = ult_obs_id
+			where id = _observacion_pre_id;
+
+
+        WHEN _observacion_id > 0 THEN
+
+            UPDATE observaciones_ires_cytg
+            SET observacion_pre_id = _observacion_pre_id,
+				num_observacion = _num_observacion,
+				observacion = _observacion,
+				tipo_observacion_id = _tipo_observacion_id,
+				estatus_info_resultados_id = _estatus_info_resultados_id,
+				acciones_preventivas = _acciones_preventivas,
+				acciones_correctivas = _acciones_correctivas,
+				clasif_final_cytg = _clasif_final_cytg,
+				monto_solventado = _monto_solventado,
+				monto_pendiente_solventar = _monto_pendiente_solventar,
+				monto_a_reintegrar = _monto_a_reintegrar,
+				monto_reintegrado = _monto_reintegrado,
+				fecha_reintegro = _fecha_reintegro,
+				monto_por_reintegrar = _monto_por_reintegrar,
+				num_oficio_cytg_aut_invest = _num_oficio_cytg_aut_invest,
+				fecha_oficio_cytg_aut_invest = _fecha_oficio_cytg_aut_invest,
+				num_carpeta_investigacion = _num_carpeta_investigacion,
+				num_oficio_vai_municipio = _num_oficio_vai_municipio,
+				fecha_oficio_vai_municipio = _fecha_oficio_vai_municipio,
+				num_oficio_pras_cytg_dependencia = _num_oficio_pras_cytg_dependencia,
+				num_oficio_resp_dependencia = _num_oficio_resp_dependencia,
+				fecha_oficio_resp_dependencia = _fecha_oficio_resp_dependencia,
+				hora_ult_cambio = current_moment
+            WHERE id = _observacion_id;
+			
+			GET DIAGNOSTICS row_counter = ROW_COUNT;
+			if row_counter <> 1 then
+				RAISE EXCEPTION 'Observación de resultados de CyTG con id % no existe', _observacion_id;
+			end if;
+
+            delete from seguimientos_obs_cytg where observacion_id = _observacion_id;
+			
+			FOR idx IN 1 .. seguimientos_arr_len LOOP
+                _seguimientos[idx] = (
+					_observacion_id,
+					_seguimientos[idx].seguimiento_id,
+					_seguimientos[idx].num_oficio_ires,
+					_seguimientos[idx].fecha_notif_ires,
+					_seguimientos[idx].fecha_vencimiento_ires,
+					_seguimientos[idx].prorroga,
+					_seguimientos[idx].num_oficio_solic_prorroga,
+					_seguimientos[idx].fecha_oficio_solic_prorroga,
+					_seguimientos[idx].num_oficio_contest_prorroga,
+					_seguimientos[idx].fecha_oficio_contest,
+					_seguimientos[idx].fecha_vencimiento_ires_nueva,
+					_seguimientos[idx].num_oficio_resp_dependencia,
+					_seguimientos[idx].fecha_oficio_resp_dependencia,
+					_seguimientos[idx].resp_dependencia,
+					_seguimientos[idx].comentarios,
+					_seguimientos[idx].estatus_seguimiento_id,
+					_seguimientos[idx].monto_solventado,
+					_seguimientos[idx].monto_pendiente_solventar
+				);
+			END LOOP;
+			
+			INSERT INTO seguimientos_obs_cytg
+			select *
+			from unnest(_seguimientos);
+			
+			-- Actualizar links preliminar -> resultados y viceversa
+			update observaciones_ires_cytg
+			set	observacion_pre_id = 0
+			where not blocked and observacion_pre_id = _observacion_pre_id;
+			
+			update observaciones_ires_cytg
+			set observacion_pre_id = _observacion_pre_id
+			where id = _observacion_id;
+			
+			update observaciones_pre_cytg
+			set observacion_ires_id = 0
+			where not blocked and observacion_ires_id = _observacion_id;
+			
+			update observaciones_pre_cytg
+			set observacion_ires_id = _observacion_id
+			where id = _observacion_pre_id;
+			
+			ult_obs_id = _observacion_id;
+			
+        ELSE
+            RAISE EXCEPTION 'Identificador negativo de observacion CyTG (IRes) % no esta soportado', _observacion_id;
+
+    END CASE;
+
+    RETURN ( ult_obs_id::integer, ''::text );
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS rmsg = MESSAGE_TEXT;
+            return ( -1::integer, rmsg::text );
+
+END;
+$$;
+
+
+ALTER FUNCTION public.alter_observacion_ires_cytg(_observacion_id integer, _observacion_pre_id integer, _num_observacion character varying, _observacion text, _tipo_observacion_id integer, _estatus_info_resultados_id integer, _acciones_preventivas text, _acciones_correctivas text, _clasif_final_cytg integer, _monto_solventado double precision, _monto_pendiente_solventar double precision, _monto_a_reintegrar double precision, _monto_reintegrado double precision, _fecha_reintegro date, _monto_por_reintegrar double precision, _num_oficio_cytg_aut_invest character varying, _fecha_oficio_cytg_aut_invest date, _num_carpeta_investigacion character varying, _num_oficio_vai_municipio character varying, _fecha_oficio_vai_municipio date, _num_oficio_pras_cytg_dependencia character varying, _num_oficio_resp_dependencia character varying, _fecha_oficio_resp_dependencia date, _seguimientos public.seguimientos_obs_cytg[]) OWNER TO postgres;
 
 
 --
@@ -1463,7 +1753,6 @@ ALTER FUNCTION public.alter_observation_preliminar(_observation_id integer, _typ
 CREATE FUNCTION public.alter_user(_user_id integer, _username character varying, _passwd character varying, _orgchart_role_id integer, _division_id integer, _disabled boolean, _first_name character varying, _last_name character varying, _access_vector integer[]) RETURNS record
     LANGUAGE plpgsql
     AS $$
-
 DECLARE
 
     current_moment timestamp with time zone = now();
@@ -1518,16 +1807,32 @@ BEGIN
 
         WHEN _user_id > 0 THEN
 
-			UPDATE users
-			SET username = _username,
-				passwd = _passwd,
-				orgchart_role_id = _orgchart_role_id,
-				division_id = _division_id,
-				disabled = _disabled,
-				first_name = _first_name,
-				last_name = _last_name,
-				touch_latter_time = current_moment
-            WHERE id = _user_id;
+			if _passwd = '' then
+				
+				UPDATE users
+				SET username = _username,
+					orgchart_role_id = _orgchart_role_id,
+					division_id = _division_id,
+					disabled = _disabled,
+					first_name = _first_name,
+					last_name = _last_name,
+					touch_latter_time = current_moment
+				WHERE id = _user_id;
+			
+			else
+				
+				UPDATE users
+				SET username = _username,
+					passwd = _passwd,
+					orgchart_role_id = _orgchart_role_id,
+					division_id = _division_id,
+					disabled = _disabled,
+					first_name = _first_name,
+					last_name = _last_name,
+					touch_latter_time = current_moment
+				WHERE id = _user_id;
+			
+			end if;
 			
 			GET DIAGNOSTICS row_counter = ROW_COUNT;
 			if row_counter <> 1 then

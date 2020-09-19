@@ -1,5 +1,5 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
-import { put, takeLatest } from 'redux-saga/effects';
+import { put, take, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { TokenStorage } from 'src/shared/utils/token-storage.util';
 import { authReducer } from '../auth.reducer';
@@ -12,6 +12,7 @@ import { loadCatalogResultsReportASENLAction } from 'src/area/results-report-ase
 import { loadCatalogResultsReportCYTGAction } from 'src/area/results-report-cytg/state/usecases/load-catalog.usecase';
 import { loadAuditCatalogAction } from 'src/area/auditories/state/usecases/load-audit-catalog.usecase';
 import { loadUsersCatalogAction } from 'src/area/users/state/usecases/load-users-catalog.usecase';
+import { loadUserProfileAction, loadUserProfileErrorAction, loadUserProfileSuccessAction } from './load-user-profile.usecase';
 
 const postfix = '/app';
 const CHECK_AUTH = `CHECK_AUTH${postfix}`;
@@ -28,6 +29,12 @@ function* checkAuthWorker(): Generator<any, any, any> {
   try {
     if (TokenStorage.isAuthenticated()) {
       yield put(checkAuthLoggedInAction());
+      //User Profile
+      yield put(loadUserProfileAction());
+      yield take([
+        loadUserProfileSuccessAction,
+        loadUserProfileErrorAction,
+      ]);
       // Load all Form Catalogs
       yield put(loadCatalogObsSFPAction());
       yield put(loadCatalogObsASFAction());

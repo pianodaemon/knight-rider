@@ -164,7 +164,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     )
 
 
-def get_catalogs(table_name_list):
+def get_catalogs(table_name_list, search_params):
     ''' Fetches values and captions from a list of tables. These pairs can be used on input screens '''
     fields_d = {}
 
@@ -214,7 +214,7 @@ def get_catalogs(table_name_list):
                 FROM dependencies as dep
                 JOIN dependencia_clasif AS clasif ON dep.clasif_id = clasif.id
                 ORDER BY dep.id;
-            '''.format(table)
+            '''
 
             rows = exec_steady(sql)
             for row in rows:
@@ -250,6 +250,17 @@ def get_catalogs(table_name_list):
                     })
                 
                 first_dir = row[0]
+
+        elif table == 'divisions' and search_params and 'direccion_id' in search_params:
+            sql = '''
+                SELECT *
+                FROM divisions
+                WHERE id = {};
+            '''.format(search_params['direccion_id'])
+
+            rows = exec_steady(sql)
+            for row in rows:
+                values_l.append(dict(row))
 
         else:
             sql = '''

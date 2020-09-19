@@ -16,6 +16,7 @@ type Props = {
   loading: boolean,
   paging: any,
   isAllowed: Function,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -39,6 +40,7 @@ export const ObservationCYTGTable = (props: Props) => {
     paging,
     removeObservationCYTGAction,
     isAllowed,
+    divisionId,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -47,9 +49,11 @@ export const ObservationCYTGTable = (props: Props) => {
   const sorting: boolean = false;
   const classes = useStyles();
   useEffect(() => {
-    loadObservationsCYTGAction({ per_page: paging.per_page, order });
+    if (divisionId || divisionId === 0) {
+      loadObservationsCYTGAction({ per_page: paging.per_page, order });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [divisionId]);
   const columns = [
     {
       title: 'ID',
@@ -62,6 +66,12 @@ export const ObservationCYTGTable = (props: Props) => {
       title: 'Cuenta Pública',
       field: 'years',
       sorting,
+    },
+    {
+      title: 'Número o Clave de Observación',
+      field: 'num_observacion',
+      sorting,
+      customSort,
     },
     {
       title: 'Dirección',
@@ -88,6 +98,11 @@ export const ObservationCYTGTable = (props: Props) => {
   ];
   return (
     <MaterialTable
+      localization={{
+        body: {
+          emptyDataSourceMessage: loading ? 'Cargando registros' : 'No hay registros para mostrar'
+        }
+      }}
       title="Observaciones Preliminares CyTG"
       onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
         loadObservationsCYTGAction({
@@ -107,6 +122,7 @@ export const ObservationCYTGTable = (props: Props) => {
         actionsColumnIndex: columns.length,
         toolbar: true,
         toolbarButtonAlignment: 'right',
+        emptyRowsWhenPaging: false,
       }}
       components={{
         Pagination: (componentProps) => {

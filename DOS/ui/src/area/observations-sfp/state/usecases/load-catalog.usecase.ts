@@ -1,6 +1,7 @@
 import { Action, createAction, ActionFunctionAny } from 'redux-actions';
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
+import { currentUserDivisionIdSelector } from 'src/area/auth/state/auth.selectors';
 import { getCatalog } from '../../service/catalog.service';
 import { observationsSFPReducer } from '../observations-sfp.reducer';
 
@@ -21,7 +22,12 @@ export const loadCatalogErrorAction: ActionFunctionAny<
 
 function* loadCatalogsWorker(): Generator<any, any, any> {
   try {
-    const result = yield call(getCatalog);
+    const divisionId = yield select(currentUserDivisionIdSelector);
+    const result = yield call(
+      getCatalog, {
+        ...(divisionId === 0 ? {} : {direccion_id: divisionId})
+      }
+    );
     yield put(loadCatalogSuccessAction(result));
   } catch (e) {
     yield put(loadCatalogErrorAction());

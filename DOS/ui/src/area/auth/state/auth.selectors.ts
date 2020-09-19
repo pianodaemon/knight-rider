@@ -7,6 +7,11 @@ import {
 
 const sliceSelector = (state: any) => state[authReducer.sliceName];
 
+export const usernameSelector = createSelector(
+  sliceSelector,
+  (slice: any) => slice.profile ? `${slice.profile?.first_name} ${slice.profile?.last_name} (${slice.profile?.username})` : ''
+);
+
 export const currentUserDivisionIdSelector = createSelector(
   sliceSelector,
   (slice: any) => slice.profile?.division_id

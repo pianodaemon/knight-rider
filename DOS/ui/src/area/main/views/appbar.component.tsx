@@ -37,6 +37,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
+import Chip from '@material-ui/core/Chip';
 import { useRefreshToken } from 'src/shared/hooks/use-refresh-token.hook';
 import { BreadcrumbsBar } from 'src/area/main/views/breadcrumbs.component';
 
@@ -46,6 +47,7 @@ type Props = {
   isLoggedIn: boolean,
   checked: boolean,
   refreshing: boolean,
+  username: string,
 };
 
 const customHistory = createBrowserHistory();
@@ -148,7 +150,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export function AppBarComponent(props: Props) {
-  const { checked, isLoggedIn, logoutAction, refreshing, refreshTokenAuthAction } = props;
+  const { checked, isLoggedIn, logoutAction, refreshing, refreshTokenAuthAction, username } = props;
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -334,35 +336,35 @@ export function AppBarComponent(props: Props) {
             {(!isLoggedIn && checked) && <Button onClick={() => customHistory.push('/sign-in')} color="inherit">ACCEDER</Button>}
             {isLoggedIn && (
             <>
-              <IconButton
-                  edge="end"
-                  aria-label="account of current user"
-                  // aria-controls={menuId}
-                  aria-haspopup="true"
-                  onClick={handleMenu}
-                  color="inherit"
-                >
-                  <AccountCircle />
-                </IconButton>
-                <Menu
-                  id="menu-appbar"
-                  anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  open={openProfileMenu}
-                  onClose={handleClose}
-                >
-                  <MenuItem onClick={() => {
+              <Chip
+                label={`${username}`}
+                color="primary"
+                icon={<AccountCircle />}
+                onClick={handleMenu}
+              />
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={openProfileMenu}
+                onClose={handleClose}
+              >
+                <MenuItem
+                  onClick={() => {
                     logoutAction({history: customHistory});
                     handleClose();
-                  }}>Terminar Sesión</MenuItem>
+                  }}
+                >
+                  Terminar Sesión
+                </MenuItem>
               </Menu>
             </>
             )}

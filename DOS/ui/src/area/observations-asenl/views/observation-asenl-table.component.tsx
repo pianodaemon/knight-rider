@@ -16,6 +16,7 @@ type Props = {
   loading: boolean,
   paging: any,
   isAllowed: Function,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -39,6 +40,7 @@ export const ObservationASENLTable = (props: Props) => {
     paging,
     removeObservationASENLAction,
     isAllowed,
+    divisionId,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -47,9 +49,11 @@ export const ObservationASENLTable = (props: Props) => {
   const sorting: boolean = false;
   const classes = useStyles();
   useEffect(() => {
-    loadObservationsASENLAction({ per_page: paging.per_page, order });
+    if (divisionId || divisionId === 0) {
+      loadObservationsASENLAction({ per_page: paging.per_page, order });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [divisionId]);
   const columns = [
     {
       title: 'ID',
@@ -62,6 +66,12 @@ export const ObservationASENLTable = (props: Props) => {
       title: 'Cuenta Pública',
       field: 'years',
       sorting,
+    },
+    {
+      title: 'Número o Clave de Observación',
+      field: 'num_observacion',
+      sorting,
+      customSort,
     },
     {
       title: 'Dirección',
@@ -88,6 +98,11 @@ export const ObservationASENLTable = (props: Props) => {
   ];
   return (
     <MaterialTable
+      localization={{
+        body: {
+          emptyDataSourceMessage: loading ? 'Cargando registros' : 'No hay registros para mostrar'
+        }
+      }}
       title="Observaciones Preliminares ASENL"
       onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
         loadObservationsASENLAction({
@@ -107,6 +122,7 @@ export const ObservationASENLTable = (props: Props) => {
         actionsColumnIndex: columns.length,
         toolbar: true,
         toolbarButtonAlignment: 'right',
+        emptyRowsWhenPaging: false,
       }}
       components={{
         Pagination: (componentProps) => {

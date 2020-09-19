@@ -306,17 +306,22 @@ class Catalog(Resource):
         except Exception as err:
             ns.abort(401, message=err)
 
+        search_params = get_search_params(request.args, ['direccion_id'])
+
         try:
-            field_catalog = observaciones_sfp.get_catalogs([
-                'divisions',
-                'audits',
-                'dependencies',
-                'social_programs',
-                'autoridades_invest',
-                'clasifs_internas_cytg',
-                'observation_types',
-                'estatus_sfp'
-            ])
+            field_catalog = observaciones_sfp.get_catalogs(
+                [
+                    'divisions',
+                    'audits',
+                    'dependencies',
+                    'social_programs',
+                    'autoridades_invest',
+                    'clasifs_internas_cytg',
+                    'observation_types',
+                    'estatus_sfp',
+                ],
+                search_params
+            )
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))
         except Exception as err:

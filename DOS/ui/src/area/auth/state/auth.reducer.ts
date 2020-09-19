@@ -16,6 +16,7 @@ export interface JWT {
 interface AuthSlice {
   error: any;
   loading: boolean;
+  profile: any | null,
   refreshing: boolean,
   signedIn: boolean,
   token: JWT | null;
@@ -24,6 +25,7 @@ interface AuthSlice {
 const initialState: AuthSlice = {
   error: null,
   loading: false,
+  profile: null,
   refreshing: false,
   signedIn: false,
   token: null,

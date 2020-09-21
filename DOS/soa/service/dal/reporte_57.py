@@ -1,14 +1,14 @@
 from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal, onlyObras, user_id):
+def get(ej_ini, ej_fin, fiscal, onlyObras, division_id):
     ''' Returns an instance of Reporte 57 and 59'''
     
     # Tratamiento de filtros
     ej_ini     = int(ej_ini)
     ej_fin     = int(ej_fin)
     only_obras = True if onlyObras else False
-    str_filtro_direccion = get_direction_filter(user_id, only_obras)
+    str_filtro_direccion = get_direction_filter(int(division_id), only_obras)
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
@@ -379,21 +379,15 @@ def getObraPublicaId():
     
     return rows[0][0]
 
-def get_direction_filter(user_id, only_obras):
-    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
-    try:
-        direccion_id = exec_steady(sql)[0][0]
-    except EmptySetError:
-        direccion_id = 0
-
+def get_direction_filter(division_id, only_obras):
     if only_obras:
         idObraPublica = getObraPublicaId()
-        if direccion_id == idObraPublica or direccion_id == 0:      #Condicion solo los usuarios con direccion de obra publica o el usuario que puede puede ver todas las direcciones
+        if division_id == idObraPublica or division_id == 0:    #Condicion solo los usuarios con direccion de obra publica o el usuario que puede puede ver todas las direcciones
             str_filtro_direccion = 'and direccion_id = %i' % idObraPublica
         else:
-            str_filtro_direccion = 'and direccion_id = 0'
+            str_filtro_direccion = 'and direccion_id = 0'       #No hay direcciones con ese id, el query estara vacio
     else: 
-        str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
+        str_filtro_direccion = 'and direccion_id = ' + str(division_id) if int(division_id) else ''
 
     return str_filtro_direccion
 

@@ -2,12 +2,12 @@ from dal.helper import exec_steady
 from misc.helperpg import EmptySetError, ServerError
 
 
-def get(ej_ini, ej_fin, user_id):
-    ''' Returns an instance of Reporte 53 '''
+def get(ej_ini, ej_fin, division_id):
+    ''' Returns an instance of Reporte 52 and 53 '''
     # Tratamiento de filtros
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
-    str_filtro_direccion = get_direction_filter(user_id)
+    str_filtro_direccion = get_direction_filter(int(division_id))
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
@@ -212,14 +212,8 @@ def get(ej_ini, ej_fin, user_id):
     }
 
 
-def get_direction_filter(user_id):
-    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
-    try:
-        direccion_id = exec_steady(sql)[0][0]
-    except EmptySetError:
-        direccion_id = 0
-    str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
-    return str_filtro_direccion
+def get_direction_filter(division_id):
+    return 'and direccion_id = ' + str(division_id) if division_id else ''
 
 def get_ignored_audit_structs(ignored_audit_set, prefix):
     s = ''

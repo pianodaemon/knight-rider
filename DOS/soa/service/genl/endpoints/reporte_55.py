@@ -18,10 +18,10 @@ reporte_55_ns_captions = {
     'monto_no_aten':        'Monto (solventados)',
     'ejercicio_ini':        'Ejercicio (desde)',
     'ejercicio_fin':        'Ejercicio (hasta)',
-    'user_id':              'Id de la direccion del usuario y la observacion',
+    'division_id': 'Id de la direccion del usuario',
 }
 
-ns = api.namespace("reporte_55", description="Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados")
+ns = api.namespace("reporte_55", description="Observaciones por Ente Fiscalizador Atendidas y por Atender")
 
 data_row = api.model('Data row (Reporte 55)', {
     'dep':         fields.String(description=reporte_55_ns_captions['dependencia']),
@@ -64,7 +64,7 @@ class Reporte55(Resource):
     @ns.marshal_with(report)
     @ns.param('ejercicio_ini', reporte_55_ns_captions['ejercicio_ini'], required=True)
     @ns.param('ejercicio_fin', reporte_55_ns_captions['ejercicio_fin'], required=True)
-    @ns.param('user_id',       reporte_55_ns_captions['user_id'],       required=True)
+    @ns.param('division_id',   reporte_55_ns_captions['division_id'],   required=True)
     def get(self):
         ''' To fetch an instance of Reporte 55 '''
         try:
@@ -74,10 +74,10 @@ class Reporte55(Resource):
 
         ejercicio_ini = request.args.get('ejercicio_ini', '2000')
         ejercicio_fin = request.args.get('ejercicio_fin', '2040')
-        user_id       = request.args.get('user_id', '0')
+        division_id   = request.args.get('division_id',   '0')
 
         try:
-            rep = reporte_55.get(ejercicio_ini, ejercicio_fin, user_id)
+            rep = reporte_55.get(ejercicio_ini, ejercicio_fin, division_id)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

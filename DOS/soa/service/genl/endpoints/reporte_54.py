@@ -5,7 +5,7 @@ from psycopg2 import Error as pg_err
 from genl.restplus import api
 from dal import reporte_54
 from misc.helperpg import ServerError
-from misc.helper import verify_token
+from misc.helper import verify_token, get_auth
 
 
 reporte_54_ns_captions = {
@@ -54,9 +54,10 @@ class Reporte54(Resource):
     @ns.param('fiscal',        reporte_54_ns_captions['fiscal'],        required=False)
     @ns.param('division_id',   reporte_54_ns_captions['division_id'],   required=True)
     def get(self):
-        ''' To fetch an instance of Reporte 54 '''
+        ''' Obtiene un arreglo con Entidad, Tipo Obs, (Cant Obs y Monto) para SOLV, EN ANALISISI o NO SOLV de Preliminares, se filtra por ente, si no se especifica devuelte por todos los entes '''
         try:
             verify_token(request.headers)
+            auth = get_auth(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
@@ -66,7 +67,7 @@ class Reporte54(Resource):
         division_id   = request.args.get('division_id',   '0')
 
         try:
-            rep = reporte_54.get(ejercicio_ini, ejercicio_fin, fiscal, division_id)
+            rep = reporte_54.get(ejercicio_ini, ejercicio_fin, fiscal, division_id, auth)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

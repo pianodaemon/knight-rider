@@ -5,7 +5,7 @@ from psycopg2 import Error as pg_err
 from genl.restplus import api
 from dal import reporte_56
 from misc.helperpg import ServerError
-from misc.helper import verify_token
+from misc.helper import verify_token, get_auth
 
 
 reporte_56_ns_captions = {
@@ -52,9 +52,10 @@ class Reporte56(Resource):
     @ns.param('reporte_num',   reporte_56_ns_captions['reporte_num'],   required=False)
     @ns.param('division_id',   reporte_56_ns_captions['division_id'],   required=True)
     def get(self):
-        ''' To fetch an instance of Reporte 56 '''
+        ''' Obtiene un arreglo con Entidad, Ejercicio, Tipo, Clasificacion, Cant Obs y Monto para IRES, se filtra por ente '''
         try:
             verify_token(request.headers)
+            auth = get_auth(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
@@ -65,7 +66,7 @@ class Reporte56(Resource):
         division_id   = request.args.get('division_id',   '0')
 
         try:
-            rep = reporte_56.get(ejercicio_ini, ejercicio_fin, fiscal, reporte_num, division_id)
+            rep = reporte_56.get(ejercicio_ini, ejercicio_fin, fiscal, reporte_num, division_id, auth)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

@@ -5,7 +5,7 @@ from psycopg2 import Error as pg_err
 from genl.restplus import api
 from dal import reporte_57
 from misc.helperpg import ServerError
-from misc.helper import verify_token
+from misc.helper import verify_token, get_auth
 
 
 reporte_57_ns_captions = {
@@ -18,7 +18,7 @@ reporte_57_ns_captions = {
     'ejercicio_ini': 'Ejercicio (desde)',
     'ejercicio_fin': 'Ejercicio (hasta)',
     'fiscal': 'Ente Fiscalizador (ASENL/ASF/SFP/CYTG)',
-    'only_obras': 'String vacio si es falso (devuelve todas las direcciones)',
+    'only_obras': 'String aleatorio para filtrar por direccion=Obras/Campo vacio no filtra (devolvera todas las direcciones)',
     'division_id': 'Id de la direccion del usuario',
 }
 
@@ -50,9 +50,10 @@ class Reporte57(Resource):
     @ns.param('only_obras',    reporte_57_ns_captions['only_obras'],    required=False)
     @ns.param('division_id',   reporte_57_ns_captions['division_id'],   required=True)
     def get(self):
-        ''' To fetch an instance of Reporte 57 '''
+        ''' Obtiene un arreglo con Entidad, Tipo, Cant Obs y Monto para IRES, se filtra por ente '''
         try:
             verify_token(request.headers)
+            auth = get_auth(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
@@ -63,7 +64,7 @@ class Reporte57(Resource):
         division_id   = request.args.get('division_id',   '0')
 
         try:
-            rep = reporte_57.get(ejercicio_ini, ejercicio_fin, fiscal, only_obras, division_id)
+            rep = reporte_57.get(ejercicio_ini, ejercicio_fin, fiscal, only_obras, division_id, auth)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

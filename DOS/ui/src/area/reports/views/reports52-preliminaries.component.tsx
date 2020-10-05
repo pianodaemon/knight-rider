@@ -10,6 +10,7 @@ type Props = {
   loading: boolean,
   loadReportsAction: Function,
   report: any,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -88,13 +89,16 @@ export const Report52Preliminaries = (props: Props) => {
     report,
     // loading,
     loadReportsAction,
+    divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
   useEffect(() => {
-    loadReportsAction({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni});
+    if( divisionId || divisionId === 0 ){
+      loadReportsAction({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, division_id: divisionId});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni]);
+  }, [yearEnd, yearIni, divisionId]);
   const classes = useStyles();
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);

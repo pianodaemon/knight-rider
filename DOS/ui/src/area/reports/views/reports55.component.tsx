@@ -5,12 +5,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { TokenStorage } from 'src/shared/utils/token-storage.util';
 
 type Props = {
   loading: boolean,
   loadReport55Action: Function,
   report: any,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -89,14 +89,16 @@ export const Report55 = (props: Props) => {
     report,
     // loading,
     loadReport55Action,
+    divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
-  const { sub: userId } = TokenStorage.getTokenClaims() || {};
   useEffect(() => {
-    loadReport55Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, user_id: userId });
+    if( divisionId || divisionId === 0 ){
+      loadReport55Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, division_id: divisionId});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni ]);
+  }, [yearEnd, yearIni, divisionId]);
   const classes = useStyles();
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);

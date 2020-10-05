@@ -5,12 +5,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { TokenStorage } from 'src/shared/utils/token-storage.util';
 
 type Props = {
   loading: boolean,
   loadReport61Action: Function,
   report: any,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -86,18 +86,20 @@ export const Report63 = (props: Props) => {
     report,
     // loading,
     loadReport61Action,
+    divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
   const [fiscal , setFiscal ] = useState<any>('SFP');
   const [pre_ires, setPreIres ] = useState<any>('pre');
   const [entidad , setEntidad ] = useState<any>(fiscal);
-  const { sub: userId } = TokenStorage.getTokenClaims() || {};
   useEffect(() => {
-    loadReport61Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, obs_c: pre_ires, user_id: userId });
+    if( divisionId || divisionId === 0 ){
+      loadReport61Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, obs_c: pre_ires, division_id: divisionId });
+    }
     setEntidad(fiscal);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni, fiscal, pre_ires]);
+  }, [yearEnd, yearIni, fiscal, pre_ires, divisionId]);
   const classes = useStyles();
   const optionsFiscals = [
     { value: 'SFP',   label: 'SFP' },

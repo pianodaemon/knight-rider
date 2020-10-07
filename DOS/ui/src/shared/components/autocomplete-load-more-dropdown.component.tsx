@@ -94,7 +94,7 @@ export function AutoCompleteLoadMoreDropdown(props: Props) {
                   {params.InputProps.endAdornment}
                 </>
               ),
-              placeholder: 'Buscar Preliminar',
+              placeholder: 'Ingrese Clave de Auditoría o el ID de Auditoria, ej. id:1',
             }}
           />
         );

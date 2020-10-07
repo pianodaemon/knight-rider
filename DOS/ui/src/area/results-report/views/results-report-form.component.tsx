@@ -28,6 +28,7 @@ import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdow
 import { AutoCompleteLoadMoreDropdown } from 'src/shared/components/autocomplete-load-more-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { SingleTextResponsiveModal } from 'src/shared/components/modal/single-text-responsive-modal.component';
+import { sub } from 'src/shared/math/add.util';
 import { Catalog, /* ObservationSFP */ } from '../state/results-report.reducer';
 
 type Props = {
@@ -487,8 +488,8 @@ export const ResultsReportForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
+                  <Grid item xs={12} sm={12}>
+                    <FormControl className={classes.formControlFull}>
                       <AutoCompleteLoadMoreDropdown
                         disabled={disabledModeOn}
                         fieldLabel="observation"
@@ -1206,7 +1207,8 @@ export const ResultsReportForm = (props: Props) => {
                                     name="monto_pendiente_solventar"
                                     onChange={handleChange('monto_pendiente_solventar')}
                                     placeholder="0"
-                                    value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
+                                    // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
+                                    value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
                                   />
                                   {errors.monto_pendiente_solventar &&
                                     touched.monto_pendiente_solventar &&

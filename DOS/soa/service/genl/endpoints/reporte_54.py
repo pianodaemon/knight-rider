@@ -5,7 +5,7 @@ from psycopg2 import Error as pg_err
 from genl.restplus import api
 from dal import reporte_54
 from misc.helperpg import ServerError
-from misc.helper import verify_token
+from misc.helper import verify_token, get_auth
 
 
 reporte_54_ns_captions = {
@@ -19,11 +19,11 @@ reporte_54_ns_captions = {
     'monto_en_analisis': 'Monto (en analisis)',
     'ejercicio_ini': 'Ejercicio (desde)',
     'ejercicio_fin': 'Ejercicio (hasta)',
-    'fiscal': 'Ente Fiscalizador (asenl o asf)',
-    'user_id': 'Id de la direccion del usuario y la observacion',
+    'fiscal': 'Ente Fiscalizador (asenl, asf o "")',
+    'division_id': 'Id de la direccion del usuario',
 }
 
-ns = api.namespace("reporte_54", description="Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados")
+ns = api.namespace("reporte_54", description="Observaciones por Estatus de la Observación del Informe Preliminar")
 
 data_row = api.model('Data row (Reporte 54)', {
     'dep':         fields.String(description=reporte_54_ns_captions['dependencia']),
@@ -52,21 +52,22 @@ class Reporte54(Resource):
     @ns.param('ejercicio_ini', reporte_54_ns_captions['ejercicio_ini'], required=True)
     @ns.param('ejercicio_fin', reporte_54_ns_captions['ejercicio_fin'], required=True)
     @ns.param('fiscal',        reporte_54_ns_captions['fiscal'],        required=False)
-    @ns.param('user_id',       reporte_54_ns_captions['user_id'],       required=True)
+    @ns.param('division_id',   reporte_54_ns_captions['division_id'],   required=True)
     def get(self):
-        ''' To fetch an instance of Reporte 54 '''
+        ''' Obtiene un arreglo con Entidad, Tipo Obs, (Cant Obs y Monto) para SOLV, EN ANALISISI o NO SOLV de Preliminares, se filtra por ente, si no se especifica devuelte por todos los entes '''
         try:
             verify_token(request.headers)
+            auth = get_auth(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
         ejercicio_ini = request.args.get('ejercicio_ini', '2000')
         ejercicio_fin = request.args.get('ejercicio_fin', '2040')
         fiscal        = request.args.get('fiscal',        '')
-        user_id       = request.args.get('user_id',       '0')
+        division_id   = request.args.get('division_id',   '0')
 
         try:
-            rep = reporte_54.get(ejercicio_ini, ejercicio_fin, fiscal, user_id)
+            rep = reporte_54.get(ejercicio_ini, ejercicio_fin, fiscal, division_id, auth)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

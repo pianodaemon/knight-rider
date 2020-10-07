@@ -1,81 +1,36 @@
-from dal.helper import exec_steady
+from dal.helper import exec_steady, get_direction_str_condition, get_ignored_audit_structs, get_ignored_audits
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal, onlyObras, user_id):
+def get(ej_ini, ej_fin, fiscal, onlyObras, division_id, auth):
     ''' Returns an instance of Reporte 57 and 59'''
     
     # Tratamiento de filtros
     ej_ini     = int(ej_ini)
     ej_fin     = int(ej_fin)
     only_obras = True if onlyObras else False
-    str_filtro_direccion = get_direction_filter(user_id, only_obras)
+    str_filtro_direccion = get_direction_filter(int(division_id), only_obras)
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
 
-    
     # Buscar las auditorias que seran ignoradas (multi-dependencia y multi-anio)
-    ignored_audit_set = set()
+    ignored_audit_str, ignored_audit_ids = get_ignored_audit_structs(get_ignored_audits(), 'ires.')
 
-    sql = '''
-        select count(auditoria_id) as conteo, auditoria_id
-        from auditoria_anios_cuenta_pub
-        group by auditoria_id
-        order by conteo desc, auditoria_id;
-    '''
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
-    except Exception:
-        raise ServerError('Hay un problema con el servidor de base de datos')
-
-    for row in rows:
-        if row[0] > 1:
-            ignored_audit_set.add(row[1])
-        else:
-            break
-    
-    sql = '''
-        select count(auditoria_id) as conteo, auditoria_id
-        from auditoria_dependencias
-        group by auditoria_id
-        order by conteo desc, auditoria_id;
-    '''
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
-
-    for row in rows:
-        if row[0] > 1:
-            ignored_audit_set.add(row[1])
-        else:
-            break
-    
-    ignored_audit_str, ignored_audit_ids = get_ignored_audit_structs(ignored_audit_set, 'ires.')
-    
-    
     #Organos fiscalizadores
     entes = setEntesIds()
 
-
-    # Retrieve de cant. obs y montos por cada ente, empezando por ASENL
-    aux_dict = {}
-
     data_rows = []
-    
     if fiscal == 'SFP':
-        data_rows = getDataSFP( ignored_audit_str, ej_ini, ej_fin, entes['SFP'], only_obras, str_filtro_direccion )
+        data_rows = getDataSFP(   ignored_audit_str, ej_ini, ej_fin,   entes['SFP'], only_obras, str_filtro_direccion, ('SFPR' in auth) )
     elif fiscal == 'ASF':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASF( ignored_audit_str, ej_ini, ej_fin, entes['ASF'], only_obras, str_filtro_direccion )
+        data_rows = getDataASF(   ignored_audit_str, ej_ini, ej_fin,   entes['ASF'], only_obras, str_filtro_direccion, ('ASFR' in auth) )
     elif fiscal == 'CYTG':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataCYTG( ignored_audit_str, ej_ini, ej_fin, entes['CyTG'], only_obras, str_filtro_direccion )
+        data_rows = getDataCYTG(  ignored_audit_str, ej_ini, ej_fin,  entes['CyTG'], only_obras, str_filtro_direccion, ('CYTR' in auth) )
     elif fiscal == 'ASENL':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-        data_rows = getDataASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'], only_obras, str_filtro_direccion )
+        data_rows = getDataASENL( ignored_audit_str, ej_ini, ej_fin, entes['ASENL'], only_obras, str_filtro_direccion, ('ASER' in auth) )
 
     return {
         'data_rows': data_rows,
@@ -84,9 +39,8 @@ def get(ej_ini, ej_fin, fiscal, onlyObras, user_id):
 
 
 
-def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion ):
+def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion, permission ):
     data_rows = []
-
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id
         from observaciones_ires_asf as ires
@@ -103,7 +57,7 @@ def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_
     '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
 
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
 
@@ -156,9 +110,8 @@ def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_
     return data_rows
 
 
-def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion ):
+def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion, permission ):
     data_rows = []
-
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
         from observaciones_ires_cytg as ires
@@ -174,7 +127,7 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro
     '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
         
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
     
@@ -227,11 +180,8 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro
 
 
 
-def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion ):
+def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion, permission ):
     data_rows = []
-
-    obraPublicaCondicion = 'and direccion_id = %i' % getObraPublicaId() if only_obras else ''
-
     sql = '''
         select ires.id as ires_id, dep_cat.title, anio.anio_cuenta_pub, tipos.title as tipo_observacion, ires.direccion_id
         from observaciones_sfp as ires
@@ -244,10 +194,9 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_
             {}
         order by dep_cat.title, tipos.title, anio.anio_cuenta_pub, ires_id;
     '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
-        
-  
+
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
 
@@ -301,10 +250,8 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_
 
 
 
-def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion ):
-    
+def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion, permission ):
     data_rows = []
-
     sql = '''
         select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
         from observaciones_ires_asenl as ires
@@ -320,7 +267,7 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtr
     '''.format( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
         
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
     
@@ -379,33 +326,15 @@ def getObraPublicaId():
     
     return rows[0][0]
 
-def get_direction_filter(user_id, only_obras):
-    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
-    try:
-        direccion_id = exec_steady(sql)[0][0]
-    except EmptySetError:
-        direccion_id = 0
-
+def get_direction_filter(division_id, only_obras):
     if only_obras:
         idObraPublica = getObraPublicaId()
-        if direccion_id == idObraPublica or direccion_id == 0:      #Condicion solo los usuarios con direccion de obra publica o el usuario que puede puede ver todas las direcciones
+        if division_id == idObraPublica or division_id == 0:    #Condicion solo los usuarios con direccion de obra publica o el usuario que puede puede ver todas las direcciones
             str_filtro_direccion = 'and direccion_id = %i' % idObraPublica
         else:
-            str_filtro_direccion = 'and direccion_id = 0'
+            str_filtro_direccion = 'and direccion_id = 0'       #No hay direcciones con ese id, el query estara vacio
     else: 
-        str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
+        str_filtro_direccion = 'and direccion_id = ' + str(division_id) if int(division_id) else ''
 
     return str_filtro_direccion
 
-def get_ignored_audit_structs(ignored_audit_set, prefix):
-    s = ''
-    l = []
-    while True:
-        try:
-            aud = str(ignored_audit_set.pop())
-            l.append(aud)
-            s += ' and ' + prefix + 'auditoria_id <> ' + aud
-        except:
-            break
-    
-    return s, l

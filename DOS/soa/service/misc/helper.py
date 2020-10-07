@@ -47,3 +47,20 @@ def verify_token(headers):
     
     if from_redis is not None:
         raise Exception('El token no es válido (logged out)')
+
+
+def get_auth(headers):
+    if 'Authorization' not in headers:
+        raise Exception('No se encontró un token en el request')
+    
+    auth = headers['Authorization'].replace('Bearer ', '')
+
+    if public_key is None:
+        raise Exception('Hay un problema con la llave pública')
+
+    try:
+        decoded = jwt.decode(auth, public_key, algorithms='RS512')
+    except:
+        raise Exception('El token no es válido')
+    
+    return decoded['authorities']

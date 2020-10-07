@@ -1,61 +1,36 @@
-from dal.helper import exec_steady
+from dal.helper import exec_steady, get_direction_str_condition, get_ignored_audit_structs, get_ignored_audits
 from misc.helperpg import EmptySetError, ServerError
 
 
-def get(ej_ini, ej_fin, user_id):
-    ''' Returns an instance of Reporte 53 '''
+def get(ej_ini, ej_fin, division_id, auth):
+    ''' Returns an instance of Reporte 52 and 53 '''
     # Tratamiento de filtros
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
-    str_filtro_direccion = get_direction_filter(user_id)
+    str_filtro_direccion = get_direction_str_condition(int(division_id))
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
 
     # Buscar las auditorias que seran ignoradas (multi-dependencia y multi-anio)
-    ignored_audit_set = set()
+    ignored_audit_str, ignored_audit_ids = get_ignored_audit_structs(get_ignored_audits(), 'ires.')
 
-    sql = '''
-        select count(auditoria_id) as conteo, auditoria_id
-        from auditoria_anios_cuenta_pub
-        group by auditoria_id
-        order by conteo desc, auditoria_id;
-    '''
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
-    except Exception:
-        raise ServerError('Hay un problema con el servidor de base de datos')
-
-    for row in rows:
-        if row[0] > 1:
-            ignored_audit_set.add(row[1])
-        else:
-            break
+    # Retrieve de cant. obs y montos por cada ente
+    aux_dict1 = getRowsSFP(  ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion,        {}, ('SFPR' in auth))    # SFP
+    aux_dict2 = getRowsASF(  ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dict1, ('ASFR' in auth))    # ASF
+    aux_dict3 = getRowsASENL(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dict2, ('ASER' in auth))    # ASENL
+    aux_dict4 = getRowsCyTG( ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dict3, ('CYTR' in auth))    # CyTG (Ires no tiene monto observado)
     
-    sql = '''
-        select count(auditoria_id) as conteo, auditoria_id
-        from auditoria_dependencias
-        group by auditoria_id
-        order by conteo desc, auditoria_id;
-    '''
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
+    aux_l = sorted(aux_dict4.items())
 
-    for row in rows:
-        if row[0] > 1:
-            ignored_audit_set.add(row[1])
-        else:
-            break
-    
-    ignored_audit_str, ignored_audit_ids = get_ignored_audit_structs(ignored_audit_set, 'ires.')
+    # Arreglar data en lista de dicts que sera retornada como response
 
-    # Retrieve de cant. obs y montos por cada ente, empezando por SFP
-    aux_dict = {}
-    
+    return {
+        'data_rows': set_data_rows(aux_l),
+        'ignored_audit_ids': ignored_audit_ids
+    }
+
+def getRowsSFP(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dict, permission):
     sql = '''
         select dep_cat.title, anio.anio_cuenta_pub, count(ires.id) as cant_obs, sum(ires.monto_observado) as monto_observado_ires
         from observaciones_sfp as ires
@@ -68,19 +43,16 @@ def get(ej_ini, ej_fin, user_id):
         group by dep_cat.title, anio.anio_cuenta_pub
         order by dep_cat.title, anio.anio_cuenta_pub;
     '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
-
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
-    
     for row in rows:
         aux_dict[(row[0], row[1])] = {'sfp': (row[2], row[3])}
+    return aux_dict
 
-    
-    # ASF
+def getRowsASF(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dict, permission):
     ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
-
     sql = '''
         select dep_cat.title, anio.anio_cuenta_pub, count(ires.id) as cant_obs, sum(ires.monto_observado) as monto_observado_ires
         from observaciones_ires_asf as ires
@@ -95,20 +67,19 @@ def get(ej_ini, ej_fin, user_id):
         group by dep_cat.title, anio.anio_cuenta_pub
         order by dep_cat.title, anio.anio_cuenta_pub;
     '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
-    
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
-
     for row in rows:
         if (row[0], row[1]) in aux_dict:
             aux_dict[(row[0], row[1])]['asf'] = (row[2], row[3])
         else:
             aux_dict[(row[0], row[1])] = {'asf': (row[2], row[3])}
+    return aux_dict
 
-
-    # ASENL
+def getRowsASENL(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dict, permission):
+    ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
     sql = '''
         select dep_cat.title, anio.anio_cuenta_pub, count(ires.id) as cant_obs, sum(ires.monto_observado) as monto_observado_ires
         from observaciones_ires_asenl as ires
@@ -123,21 +94,19 @@ def get(ej_ini, ej_fin, user_id):
         group by dep_cat.title, anio.anio_cuenta_pub
         order by dep_cat.title, anio.anio_cuenta_pub;
     '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
-    
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
-
     for row in rows:
         if (row[0], row[1]) in aux_dict:
             aux_dict[(row[0], row[1])]['asenl'] = (row[2], row[3])
         else:
             aux_dict[(row[0], row[1])] = {'asenl': (row[2], row[3])}
+    return aux_dict
 
-
-    # CyTG
-    # Ires no tiene monto observado
+def getRowsCyTG(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dict, permission):
+    ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
     sql = '''
         select dep_cat.title, anio.anio_cuenta_pub, count(ires.id) as cant_obs
         from observaciones_ires_cytg as ires
@@ -151,24 +120,19 @@ def get(ej_ini, ej_fin, user_id):
         group by dep_cat.title, anio.anio_cuenta_pub
         order by dep_cat.title, anio.anio_cuenta_pub;
     '''.format(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
-
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
-
     for row in rows:
         if (row[0], row[1]) in aux_dict:
             aux_dict[(row[0], row[1])]['cytg'] = (row[2], 0)
         else:
             aux_dict[(row[0], row[1])] = {'cytg': (row[2], 0)}
-    
-    aux_l = sorted(aux_dict.items())
+    return aux_dict
 
-    
-    # Arreglar data en lista de dicts que sera retornada como response
+def set_data_rows( aux_l ):
     data_rows = []
-    
     for item in aux_l:
         k = item[0]
         v = item[1]
@@ -176,60 +140,31 @@ def get(ej_ini, ej_fin, user_id):
             'dep': k[0],
             'ej': k[1],
         }
+
+        r['c_sfp'] = 0
+        r['m_sfp'] = 0.0
+        r['c_asf'] = 0
+        r['m_asf'] = 0.0
+        r['c_asenl'] = 0
+        r['m_asenl'] = 0.0
+        r['c_cytg'] = 0
+        r['m_cytg'] = 0.0
+
         if 'sfp' in v:
             r['c_sfp'] = v['sfp'][0]
             r['m_sfp'] = v['sfp'][1]
-        else:
-            r['c_sfp'] = 0
-            r['m_sfp'] = 0.0
 
         if 'asf' in v:
             r['c_asf'] = v['asf'][0]
             r['m_asf'] = v['asf'][1]
-        else:
-            r['c_asf'] = 0
-            r['m_asf'] = 0.0
 
         if 'asenl' in v:
             r['c_asenl'] = v['asenl'][0]
             r['m_asenl'] = v['asenl'][1]
-        else:
-            r['c_asenl'] = 0
-            r['m_asenl'] = 0.0
 
         if 'cytg' in v:
             r['c_cytg'] = v['cytg'][0]
             r['m_cytg'] = v['cytg'][1]
-        else:
-            r['c_cytg'] = 0
-            r['m_cytg'] = 0.0
 
         data_rows.append(r)
-
-    return {
-        'data_rows': data_rows,
-        'ignored_audit_ids': ignored_audit_ids
-    }
-
-
-def get_direction_filter(user_id):
-    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
-    try:
-        direccion_id = exec_steady(sql)[0][0]
-    except EmptySetError:
-        direccion_id = 0
-    str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
-    return str_filtro_direccion
-
-def get_ignored_audit_structs(ignored_audit_set, prefix):
-    s = ''
-    l = []
-    while True:
-        try:
-            aud = str(ignored_audit_set.pop())
-            l.append(aud)
-            s += ' and ' + prefix + 'auditoria_id <> ' + aud
-        except:
-            break
-    
-    return s, l
+    return data_rows

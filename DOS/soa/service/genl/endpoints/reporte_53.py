@@ -5,7 +5,7 @@ from psycopg2 import Error as pg_err
 from genl.restplus import api
 from dal import reporte_53
 from misc.helperpg import ServerError
-from misc.helper import verify_token
+from misc.helper import verify_token, get_auth
 
 
 reporte_53_ns_captions = {
@@ -21,10 +21,10 @@ reporte_53_ns_captions = {
     'monto_cytg': 'Monto (CyTG)',
     'ejercicio_ini': 'Ejercicio (desde)',
     'ejercicio_fin': 'Ejercicio (hasta)',
-    'user_id': 'Id de la direccion del usuario y la observacion',
+    'division_id': 'Id de la direccion del usuario',
 }
 
-ns = api.namespace("reporte_53", description="Concentrado de Observaciones por Ente Fiscalizador y Entidad del Informe de Resultados")
+ns = api.namespace("reporte_53", description="Servicios para los reportes 52 y 53")
 
 data_row = api.model('Data row (Reporte 53)', {
     'dep': fields.String(description=reporte_53_ns_captions['dependencia']),
@@ -54,20 +54,21 @@ class Reporte53(Resource):
     @ns.marshal_with(report)
     @ns.param('ejercicio_ini', reporte_53_ns_captions['ejercicio_ini'], required=True)
     @ns.param('ejercicio_fin', reporte_53_ns_captions['ejercicio_fin'], required=True)
-    @ns.param('user_id', reporte_53_ns_captions['user_id'], required=True)
+    @ns.param('division_id',   reporte_53_ns_captions['division_id'],   required=True)
     def get(self):
-        ''' To fetch an instance of Reporte 53 '''
+        ''' Obtiene un arreglo con Entidad, Ejercicio, Cant Obs y Monto de los Informe de Resultados para todos los entes '''
         try:
             verify_token(request.headers)
+            auth = get_auth(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
         ejercicio_ini = request.args.get('ejercicio_ini', '2000')
         ejercicio_fin = request.args.get('ejercicio_fin', '2040')
-        user_id = request.args.get('user_id', '0')
+        division_id   = request.args.get('division_id',   '0')
 
         try:
-            rep = reporte_53.get(ejercicio_ini, ejercicio_fin, user_id)
+            rep = reporte_53.get(ejercicio_ini, ejercicio_fin, division_id, auth)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

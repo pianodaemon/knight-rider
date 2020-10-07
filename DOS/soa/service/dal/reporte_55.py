@@ -1,59 +1,21 @@
-from dal.helper import exec_steady
+from dal.helper import exec_steady, get_direction_str_condition, get_ignored_audit_structs, get_ignored_audits
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, user_id):
+def get(ej_ini, ej_fin, division_id, auth):
     ''' Returns an instance of Reporte 55 '''
     
     # Tratamiento de filtros
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
-    str_filtro_direccion = get_direction_filter(user_id)
+    str_filtro_direccion = get_direction_str_condition(int(division_id))
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
 
     # Buscar las auditorias que seran ignoradas (multi-dependencia y multi-anio)
-    ignored_audit_set = set()
+    ignored_audit_str, ignored_audit_ids = get_ignored_audit_structs(get_ignored_audits(), 'pre.')
 
-    sql = '''
-        select count(auditoria_id) as conteo, auditoria_id
-        from auditoria_anios_cuenta_pub
-        group by auditoria_id
-        order by conteo desc, auditoria_id;
-    '''
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
-    except Exception:
-        raise ServerError('Hay un problema con el servidor de base de datos')
-
-    for row in rows:
-        if row[0] > 1:
-            ignored_audit_set.add(row[1])
-        else:
-            break
-    
-    sql = '''
-        select count(auditoria_id) as conteo, auditoria_id
-        from auditoria_dependencias
-        group by auditoria_id
-        order by conteo desc, auditoria_id;
-    '''
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
-
-    for row in rows:
-        if row[0] > 1:
-            ignored_audit_set.add(row[1])
-        else:
-            break
-    
-    ignored_audit_str, ignored_audit_ids = get_ignored_audit_structs(ignored_audit_set, 'pre.')
-
-    data_rows = getData( ignored_audit_str, ej_ini, ej_fin, 'NO DATO', str_filtro_direccion )
+    data_rows = getData( ignored_audit_str, ej_ini, ej_fin, 'NO DATO', str_filtro_direccion, auth )
 
     return {
         'data_rows': data_rows,
@@ -61,11 +23,10 @@ def get(ej_ini, ej_fin, user_id):
     }
 
 
-
-def getData( ignored_audit_str, ej_ini, ej_fin, str_no_atendidas, str_filtro_direccion ):
-    rows_asf   = getFiscalData( 'observaciones_pre_asf',   ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
-    rows_asenl = getFiscalData( 'observaciones_pre_asenl', ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
-    rows_cytg  = getFiscalData( 'observaciones_pre_cytg',  ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
+def getData( ignored_audit_str, ej_ini, ej_fin, str_no_atendidas, str_filtro_direccion, auth ):
+    rows_asf   = getFiscalData( 'observaciones_pre_asf',   ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, ('ASFP' in auth) )
+    rows_asenl = getFiscalData( 'observaciones_pre_asenl', ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, ('ASEP' in auth) )
+    rows_cytg  = getFiscalData( 'observaciones_pre_cytg',  ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, ('CYTP' in auth) )
 
     aux_dict  = setObjFiscal( 'asf',   rows_asf,   {},        str_no_atendidas )
     aux_dict1 = setObjFiscal( 'asenl', rows_asenl, aux_dict,  str_no_atendidas )
@@ -126,7 +87,7 @@ def setObjFiscal( fiscal, rows, aux_dict, str_no_atendidas ):
     return aux_dict
 
 
-def getFiscalData(table_name, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion):
+def getFiscalData(table_name, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, permission):
     sql = '''
         select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.resp_dependencia as resp_dependencia, pre.monto_observado as monto
         from {} as pre
@@ -139,29 +100,8 @@ def getFiscalData(table_name, ignored_audit_str, ej_ini, ej_fin, str_filtro_dire
         order by dependencia, pre_id;
     '''.format( table_name, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
     return rows
 
-def get_direction_filter(user_id):
-    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
-    try:
-        direccion_id = exec_steady(sql)[0][0]
-    except EmptySetError:
-        direccion_id = 0
-    str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
-    return str_filtro_direccion
-
-def get_ignored_audit_structs(ignored_audit_set, prefix):
-    s = ''
-    l = []
-    while True:
-        try:
-            aud = str(ignored_audit_set.pop())
-            l.append(aud)
-            s += ' and ' + prefix + 'auditoria_id <> ' + aud
-        except:
-            break
-    
-    return s, l

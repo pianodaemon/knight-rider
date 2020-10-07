@@ -5,12 +5,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { TokenStorage } from 'src/shared/utils/token-storage.util';
+import { useSelector } from 'react-redux'
+import { resolvePermission } from 'src/shared/utils/permissions.util';
 
 type Props = {
   loading: boolean,
   loadReport55Action: Function,
   report: any,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -81,6 +83,10 @@ const useStyles = makeStyles(() =>
     cantObs: {
       textAlign: 'center',
     },
+    hrAtentidasYPorAtender: {
+      background:'rgb(100,100,100,0.1) !important', 
+      color: '#333 !important',
+    },
   })
 );
 
@@ -89,14 +95,16 @@ export const Report55 = (props: Props) => {
     report,
     // loading,
     loadReport55Action,
+    divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
-  const { sub: userId } = TokenStorage.getTokenClaims() || {};
   useEffect(() => {
-    loadReport55Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, user_id: userId });
+    if( divisionId || divisionId === 0 ){
+      loadReport55Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, division_id: divisionId});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni ]);
+  }, [yearEnd, yearIni, divisionId]);
   const classes = useStyles();
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
@@ -114,6 +122,9 @@ export const Report55 = (props: Props) => {
     }
     return valueString;
   };
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
+  const isVisibleFiscal = { 'asf' : isVisible('ASFP'), 'asenl' : isVisible('ASEP'), 'cytg' : isVisible('CYTP') };
   return (
     <div className={classes.Container} style={{overflow:'auto'}}>
       <div>
@@ -158,14 +169,14 @@ export const Report55 = (props: Props) => {
           <tr className={classes.titrow}>    
             <th rowSpan={2} style={{background:'#ffffff', color: '#333333',}} >Secretaría/Entidad/Municipio</th> 
             <th colSpan={2}>ASF</th>
-            <th colSpan={2} style={{background:'rgb(100,100,100,0.1)', color: '#888888',}} >TOTAL ATENDIDAS</th> 
-            <th colSpan={2} style={{background:'rgb(100,100,100,0.1)', color: '#888888',}} >POR ATENDER</th> 
+            <th colSpan={2} className={classes.hrAtentidasYPorAtender} >TOTAL ATENDIDAS</th> 
+            <th colSpan={2} className={classes.hrAtentidasYPorAtender} >POR ATENDER</th> 
             <th colSpan={2}>ASENL</th>
-            <th colSpan={2} style={{background:'rgb(100,100,100,0.1)', color: '#888888',}} >TOTAL ATENDIDAS</th> 
-            <th colSpan={2} style={{background:'rgb(100,100,100,0.1)', color: '#888888',}} >POR ATENDER</th> 
+            <th colSpan={2} className={classes.hrAtentidasYPorAtender} >TOTAL ATENDIDAS</th> 
+            <th colSpan={2} className={classes.hrAtentidasYPorAtender} >POR ATENDER</th> 
             <th colSpan={2}>CyTG</th>
-            <th colSpan={2} style={{background:'rgb(100,100,100,0.1)', color: '#888888',}} >TOTAL ATENDIDAS</th> 
-            <th colSpan={2} style={{background:'rgb(100,100,100,0.1)', color: '#888888',}} >POR ATENDER</th> 
+            <th colSpan={2} className={classes.hrAtentidasYPorAtender} >TOTAL ATENDIDAS</th> 
+            <th colSpan={2} className={classes.hrAtentidasYPorAtender} >POR ATENDER</th> 
             <th colSpan={2} style={{background:'#2763be', color: '#ffffff',}} >TOTAL ATENDIDAS</th> 
             <th colSpan={2} style={{background:'#2763be', color: '#ffffff',}} >POR ATENDER</th> 
           </tr> 
@@ -197,62 +208,62 @@ export const Report55 = (props: Props) => {
              <tr> 
                <td>{dep.dep}</td> 
 
-               <td className={classes.cantObs} >{dep.c_asf}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_asf)} </td>
-               <td className={classes.cantObs} >{dep.c_a_asf}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_a_asf)}</td>
-               <td className={classes.cantObs} >{dep.c_na_asf}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_na_asf)}</td>
+               <td className={classes.cantObs} > {isVisibleFiscal.asf ? dep.c_asf                  : '-' }</td>
+               <td className={classes.montos}  > {isVisibleFiscal.asf ? formatMoney(dep.m_asf)     : '-' }</td>
+               <td className={classes.cantObs} > {isVisibleFiscal.asf ? dep.c_a_asf                : '-' }</td>
+               <td className={classes.montos}  > {isVisibleFiscal.asf ? formatMoney(dep.m_a_asf)   : '-' }</td>
+               <td className={classes.cantObs} > {isVisibleFiscal.asf ? dep.c_na_asf               : '-' }</td>
+               <td className={classes.montos}  > {isVisibleFiscal.asf ? formatMoney(dep.m_na_asf)  : '-' } </td>
 
-               <td className={classes.cantObs} >{dep.c_asenl}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_asenl)}</td>
-               <td className={classes.cantObs} >{dep.c_a_asenl}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_a_asenl)}</td>
-               <td className={classes.cantObs} >{dep.c_na_asenl}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_na_asenl)}</td>
+               <td className={classes.cantObs} >{isVisibleFiscal.asenl ? dep.c_asenl                 : '-' }</td>
+               <td className={classes.montos}  >{isVisibleFiscal.asenl ? formatMoney(dep.m_asenl)    : '-' }</td>
+               <td className={classes.cantObs} >{isVisibleFiscal.asenl ? dep.c_a_asenl               : '-' }</td>
+               <td className={classes.montos}  >{isVisibleFiscal.asenl ? formatMoney(dep.m_a_asenl)  : '-' }</td>
+               <td className={classes.cantObs} >{isVisibleFiscal.asenl ? dep.c_na_asenl              : '-' }</td>
+               <td className={classes.montos}  >{isVisibleFiscal.asenl ? formatMoney(dep.m_na_asenl) : '-' }</td>
 
-               <td className={classes.cantObs} >{dep.c_cytg}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_cytg)}</td>
-               <td className={classes.cantObs} >{dep.c_a_cytg}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_a_cytg)}</td>
-               <td className={classes.cantObs} >{dep.c_na_cytg}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_na_cytg)}</td>
+               <td className={classes.cantObs} >{isVisibleFiscal.cytg ? dep.c_cytg                 : '-' }</td>
+               <td className={classes.montos}  >{isVisibleFiscal.cytg ? formatMoney(dep.m_cytg)    : '-' }</td>
+               <td className={classes.cantObs} >{isVisibleFiscal.cytg ? dep.c_a_cytg               : '-' }</td>
+               <td className={classes.montos}  >{isVisibleFiscal.cytg ? formatMoney(dep.m_a_cytg)  : '-' }</td>
+               <td className={classes.cantObs} >{isVisibleFiscal.cytg ? dep.c_na_cytg              : '-' }</td>
+               <td className={classes.montos}  >{isVisibleFiscal.cytg ? formatMoney(dep.m_na_cytg) : '-' }</td>
 
-               <td className={classes.cantObs} >{dep.c_a_total}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_a_total)}</td>
-               <td className={classes.cantObs} >{dep.c_na_total}</td>
-               <td className={classes.montos}  >{formatMoney(dep.m_na_total)}</td>
+               <td className={classes.cantObs} >{(isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? dep.c_a_total               : '-' }</td>
+               <td className={classes.montos}  >{(isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(dep.m_a_total)  : '-' }</td>
+               <td className={classes.cantObs} >{(isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? dep.c_na_total              : '-' }</td>
+               <td className={classes.montos}  >{(isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(dep.m_na_total) : '-' }</td>
              </tr>
           )
           }   
           { report && report.sum_rows &&
             <tr> 
               <td style={{fontWeight: "bold"}}> Totales</td> 
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_asf}</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_asf)}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_a_asf }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_a_asf )}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_na_asf }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_na_asf )}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asf ? report.sum_rows.c_asf                  : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { isVisibleFiscal.asf ? formatMoney(report.sum_rows.m_asf)     : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asf ? report.sum_rows.c_a_asf                : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { isVisibleFiscal.asf ? formatMoney(report.sum_rows.m_a_asf )  : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asf ? report.sum_rows.c_na_asf               : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { isVisibleFiscal.asf ? formatMoney(report.sum_rows.m_na_asf ) : '-' }</td>
 
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_asenl}</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_asenl)}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_a_asenl }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_a_asenl )}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_na_asenl }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_na_asenl )}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asenl ? report.sum_rows.c_asenl                  : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { isVisibleFiscal.asenl ? formatMoney(report.sum_rows.m_asenl)     : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asenl ? report.sum_rows.c_a_asenl                : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { isVisibleFiscal.asenl ? formatMoney(report.sum_rows.m_a_asenl )  : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asenl ? report.sum_rows.c_na_asenl               : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { isVisibleFiscal.asenl ? formatMoney(report.sum_rows.m_na_asenl ) : '-' }</td>
 
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_cytg}</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_cytg)}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_a_cytg }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_a_cytg )}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_na_cytg }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_na_cytg )}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.cytg ? report.sum_rows.c_cytg                  : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { isVisibleFiscal.cytg ? formatMoney(report.sum_rows.m_cytg)     : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.cytg ? report.sum_rows.c_a_cytg                : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { isVisibleFiscal.cytg ? formatMoney(report.sum_rows.m_a_cytg )  : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.cytg ? report.sum_rows.c_na_cytg               : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { isVisibleFiscal.cytg ? formatMoney(report.sum_rows.m_na_cytg ) : '-' }</td>
               
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_a_total }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_a_total )}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_na_total }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_na_total )}</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ (isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? report.sum_rows.c_a_total                : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { (isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_a_total )  : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ (isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? report.sum_rows.c_na_total               : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { (isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_na_total ) : '-' }</td>
             </tr>
           }          
           

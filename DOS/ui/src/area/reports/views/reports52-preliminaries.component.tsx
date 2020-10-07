@@ -5,6 +5,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { useSelector } from 'react-redux'
+import { resolvePermission } from 'src/shared/utils/permissions.util';
 
 type Props = {
   loading: boolean,
@@ -116,6 +118,9 @@ export const Report52Preliminaries = (props: Props) => {
     }
     return valueString;
   };
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
+  const isVisibleFiscal = { 'sfp' : isVisible('SFPR'), 'asf' : isVisible('ASFR'), 'asenl' : isVisible('ASER'), 'cytg' : isVisible('CYTR') };
   return (
     <div className={classes.Container}>
       <div>
@@ -178,16 +183,16 @@ export const Report52Preliminaries = (props: Props) => {
              { report && report.sum_rows &&
              <tr> 
                
-               <td className={classes.cantObs}>{report.sum_rows.c_asf}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asf) }</td>
-               <td className={classes.cantObs}>{report.sum_rows.c_sfp}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_sfp )}</td>
-               <td className={classes.cantObs}>{report.sum_rows.c_asenl}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asenl) }</td>
-               <td className={classes.cantObs}>{report.sum_rows.c_cytg}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_cytg) }</td>
-               <td className={classes.cantObs}>{ report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg } </td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  } </td>
+               <td className={classes.cantObs}>{  isVisibleFiscal.asf   ? report.sum_rows.c_asf                : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.asf   ? formatMoney(report.sum_rows.m_asf)   : '-' }</td>
+               <td className={classes.cantObs}>{  isVisibleFiscal.sfp   ? report.sum_rows.c_sfp                : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.sfp   ? formatMoney(report.sum_rows.m_sfp )  : '-' }</td>
+               <td className={classes.cantObs}>{  isVisibleFiscal.asenl ? report.sum_rows.c_asenl              : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.asenl ? formatMoney(report.sum_rows.m_asenl) : '-' }</td>
+               <td className={classes.cantObs}>{  isVisibleFiscal.cytg  ? report.sum_rows.c_cytg               : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.cytg  ? formatMoney(report.sum_rows.m_cytg)  : '-' }</td>
+               <td className={classes.cantObs}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg)             : '-' } </td>
+               <td className={classes.montos} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  : '-' } </td>
              </tr>
                
              }

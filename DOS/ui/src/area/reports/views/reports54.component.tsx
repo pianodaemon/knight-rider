@@ -5,6 +5,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { useSelector } from 'react-redux'
+import { resolvePermission } from 'src/shared/utils/permissions.util';
 
 type Props = {
   loading: boolean,
@@ -93,19 +95,24 @@ export const Report54 = (props: Props) => {
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
-  const [fiscal , setFiscal ] = useState<any>('');
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
+  const optionsFiscals = [
+    { value: 'asf',   label: 'ASF'  ,  tk:'ASFR'},
+    { value: 'asenl', label: 'ASENL',  tk:'ASER'},
+  ].filter( option => isVisible( option.tk ));
+  if (optionsFiscals.length >= 2){
+    optionsFiscals.push( { value: 'Todas', label: 'Todas',  tk:''    } )
+  }
+  const [fiscal , setFiscal ] = useState<any>(optionsFiscals.length ? optionsFiscals[0].value : null );
   useEffect(() => {
+    var fiscalUpdate = (fiscal === 'Todas') ? '' : fiscal
     if( divisionId || divisionId === 0 ){
-      loadReport54Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, division_id: divisionId});
+      loadReport54Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscalUpdate, division_id: divisionId});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, fiscal, divisionId]);
   const classes = useStyles();
-  const optionsFiscals = [
-    { value: 'asf',   label: 'ASF' },
-    { value: 'asenl', label: 'ASENL' },
-    { value: '',      label: 'Todas' },
-  ];
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
     let valueArray = valueStringFixed2.split('');

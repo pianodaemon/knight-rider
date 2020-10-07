@@ -5,6 +5,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { useSelector } from 'react-redux'
+import { resolvePermission } from 'src/shared/utils/permissions.util';
 
 type Props = {
   loading: boolean,
@@ -116,6 +118,9 @@ export const ReportPreliminaries = (props: Props) => {
     }
     return valueString;
   };
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
+  const isVisibleFiscal = { 'sfp' : isVisible('SFPR'), 'asf' : isVisible('ASFR'), 'asenl' : isVisible('ASER'), 'cytg' : isVisible('CYTR') };
   return (
     <div className={classes.Container}>
       <div>
@@ -181,32 +186,32 @@ export const ReportPreliminaries = (props: Props) => {
              <tr> 
                <td>{dep.dep}</td> 
                <td>{dep.ej}</td>
-               <td className={classes.cantObs} >{dep.c_asf}</td>
-               <td className={classes.montos} >{formatMoney(dep.m_asf)}</td>
-               <td className={classes.cantObs} >{dep.c_sfp}</td>
-               <td className={classes.montos} >{formatMoney(dep.m_sfp)}</td>
-               <td className={classes.cantObs} >{dep.c_asenl}</td>
-               <td className={classes.montos} >{formatMoney(dep.m_asenl)}</td>
-               <td className={classes.cantObs} >{dep.c_cytg}</td>
-               <td className={classes.montos} >{formatMoney(dep.m_cytg)}</td>
-               <td className={classes.cantObs} > { dep.c_asf + dep.c_sfp + dep.c_asenl + dep.c_cytg } </td>
-               <td className={classes.montos} > {  formatMoney(dep.m_asf + dep.m_sfp + dep.m_asenl + dep.m_cytg)  } </td>
+               <td className={classes.cantObs} >{ isVisibleFiscal.asf   ? dep.c_asf                : '-' }</td>
+               <td className={classes.montos}  >{ isVisibleFiscal.asf   ? formatMoney(dep.m_asf)   : '-' }</td>
+               <td className={classes.cantObs} >{ isVisibleFiscal.sfp   ? dep.c_sfp                : '-' }</td>
+               <td className={classes.montos}  >{ isVisibleFiscal.sfp   ? formatMoney(dep.m_sfp)   : '-' }</td>
+               <td className={classes.cantObs} >{ isVisibleFiscal.asenl ? dep.c_asenl              : '-' }</td>
+               <td className={classes.montos}  >{ isVisibleFiscal.asenl ? formatMoney(dep.m_asenl) : '-' }</td>
+               <td className={classes.cantObs} >{ isVisibleFiscal.cytg  ? dep.c_cytg               : '-' }</td>
+               <td className={classes.montos}  >{ isVisibleFiscal.cytg  ? formatMoney(dep.m_cytg)  : '-' }</td>
+               <td className={classes.cantObs} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (dep.c_asf + dep.c_sfp + dep.c_asenl + dep.c_cytg)            : '-' } </td>
+               <td className={classes.montos}  >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(dep.m_asf + dep.m_sfp + dep.m_asenl + dep.m_cytg) : '-' } </td>
              </tr>
           )
           }
           { report && report.sum_rows &&
             <tr> 
               <td style={{fontWeight: "bold"}} colSpan={2}>Total</td> 
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_asf}</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_asf)}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_sfp}</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_sfp)}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_asenl}</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_asenl)}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{report.sum_rows.c_cytg}</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}>{ formatMoney(report.sum_rows.m_cytg)}</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}> { report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg } </td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}> {  formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  } </td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asf   ? report.sum_rows.c_asf                : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.asf   ? formatMoney(report.sum_rows.m_asf)   : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.sfp   ? report.sum_rows.c_sfp                : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.sfp   ? formatMoney(report.sum_rows.m_sfp)   : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asenl ? report.sum_rows.c_asenl              : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.asenl ? formatMoney(report.sum_rows.m_asenl) : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.cytg  ? report.sum_rows.c_cytg               : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.cytg  ? formatMoney(report.sum_rows.m_cytg)  : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg)            : '-' } </td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg) : '-' } </td>
             </tr>
           }
         </tbody>

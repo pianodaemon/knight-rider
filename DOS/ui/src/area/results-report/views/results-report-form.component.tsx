@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { Formik, Field, FieldArray, ArrayHelpers, FastField } from 'formik';
+import { Formik, Field, FieldArray, ArrayHelpers, FastField, setIn } from 'formik';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -36,6 +36,7 @@ type Props = {
   readResultsReportAction: Function,
   updateResultsReportAction: Function,
   loadPreObservationsAction: Function,
+  notificationAction: Function,
   catalog: Catalog | null,
   report: any | null,
   observations: Array<any> | null,
@@ -155,6 +156,7 @@ export const ResultsReportForm = (props: Props) => {
     report,
     updateResultsReportAction,
     loadPreObservationsAction,
+    notificationAction,
     observations,
     isLoadingPre,
     canLoadMore,
@@ -206,6 +208,24 @@ export const ResultsReportForm = (props: Props) => {
     fecha_oficio_monto_solventado: null,
     monto_pendiente_solventar: "",
   };
+  const PRASTemplate = {
+    autoridad_invest_id: "",
+    fecha_oficio_cytg_aut_invest: null,
+    fecha_oficio_cytg_org_fiscalizador: null,
+    fecha_oficio_of_vista_cytg: null,
+    fecha_oficio_pras_of: null,
+    fecha_oficio_resp_dependencia: null,
+    fecha_oficio_vai_municipio: null,
+    num_carpeta_investigacion: "",
+    num_oficio_cytg_aut_invest: "",
+    num_oficio_cytg_org_fiscalizador: "",
+    num_oficio_of_vista_cytg: "",
+    num_oficio_pras_cytg_dependencia: "",
+    num_oficio_pras_of: "",
+    num_oficio_resp_dependencia: "",
+    num_oficio_vai_municipio: "",
+    pras_observacion_id: 0
+  };
   const PRAS = {
     autoridad_invest_id: 1,
     fecha_oficio_cytg_aut_invest: '2018-05-25',
@@ -235,6 +255,7 @@ export const ResultsReportForm = (props: Props) => {
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> = fields.filter((item: string) => /^fecha_/i.test(item)) || [];
     const noMandatoryFields: Array<string> = ["id", "seguimientos", "pras", "tiene_pras"];
+    const noMandatoryFieldsSeguimiento: Array<string> = ["seguimiento_id", "observacion_id", "monto_pendiente_solventar"];
 
     // Mandatory fields (not empty)
     fields.filter(field => !noMandatoryFields.includes(field)).forEach((field: string) => {
@@ -256,6 +277,34 @@ export const ResultsReportForm = (props: Props) => {
       ) {
         errors[field] = errors[field] || 'Revise que el año de la fecha que ingresó sea posterior al Año de la Auditoría';
       }
+    });
+
+    if (!values.seguimientos.length) {
+      errors.seguimiento = 'Es necesario añadir al menos 1 seguimiento al presente reporte.';
+      notificationAction({
+        message: errors.seguimiento,
+        type: 'error',
+      });
+    }
+
+    // Seguimientos
+    values.seguimientos.forEach((seguimiento: any, index: number) => {
+      Object.keys(seguimiento)
+      .filter(field => !noMandatoryFieldsSeguimiento.includes(field))
+      .forEach((field: any) => {
+        if (!values.seguimientos[index][field].toString() || values.seguimientos[index][field] instanceof Date) {
+          if (!errors.seguimientos) {
+            errors.seguimientos = [];
+          }
+
+          errors.seguimientos[index] = errors.seguimientos[index] || {};
+          errors.seguimientos[index][field] = 'Required';
+
+          if (/^fecha_/i.test(field)) {
+            errors.seguimientos[index][field] = 'Ingrese una fecha válida';
+          }
+        }
+      });
     });
 
     // PRAs
@@ -290,15 +339,15 @@ export const ResultsReportForm = (props: Props) => {
   return (
     <Paper className={classes.paper}>
       <Formik
-        // validateOnChange={false}
+        validateOnChange={false}
         initialValues={id ? report || initialValues : initialValues}
         validate={validate}
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = {...values };
           fields.pras.pras_observacion_id = fields.id;
-          fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
-            return { ...item, seguimiento_id: index };
+          fields.seguimientos = fields.seguimientos.map((item: any, index: number) => {
+            return { ...item, seguimiento_id: index, monto_pendiente_solventar: sub(fields.monto_observado, item.monto_solventado) };
           });
           if (!fields.tiene_pras) {
             fields.pras = PRAS;
@@ -321,6 +370,7 @@ export const ResultsReportForm = (props: Props) => {
           handleSubmit,
           isSubmitting,
           setFieldValue,
+          setValues,
         }: any) => {
           const anio_auditoria =
             catalog &&
@@ -736,7 +786,10 @@ export const ResultsReportForm = (props: Props) => {
                         }}
                         label="Monto Observado"
                         name="monto_observado"
-                        onChange={handleChange('monto_observado')}
+                        // onChange={handleChange('monto_observado')}
+                        onChange={(value: any) => {
+                          setFieldValue('monto_observado', value.target.value === '.' ? '0.' : value.target.value)
+                        }}
                         placeholder="0"
                         value={values.monto_observado}
                       />
@@ -838,9 +891,11 @@ export const ResultsReportForm = (props: Props) => {
                                           );
                                         })}
                                   </Select>
-                                  {errors.medio_notif_seguimiento_id &&
-                                      touched.medio_notif_seguimiento_id &&
-                                      errors.medio_notif_seguimiento_id && (
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].medio_notif_seguimiento_id &&
+                                    touched.seguimientos[index].medio_notif_seguimiento_id && (
                                         <FormHelperText
                                           error
                                           classes={{ error: classes.textErrorHelper }}
@@ -859,6 +914,18 @@ export const ResultsReportForm = (props: Props) => {
                                     onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_cytg_oic`, value.target.value)}
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_cytg_oic : ''}
                                   />
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].num_oficio_cytg_oic &&
+                                    touched.seguimientos[index].num_oficio_cytg_oic && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese un No. de Oficio CyTG u OIC
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -870,15 +937,18 @@ export const ResultsReportForm = (props: Props) => {
                                     label="Fecha de Oficio CyTG"
                                     name={`seguimientos.${index}.fecha_oficio_cytg_oic`}
                                   />
-                                  {errors.fecha_oficio_cytg_oic &&
-                              touched.fecha_oficio_cytg_oic && (
-                                <FormHelperText
-                                  error
-                                  classes={{ error: classes.textErrorHelper }}
-                                >
-                                  {errors.fecha_oficio_cytg_oic}
-                                </FormHelperText>
-                              )}
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].fecha_oficio_cytg_oic &&
+                                    touched.seguimientos[index].fecha_oficio_cytg_oic && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          {errors.seguimientos[index].fecha_oficio_cytg_oic}
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -890,15 +960,18 @@ export const ResultsReportForm = (props: Props) => {
                                     label="Fecha de Recibido de la dependencia (ACUSE)"
                                     name={`seguimientos.${index}.fecha_recibido_dependencia`}
                                   />
-                                  {errors.fecha_recibido_dependencia &&
-                              touched.fecha_recibido_dependencia && (
-                                <FormHelperText
-                                  error
-                                  classes={{ error: classes.textErrorHelper }}
-                                >
-                                  {errors.fecha_recibido_dependencia}
-                                </FormHelperText>
-                              )}
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].fecha_recibido_dependencia &&
+                                    touched.seguimientos[index].fecha_recibido_dependencia && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          {errors.seguimientos[index].fecha_recibido_dependencia}
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -910,15 +983,18 @@ export const ResultsReportForm = (props: Props) => {
                                     label="Fecha de vencimiento CyTG"
                                     name={`seguimientos.${index}.fecha_vencimiento_cytg`}
                                   />
-                                  {errors.fecha_vencimiento_cytg &&
-                              touched.fecha_vencimiento_cytg && (
-                                <FormHelperText
-                                  error
-                                  classes={{ error: classes.textErrorHelper }}
-                                >
-                                  {errors.fecha_vencimiento_cytg}
-                                </FormHelperText>
-                              )}
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].fecha_vencimiento_cytg &&
+                                    touched.seguimientos[index].fecha_vencimiento_cytg && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          {errors.seguimientos[index].fecha_vencimiento_cytg}
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -930,6 +1006,18 @@ export const ResultsReportForm = (props: Props) => {
                                     onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_resp_dependencia`, value.target.value)}
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_resp_dependencia : ''}
                                   />
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].num_oficio_resp_dependencia &&
+                                    touched.seguimientos[index].num_oficio_resp_dependencia && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese un No. de Oficio de respuesta dependencia
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -941,15 +1029,18 @@ export const ResultsReportForm = (props: Props) => {
                                     name={`seguimientos.${index}.fecha_recibido_oficio_resp`}
                                     // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].fecha_recibido_oficio_resp : ''}
                                   />
-                                  {errors.fecha_recibido_oficio_resp &&
-                              touched.fecha_recibido_oficio_resp && (
-                                <FormHelperText
-                                  error
-                                  classes={{ error: classes.textErrorHelper }}
-                                >
-                                  {errors.fecha_recibido_oficio_resp}
-                                </FormHelperText>
-                              )}
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].fecha_recibido_oficio_resp &&
+                                    touched.seguimientos[index].fecha_recibido_oficio_resp && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          {errors.seguimientos[index].fecha_recibido_oficio_resp}
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={12} md={6}>
@@ -978,6 +1069,18 @@ export const ResultsReportForm = (props: Props) => {
                                     rowsMax={5}
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].resp_dependencia : ''}
                                   />
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].resp_dependencia &&
+                                    touched.seguimientos[index].resp_dependencia && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese una Respuesta de la dependencia
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={12} md={6}>
@@ -1007,14 +1110,18 @@ export const ResultsReportForm = (props: Props) => {
                                     rowsMax={5}
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].comentarios : ''}
                                   />
-                                  {errors.comentarios && touched.comentarios && errors.comentarios && (
-                                  <FormHelperText
-                                    error
-                                    classes={{ error: classes.textErrorHelper }}
-                                  >
-                                    Ingrese un Comentario
-                                  </FormHelperText>
-                                  )}
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].comentarios &&
+                                    touched.seguimientos[index].comentarios && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese Comentarios
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -1053,6 +1160,18 @@ export const ResultsReportForm = (props: Props) => {
                                       <ZoomInIcon />
                                     </IconButton>
                                   </div>
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].clasif_final_interna_cytg &&
+                                    touched.seguimientos[index].clasif_final_interna_cytg && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese Clasificación final Interna CyTG
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -1064,6 +1183,18 @@ export const ResultsReportForm = (props: Props) => {
                                     onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_org_fiscalizador`, value.target.value)}
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_org_fiscalizador : ''}
                                   />
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].num_oficio_org_fiscalizador &&
+                                    touched.seguimientos[index].num_oficio_org_fiscalizador && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese No. Oficio para Organo fiscalizador
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -1075,15 +1206,18 @@ export const ResultsReportForm = (props: Props) => {
                                     name={`seguimientos.${index}.fecha_oficio_org_fiscalizador`}
                                     // value={seguimiento.fecha_oficio_org_fiscalizador}
                                   />
-                                  {errors.fecha_oficio_org_fiscalizador &&
-                              touched.fecha_oficio_org_fiscalizador && (
-                                <FormHelperText
-                                  error
-                                  classes={{ error: classes.textErrorHelper }}
-                                >
-                                  {errors.fecha_oficio_org_fiscalizador}
-                                </FormHelperText>
-                              )}
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].fecha_oficio_org_fiscalizador &&
+                                    touched.seguimientos[index].fecha_oficio_org_fiscalizador && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          {errors.seguimientos[index].fecha_oficio_org_fiscalizador}
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -1113,15 +1247,18 @@ export const ResultsReportForm = (props: Props) => {
                                           );
                                         })}
                                   </Select>
-                                  {errors.estatus_id &&
-                                    touched.estatus_id && (
-                                      <FormHelperText
-                                        error
-                                        classes={{ error: classes.textErrorHelper }}
-                                      >
-                                        Ingrese una Dirección
-                                      </FormHelperText>
-                                    )}
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].estatus_id &&
+                                    touched.seguimientos[index].estatus_id && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese Estatus
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -1135,20 +1272,25 @@ export const ResultsReportForm = (props: Props) => {
                                     }}
                                     label="Monto Solventado"
                                     // name="monto_solventado"
-                                    onChange={(value: any) => setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value)}
+                                    // onChange={(value: any) => setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value)}
+                                    onChange={(value: any) => {
+                                      setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value === '.' ? '0.' : value.target.value)
+                                    }}
                                     placeholder="0"
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado : ''}
                                   />
-                                  {errors.monto_solventado &&
-                                  touched.monto_solventado &&
-                                  errors.monto_solventado && (
-                                    <FormHelperText
-                                      error
-                                      classes={{ error: classes.textErrorHelper }}
-                                    >
-                                      Ingrese Monto Solventado
-                                    </FormHelperText>
-                                  )}
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].monto_solventado &&
+                                    touched.seguimientos[index].monto_solventado && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese Monto Solventado
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>                              
                               <Grid item xs={12} sm={6}>
@@ -1164,14 +1306,18 @@ export const ResultsReportForm = (props: Props) => {
                                     rowsMax={5}
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_monto_solventado : ''}
                                   />
-                                  {errors.num_oficio_monto_solventado && touched.num_oficio_monto_solventado && errors.num_oficio_monto_solventado && (
-                                  <FormHelperText
-                                    error
-                                    classes={{ error: classes.textErrorHelper }}
-                                  >
-                                    Ingrese # de Oficio (monto solventado)
-                                  </FormHelperText>
-                                  )}
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].num_oficio_monto_solventado &&
+                                    touched.seguimientos[index].num_oficio_monto_solventado && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese No. de Oficio (monto solventado)
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -1183,15 +1329,18 @@ export const ResultsReportForm = (props: Props) => {
                                     name={`seguimientos.${index}.fecha_oficio_monto_solventado`}
                                     // value={seguimiento.fecha_oficio_monto_solventado}
                                   />
-                                  {errors.fecha_oficio_monto_solventado &&
-                              touched.fecha_oficio_monto_solventado && (
-                                <FormHelperText
-                                  error
-                                  classes={{ error: classes.textErrorHelper }}
-                                >
-                                  {errors.fecha_oficio_monto_solventado}
-                                </FormHelperText>
-                              )}
+                                  {
+                                    errors.seguimientos &&
+                                    errors.seguimientos[index] &&
+                                    errors.seguimientos[index].fecha_oficio_monto_solventado &&
+                                    touched.seguimientos[index].fecha_oficio_monto_solventado && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                           {errors.seguimientos[index].fecha_oficio_monto_solventado}
+                                        </FormHelperText>
+                                      )}
                                 </FormControl>
                               </Grid>
                               <Grid item xs={12} sm={6}>
@@ -1203,23 +1352,14 @@ export const ResultsReportForm = (props: Props) => {
                                       inputComponent: NumberFormatCustom as any,
                                       startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                     }}
+                                    inputProps={{allowNegative: true,}}
                                     label="Monto Pendiente de solventar"
                                     name="monto_pendiente_solventar"
-                                    onChange={handleChange('monto_pendiente_solventar')}
+                                    // onChange={handleChange('monto_pendiente_solventar')}
                                     placeholder="0"
                                     // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
                                     value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
                                   />
-                                  {errors.monto_pendiente_solventar &&
-                                    touched.monto_pendiente_solventar &&
-                                    errors.monto_pendiente_solventar && (
-                                      <FormHelperText
-                                        error
-                                        classes={{ error: classes.textErrorHelper }}
-                                      >
-                                        Ingrese Monto Pendiente de solventar
-                                      </FormHelperText>
-                                    )}
                                 </FormControl>
                               </Grid>
                             </Grid>
@@ -1356,7 +1496,10 @@ export const ResultsReportForm = (props: Props) => {
                             color="primary"
                             disabled={disabledModeOn}
                             name="tiene_pras"
-                            onChange={handleChange('tiene_pras')}
+                            onChange={(event) => {
+                              setValues(setIn(values, 'pras', PRASTemplate));
+                              setFieldValue('tiene_pras', event.target.checked);
+                            }}
                           />
                         }
                         label="¿Tiene PRAS?"

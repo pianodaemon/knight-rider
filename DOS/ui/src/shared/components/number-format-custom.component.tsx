@@ -12,7 +12,6 @@ export function NumberFormatCustom(props: NumberFormatCustomProps) {
 
   return (
     <NumberFormat
-      {...other}
       getInputRef={inputRef}
       onValueChange={(values) => {
         onChange({
@@ -25,6 +24,8 @@ export function NumberFormatCustom(props: NumberFormatCustomProps) {
       thousandSeparator
       isNumericString
       prefix=""
+      allowNegative={false}
+      {...other}
     />
   );
 }

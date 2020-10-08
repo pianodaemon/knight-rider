@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
 import { ResultsReportForm } from './results-report-form.component';
 import { createResultsReportAction } from '../state/usecases/create-results-report.usecase';
 import { readResultsReportAction } from '../state/usecases/read-results-report.usecase';
@@ -18,6 +19,7 @@ const mapDispatchToProps = {
   readResultsReportAction,
   updateResultsReportAction,
   loadPreObservationsAction,
+  notificationAction,
 };
 
 function mapStateToProps(state: any) {

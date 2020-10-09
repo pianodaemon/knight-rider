@@ -7,6 +7,7 @@ import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux'
 import { resolvePermission } from 'src/shared/utils/permissions.util';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 type Props = {
   loading: boolean,
@@ -174,22 +175,28 @@ export const Report61 = (props: Props) => {
             value={optionS}
             onChange={(e)=> {setOptionS(e.target.value);}}
           >
-            {Object.entries(optionsFiscalsAux).map(([key, item]) => {
-              if( item.isVisible ){
-                return (
-                  <MenuItem
-                    value={item.value}
-                  >
-                    {item.label}
-                  </MenuItem>
-                );
-              }
+            {optionsFiscals.map((item) => {
+              return (
+                <MenuItem
+                  value={item.value}
+                >
+                  {item.label}
+                </MenuItem>
+              );
             })}
           </Select>
         </div>
       </div>
 
-      <table className={classes.tableWhole}> 
+      <ReactHTMLTableToExcel
+         id="downloadTableXlsButton"
+         className="downloadTableXlsButton"
+         table="table-to-xls"
+         filename="Reporte"
+         sheet="tablexls"
+         buttonText="Descargar Reporte"
+      />
+      <table className={classes.tableWhole} id="table-to-xls"> 
         <tbody className={classes.tableReports} >
           <tr >    
             <th colSpan={7}> {entidad} </th> 

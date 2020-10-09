@@ -21,7 +21,8 @@
     "jsx": "react"
   },
   "include": [
-    "src"
+    "src",
+    "./typings-custom/**/*.ts"
   ],
   "paths": {
     "src": "./src/"

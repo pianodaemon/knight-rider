@@ -7,6 +7,7 @@ import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux'
 import { resolvePermission } from 'src/shared/utils/permissions.util';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 type Props = {
   loading: boolean,
@@ -186,7 +187,15 @@ export const Report54 = (props: Props) => {
       </div>
 
 
-      <table className={classes.tableWhole}> 
+      <ReactHTMLTableToExcel
+         id="downloadTableXlsButton"
+         className="downloadTableXlsButton"
+         table="table-to-xls"
+         filename="Reporte"
+         sheet="tablexls"
+         buttonText="Descargar Reporte"
+      />
+      <table className={classes.tableWhole} id="table-to-xls"> 
         <tbody className={classes.tableReports} >
           <tr className={classes.titrow}>    
             <th rowSpan={2} style={{background:'#ffffff', color: '#333333',}}>Secretaría/Entidad/Municipio</th> 

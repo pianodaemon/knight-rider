@@ -1,97 +1,43 @@
-from dal.helper import exec_steady
+from dal.helper import exec_steady, get_direction_str_condition, get_ignored_audit_structs, get_ignored_audits
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal, reporte_num, user_id):
+def get(ej_ini, ej_fin, fiscal, reporte_num, division_id, auth):
     ''' Returns an instance of Reporte 56 and 58'''
     
     # Tratamiento de filtros
     ej_ini = int(ej_ini)
     ej_fin = int(ej_fin)
     reporte_num = str(reporte_num)
-    str_filtro_direccion = get_direction_filter(user_id)
+    str_filtro_direccion = get_direction_str_condition(int(division_id))
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
 
-    
     # Buscar las auditorias que seran ignoradas (multi-dependencia y multi-anio)
-    ignored_audit_set = set()
+    ignored_audit_str, ignored_audit_ids = get_ignored_audit_structs(get_ignored_audits(), 'ires.')
 
-    sql = '''
-        select count(auditoria_id) as conteo, auditoria_id
-        from auditoria_anios_cuenta_pub
-        group by auditoria_id
-        order by conteo desc, auditoria_id;
-    '''
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
-    except Exception:
-        raise ServerError('Hay un problema con el servidor de base de datos')
-
-    for row in rows:
-        if row[0] > 1:
-            ignored_audit_set.add(row[1])
-        else:
-            break
-    
-    sql = '''
-        select count(auditoria_id) as conteo, auditoria_id
-        from auditoria_dependencias
-        group by auditoria_id
-        order by conteo desc, auditoria_id;
-    '''
-    try:
-        rows = exec_steady(sql)
-    except EmptySetError:
-        rows = []
-
-    for row in rows:
-        if row[0] > 1:
-            ignored_audit_set.add(row[1])
-        else:
-            break
-    
-    ignored_audit_str, ignored_audit_ids = get_ignored_audit_structs(ignored_audit_set, 'ires.')
-    
-    
     #Organos fiscalizadores
-    entesSql = "select * from fiscals;"
-    try:
-        entesRows = exec_steady(entesSql)
-    except EmptySetError:
-        rows = []
-
-    entes = {}
-    for e in entesRows:
-        entes[e[1]] = e[0]
-
-
-    # Retrieve de cant. obs y montos por cada ente, empezando por ASENL
-    aux_dict = {}
-
-    data_rows = []
+    entes = setEntesIds()
 
     if fiscal == 'SFP':
         sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'SFP', str_filtro_direccion)
-        l = getDataSFP( sql, entes['SFP'] )
-        data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
+        l = getDataSFP( sql, entes['SFP'], ('SFPR' in auth) )
     elif fiscal == 'ASF':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
         sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'ASF', str_filtro_direccion)
-        l = getDataASF( sql, entes['ASF'] )
-        data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
+        l = getDataASF( sql, entes['ASF'], ('ASFR' in auth) )
     elif fiscal == 'CYTG':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
         sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'CYTG', str_filtro_direccion)
-        l = getDataCYTG( sql, entes['CyTG'] )
-        data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
+        l = getDataCYTG( sql, entes['CyTG'], ('CYTR' in auth) )
     elif fiscal == 'ASENL':
         ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
         sql = setSQLs( ignored_audit_str, ej_ini, ej_fin, reporte_num, 'ASENL', str_filtro_direccion)
-        l = getDataASENL( sql, entes['ASENL'] )
-        data_rows = setDataObj56(l) if reporte_num == 'reporte56' else setDataObj58(l)
+        l = getDataASENL( sql, entes['ASENL'], ('ASER' in auth) )
+    else:
+        l = []
+
+    data_rows = setDataObj56(l) if (reporte_num == 'reporte56') else (setDataObj58(l) if (reporte_num == 'reporte58') else [])
 
     return {
         'data_rows': data_rows,
@@ -100,9 +46,9 @@ def get(ej_ini, ej_fin, fiscal, reporte_num, user_id):
 
 
 
-def getDataASF( sql, ente ):
+def getDataASF( sql, ente, permission ):
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
 
@@ -133,9 +79,9 @@ def getDataASF( sql, ente ):
     return l
 
 
-def getDataCYTG( sql, ente ):
+def getDataCYTG( sql, ente, permission ):
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
     
@@ -167,9 +113,9 @@ def getDataCYTG( sql, ente ):
 
 
 
-def getDataSFP( sql, ente ):
+def getDataSFP( sql, ente, permission ):
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
 
@@ -201,9 +147,9 @@ def getDataSFP( sql, ente ):
     return l
 
 
-def getDataASENL( sql, ente ):
+def getDataASENL( sql, ente, permission ):
     try:
-        rows = exec_steady(sql)
+        rows = exec_steady(sql) if permission else []
     except EmptySetError:
         rows = []
     
@@ -345,24 +291,15 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
     }
     return sqls[ent]
 
-def get_direction_filter(user_id):
-    sql = 'select division_id from users where id = ' + str(user_id) + ' ;'
+def setEntesIds():
+    entesSql = "select * from fiscals;"
     try:
-        direccion_id = exec_steady(sql)[0][0]
+        entesRows = exec_steady(entesSql)
     except EmptySetError:
-        direccion_id = 0
-    str_filtro_direccion = 'and direccion_id = ' + str(direccion_id) if int(direccion_id) else ''
-    return str_filtro_direccion
+        rows = []
 
-def get_ignored_audit_structs(ignored_audit_set, prefix):
-    s = ''
-    l = []
-    while True:
-        try:
-            aud = str(ignored_audit_set.pop())
-            l.append(aud)
-            s += ' and ' + prefix + 'auditoria_id <> ' + aud
-        except:
-            break
-    
-    return s, l
+    entes = {}
+    for e in entesRows:
+        entes[e[1]] = e[0]
+
+    return entes

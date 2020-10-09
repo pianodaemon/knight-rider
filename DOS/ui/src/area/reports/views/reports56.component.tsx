@@ -5,12 +5,15 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { TokenStorage } from 'src/shared/utils/token-storage.util';
+import { useSelector } from 'react-redux'
+import { resolvePermission } from 'src/shared/utils/permissions.util';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 type Props = {
   loading: boolean,
   loadReport56Action: Function,
   report: any,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -86,22 +89,26 @@ export const Report56 = (props: Props) => {
     report,
     // loading,
     loadReport56Action,
+    divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
-  const [fiscal , setFiscal ] = useState<any>('SFP');
-  const { sub: userId } = TokenStorage.getTokenClaims() || {};
-  useEffect(() => {
-    loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, user_id: userId });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni, fiscal]);
-  const classes = useStyles();
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   const optionsFiscals = [
-    { value: 'SFP',   label: 'SFP' },
-    { value: 'ASF',   label: 'ASF' },
-    { value: 'ASENL', label: 'ASENL' },
-    { value: 'CYTG',  label: 'CYTG' },
-  ];
+    { value: 'SFP',   label: 'SFP',   tk: 'SFPR' },
+    { value: 'ASF',   label: 'ASF',   tk: 'ASFR' },
+    { value: 'ASENL', label: 'ASENL', tk: 'ASER' },
+    { value: 'CYTG',  label: 'CYTG',  tk: 'CYTR' },
+  ].filter( option => isVisible( option.tk ));
+  const [fiscal , setFiscal ] = useState<any>(optionsFiscals.length ? optionsFiscals[0].value : null );
+  useEffect(() => {
+    if( divisionId || divisionId === 0 ){
+      loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, reporte_num: 'reporte56', division_id: divisionId });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [yearEnd, yearIni, fiscal, divisionId]);
+  const classes = useStyles();
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
     let valueArray = valueStringFixed2.split('');
@@ -179,10 +186,19 @@ export const Report56 = (props: Props) => {
 
       </div>
 
+      <ReactHTMLTableToExcel
+         id="downloadTableXlsButton"
+         className="downloadTableXlsButton"
+         table="table-to-xls"
+         filename="Reporte"
+         sheet="tablexls"
+         buttonText="Descargar Reporte"
+      />
       <div style={{background: "rgba(0,0,0,0.03)", borderBottom: "1px solid rgba(0,0,0,0.05)", textAlign: "center", padding: "5px 0", fontWeight: "bold", marginBottom: "0px" }}>
         Pendientes de Solventar
       </div>
-      <table className={classes.tableWhole}> 
+
+      <table className={classes.tableWhole} id="table-to-xls"> 
         <tbody className={classes.tableReports} >
           <tr className={classes.titrow}>    
             <th >Secretaría/Entidad/Municipio</th> 

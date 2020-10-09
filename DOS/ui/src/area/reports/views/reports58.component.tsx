@@ -5,12 +5,15 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { TokenStorage } from 'src/shared/utils/token-storage.util';
+import { useSelector } from 'react-redux'
+import { resolvePermission } from 'src/shared/utils/permissions.util';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 type Props = {
   loading: boolean,
   loadReport56Action: Function,
   report: any,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -86,24 +89,28 @@ export const Report58 = (props: Props) => {
     report,
     // loading,
     loadReport56Action,
+    divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
-  const [fiscal , setFiscal ] = useState<any>('SFP');
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
+  const optionsFiscals = [
+    { value: 'SFP',   label: 'SFP',   tk: 'SFPR' },
+    { value: 'ASF',   label: 'ASF',   tk: 'ASFR' },
+    { value: 'ASENL', label: 'ASENL', tk: 'ASER' },
+    { value: 'CYTG',  label: 'CYTG',  tk: 'CYTR' },
+  ].filter( option => isVisible( option.tk ));
+  const [fiscal , setFiscal ] = useState<any>(optionsFiscals.length ? optionsFiscals[0].value : null );
   const [entidad , setEntidad ] = useState<any>(fiscal);
-  const { sub: userId } = TokenStorage.getTokenClaims() || {};
   useEffect(() => {
-    loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, reporte_num: 'reporte58', user_id: userId });
+    if( divisionId || divisionId === 0 ){
+      loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, reporte_num: 'reporte58', division_id: divisionId });
+    }
     setEntidad(fiscal);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni, fiscal]);
+  }, [yearEnd, yearIni, fiscal, divisionId]);
   const classes = useStyles();
-  const optionsFiscals = [
-    { value: 'SFP',   label: 'SFP' },
-    { value: 'ASF',   label: 'ASF' },
-    { value: 'ASENL', label: 'ASENL' },
-    { value: 'CYTG',  label: 'CYTG' },
-  ];
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
     let valueArray = valueStringFixed2.split('');
@@ -176,7 +183,15 @@ export const Report58 = (props: Props) => {
 
       </div>
 
-      <table className={classes.tableWhole}> 
+      <ReactHTMLTableToExcel
+         id="downloadTableXlsButton"
+         className="downloadTableXlsButton"
+         table="table-to-xls"
+         filename="Reporte"
+         sheet="tablexls"
+         buttonText="Descargar Reporte"
+      />
+      <table className={classes.tableWhole} id="table-to-xls"> 
         <tbody className={classes.tableReports} >
           <tr >    
             <th colSpan={4}> {entidad} </th> 

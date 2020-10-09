@@ -5,12 +5,15 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { TokenStorage } from 'src/shared/utils/token-storage.util';
+import { useSelector } from 'react-redux'
+import { resolvePermission } from 'src/shared/utils/permissions.util';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 type Props = {
   loading: boolean,
   loadReport54Action: Function,
   report: any,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -89,21 +92,28 @@ export const Report54 = (props: Props) => {
     report,
     // loading,
     loadReport54Action,
+    divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
-  const [fiscal , setFiscal ] = useState<any>('');
-  const { sub: userId } = TokenStorage.getTokenClaims() || {};
-  useEffect(() => {
-    loadReport54Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, user_id: userId });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni, fiscal]);
-  const classes = useStyles();
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   const optionsFiscals = [
-    { value: 'asf',   label: 'ASF' },
-    { value: 'asenl', label: 'ASENL' },
-    { value: '',      label: 'Todas' },
-  ];
+    { value: 'asf',   label: 'ASF'  ,  tk:'ASFR'},
+    { value: 'asenl', label: 'ASENL',  tk:'ASER'},
+  ].filter( option => isVisible( option.tk ));
+  if (optionsFiscals.length >= 2){
+    optionsFiscals.push( { value: 'Todas', label: 'Todas',  tk:''    } )
+  }
+  const [fiscal , setFiscal ] = useState<any>(optionsFiscals.length ? optionsFiscals[0].value : null );
+  useEffect(() => {
+    var fiscalUpdate = (fiscal === 'Todas') ? '' : fiscal
+    if( divisionId || divisionId === 0 ){
+      loadReport54Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscalUpdate, division_id: divisionId});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [yearEnd, yearIni, fiscal, divisionId]);
+  const classes = useStyles();
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
     let valueArray = valueStringFixed2.split('');
@@ -177,7 +187,15 @@ export const Report54 = (props: Props) => {
       </div>
 
 
-      <table className={classes.tableWhole}> 
+      <ReactHTMLTableToExcel
+         id="downloadTableXlsButton"
+         className="downloadTableXlsButton"
+         table="table-to-xls"
+         filename="Reporte"
+         sheet="tablexls"
+         buttonText="Descargar Reporte"
+      />
+      <table className={classes.tableWhole} id="table-to-xls"> 
         <tbody className={classes.tableReports} >
           <tr className={classes.titrow}>    
             <th rowSpan={2} style={{background:'#ffffff', color: '#333333',}}>Secretaría/Entidad/Municipio</th> 

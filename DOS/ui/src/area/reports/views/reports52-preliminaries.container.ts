@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import { Report52Preliminaries } from './reports52-preliminaries.component';
 import { loadReportsAction } from '../state/usecases/load-reports.usecase';
+import { currentUserDivisionIdSelector } from 'src/area/auth/state/auth.selectors';
 import {
   isLoadingSelector,
   reportSelector,
@@ -14,6 +15,7 @@ function mapStateToProps(state: any) {
   return {
     report: reportSelector(state),
     loading: isLoadingSelector(state),
+    divisionId: currentUserDivisionIdSelector(state),
   };
 }
 

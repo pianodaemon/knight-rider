@@ -5,12 +5,15 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { TokenStorage } from 'src/shared/utils/token-storage.util';
+import { useSelector } from 'react-redux'
+import { resolvePermission } from 'src/shared/utils/permissions.util';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 type Props = {
   loading: boolean,
   loadReport61Action: Function,
   report: any,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -86,29 +89,34 @@ export const Report61 = (props: Props) => {
     report,
     // loading,
     loadReport61Action,
+    divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
-  const [fiscal , setFiscal ] = useState<any>('SFP');
-  const [pre_ires , setPreIres ] = useState<any>('pre');
-  const [entidad , setEntidad ] = useState<any>(fiscal);
-  const { sub: userId } = TokenStorage.getTokenClaims() || {};
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
+  const optionsFiscalsAux: {[index: string]:any}   = {
+    'SFPR' : { value:'SFPR' ,label: 'SFP'                   ,isVisible: isVisible('SFPR'), fiscal: 'SFP'   ,pre_ires: 'pre'},
+    'ASFP' : { value:'ASFP' ,label: 'ASF Preliminares'      ,isVisible: isVisible('ASFP'), fiscal: 'ASF'   ,pre_ires: 'pre'},
+    'ASEP' : { value:'ASEP' ,label: 'ASENL Preliminares'    ,isVisible: isVisible('ASEP'), fiscal: 'ASENL' ,pre_ires: 'pre'},
+    'CYTP' : { value:'CYTP' ,label: 'CYTG Preliminares'     ,isVisible: isVisible('CYTP'), fiscal: 'CYTG'  ,pre_ires: 'pre'},
+    'ASFR' : { value:'ASFR' ,label: 'ASF Inf. Resultados'   ,isVisible: isVisible('ASFR'), fiscal: 'ASF'   ,pre_ires: 'ires'},
+    'ASER' : { value:'ASER' ,label: 'ASENL Inf. Resultados' ,isVisible: isVisible('ASER'), fiscal: 'ASENL' ,pre_ires: 'ires'},
+    'CYTR' : { value:'CYTR' ,label: 'CYTG Inf. Resultados'  ,isVisible: isVisible('CYTR'), fiscal: 'CYTG'  ,pre_ires: 'ires'},
+  };
+  const optionsFiscals = Object.values(optionsFiscalsAux).filter( option => option.isVisible );
+  const [ optionS , setOptionS ] = useState<any>( optionsFiscals.length ? optionsFiscals[0].value : 'SFPR' );
+  const [ entidad , setEntidad ] = useState<any>( optionsFiscalsAux[optionS].label );
   useEffect(() => {
-    loadReport61Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, obs_c: pre_ires, user_id: userId });
-    setEntidad(fiscal);
+    var fiscal = optionsFiscalsAux[optionS].fiscal;
+    var pre_ires = optionsFiscalsAux[optionS].pre_ires;
+    if( divisionId || divisionId === 0 ){
+      loadReport61Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, obs_c: pre_ires, division_id: divisionId });
+    }
+    setEntidad(optionsFiscalsAux[optionS].label);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni, fiscal, pre_ires]);
+  }, [yearEnd, yearIni, optionS, divisionId]);
   const classes = useStyles();
-  const optionsFiscals = [
-    { value: 'SFP',   label: 'SFP' },
-    { value: 'ASF',   label: 'ASF' },
-    { value: 'ASENL', label: 'ASENL' },
-    { value: 'CYTG',  label: 'CYTG' },
-  ];
-  const optionsPreIres = [
-    { value: 'pre',   label: 'Preliminares' },
-    { value: 'ires',  label: 'Informe de Resultados' },
-  ];
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
     let valueArray = valueStringFixed2.split('');
@@ -164,8 +172,8 @@ export const Report61 = (props: Props) => {
           <InputLabel className={classes.labelSelectYear}>Ente Fiscalizador:</InputLabel>
           <Select
             labelId="fiscal"
-            value={fiscal}
-            onChange={(e)=> {setFiscal(e.target.value);}}
+            value={optionS}
+            onChange={(e)=> {setOptionS(e.target.value);}}
           >
             {optionsFiscals.map((item) => {
               return (
@@ -178,29 +186,17 @@ export const Report61 = (props: Props) => {
             })}
           </Select>
         </div>
-
-        <div className={classes.selectYearContainer}>
-          <InputLabel className={classes.labelSelectYear}>Observación:</InputLabel>
-          <Select
-            labelId="pre_ires"
-            value={pre_ires}
-            onChange={(e)=> {setPreIres(e.target.value);}}
-          >
-            {optionsPreIres.map((item) => {
-              return (
-                <MenuItem
-                  value={item.value}
-                >
-                  {item.label}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </div>
-
       </div>
 
-      <table className={classes.tableWhole}> 
+      <ReactHTMLTableToExcel
+         id="downloadTableXlsButton"
+         className="downloadTableXlsButton"
+         table="table-to-xls"
+         filename="Reporte"
+         sheet="tablexls"
+         buttonText="Descargar Reporte"
+      />
+      <table className={classes.tableWhole} id="table-to-xls"> 
         <tbody className={classes.tableReports} >
           <tr >    
             <th colSpan={7}> {entidad} </th> 

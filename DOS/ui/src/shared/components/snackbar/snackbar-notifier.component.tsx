@@ -8,13 +8,22 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 type Props = {
   notificationCloseAction: Function,
-  notification: any,
+  notification: Notification,
 };
+
+type Notification = {
+  autoHideDuration?: number,
+  isOpen: boolean,
+  message: React.ReactNode,
+  type: "error" | "info" | "success",
+};
+
+const AUTO_HIDE_DURATION = 15000;
 
 export const SnackbarNotifier = (props: Props) => {
   // const [open, setOpen] = React.useState(false);
   const { notification, notificationCloseAction } = props;
-  const { isOpen, message, type } = notification;
+  const { autoHideDuration, isOpen, message, type } = notification;
 
   const handleClose = (
     event: React.SyntheticEvent | React.MouseEvent,
@@ -48,7 +57,7 @@ export const SnackbarNotifier = (props: Props) => {
           horizontal: 'left',
         }}
         open={isOpen}
-        autoHideDuration={6000}
+        {...(autoHideDuration ? {autoHideDuration : autoHideDuration} : {autoHideDuration : AUTO_HIDE_DURATION})}
         onClose={handleClose}
         message={message}
         action={

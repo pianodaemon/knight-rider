@@ -5,11 +5,15 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { range } from 'src/shared/utils/range.util';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { useSelector } from 'react-redux'
+import { resolvePermission } from 'src/shared/utils/permissions.util';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 type Props = {
   loading: boolean,
   loadReportsAction: Function,
   report: any,
+  divisionId: number,
 };
 
 const useStyles = makeStyles(() =>
@@ -88,13 +92,16 @@ export const Report52Preliminaries = (props: Props) => {
     report,
     // loading,
     loadReportsAction,
+    divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2012');
   useEffect(() => {
-    loadReportsAction({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni});
+    if( divisionId || divisionId === 0 ){
+      loadReportsAction({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, division_id: divisionId});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni]);
+  }, [yearEnd, yearIni, divisionId]);
   const classes = useStyles();
   const formatMoney = ( monto: number): string =>  {
     let valueStringFixed2 = monto.toFixed(2);
@@ -112,6 +119,9 @@ export const Report52Preliminaries = (props: Props) => {
     }
     return valueString;
   };
+  const permissions: any = useSelector((state: any) => state.authSlice);
+  const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
+  const isVisibleFiscal = { 'sfp' : isVisible('SFPR'), 'asf' : isVisible('ASFR'), 'asenl' : isVisible('ASER'), 'cytg' : isVisible('CYTR') };
   return (
     <div className={classes.Container}>
       <div>
@@ -149,8 +159,15 @@ export const Report52Preliminaries = (props: Props) => {
         </div>
       </div>
 
-
-      <table className={classes.tableWhole}> 
+      <ReactHTMLTableToExcel
+         id="downloadTableXlsButton"
+         className="downloadTableXlsButton"
+         table="table-to-xls"
+         filename="Reporte"
+         sheet="tablexls"
+         buttonText="Descargar Reporte"
+      />
+      <table className={classes.tableWhole} id="table-to-xls"> 
         <tbody className={classes.tableReports} >
           <tr className={classes.titrow}>    
             <th colSpan={2}>ASF</th> 
@@ -174,16 +191,16 @@ export const Report52Preliminaries = (props: Props) => {
              { report && report.sum_rows &&
              <tr> 
                
-               <td className={classes.cantObs}>{report.sum_rows.c_asf}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asf) }</td>
-               <td className={classes.cantObs}>{report.sum_rows.c_sfp}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_sfp )}</td>
-               <td className={classes.cantObs}>{report.sum_rows.c_asenl}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asenl) }</td>
-               <td className={classes.cantObs}>{report.sum_rows.c_cytg}</td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_cytg) }</td>
-               <td className={classes.cantObs}>{ report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg } </td>
-               <td className={classes.montos} >{ formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  } </td>
+               <td className={classes.cantObs}>{  isVisibleFiscal.asf   ? report.sum_rows.c_asf                : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.asf   ? formatMoney(report.sum_rows.m_asf)   : '-' }</td>
+               <td className={classes.cantObs}>{  isVisibleFiscal.sfp   ? report.sum_rows.c_sfp                : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.sfp   ? formatMoney(report.sum_rows.m_sfp )  : '-' }</td>
+               <td className={classes.cantObs}>{  isVisibleFiscal.asenl ? report.sum_rows.c_asenl              : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.asenl ? formatMoney(report.sum_rows.m_asenl) : '-' }</td>
+               <td className={classes.cantObs}>{  isVisibleFiscal.cytg  ? report.sum_rows.c_cytg               : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.cytg  ? formatMoney(report.sum_rows.m_cytg)  : '-' }</td>
+               <td className={classes.cantObs}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg)             : '-' } </td>
+               <td className={classes.montos} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  : '-' } </td>
              </tr>
                
              }

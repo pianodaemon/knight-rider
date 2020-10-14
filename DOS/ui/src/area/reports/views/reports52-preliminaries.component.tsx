@@ -199,8 +199,8 @@ export const Report52Preliminaries = (props: Props) => {
                <td className={classes.montos} >{  isVisibleFiscal.asenl ? formatMoney(report.sum_rows.m_asenl) : '-' }</td>
                <td className={classes.cantObs}>{  isVisibleFiscal.cytg  ? report.sum_rows.c_cytg               : '-' }</td>
                <td className={classes.montos} >{  isVisibleFiscal.cytg  ? formatMoney(report.sum_rows.m_cytg)  : '-' }</td>
-               <td className={classes.cantObs}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg)             : '-' } </td>
-               <td className={classes.montos} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg)  : '-' } </td>
+               <td className={classes.cantObs}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (report.sum_rows.c_total)             : '-' } </td>
+               <td className={classes.montos} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_total)  : '-' } </td>
              </tr>
                
              }

@@ -219,8 +219,8 @@ export const ReportPreliminaries = (props: Props) => {
               <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.asenl ? formatMoney(report.sum_rows.m_asenl) : '-' }</td>
               <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.cytg  ? report.sum_rows.c_cytg               : '-' }</td>
               <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.cytg  ? formatMoney(report.sum_rows.m_cytg)  : '-' }</td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (report.sum_rows.c_asf + report.sum_rows.c_sfp + report.sum_rows.c_asenl + report.sum_rows.c_cytg)            : '-' } </td>
-              <td style={{fontWeight: "bold", textAlign: "right"}} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_asf + report.sum_rows.m_sfp + report.sum_rows.m_asenl + report.sum_rows.m_cytg) : '-' } </td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (report.sum_rows.c_total)            : '-' } </td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_total) : '-' } </td>
             </tr>
           }
         </tbody>

@@ -5,6 +5,7 @@ import { getReports } from '../../service/reports.service';
 import { resultsReducer } from '../reports.reducer';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
 // import { pagingSelector } from '../results-report.selectors';
+import { Decimal } from 'decimal.js';
 
 const postfix = '/app';
 const LOAD_REPORTS = `LOAD_REPORTS${postfix}`;
@@ -44,17 +45,30 @@ function* loadResultsReportWorker(action?: any): Generator<any, any, any> {
     const result = yield call(getReports, options);
 
     var dat = result.data;
-    var sum_obj = {c_asf:0, m_asf:0, c_sfp:0, m_sfp:0, c_asenl:0, m_asenl:0, c_cytg:0, m_cytg:0 };
+    var sum_obj = {
+      c_asf    : 0              ,
+      m_asf    : new Decimal(0) , 
+      c_sfp    : 0              , 
+      m_sfp    : new Decimal(0) , 
+      c_asenl  : 0              , 
+      m_asenl  : new Decimal(0) , 
+      c_cytg   : 0              ,
+      m_cytg   : new Decimal(0) ,
+      c_total  : 0              ,
+      m_total  : new Decimal(0) ,
+    };
     dat.data_rows.forEach(function(x: any) {
-      sum_obj.c_asf   += x.c_asf   ;
-      sum_obj.m_asf   += x.m_asf   ;
-      sum_obj.c_sfp   += x.c_sfp   ;
-      sum_obj.m_sfp   += x.m_sfp   ;
-      sum_obj.c_asenl += x.c_asenl ;
-      sum_obj.m_asenl += x.m_asenl ;
-      sum_obj.c_cytg  += x.c_cytg  ;
-      sum_obj.m_cytg  += x.m_cytg  ;
+      sum_obj.c_asf   += x.c_asf                                    ;
+      sum_obj.m_asf    = Decimal.add( sum_obj.m_asf, x.m_asf )      ;
+      sum_obj.c_sfp   += x.c_sfp                                    ;
+      sum_obj.m_sfp    = Decimal.add( sum_obj.m_sfp, x.m_sfp )      ;
+      sum_obj.c_asenl += x.c_asenl                                  ;
+      sum_obj.m_asenl  = Decimal.add( sum_obj.m_asenl, x.m_asenl )  ;
+      sum_obj.c_cytg  += x.c_cytg                                   ;
+      sum_obj.m_cytg   = Decimal.add( sum_obj.m_cytg, x.m_cytg )    ;
     } )
+    sum_obj.c_total = sum_obj.c_asf + sum_obj.c_sfp + sum_obj.c_asenl + sum_obj.c_cytg;
+    sum_obj.m_total = (sum_obj.m_asf).plus(sum_obj.m_sfp).plus(sum_obj.m_asenl).plus(sum_obj.m_cytg);
 
     var sendData = {data_rows: result.data.data_rows, sum_rows: sum_obj};
     yield put(loadReportsSuccessAction( sendData ));

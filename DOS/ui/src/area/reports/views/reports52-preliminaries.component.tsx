@@ -8,6 +8,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux'
 import { resolvePermission } from 'src/shared/utils/permissions.util';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import NumberFormat from 'react-number-format';
 
 type Props = {
   loading: boolean,
@@ -103,22 +104,6 @@ export const Report52Preliminaries = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, divisionId]);
   const classes = useStyles();
-  const formatMoney = ( monto: number): string =>  {
-    let valueStringFixed2 = monto.toFixed(2);
-    let valueArray = valueStringFixed2.split('');
-    let arrayReverse = valueArray.reverse();
-    let valueString = '';
-    for(let i in arrayReverse ) {
-      let st:number = Number(i);
-      valueString = arrayReverse[i] + valueString;
-      let sti:number;
-      sti = (st - 2);
-      if( (sti%3)===0 && st !== 2 && st !== (arrayReverse.length - 1) ){
-        valueString = ',' + valueString
-      }
-    }
-    return valueString;
-  };
   const permissions: any = useSelector((state: any) => state.authSlice);
   const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   const isVisibleFiscal = { 'sfp' : isVisible('SFPR'), 'asf' : isVisible('ASFR'), 'asenl' : isVisible('ASER'), 'cytg' : isVisible('CYTR') };
@@ -192,15 +177,15 @@ export const Report52Preliminaries = (props: Props) => {
              <tr> 
                
                <td className={classes.cantObs}>{  isVisibleFiscal.asf   ? report.sum_rows.c_asf                : '-' }</td>
-               <td className={classes.montos} >{  isVisibleFiscal.asf   ? formatMoney(report.sum_rows.m_asf)   : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.asf   ? <NumberFormat value={report.sum_rows.m_asf.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
                <td className={classes.cantObs}>{  isVisibleFiscal.sfp   ? report.sum_rows.c_sfp                : '-' }</td>
-               <td className={classes.montos} >{  isVisibleFiscal.sfp   ? formatMoney(report.sum_rows.m_sfp )  : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.sfp   ? <NumberFormat value={report.sum_rows.m_sfp.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
                <td className={classes.cantObs}>{  isVisibleFiscal.asenl ? report.sum_rows.c_asenl              : '-' }</td>
-               <td className={classes.montos} >{  isVisibleFiscal.asenl ? formatMoney(report.sum_rows.m_asenl) : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.asenl ? <NumberFormat value={report.sum_rows.m_asenl.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
                <td className={classes.cantObs}>{  isVisibleFiscal.cytg  ? report.sum_rows.c_cytg               : '-' }</td>
-               <td className={classes.montos} >{  isVisibleFiscal.cytg  ? formatMoney(report.sum_rows.m_cytg)  : '-' }</td>
+               <td className={classes.montos} >{  isVisibleFiscal.cytg  ? <NumberFormat value={report.sum_rows.m_cytg.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
                <td className={classes.cantObs}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (report.sum_rows.c_total)             : '-' } </td>
-               <td className={classes.montos} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_total)  : '-' } </td>
+               <td className={classes.montos} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? <NumberFormat value={report.sum_rows.m_total.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' } </td>
              </tr>
                
              }

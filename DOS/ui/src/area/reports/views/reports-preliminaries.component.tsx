@@ -8,6 +8,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux'
 import { resolvePermission } from 'src/shared/utils/permissions.util';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import NumberFormat from 'react-number-format';
 
 type Props = {
   loading: boolean,
@@ -103,22 +104,6 @@ export const ReportPreliminaries = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, divisionId]);
   const classes = useStyles();
-  const formatMoney = ( monto: number): string =>  {
-    let valueStringFixed2 = monto.toFixed(2);
-    let valueArray = valueStringFixed2.split('');
-    let arrayReverse = valueArray.reverse();
-    let valueString = '';
-    for(let i in arrayReverse ) {
-      let st:number = Number(i);
-      valueString = arrayReverse[i] + valueString;
-      let sti:number;
-      sti = (st - 2);
-      if( (sti%3)===0 && st !== 2 && st !== (arrayReverse.length - 1) ){
-        valueString = ',' + valueString
-      }
-    }
-    return valueString;
-  };
   const permissions: any = useSelector((state: any) => state.authSlice);
   const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   const isVisibleFiscal = { 'sfp' : isVisible('SFPR'), 'asf' : isVisible('ASFR'), 'asenl' : isVisible('ASER'), 'cytg' : isVisible('CYTR') };
@@ -195,16 +180,16 @@ export const ReportPreliminaries = (props: Props) => {
              <tr> 
                <td>{dep.dep}</td> 
                <td>{dep.ej}</td>
-               <td className={classes.cantObs} >{ isVisibleFiscal.asf   ? dep.c_asf                : '-' }</td>
-               <td className={classes.montos}  >{ isVisibleFiscal.asf   ? formatMoney(dep.m_asf)   : '-' }</td>
+               <td className={classes.cantObs} >{ isVisibleFiscal.asf   ? dep.c_asf : '-' }</td>
+               <td className={classes.montos}  >{ isVisibleFiscal.asf   ? <NumberFormat value={dep.m_asf} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
                <td className={classes.cantObs} >{ isVisibleFiscal.sfp   ? dep.c_sfp                : '-' }</td>
-               <td className={classes.montos}  >{ isVisibleFiscal.sfp   ? formatMoney(dep.m_sfp)   : '-' }</td>
+               <td className={classes.montos}  >{ isVisibleFiscal.sfp   ? <NumberFormat value={dep.m_sfp} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
                <td className={classes.cantObs} >{ isVisibleFiscal.asenl ? dep.c_asenl              : '-' }</td>
-               <td className={classes.montos}  >{ isVisibleFiscal.asenl ? formatMoney(dep.m_asenl) : '-' }</td>
+               <td className={classes.montos}  >{ isVisibleFiscal.asenl ? <NumberFormat value={dep.m_asenl} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
                <td className={classes.cantObs} >{ isVisibleFiscal.cytg  ? dep.c_cytg               : '-' }</td>
-               <td className={classes.montos}  >{ isVisibleFiscal.cytg  ? formatMoney(dep.m_cytg)  : '-' }</td>
+               <td className={classes.montos}  >{ isVisibleFiscal.cytg  ? <NumberFormat value={dep.m_cytg} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
                <td className={classes.cantObs} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (dep.c_asf + dep.c_sfp + dep.c_asenl + dep.c_cytg)            : '-' } </td>
-               <td className={classes.montos}  >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(dep.m_asf + dep.m_sfp + dep.m_asenl + dep.m_cytg) : '-' } </td>
+               <td className={classes.montos}  >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? <NumberFormat value={dep.m_asf + dep.m_sfp + dep.m_asenl + dep.m_cytg} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' } </td>
              </tr>
           )
           }
@@ -212,15 +197,15 @@ export const ReportPreliminaries = (props: Props) => {
             <tr> 
               <td style={{fontWeight: "bold"}} colSpan={2}>Total</td> 
               <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asf   ? report.sum_rows.c_asf                : '-' }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.asf   ? formatMoney(report.sum_rows.m_asf)   : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.asf   ? <NumberFormat value={report.sum_rows.m_asf.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
               <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.sfp   ? report.sum_rows.c_sfp                : '-' }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.sfp   ? formatMoney(report.sum_rows.m_sfp)   : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.sfp   ? <NumberFormat value={report.sum_rows.m_sfp.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
               <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asenl ? report.sum_rows.c_asenl              : '-' }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.asenl ? formatMoney(report.sum_rows.m_asenl) : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.asenl ? <NumberFormat value={report.sum_rows.m_asenl.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
               <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.cytg  ? report.sum_rows.c_cytg               : '-' }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.cytg  ? formatMoney(report.sum_rows.m_cytg)  : '-' }</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ isVisibleFiscal.cytg  ? <NumberFormat value={report.sum_rows.m_cytg.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
               <td style={{fontWeight: "bold", textAlign: "center"}}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (report.sum_rows.c_total)            : '-' } </td>
-              <td style={{fontWeight: "bold", textAlign: "right"}} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? formatMoney(report.sum_rows.m_total) : '-' } </td>
+              <td style={{fontWeight: "bold", textAlign: "right"}} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? <NumberFormat value={report.sum_rows.m_total.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' } </td>
             </tr>
           }
         </tbody>

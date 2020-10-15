@@ -197,12 +197,12 @@ export const ObservationsSFPForm = (props: Props) => {
     fecha_recibido_oficio_resp: null,
     resp_dependencia: "",
     comentarios: "",
-    clasif_final_interna_cytg: "",
+    clasif_final_interna_cytg: 0,
     num_oficio_org_fiscalizador: "",
     fecha_oficio_org_fiscalizador: null,
-    estatus_id: "",
-    monto_solventado: "",
-    monto_pendiente_solventar: "",
+    estatus_id: 1, // @todo DO NOT HARDCODE, it has DB constraint, use valid value
+    monto_solventado: 0,
+    monto_pendiente_solventar: 0,
   };
   useEffect(() => {
     if (id) {
@@ -215,9 +215,13 @@ export const ObservationsSFPForm = (props: Props) => {
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> = fields.filter((item: string) => /^fecha_/i.test(item)) || [];
     const noMandatoryFields: Array<string> = ["id", "seguimientos", "anios_cuenta_publica",];
+    const mandatoryFields: Array<string> = ["direccion_id", "programa_social_id", "auditoria_id", "tipo_observacion_id", "autoridad_invest_id"];
 
     // Mandatory fields (not empty)
-    fields.filter(field => !noMandatoryFields.includes(field)).forEach((field: string) => {
+    fields
+    .filter(field => !noMandatoryFields.includes(field))
+    .filter(field => mandatoryFields.includes(field))
+    .forEach((field: string) => {
       if (!values[field] || values[field] instanceof Date) {
         errors[field] = 'Required';
 
@@ -256,9 +260,31 @@ export const ObservationsSFPForm = (props: Props) => {
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = values;
+          console.log('fields', fields);
+          Object.keys(fields).forEach((field: any) => {
+            if (fields[field] === null) {
+              fields[field] = "";
+            }
+            if(/^fecha_/i.test(field) && !fields[field]) {
+              fields[field] = values.fecha_captura;
+            }
+            if(/^monto_/i.test(field) && !fields[field]) {
+              fields[field] = 0;
+            }
+          });
           const anio_auditoria = catalog && catalog.audits && values.auditoria_id && catalog.audits.find((item) => item.id === values.auditoria_id) ? (catalog.audits.find((item) => item.id === values.auditoria_id) || {}).years : '';
           fields.anios_cuenta_publica = [anio_auditoria];
+          if (!fields.seguimientos.length) {
+            fields.seguimientos = [
+              seguimientoTemplate
+            ];
+          }
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
+            Object.keys(item).forEach((field: any) => {
+              if(/^fecha_/i.test(field)) {
+                item[field] = values.fecha_captura;
+              }
+            });
             return { ...item, seguimiento_id: index };
           });
           if (id) {

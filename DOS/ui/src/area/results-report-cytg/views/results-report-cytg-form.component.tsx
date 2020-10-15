@@ -808,7 +808,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto solventado"
+                        label="Monto solventado (cifra en miles de pesos)"
                         value={values.monto_solventado}
                         onChange={handleChange('monto_solventado')}
                         name="monto_solventado"
@@ -835,7 +835,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto pendiente de solventar"
+                        label="Monto pendiente de solventar (cifra en miles de pesos)"
                         value={values.monto_pendiente_solventar}
                         onChange={handleChange('monto_pendiente_solventar')}
                         name="monto_pendiente_solventar"
@@ -1293,7 +1293,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                       inputComponent: NumberFormatCustom as any,
                                       startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                     }}
-                                    label="Monto Solventado"
+                                    label="Monto Solventado (cifra en miles de pesos)"
                                     // name="monto_solventado"
                                     onChange={(value: any) => setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value)}
                                     placeholder="0"
@@ -1320,7 +1320,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                       inputComponent: NumberFormatCustom as any,
                                       startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                     }}
-                                    label="Monto Pendiente de solventar"
+                                    label="Monto Pendiente de solventar (cifra en miles de pesos)"
                                     name="monto_pendiente_solventar"
                                     onChange={handleChange('monto_pendiente_solventar')}
                                     placeholder="0"
@@ -1363,7 +1363,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto a reintegrar"
+                        label="Monto a reintegrar (cifra en miles de pesos)"
                         value={values.monto_a_reintegrar}
                         onChange={handleChange('monto_a_reintegrar')}
                         name="monto_a_reintegrar"

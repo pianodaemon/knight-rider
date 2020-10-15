@@ -4,6 +4,7 @@ import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { getReport57 } from '../../service/reports57.service';
 import { result57Reducer } from '../reports57.reducer';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
+import { Decimal } from 'decimal.js';
 
 const postfix = '/app';
 const LOAD_REPORT57 = `LOAD_REPORT57${postfix}`;
@@ -44,10 +45,10 @@ function* loadReport57Worker(action?: any): Generator<any, any, any> {
 
     var dat = result.data;
     
-    var sum_obj = { c_obs:0, monto:0 };
+    var sum_obj = { c_obs:0, monto: new Decimal(0) };
     dat.data_rows.forEach(function(x: any) {
       sum_obj.c_obs      += x.c_obs      ;
-      sum_obj.monto      += x.monto      ;
+      sum_obj.monto = Decimal.add( sum_obj.monto, x.monto )
     } )
 
     var sendData = {data_rows: result.data.data_rows, sum_rows: sum_obj};

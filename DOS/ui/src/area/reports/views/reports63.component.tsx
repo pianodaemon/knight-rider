@@ -208,7 +208,7 @@ export const Report63 = (props: Props) => {
           { report && report.sum_rows &&
             <tr> 
               <td style={{fontWeight: "bold"}} > Totales</td> 
-              <td style={{fontWeight: "bold", textAlign: "center"}}></td>
+              <td style={{fontWeight: "bold", textAlign: "center"}}> { report.sum_rows.c_obs } </td>
               <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
               <td style={{fontWeight: "bold", textAlign: "center"}}></td>
               <td style={{fontWeight: "bold", textAlign: "center"}}> </td>

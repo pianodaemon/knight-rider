@@ -600,7 +600,7 @@ export const ObservationsASFForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto Observado"
+                        label="Monto Observado (cifra en miles de pesos)"
                         value={values.monto_observado}
                         onChange={handleChange('monto_observado')}
                         name="monto_observado"

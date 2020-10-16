@@ -8,6 +8,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux'
 import { resolvePermission } from 'src/shared/utils/permissions.util';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import NumberFormat from 'react-number-format';
 
 type Props = {
   loading: boolean,
@@ -111,22 +112,6 @@ export const Report58 = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, fiscal, divisionId]);
   const classes = useStyles();
-  const formatMoney = ( monto: number): string =>  {
-    let valueStringFixed2 = monto.toFixed(2);
-    let valueArray = valueStringFixed2.split('');
-    let arrayReverse = valueArray.reverse();
-    let valueString = '';
-    for(let i in arrayReverse ) {
-      let st:number = Number(i);
-      valueString = arrayReverse[i] + valueString;
-      let sti:number;
-      sti = (st - 2);
-      if( (sti%3)===0 && st !== 2 && st !== (arrayReverse.length - 1) ){
-        valueString = ',' + valueString
-      }
-    }
-    return valueString;
-  };
   return (
     <div className={classes.Container}>
       <div>
@@ -207,7 +192,7 @@ export const Report58 = (props: Props) => {
               <td>{dep.dep}</td> 
               <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
               <td className={classes.cantObs} >{dep.c_obs}</td>
-              <td className={classes.montos} >{ formatMoney(dep.monto) }</td>
+              <td className={classes.montos} >{ <NumberFormat value={dep.monto} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> }</td>
             </tr>
           )
           }   
@@ -216,7 +201,7 @@ export const Report58 = (props: Props) => {
               <td style={{fontWeight: "bold"}} > Totales</td> 
               <td style={{fontWeight: "bold", textAlign: "center"}}></td>
               <td style={{fontWeight: "bold", textAlign: "center"}}> { report.sum_rows.c_obs }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}> { formatMoney( report.sum_rows.monto )}</td>
+              <td style={{fontWeight: "bold", textAlign: "right"}}> { <NumberFormat value={ report.sum_rows.monto.valueOf() } displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
             </tr>
           }           
           

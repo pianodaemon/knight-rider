@@ -260,7 +260,6 @@ export const ObservationsSFPForm = (props: Props) => {
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = values;
-          console.log('fields', fields);
           Object.keys(fields).forEach((field: any) => {
             if (fields[field] === null) {
               fields[field] = "";

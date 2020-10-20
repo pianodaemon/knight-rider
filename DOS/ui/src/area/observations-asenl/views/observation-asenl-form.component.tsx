@@ -215,15 +215,27 @@ export const ObservationsASENLForm = (props: Props) => {
     ];
     const noMandatoryFields: Array<string> = [
       "id",
-      "tipo_observacion_id",
+      // "tipo_observacion_id",
       ...observacionCompartidaFields,
     ];
     const direccion: () => string = (): string => (
       (catalog && catalog.divisions && catalog.divisions.find((division: any) => division.id === values.direccion_id)) || {}
     ).title || '';
+    const mandatoryFields: Array<string> = [
+      "direccion_id",
+      // "compartida_tipo_observacion_id",
+      "auditoria_id",
+      "tipo_auditoria_id",
+      "tipo_observacion_id",
+      "clasif_final_cytg",
+      "estatus_proceso_id",
+      "proyeccion_solventacion_id",
+      "resultado_final_pub_id",
+    ];
     // Mandatory fields (not empty)
     fields
       .filter((field) => !noMandatoryFields.includes(field))
+      .filter(field => mandatoryFields.includes(field))
       .forEach((field: string) => {
         if (!values[field] || values[field] instanceof Date) {
           errors[field] = 'Required';
@@ -246,7 +258,7 @@ export const ObservationsASENLForm = (props: Props) => {
     });
     // Campos observación compartida
     observacionCompartidaFields.forEach((field: string) => {
-      console.log(compartida, ((Boolean(values.compartida_observacion)) && (direccion()).toLocaleLowerCase() === 'central'));
+      // console.log(compartida, ((Boolean(values.compartida_observacion)) && (direccion()).toLocaleLowerCase() === 'central'));
       if (
         (compartida || ((Boolean(values.compartida_observacion)) && (direccion()).toLocaleLowerCase() === 'central')) &&
         !values[field].toString()
@@ -254,7 +266,7 @@ export const ObservationsASENLForm = (props: Props) => {
         errors[field] = !values[field] ? 'Required' : '';
       }
     });
-    console.log(errors);
+    // console.log(errors);
     return errors;
   };
   return (
@@ -269,6 +281,17 @@ export const ObservationsASENLForm = (props: Props) => {
             ...values,
             monto_observado: parseFloat(values.monto_observado.toString()),
           };
+          Object.keys(fields).forEach((field: any) => {
+            if (fields[field] === null) {
+              fields[field] = "";
+            }
+            if(/^fecha_/i.test(field) && !fields[field]) {
+              fields[field] = values.fecha_captura;
+            }
+            if((/^monto_/i.test(field) || field === "compartida_monto" || field === "compartida_tipo_observacion_id") && !fields[field]) {
+              fields[field] = 0;
+            }
+          });
           if (id) {
             delete fields.id;
             updateObservationASENLAction({ id, fields, history, releaseForm });
@@ -594,6 +617,7 @@ export const ObservationsASENLForm = (props: Props) => {
                         value={values.num_oficio_notif_obs_prelim || ''}
                         onChange={handleChange('num_oficio_notif_obs_prelim')}
                         disabled={disabledModeOn}
+                        InputLabelProps={{ shrink: true }}
                       />
                       {errors.num_oficio_notif_obs_prelim &&
                         touched.num_oficio_notif_obs_prelim && (

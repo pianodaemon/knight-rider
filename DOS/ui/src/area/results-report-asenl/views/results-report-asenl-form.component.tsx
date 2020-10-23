@@ -207,9 +207,21 @@ export const ResultsReportASENLForm = (props: Props) => {
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> = fields.filter((item: string) => /^fecha_/i.test(item)) || [];
     const noMandatoryFields: Array<string> = ["id","observacion_reincidente"];
+    const mandatoryFields: Array<string> = [
+      "observacion_pre_id",
+      "tipo_observacion_id",
+      "compartida_tipo_observacion_id",
+      "clasif_final_cytg",
+      "acciones",
+      "direccion_id",
+      "auditoria_id",
+    ];
 
     // Mandatory fields (not empty)
-    fields.filter(field => !noMandatoryFields.includes(field)).forEach((field: string) => {
+    fields
+    .filter(field => !noMandatoryFields.includes(field))
+    .filter(field => mandatoryFields.includes(field))
+    .forEach((field: string) => {
       if (!values[field] || values[field] instanceof Date) {
         errors[field] = 'Required';
 
@@ -218,6 +230,9 @@ export const ResultsReportASENLForm = (props: Props) => {
         }
       }
       if (field === 'observacion_pre_id' && Array.isArray(values[field]) && !values[field].length) {
+        errors[field] = 'Required';
+      }
+      if (field === 'acciones' && !values[field].length) {
         errors[field] = 'Required';
       }
     });
@@ -242,6 +257,19 @@ export const ResultsReportASENLForm = (props: Props) => {
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = {...values };
+          const today = new Date();
+          const defaultDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+          Object.keys(fields).forEach((field: any) => {
+            if (fields[field] === null) {
+              fields[field] = "";
+            }
+            if(/^fecha_/i.test(field) && !fields[field]) {
+              fields[field] = defaultDate;
+            }
+            if((/^monto_/i.test(field) || field === "compartida_monto" || field === "compartida_tipo_observacion_id") && !fields[field]) {
+              fields[field] = 0;
+            }
+          });
           fields.observacion_pre_id = Array.isArray(fields.observacion_pre_id) ? fields.observacion_pre_id[0] : fields.observacion_pre_id;
           if (id) {
             delete fields.id;
@@ -761,6 +789,14 @@ export const ResultsReportASENLForm = (props: Props) => {
                         }
                         value={catalog && values && values.clasif_final_cytg ? values.clasif_final_cytg : ''}
                       />
+                      {errors.clasif_final_cytg && touched.clasif_final_cytg && errors.clasif_final_cytg && (
+                      <FormHelperText
+                        error
+                        classes={{ error: classes.textErrorHelper }}
+                      >
+                        Ingrese Clasificación final Interna CyTG
+                      </FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>

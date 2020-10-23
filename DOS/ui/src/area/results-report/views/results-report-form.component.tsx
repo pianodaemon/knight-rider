@@ -156,7 +156,7 @@ export const ResultsReportForm = (props: Props) => {
     report,
     updateResultsReportAction,
     loadPreObservationsAction,
-    notificationAction,
+    // notificationAction,
     observations,
     isLoadingPre,
     canLoadMore,
@@ -208,6 +208,27 @@ export const ResultsReportForm = (props: Props) => {
     fecha_oficio_monto_solventado: null,
     monto_pendiente_solventar: "",
   };
+  const seguimiento = {
+    "observacion_id": 111,
+    "seguimiento_id": 0,
+    "medio_notif_seguimiento_id": 1,
+    "num_oficio_cytg_oic": "",
+    "fecha_oficio_cytg_oic": "2020-10-22",
+    "fecha_recibido_dependencia": "2020-10-22",
+    "fecha_vencimiento_cytg": "2020-10-22",
+    "num_oficio_resp_dependencia": "",
+    "fecha_recibido_oficio_resp": "2020-10-22",
+    "resp_dependencia": "",
+    "comentarios": "",
+    "clasif_final_interna_cytg": 0,
+    "num_oficio_org_fiscalizador": "",
+    "fecha_oficio_org_fiscalizador": "2020-10-22",
+    "estatus_id": 1,
+    "monto_solventado": "0",
+    "num_oficio_monto_solventado": "",
+    "fecha_oficio_monto_solventado": "2020-10-22",
+    "monto_pendiente_solventar": 0
+  };
   const PRASTemplate = {
     autoridad_invest_id: "",
     fecha_oficio_cytg_aut_invest: null,
@@ -254,11 +275,22 @@ export const ResultsReportForm = (props: Props) => {
     const errors: any = {};
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> = fields.filter((item: string) => /^fecha_/i.test(item)) || [];
+    const mandatoryFields: Array<string> = [
+      "observacion_pre_id",
+      "tipo_observacion_id",
+      "direccion_id",
+      "auditoria_id",
+      "programa_social_id",
+    ];
     const noMandatoryFields: Array<string> = ["id", "seguimientos", "pras", "tiene_pras"];
-    const noMandatoryFieldsSeguimiento: Array<string> = ["seguimiento_id", "observacion_id", "monto_pendiente_solventar"];
+    // const noMandatoryFieldsSeguimiento: Array<string> = ["seguimiento_id", "observacion_id", "monto_pendiente_solventar"];
+    const noMandatoryFieldsPRA: Array<string> = ["pras_observacion_id"];
 
     // Mandatory fields (not empty)
-    fields.filter(field => !noMandatoryFields.includes(field)).forEach((field: string) => {
+    fields
+    .filter(field => !noMandatoryFields.includes(field))
+    .filter(field => mandatoryFields.includes(field))
+    .forEach((field: string) => {
       if (!values[field] || values[field] instanceof Date) {
         errors[field] = 'Required';
 
@@ -279,6 +311,7 @@ export const ResultsReportForm = (props: Props) => {
       }
     });
 
+    /*
     if (!values.seguimientos.length) {
       errors.seguimiento = 'Es necesario añadir al menos 1 seguimiento al presente reporte.';
       notificationAction({
@@ -292,7 +325,7 @@ export const ResultsReportForm = (props: Props) => {
       Object.keys(seguimiento)
       .filter(field => !noMandatoryFieldsSeguimiento.includes(field))
       .forEach((field: any) => {
-        if (!values.seguimientos[index][field].toString() || values.seguimientos[index][field] instanceof Date) {
+        if (!values.seguimientos[index][field] || values.seguimientos[index][field] instanceof Date) {
           if (!errors.seguimientos) {
             errors.seguimientos = [];
           }
@@ -306,10 +339,13 @@ export const ResultsReportForm = (props: Props) => {
         }
       });
     });
+    */
 
     // PRAs
     if (values.tiene_pras) {
-      Object.keys(values.pras).forEach((field: any) => {
+      Object.keys(values.pras)
+      .filter(field => !noMandatoryFieldsPRA.includes(field))
+      .forEach((field: any) => {
         if (!values.pras[field] || values.pras[field] instanceof Date) {
           errors[`pras_${field}`] = 'Required';
   
@@ -328,6 +364,7 @@ export const ResultsReportForm = (props: Props) => {
       setTimeout(() => element.scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"}), 0);
     }
     */
+   console.log(errors);
     return errors;
   };
   const disabledModeOn = action === 'view';
@@ -345,13 +382,29 @@ export const ResultsReportForm = (props: Props) => {
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = {...values };
-          fields.pras.pras_observacion_id = fields.id;
+          const today = new Date();
+          const defaultDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+          Object.keys(fields).forEach((field: any) => {
+            if (fields[field] === null) {
+              fields[field] = "";
+            }
+            if (/^fecha_/i.test(field) && !fields[field]) {
+              fields[field] = defaultDate;
+            }
+            if (/^monto_/i.test(field) && !fields[field]) {
+              fields[field] = 0;
+            }
+          });
+          if (!fields.seguimientos.length) {
+            fields.seguimientos = [seguimiento];
+          }
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => {
             return { ...item, seguimiento_id: index, monto_pendiente_solventar: sub(fields.monto_observado, item.monto_solventado) };
           });
           if (!fields.tiene_pras) {
             fields.pras = PRAS;
           }
+          fields.pras.pras_observacion_id = fields.id || 0;
           fields.observacion_pre_id = Array.isArray(fields.observacion_pre_id) ? fields.observacion_pre_id[0] : fields.observacion_pre_id;
           if (id) {
             delete fields.id;

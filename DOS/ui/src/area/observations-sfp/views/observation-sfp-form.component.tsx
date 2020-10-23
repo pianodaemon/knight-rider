@@ -280,7 +280,7 @@ export const ObservationsSFPForm = (props: Props) => {
           }
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
             Object.keys(item).forEach((field: any) => {
-              if(/^fecha_/i.test(field)) {
+              if(/^fecha_/i.test(field) && !item[field]) {
                 item[field] = values.fecha_captura;
               }
             });

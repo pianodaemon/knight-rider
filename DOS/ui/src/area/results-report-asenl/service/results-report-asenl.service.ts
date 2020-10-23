@@ -24,7 +24,7 @@ export function getResultReportsASENL(options: any): Promise<any> {
 export function createResultsReportASENL(
   fields: ResultsReportASENL
 ): Promise<any> {
-  return axiosApi(`${getAppSettings().baseUrl}/${PREFIX}`, {
+  return axiosApi(`${getAppSettings().baseUrl}/${PREFIX}/`, {
     method: 'post',
     headers: {
       accept: 'application/json',

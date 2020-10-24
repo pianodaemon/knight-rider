@@ -215,7 +215,7 @@ export const ObservationsSFPForm = (props: Props) => {
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> = fields.filter((item: string) => /^fecha_/i.test(item)) || [];
     const noMandatoryFields: Array<string> = ["id", "seguimientos", "anios_cuenta_publica",];
-    const mandatoryFields: Array<string> = ["direccion_id", "programa_social_id", "auditoria_id", "tipo_observacion_id", "autoridad_invest_id"];
+    const mandatoryFields: Array<string> = ["direccion_id", "programa_social_id", "auditoria_id", "tipo_observacion_id", /* "autoridad_invest_id" */];
 
     // Mandatory fields (not empty)
     fields
@@ -260,7 +260,6 @@ export const ObservationsSFPForm = (props: Props) => {
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = values;
-          console.log('fields', fields);
           Object.keys(fields).forEach((field: any) => {
             if (fields[field] === null) {
               fields[field] = "";
@@ -268,7 +267,7 @@ export const ObservationsSFPForm = (props: Props) => {
             if(/^fecha_/i.test(field) && !fields[field]) {
               fields[field] = values.fecha_captura;
             }
-            if(/^monto_/i.test(field) && !fields[field]) {
+            if((/^monto_/i.test(field) || "autoridad_invest_id" === field) && !fields[field]) {
               fields[field] = 0;
             }
           });
@@ -281,7 +280,7 @@ export const ObservationsSFPForm = (props: Props) => {
           }
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
             Object.keys(item).forEach((field: any) => {
-              if(/^fecha_/i.test(field)) {
+              if(/^fecha_/i.test(field) && !item[field]) {
                 item[field] = values.fecha_captura;
               }
             });

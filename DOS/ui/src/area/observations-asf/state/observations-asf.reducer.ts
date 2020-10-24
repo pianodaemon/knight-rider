@@ -86,7 +86,7 @@ const initialState: ObservationsASFSlice = {
     count: 0,
     pages: 0,
     page: 1,
-    per_page: 5,
+    per_page: 200,
     order: 'desc',
     order_by: 'id',
   },

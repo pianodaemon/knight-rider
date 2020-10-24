@@ -197,7 +197,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
     programa_social_id: '',
   };
   const seguimientoTemplate = {
-    observacion_id: '',
+    observacion_id: parseInt(id, 10) || 0,
     seguimiento_id: '',
     num_oficio_ires: '',
     fecha_notif_ires: null,
@@ -212,7 +212,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
     fecha_oficio_resp_dependencia: null,
     resp_dependencia: '',
     comentarios: '',
-    estatus_seguimiento_id: '',
+    estatus_seguimiento_id: 1, // @todo HARDCODED VALUE. Warning! this could be no longer valid
     monto_solventado: '',
     monto_pendiente_solventar: '',
   };
@@ -228,10 +228,19 @@ export const ResultsReportCYTGForm = (props: Props) => {
     const dateFields: Array<string> =
       fields.filter((item: string) => /^fecha_/i.test(item)) || [];
     const noMandatoryFields: Array<string> = ['id','monto_por_reintegrar'];
+    const mandatoryFields: Array<string> = [
+      "tipo_observacion_id",
+      "estatus_info_resultados_id",
+      "clasif_final_cytg",
+      "direccion_id",
+      "auditoria_id",
+      "programa_social_id",
+    ];
 
     // Mandatory fields (not empty)
     fields
       .filter((field) => !noMandatoryFields.includes(field))
+      .filter((field) => mandatoryFields.includes(field))
       .forEach((field: string) => {
         if (!values[field] || values[field] instanceof Date) {
           errors[field] = 'Required';
@@ -276,6 +285,35 @@ export const ResultsReportCYTGForm = (props: Props) => {
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = { ...values };
+          const today = new Date();
+          const defaultDate = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+          Object.keys(fields).forEach((field: any) => {
+            if (fields[field] === null) {
+              fields[field] = "";
+            }
+            if(/^fecha_/i.test(field) && !fields[field]) {
+              fields[field] = defaultDate;
+            }
+            if(/^monto_/i.test(field) && !fields[field]) {
+              fields[field] = 0;
+            }
+          });
+          if (!fields.seguimientos.length) {
+            fields.seguimientos = [
+              seguimientoTemplate
+            ];
+          }
+          fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
+            Object.keys(item).forEach((field: any) => {
+              if(/^fecha_/i.test(field) && !item[field]) {
+                item[field] = defaultDate;
+              }
+              if(/^monto_/i.test(field) && !item[field]) {
+                item[field] = 0;
+              }
+            });
+            return { ...item, seguimiento_id: index };
+          });
           fields.observacion_pre_id = Array.isArray(fields.observacion_pre_id)
             ? fields.observacion_pre_id[0]
             : fields.observacion_pre_id;
@@ -802,6 +840,15 @@ export const ResultsReportCYTGForm = (props: Props) => {
                             : ''
                         }
                       />
+                      {errors.clasif_final_cytg &&
+                        touched.clasif_final_cytg && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Clasificación final Interna CyTG
+                          </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -905,6 +952,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                         label="# de Oficio PRAS/PFRA de la CyTG para la Dependencia"
                         value={values.num_oficio_pras_cytg_dependencia || ''}
                         onChange={handleChange('num_oficio_pras_cytg_dependencia')}
+                        InputLabelProps={{ shrink: true }}
                       />
                       {errors.num_oficio_pras_cytg_dependencia && touched.num_oficio_pras_cytg_dependencia && (
                         <FormHelperText
@@ -1024,6 +1072,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                     label="# de Oficio del informe de resultados/cédula de seguimiento"
                                     onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_ires`, value.target.value)}
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_ires : ''}
+                                    InputLabelProps={{ shrink: true }}
                                   />
                                 </FormControl>
                               </Grid>
@@ -1069,7 +1118,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                 <FormGroup row>
                                   <FormControlLabel
                                     disabled={disabledModeOn}
-                                    control={<Checkbox checked={values.prorroga} onChange={handleChange('prorroga')} name="prorroga" />}
+                                    control={<Checkbox checked={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].prorroga : false} onChange={handleChange(`seguimientos.${index}.prorroga`)} name="prorroga" />}
                                     label="Prórroga (Sí o No)"
                                   />
                                 </FormGroup>
@@ -1322,7 +1371,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                     }}
                                     label="Monto Pendiente de solventar (cifra en miles de pesos)"
                                     name="monto_pendiente_solventar"
-                                    onChange={handleChange('monto_pendiente_solventar')}
+                                    onChange={handleChange(`seguimientos.${index}.monto_pendiente_solventar`)}
                                     placeholder="0"
                                     value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
                                   />
@@ -1470,6 +1519,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                         label="# de Oficio de la CyTG para la Autoridad investigadora"
                         value={values.num_oficio_cytg_aut_invest || ''}
                         onChange={handleChange('num_oficio_cytg_aut_invest')}
+                        InputLabelProps={{ shrink: true }}
                       />
                       {errors.num_oficio_cytg_aut_invest && touched.num_oficio_cytg_aut_invest && (
                         <FormHelperText

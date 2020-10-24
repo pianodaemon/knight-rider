@@ -355,7 +355,7 @@ def pras_to_comp_type_lit(pras):
 
 
 def add_preliminar_data(ent):
-    if ent['observacion_pre_id'] < 1:
+    if ent['observacion_pre_id'] <= 0:
         ent['direccion_id'] = None
         ent['programa_social_id'] = None
         ent['auditoria_id'] = None
@@ -367,12 +367,16 @@ def add_preliminar_data(ent):
             AND NOT blocked;
         '''.format(ent['observacion_pre_id'])
 
-        rows = exec_steady(sql)
-
-        row = dict(rows[0])
-        ent['direccion_id'] = row['direccion_id']
-        ent['programa_social_id'] = row['programa_social_id']
-        ent['auditoria_id'] = row['auditoria_id']
+        try:
+            rows = exec_steady(sql)
+            row = dict(rows[0])
+            ent['direccion_id'] = row['direccion_id']
+            ent['programa_social_id'] = row['programa_social_id']
+            ent['auditoria_id'] = row['auditoria_id']
+        except Exception as err:
+            ent['direccion_id'] = None
+            ent['programa_social_id'] = None
+            ent['auditoria_id'] = None
 
 
 def transform_list_into_dict(input_list):

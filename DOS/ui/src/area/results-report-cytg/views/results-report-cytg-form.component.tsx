@@ -1118,11 +1118,30 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                 <FormGroup row>
                                   <FormControlLabel
                                     disabled={disabledModeOn}
-                                    control={<Checkbox checked={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].prorroga : false} onChange={handleChange(`seguimientos.${index}.prorroga`)} name="prorroga" />}
+                                    control={
+                                      <Checkbox
+                                        checked={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].prorroga : false}
+                                        onChange={
+                                          (event) => {
+                                            setFieldValue(`seguimientos.${index}.prorroga`, event.target.checked);
+                                            if (!event.target.checked) {
+                                              setFieldValue(`seguimientos.${index}.num_oficio_solic_prorroga`, '');
+                                              setFieldValue(`seguimientos.${index}.fecha_oficio_solic_prorroga`, null);
+                                              setFieldValue(`seguimientos.${index}.num_oficio_contest_prorroga`, '');
+                                              setFieldValue(`seguimientos.${index}.fecha_oficio_contest`, null);
+                                              setFieldValue(`seguimientos.${index}.fecha_vencimiento_ires_nueva`, null);
+                                            }
+                                          }
+                                        }
+                                        name="prorroga"
+                                      />
+                                    }
                                     label="Prórroga (Sí o No)"
                                   />
                                 </FormGroup>
                               </Grid>
+                              {values.seguimientos[index].prorroga && (
+                              <>
                               <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl}>
                                   <TextField 
@@ -1202,6 +1221,8 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                   )}
                                 </FormControl>
                               </Grid>
+                              </>
+                              )}
                               <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl}>
                                   <TextField 

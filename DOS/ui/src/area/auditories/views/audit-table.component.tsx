@@ -78,6 +78,13 @@ export const AuditTable = (props: Props) => {
         pageSize: per_page,
         thirdSortClick: false,
         actionsColumnIndex: 5, // @todo this shouldn't be hardcoded, calculate using columns.lenght
+        emptyRowsWhenPaging: false,
+        maxBodyHeight: 500,
+        rowStyle: (_data: any, index: number, _level: number) => {
+          return index % 2
+            ? { backgroundColor: 'rgb(204,204,204,0.3)' }
+            : {};
+        }
       }}
       components={{
         Pagination: (componentProps) => {
@@ -87,7 +94,7 @@ export const AuditTable = (props: Props) => {
               count={count}
               page={page - 1 || 0}
               rowsPerPage={per_page}
-              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+              rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
               onChangePage={(event, currentPage: number) => {
                 loadAuditsAction({
                   per_page,

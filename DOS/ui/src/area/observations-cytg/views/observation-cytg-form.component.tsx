@@ -207,11 +207,20 @@ export const ObservationsCYTGForm = (props: Props) => {
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> =
       fields.filter((item: string) => /^fecha_/i.test(item)) || [];
-    const noMandatoryFields: Array<string> = ['id', 'tipo_observacion_id'];
+    const noMandatoryFields: Array<string> = ["id", "prorroga"];
+    const mandatoryFields: Array<string> = [
+      "direccion_id",
+      "programa_social_id",
+      "auditoria_id",
+      "tipo_auditoria_id",
+      "tipo_observacion_id",
+      "clasif_pre_cytg",
+    ];
 
     // Mandatory fields (not empty)
     fields
       .filter((field) => !noMandatoryFields.includes(field))
+      .filter(field => mandatoryFields.includes(field))
       .forEach((field: string) => {
         if (!values[field] || values[field] instanceof Date) {
           errors[field] = 'Required';
@@ -252,6 +261,17 @@ export const ObservationsCYTGForm = (props: Props) => {
             ...values,
             monto_observado: parseFloat(values.monto_observado.toString()),
           };
+          Object.keys(fields).forEach((field: any) => {
+            if (fields[field] === null) {
+              fields[field] = "";
+            }
+            if((/^fecha_/i.test(field) || /^periodo_/i.test(field)) && !fields[field]) {
+              fields[field] = values.fecha_captura;
+            }
+            if(/^monto_/i.test(field) && !fields[field]) {
+              fields[field] = 0;
+            }
+          });
           if (id) {
             delete fields.id;
             updateObservationCYTGAction({ id, fields, history, releaseForm });
@@ -828,7 +848,7 @@ export const ObservationsCYTGForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto Observado"
+                        label="Monto Observado (cifra en miles de pesos)"
                         value={values.monto_observado}
                         onChange={handleChange('monto_observado')}
                         name="monto_observado"

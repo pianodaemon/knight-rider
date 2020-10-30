@@ -108,6 +108,13 @@ export const ResultsReportTable = (props: Props) => {
         actionsColumnIndex: columns.length,
         toolbar: true,
         toolbarButtonAlignment: 'right',
+        emptyRowsWhenPaging: false,
+        maxBodyHeight: 500,
+        rowStyle: (_data: any, index: number, _level: number) => {
+          return index % 2 
+            ? { backgroundColor: 'rgb(204,204,204,0.3)' }
+            : {};
+        }
       }}
       components={{
         Pagination: (componentProps) => {
@@ -117,7 +124,7 @@ export const ResultsReportTable = (props: Props) => {
               count={count}
               page={page - 1 || 0}
               rowsPerPage={per_page}
-              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+              rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
               onChangePage={(event, currentPage: number) => {
                 loadResultsReportAction({
                   per_page,

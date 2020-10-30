@@ -782,14 +782,14 @@ export const ObservationsSFPForm = (props: Props) => {
                       <Grid item xs={12} sm={6}>
                         <FormControl className={classes.formControl}>
                           <InputLabel>
-                            Selecciona el Seguimiento a editar
+                            Seleccione el Seguimiento a editar
                           </InputLabel>
                           <Select
                             labelId="current_seguimiento"
                             // id="estatus_id-select"
                             onChange={(event: any) => setCurrenntSeg(event.target.value)}
                             value={currentSeg}
-                            disabled={(action === 'view')}
+                            // disabled={(action === 'view')}
                           >
                             {values &&
                                 values.seguimientos &&
@@ -797,7 +797,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                   return (
                                     <MenuItem
                                       value={index}
-                                      key={`type-${index}`}
+                                      key={`type-${index+1}`}
                                     >
                                       No. Seguimiento: {index}
                                     </MenuItem>
@@ -807,7 +807,9 @@ export const ObservationsSFPForm = (props: Props) => {
                         </FormControl>
                       </Grid>
                       {values && values.seguimientos && values.seguimientos.map((seguimiento: any, index: number) => {
-                        if (index !== currentSeg) return;
+                        if (index !== currentSeg) {
+                          return false;
+                        }
                         return (
                           <Paper className={classes.paper2} elevation={4} key={`fields-group-${index+1}`}>
                             <Grid container spacing={3}>
@@ -1155,8 +1157,7 @@ export const ObservationsSFPForm = (props: Props) => {
                             </Grid>
                           </Paper>
                         );
-                      }
-                      )}
+                      })}
                     </>
                   )}
                 />

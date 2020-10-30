@@ -13,12 +13,16 @@ def _alter_audit(**kwargs):
         {}::integer,
         '{}'::character varying,
         '{}'::integer[],
-        '{}'::integer[])
+        '{}'::integer[],
+        {}::integer,
+        {}::integer)
         AS result( rc integer, msg text )""".format(
             kwargs["id"],
             kwargs["title"],
             dependecy_ids_str,
-            years_str
+            years_str,
+            kwargs["org_fiscal_id"],
+            kwargs["direccion_id"],
         )
 
     rcode, rmsg = run_stored_procedure(sql)
@@ -112,7 +116,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     )
 
 
-def get_catalogs(table_name_list):
+def get_catalogs(table_name_list, search_params):
     ''' Fetches values and captions from a list of tables, intended for use in ui screens '''
     fields_d = {}
 
@@ -126,6 +130,14 @@ def get_catalogs(table_name_list):
                 JOIN dependencia_clasif AS clasif ON dep.clasif_id = clasif.id
                 ORDER BY dep.id;
             '''.format(table)
+
+        elif table == 'divisions' and search_params and 'direccion_id' in search_params and int(search_params['direccion_id']) > 0:
+            sql = '''
+                SELECT *
+                FROM {}
+                WHERE id = {};
+            '''.format(table, search_params['direccion_id'])
+
         else:
             sql = '''
                 SELECT *
@@ -147,6 +159,8 @@ def add_audit_data(ent):
     attributes = set([
         'id',
         'title',
+        'org_fiscal_id',
+        'direccion_id',
     ])
     mod_ent = {attr: ent[attr] for attr in attributes}
 

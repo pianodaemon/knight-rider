@@ -50,6 +50,7 @@ class AuditList(Resource):
     @ns.param("per_page", "How many items per page, default is 10")
     @ns.param("page", "Which page to fetch, default is 1")
     @ns.param("title", "Alphanumeric audit's identifier")
+    @ns.param("direccion_id", "ID de la Dirección")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several audits. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -67,7 +68,7 @@ class AuditList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['title']
+            ['title', 'direccion_id']
         )
 
         try:

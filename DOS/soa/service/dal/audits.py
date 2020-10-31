@@ -87,6 +87,11 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if per_page < 1 or page < 1:
         raise Exception("Value of params 'per_page' and 'page' should be >= 1")
 
+    if search_params and 'direccion_id' in search_params and search_params['direccion_id'] == '0':
+        del search_params['direccion_id']
+        if not search_params:
+            search_params = None
+
     # Counting total number of items and fetching target page
     total_items = count_entities('audits', search_params)
     if total_items > limit:

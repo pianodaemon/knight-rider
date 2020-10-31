@@ -165,7 +165,7 @@ def get_catalogs(table_name_list):
             a = transform_list_into_dict(anios)
 
             sql = '''
-                SELECT id, title
+                SELECT id, title, org_fiscal_id, direccion_id
                 FROM audits
                 WHERE NOT blocked
                 ORDER BY title;

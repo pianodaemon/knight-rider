@@ -91,9 +91,11 @@ pair = api.model('Id-Title pair', {
     'title': fields.String(description='Entry title'),
 })
 
-audit = api.model('Datos de una auditoría', {
+audit = api.model('Auditoría', {
     'id': fields.Integer(description='Id de la auditoría'),
     'title': fields.String(description='Título de la auditoría'),
+    'org_fiscal_id': fields.Integer(description='Id del Órgano Fiscalizador'),
+    'direccion_id': fields.Integer(description='Id de la Dirección'),
     'dependency_ids': fields.List(fields.Integer(), description='List of dependency ids'),
     'years': fields.List(fields.Integer(), description='List of years (public account)'),
 })

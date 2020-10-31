@@ -10,9 +10,11 @@ from misc.helperpg import get_msg_pgerror, EmptySetError
 
 ns = api.namespace("audits", description="Available services for an audit")
 
-audit = api.model('Datos de una auditoría', {
+audit = api.model('Auditoría', {
     'id': fields.Integer(description='Id de la auditoría'),
     'title': fields.String(description='Título de la auditoría'),
+    'org_fiscal_id': fields.Integer(description='Id del Órgano Fiscalizador'),
+    'direccion_id': fields.Integer(description='Id de la Dirección'),
     'dependency_ids': fields.List(fields.Integer(), description='List of dependency ids'),
     'years': fields.List(fields.Integer(), description='List of years (public account)'),
 })
@@ -24,7 +26,14 @@ dependency = api.model('Datos de una Dependencia', {
     'clasif_title': fields.String(description='Clasificación de la Dependencia'),
 })
 
-catalog = api.model('Leyendas y datos para la UI de Observaciones SFP', {
+pair = api.model('Id-Title pair', {
+    'id': fields.Integer(description='An integer as entry identifier'),
+    'title': fields.String(description='Entry title'),
+})
+
+catalog = api.model('Catálogo para pantalla de Auditorías', {
+    'fiscals': fields.List(fields.Nested(pair)),
+    'divisions': fields.List(fields.Nested(pair)),
     'dependencies': fields.List(fields.Nested(dependency)),
 })
 
@@ -174,6 +183,7 @@ class Audit(Resource):
 class Catalog(Resource):
 
     @ns.marshal_with(catalog)
+    @ns.param("direccion_id", "Id de la Dirección")
     def get(self):
         ''' To fetch an object containing data for screen fields (key: table name, value: list of table rows) '''
         try:
@@ -181,8 +191,17 @@ class Catalog(Resource):
         except Exception as err:
             ns.abort(401, message=err)
 
+        search_params = get_search_params(request.args, ['direccion_id'])
+
         try:
-            field_catalog = audits.get_catalogs(['dependencies'])
+            field_catalog = audits.get_catalogs(
+                [
+                    'fiscals',
+                    'divisions',
+                    'dependencies',
+                ],
+                search_params,
+            )
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))
         except Exception as err:

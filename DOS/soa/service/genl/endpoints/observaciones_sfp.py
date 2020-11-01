@@ -62,6 +62,10 @@ seguimiento = api.model('Seguimiento de una Observación SFP', {
     'estatus_id': fields.Integer(description='Estatus'),
     'monto_solventado': fields.Float(description='Monto Solventado'),
     'monto_pendiente_solventar': fields.Float(description='Monto Pendiente de solventar'),
+    'monto_a_reintegrar': fields.Float(description=obs_sfp_ns_captions['monto_a_reintegrar']),
+    'monto_reintegrado': fields.Float(description=obs_sfp_ns_captions['monto_reintegrado']),
+    'fecha_reintegro': fields.Date(description=obs_sfp_ns_captions['fecha_reintegro']),
+    'monto_por_reintegrar': fields.Float(description=obs_sfp_ns_captions['monto_por_reintegrar']),
 })
 
 obs_sfp = api.model('Observación SFP', {

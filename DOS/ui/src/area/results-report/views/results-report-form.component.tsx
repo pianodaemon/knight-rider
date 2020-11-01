@@ -12,6 +12,9 @@ import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -877,835 +880,846 @@ export const ResultsReportForm = (props: Props) => {
                   </Grid>
                 </Grid>
 
-                <hr className={classes.hrSpacer} />
-                <hr className={classes.hrDivider} />
-                
-                <fieldset className={classes.fieldset}>
-                  <legend className={classes.containerLegend}>
+                <ExpansionPanel elevation={4}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
                     <Typography variant="body2" align="center" classes={{root:classes.legend}}>
-                      Seguimientos
+                      Seguimientos y Resumen Reintegros (click para mostrar)
                     </Typography>
-                  </legend>
-                  
-                  <FieldArray
-                    name="seguimientos"
-                    validateOnChange={false}
-                    render={(arrayHelpers: ArrayHelpers) => (
-                      <>
-                        {action !== 'view' && (
-                        <div style={{ padding: '0px 10px', textAlign: 'left', marginBottom: '10px' }}>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<PostAddIcon />}
-                            size="medium"
-                            onClick={() => arrayHelpers.push(seguimientoTemplate)}
-                          >
-                            Agregar Seguimiento
-                          </Button>
-                        </div>
-                        )}
-                        <Grid item xs={12} sm={6}>
-                          <FormControl className={classes.formControl}>
-                            <InputLabel>
-                              Seleccione el Seguimiento a editar
-                            </InputLabel>
-                            <Select
-                              labelId="current_seguimiento"
-                              // id="estatus_id-select"
-                              onChange={(event: any) => setCurrenntSeg(event.target.value)}
-                              value={currentSeg}
-                              // disabled={(action === 'view')}
-                            >
-                              {values &&
-                                  values.seguimientos &&
-                                  values.seguimientos.map((seguimiento: any, index: number) => {
-                                    return (
-                                      <MenuItem
-                                        value={index}
-                                        key={`type-${index+1}`}
-                                      >
-                                        No. Seguimiento: {index}
-                                      </MenuItem>
-                                    );
-                                  })}
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                        {values && values.seguimientos && values.seguimientos.map((seguimiento: any, index: number) => {
-                          if (index !== currentSeg) {
-                            return false;
-                          }
-                          return (
-                            <Paper className={classes.paper2} elevation={4} key={`fields-group-${index+1}`}>
-                              <Grid container spacing={3}>
-                                {action !== 'view' && (
-                                <>
-                                  <Grid item xs={12} sm={6}>
-                                    <Button
-                                      variant="contained"
-                                      color="secondary"
-                                      startIcon={<DeleteForeverIcon />}
-                                      size="medium"
-                                      onClick={() => arrayHelpers.remove(index)}
-                                    >
-                                      Remover Seguimiento
-                                    </Button>
+                  </ExpansionPanelSummary>
+                    <hr className={classes.hrSpacer} />
+                    <hr className={classes.hrDivider} />
+                    
+                    <fieldset className={classes.fieldset}>
+                      <legend className={classes.containerLegend}>
+                        <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                          Seguimientos
+                        </Typography>
+                      </legend>
+                      
+                      <FieldArray
+                        name="seguimientos"
+                        validateOnChange={false}
+                        render={(arrayHelpers: ArrayHelpers) => (
+                          <>
+                            {action !== 'view' && (
+                            <div style={{ padding: '0px 10px', textAlign: 'left', marginBottom: '10px' }}>
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                startIcon={<PostAddIcon />}
+                                size="medium"
+                                onClick={() => arrayHelpers.push(seguimientoTemplate)}
+                              >
+                                Agregar Seguimiento
+                              </Button>
+                            </div>
+                            )}
+                            <Grid item xs={12} sm={6}>
+                              <FormControl className={classes.formControl}>
+                                <InputLabel>
+                                  Seleccione el Seguimiento a editar
+                                </InputLabel>
+                                <Select
+                                  labelId="current_seguimiento"
+                                  // id="estatus_id-select"
+                                  onChange={(event: any) => setCurrenntSeg(event.target.value)}
+                                  value={currentSeg}
+                                  // disabled={(action === 'view')}
+                                >
+                                  {values &&
+                                      values.seguimientos &&
+                                      values.seguimientos.map((seguimiento: any, index: number) => {
+                                        return (
+                                          <MenuItem
+                                            value={index}
+                                            key={`type-${index+1}`}
+                                          >
+                                            No. Seguimiento: {index}
+                                          </MenuItem>
+                                        );
+                                      })}
+                                </Select>
+                              </FormControl>
+                            </Grid>
+                            {values && values.seguimientos && values.seguimientos.map((seguimiento: any, index: number) => {
+                              if (index !== currentSeg) {
+                                return false;
+                              }
+                              return (
+                                <Paper className={classes.paper2} elevation={4} key={`fields-group-${index+1}`}>
+                                  <Grid container spacing={3}>
+                                    {action !== 'view' && (
+                                    <>
+                                      <Grid item xs={12} sm={6}>
+                                        <Button
+                                          variant="contained"
+                                          color="secondary"
+                                          startIcon={<DeleteForeverIcon />}
+                                          size="medium"
+                                          onClick={() => arrayHelpers.remove(index)}
+                                        >
+                                          Remover Seguimiento
+                                        </Button>
+                                      </Grid>
+                                      <Grid item xs={12} sm={6} />
+                                    </>
+                                    )}
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <TextField 
+                                          id="seguimiento_id"
+                                          label="No. Seguimiento"
+                                          disabled
+                                          // onChange={(value: any) => setFieldValue(`seguimientos.${index}`, value.target.value)} 
+                                          value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].seguimiento_id : ''} 
+                                          variant="filled"
+                                        />
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <InputLabel id="medio_notif_seguimiento_id">
+                                          Medio notificación de seguimiento
+                                        </InputLabel>
+                                        <Select
+                                          disabled={disabledModeOn}
+                                          // id="medio_notif_seguimiento_id-select"
+                                          labelId="medio_notif_seguimiento_id"
+                                          value={catalog && catalog.medios_notif_seguimiento_asf && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].medio_notif_seguimiento_id : ''}
+                                          onChange={handleChange(`seguimientos.${index}.medio_notif_seguimiento_id`)}
+                                        >
+                                          {catalog &&
+                                              catalog.medios_notif_seguimiento_asf &&
+                                              catalog.medios_notif_seguimiento_asf.map((item) => {
+                                                return (
+                                                  <MenuItem
+                                                    value={item.id}
+                                                    key={`type-${item.id}`}
+                                                  >
+                                                    {item.title}
+                                                  </MenuItem>
+                                                );
+                                              })}
+                                        </Select>
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].medio_notif_seguimiento_id &&
+                                          touched.seguimientos[index].medio_notif_seguimiento_id && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                Seleccione un Medio notificación de seguimiento
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <TextField 
+                                          disabled={disabledModeOn}
+                                          // id="num_oficio_cytg_oic"
+                                          label="# de Oficio CyTG u OIC"
+                                          onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_cytg_oic`, value.target.value)}
+                                          value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_cytg_oic : ''}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].num_oficio_cytg_oic &&
+                                          touched.seguimientos[index].num_oficio_cytg_oic && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                Ingrese un No. de Oficio CyTG u OIC
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <Field
+                                          component={FormikDatePicker}
+                                          disabled={disabledModeOn}
+                                          // id="fecha_oficio_cytg_oic"
+                                          label="Fecha de Oficio CyTG"
+                                          name={`seguimientos.${index}.fecha_oficio_cytg_oic`}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].fecha_oficio_cytg_oic &&
+                                          touched.seguimientos[index].fecha_oficio_cytg_oic && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                {errors.seguimientos[index].fecha_oficio_cytg_oic}
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <Field
+                                          component={FormikDatePicker}
+                                          disabled={disabledModeOn}
+                                          // id="fecha_recibido_dependencia"
+                                          label="Fecha de Recibido de la dependencia (ACUSE)"
+                                          name={`seguimientos.${index}.fecha_recibido_dependencia`}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].fecha_recibido_dependencia &&
+                                          touched.seguimientos[index].fecha_recibido_dependencia && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                {errors.seguimientos[index].fecha_recibido_dependencia}
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <Field
+                                          component={FormikDatePicker}
+                                          disabled={disabledModeOn}
+                                          // id="fecha_vencimiento_cytg"
+                                          label="Fecha de vencimiento CyTG"
+                                          name={`seguimientos.${index}.fecha_vencimiento_cytg`}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].fecha_vencimiento_cytg &&
+                                          touched.seguimientos[index].fecha_vencimiento_cytg && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                {errors.seguimientos[index].fecha_vencimiento_cytg}
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <TextField
+                                          disabled={disabledModeOn}
+                                          // id="num_oficio_resp_dependencia"
+                                          label="# De Oficio de respuesta dependencia"
+                                          onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_resp_dependencia`, value.target.value)}
+                                          value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_resp_dependencia : ''}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].num_oficio_resp_dependencia &&
+                                          touched.seguimientos[index].num_oficio_resp_dependencia && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                Ingrese un No. de Oficio de respuesta dependencia
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <Field
+                                          component={FormikDatePicker}
+                                          disabled={disabledModeOn}
+                                          label="Fecha de recibido del oficio de respuesta"
+                                          name={`seguimientos.${index}.fecha_recibido_oficio_resp`}
+                                          // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].fecha_recibido_oficio_resp : ''}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].fecha_recibido_oficio_resp &&
+                                          touched.seguimientos[index].fecha_recibido_oficio_resp && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                {errors.seguimientos[index].fecha_recibido_oficio_resp}
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={12} md={6}>
+                                      <FormControl className={classes.formControlFull}>
+                                        <TextField 
+                                          disabled={disabledModeOn}
+                                          // id="resp_dependencia"
+                                          InputProps={{
+                                            startAdornment: (
+                                              <InputAdornment position="start">
+                                                <IconButton
+                                                  aria-label="toggle visibility"
+                                                  onClick={() => setModalField({...modalField, open: true, field: "Respuesta de la dependencia", text: values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].resp_dependencia : '' })}
+                                                  onMouseDown={() => {}}
+                                                >
+                                                  <ZoomInIcon />
+                                                </IconButton>
+                                              </InputAdornment>
+                                            ),
+                                          }}
+                                          label="Respuesta de la dependencia"
+                                          multiline
+                                          // name={`seguimientos.${index}.resp_dependencia`}
+                                          onChange={(value: any) => setFieldValue(`seguimientos.${index}.resp_dependencia`, value.target.value)}
+                                          rows={5}
+                                          rowsMax={5}
+                                          value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].resp_dependencia : ''}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].resp_dependencia &&
+                                          touched.seguimientos[index].resp_dependencia && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                Ingrese una Respuesta de la dependencia
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={12} md={6}>
+                                      <FormControl className={classes.formControlFull}>
+                                        <FastField
+                                          component={TextField}
+                                          disabled={disabledModeOn}
+                                          // id="comentarios-seguimiento"
+                                          InputProps={{
+                                            startAdornment: (
+                                              <InputAdornment position="start">
+                                                <IconButton
+                                                  aria-label="toggle visibility"
+                                                  onClick={() => setModalField({...modalField, open: true, field: "Comentarios", text: values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].comentarios : '' })}
+                                                  onMouseDown={() => {}}
+                                                >
+                                                  <ZoomInIcon />
+                                                </IconButton>
+                                              </InputAdornment>
+                                            ),
+                                          }}
+                                          label="Comentarios"
+                                          multiline
+                                          name={`seguimientos.${index}.comentarios`}
+                                          onChange={(value: any) => setFieldValue(`seguimientos.${index}.comentarios`, value.target.value)}
+                                          rows={5}
+                                          rowsMax={5}
+                                          value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].comentarios : ''}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].comentarios &&
+                                          touched.seguimientos[index].comentarios && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                Ingrese Comentarios
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <AutoCompleteDropdown
+                                          disabled={disabledModeOn}
+                                          fieldLabel="title"
+                                          fieldValue="sorting_val"
+                                          label="Clasificación final Interna CyTG"
+                                          name="clasif_final_interna_cytg"
+                                          onChange={(value: any) => {
+                                            return setFieldValue(`seguimientos.${index}.clasif_final_interna_cytg`, value);
+                                          }}
+                                          options={
+                                            catalog && catalog.clasifs_internas_cytg
+                                              ? (catalog.clasifs_internas_cytg.find((item: any) => item.direccion_id === values.direccion_id) || {}).clasifs_internas_pairs || []
+                                              : []
+                                          }
+                                          value={catalog && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].clasif_final_interna_cytg : ''}
+                                        />
+                                        <div style={{ width: 32, height: 32 }}>
+                                          <IconButton
+                                            aria-label="toggle visibility"
+                                            onClick={() =>
+                                            setModalField({
+                                            ...modalField,
+                                            open: true,
+                                            field: 'Clasificación final Interna CyTG',
+                                            text:
+                                              catalog && catalog.clasifs_internas_cytg
+                                              ? (((catalog.clasifs_internas_cytg.find((item: any) => item.direccion_id === values.direccion_id) || {}).clasifs_internas_pairs || []).find((item: any) => item.sorting_val === values.seguimientos[index].clasif_final_interna_cytg) || {}).title || ''
+                                              : ''
+                                            })}
+                                            onMouseDown={() => {}}
+                                          >
+                                            <ZoomInIcon />
+                                          </IconButton>
+                                        </div>
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].clasif_final_interna_cytg &&
+                                          touched.seguimientos[index].clasif_final_interna_cytg && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                Ingrese Clasificación final Interna CyTG
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <TextField 
+                                          disabled={disabledModeOn}
+                                          // id="num_oficio_org_fiscalizador"
+                                          label="# Oficio para Organo fiscalizador"
+                                          onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_org_fiscalizador`, value.target.value)}
+                                          value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_org_fiscalizador : ''}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].num_oficio_org_fiscalizador &&
+                                          touched.seguimientos[index].num_oficio_org_fiscalizador && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                Ingrese No. Oficio para Organo fiscalizador
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <Field
+                                          component={FormikDatePicker}
+                                          disabled={disabledModeOn}
+                                          label="Fecha del Oficio para Órgano fiscalizador"
+                                          name={`seguimientos.${index}.fecha_oficio_org_fiscalizador`}
+                                          // value={seguimiento.fecha_oficio_org_fiscalizador}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].fecha_oficio_org_fiscalizador &&
+                                          touched.seguimientos[index].fecha_oficio_org_fiscalizador && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                {errors.seguimientos[index].fecha_oficio_org_fiscalizador}
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        {/* <TextField id="estatus_id" label="Estatus" value={seguimiento.estatus_id} /> */}
+
+                                        <InputLabel>
+                                          Estatus
+                                        </InputLabel>
+                                        <Select
+                                          disabled={disabledModeOn}
+                                          // id="estatus_id-select"
+                                          labelId="estatus_id"
+                                          onChange={handleChange(`seguimientos.${index}.estatus_id`)}
+                                          value={catalog && catalog.estatus_ires_asf && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].estatus_id : ''}
+                                        >
+                                          {catalog &&
+                                              catalog.estatus_ires_asf &&
+                                              catalog.estatus_ires_asf.map((item) => {
+                                                return (
+                                                  <MenuItem
+                                                    value={item.id}
+                                                    key={`type-${item.id}`}
+                                                  >
+                                                    {item.title}
+                                                  </MenuItem>
+                                                );
+                                              })}
+                                        </Select>
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].estatus_id &&
+                                          touched.seguimientos[index].estatus_id && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                Ingrese Estatus
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <TextField
+                                          disabled={disabledModeOn}
+                                          // id="monto_solventado"
+                                          InputProps={{
+                                            inputComponent: NumberFormatCustom as any,
+                                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                          }}
+                                          label="Monto Solventado (cifra en miles de pesos)"
+                                          // name="monto_solventado"
+                                          // onChange={(value: any) => setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value)}
+                                          onChange={(value: any) => {
+                                            setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value === '.' ? '0.' : value.target.value)
+                                          }}
+                                          placeholder="0"
+                                          value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado : ''}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].monto_solventado &&
+                                          touched.seguimientos[index].monto_solventado && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                Ingrese Monto Solventado
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>                              
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <FastField
+                                          component={TextField}
+                                          disabled={disabledModeOn}
+                                          // id="comentarios-seguimiento"
+                                          label="# de Oficio (monto solventado)"
+                                          name={`seguimientos.${index}.num_oficio_monto_solventado`}
+                                          onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_monto_solventado`, value.target.value)}
+                                          rows={5}
+                                          rowsMax={5}
+                                          value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_monto_solventado : ''}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].num_oficio_monto_solventado &&
+                                          touched.seguimientos[index].num_oficio_monto_solventado && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                Ingrese No. de Oficio (monto solventado)
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <Field
+                                          component={FormikDatePicker}
+                                          disabled={disabledModeOn}
+                                          label="Fecha de Oficio - acuse (monto solventado)"
+                                          name={`seguimientos.${index}.fecha_oficio_monto_solventado`}
+                                          // value={seguimiento.fecha_oficio_monto_solventado}
+                                        />
+                                        {
+                                          errors.seguimientos &&
+                                          errors.seguimientos[index] &&
+                                          errors.seguimientos[index].fecha_oficio_monto_solventado &&
+                                          touched.seguimientos[index].fecha_oficio_monto_solventado && (
+                                              <FormHelperText
+                                                error
+                                                classes={{ error: classes.textErrorHelper }}
+                                              >
+                                                {errors.seguimientos[index].fecha_oficio_monto_solventado}
+                                              </FormHelperText>
+                                            )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <TextField
+                                          disabled
+                                          id="monto_pendiente_solventar"
+                                          InputProps={{
+                                            inputComponent: NumberFormatCustom as any,
+                                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                          }}
+                                          inputProps={{allowNegative: true,}}
+                                          label="Monto Pendiente de solventar (cifra en miles de pesos)"
+                                          name="monto_pendiente_solventar"
+                                          // onChange={handleChange('monto_pendiente_solventar')}
+                                          placeholder="0"
+                                          // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
+                                          value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
+                                          variant="filled"
+                                        />
+                                      </FormControl>
+                                    </Grid>
                                   </Grid>
-                                  <Grid item xs={12} sm={6} />
-                                </>
-                                )}
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <TextField 
-                                      id="seguimiento_id"
-                                      label="No. Seguimiento"
-                                      disabled
-                                      // onChange={(value: any) => setFieldValue(`seguimientos.${index}`, value.target.value)} 
-                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].seguimiento_id : ''} 
-                                      variant="filled"
-                                    />
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <InputLabel id="medio_notif_seguimiento_id">
-                                      Medio notificación de seguimiento
-                                    </InputLabel>
-                                    <Select
-                                      disabled={disabledModeOn}
-                                      // id="medio_notif_seguimiento_id-select"
-                                      labelId="medio_notif_seguimiento_id"
-                                      value={catalog && catalog.medios_notif_seguimiento_asf && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].medio_notif_seguimiento_id : ''}
-                                      onChange={handleChange(`seguimientos.${index}.medio_notif_seguimiento_id`)}
-                                    >
-                                      {catalog &&
-                                          catalog.medios_notif_seguimiento_asf &&
-                                          catalog.medios_notif_seguimiento_asf.map((item) => {
-                                            return (
-                                              <MenuItem
-                                                value={item.id}
-                                                key={`type-${item.id}`}
-                                              >
-                                                {item.title}
-                                              </MenuItem>
-                                            );
-                                          })}
-                                    </Select>
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].medio_notif_seguimiento_id &&
-                                      touched.seguimientos[index].medio_notif_seguimiento_id && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            Seleccione un Medio notificación de seguimiento
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <TextField 
-                                      disabled={disabledModeOn}
-                                      // id="num_oficio_cytg_oic"
-                                      label="# de Oficio CyTG u OIC"
-                                      onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_cytg_oic`, value.target.value)}
-                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_cytg_oic : ''}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].num_oficio_cytg_oic &&
-                                      touched.seguimientos[index].num_oficio_cytg_oic && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            Ingrese un No. de Oficio CyTG u OIC
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <Field
-                                      component={FormikDatePicker}
-                                      disabled={disabledModeOn}
-                                      // id="fecha_oficio_cytg_oic"
-                                      label="Fecha de Oficio CyTG"
-                                      name={`seguimientos.${index}.fecha_oficio_cytg_oic`}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].fecha_oficio_cytg_oic &&
-                                      touched.seguimientos[index].fecha_oficio_cytg_oic && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            {errors.seguimientos[index].fecha_oficio_cytg_oic}
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <Field
-                                      component={FormikDatePicker}
-                                      disabled={disabledModeOn}
-                                      // id="fecha_recibido_dependencia"
-                                      label="Fecha de Recibido de la dependencia (ACUSE)"
-                                      name={`seguimientos.${index}.fecha_recibido_dependencia`}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].fecha_recibido_dependencia &&
-                                      touched.seguimientos[index].fecha_recibido_dependencia && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            {errors.seguimientos[index].fecha_recibido_dependencia}
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <Field
-                                      component={FormikDatePicker}
-                                      disabled={disabledModeOn}
-                                      // id="fecha_vencimiento_cytg"
-                                      label="Fecha de vencimiento CyTG"
-                                      name={`seguimientos.${index}.fecha_vencimiento_cytg`}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].fecha_vencimiento_cytg &&
-                                      touched.seguimientos[index].fecha_vencimiento_cytg && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            {errors.seguimientos[index].fecha_vencimiento_cytg}
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <TextField
-                                      disabled={disabledModeOn}
-                                      // id="num_oficio_resp_dependencia"
-                                      label="# De Oficio de respuesta dependencia"
-                                      onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_resp_dependencia`, value.target.value)}
-                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_resp_dependencia : ''}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].num_oficio_resp_dependencia &&
-                                      touched.seguimientos[index].num_oficio_resp_dependencia && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            Ingrese un No. de Oficio de respuesta dependencia
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <Field
-                                      component={FormikDatePicker}
-                                      disabled={disabledModeOn}
-                                      label="Fecha de recibido del oficio de respuesta"
-                                      name={`seguimientos.${index}.fecha_recibido_oficio_resp`}
-                                      // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].fecha_recibido_oficio_resp : ''}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].fecha_recibido_oficio_resp &&
-                                      touched.seguimientos[index].fecha_recibido_oficio_resp && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            {errors.seguimientos[index].fecha_recibido_oficio_resp}
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6}>
-                                  <FormControl className={classes.formControlFull}>
-                                    <TextField 
-                                      disabled={disabledModeOn}
-                                      // id="resp_dependencia"
-                                      InputProps={{
-                                        startAdornment: (
-                                          <InputAdornment position="start">
-                                            <IconButton
-                                              aria-label="toggle visibility"
-                                              onClick={() => setModalField({...modalField, open: true, field: "Respuesta de la dependencia", text: values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].resp_dependencia : '' })}
-                                              onMouseDown={() => {}}
+
+                                  <Grid container spacing={3}>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <TextField
+                                          disabled={disabledModeOn}
+                                          id="monto_a_reintegrar"
+                                          InputProps={{
+                                            inputComponent: NumberFormatCustom as any,
+                                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                          }}
+                                          label="Monto a reintegrar (cifra en miles de pesos)"
+                                          name="monto_a_reintegrar"
+                                          placeholder="0"
+                                          value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar : ''}
+                                          onChange={handleChange(`seguimientos.${index}.monto_a_reintegrar`)}
+                                        />
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <TextField
+                                          disabled={disabledModeOn}
+                                          id="monto_reintegrado"
+                                          InputProps={{
+                                            inputComponent: NumberFormatCustom as any,
+                                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                          }}
+                                          label="Monto reintegrado (cifra en miles de pesos)"
+                                          name="monto_reintegrado"
+                                          placeholder="0"
+                                          value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_reintegrado : ''}
+                                          onChange={handleChange(`seguimientos.${index}.monto_reintegrado`)}
+                                        />
+                                        {errors.monto_reintegrado &&
+                                          touched.monto_reintegrado &&
+                                          errors.monto_reintegrado && (
+                                            <FormHelperText
+                                              error
+                                              classes={{ error: classes.textErrorHelper }}
                                             >
-                                              <ZoomInIcon />
-                                            </IconButton>
-                                          </InputAdornment>
-                                        ),
-                                      }}
-                                      label="Respuesta de la dependencia"
-                                      multiline
-                                      // name={`seguimientos.${index}.resp_dependencia`}
-                                      onChange={(value: any) => setFieldValue(`seguimientos.${index}.resp_dependencia`, value.target.value)}
-                                      rows={5}
-                                      rowsMax={5}
-                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].resp_dependencia : ''}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].resp_dependencia &&
-                                      touched.seguimientos[index].resp_dependencia && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            Ingrese una Respuesta de la dependencia
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6}>
-                                  <FormControl className={classes.formControlFull}>
-                                    <FastField
-                                      component={TextField}
-                                      disabled={disabledModeOn}
-                                      // id="comentarios-seguimiento"
-                                      InputProps={{
-                                        startAdornment: (
-                                          <InputAdornment position="start">
-                                            <IconButton
-                                              aria-label="toggle visibility"
-                                              onClick={() => setModalField({...modalField, open: true, field: "Comentarios", text: values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].comentarios : '' })}
-                                              onMouseDown={() => {}}
+                                              Ingrese Monto reintegrado
+                                            </FormHelperText>
+                                          )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <Field
+                                          component={FormikDatePicker}
+                                          disabled={disabledModeOn}
+                                          id="fecha_reintegro"
+                                          label="Fecha de reintegro"
+                                          name={`seguimientos.${index}.fecha_reintegro`}
+                                        />
+                                        {errors.fecha_reintegro &&
+                                          touched.fecha_reintegro && (
+                                            <FormHelperText
+                                              error
+                                              classes={{ error: classes.textErrorHelper }}
                                             >
-                                              <ZoomInIcon />
-                                            </IconButton>
-                                          </InputAdornment>
-                                        ),
-                                      }}
-                                      label="Comentarios"
-                                      multiline
-                                      name={`seguimientos.${index}.comentarios`}
-                                      onChange={(value: any) => setFieldValue(`seguimientos.${index}.comentarios`, value.target.value)}
-                                      rows={5}
-                                      rowsMax={5}
-                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].comentarios : ''}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].comentarios &&
-                                      touched.seguimientos[index].comentarios && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            Ingrese Comentarios
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <AutoCompleteDropdown
-                                      disabled={disabledModeOn}
-                                      fieldLabel="title"
-                                      fieldValue="sorting_val"
-                                      label="Clasificación final Interna CyTG"
-                                      name="clasif_final_interna_cytg"
-                                      onChange={(value: any) => {
-                                        return setFieldValue(`seguimientos.${index}.clasif_final_interna_cytg`, value);
-                                      }}
-                                      options={
-                                        catalog && catalog.clasifs_internas_cytg
-                                          ? (catalog.clasifs_internas_cytg.find((item: any) => item.direccion_id === values.direccion_id) || {}).clasifs_internas_pairs || []
-                                          : []
-                                      }
-                                      value={catalog && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].clasif_final_interna_cytg : ''}
-                                    />
-                                    <div style={{ width: 32, height: 32 }}>
-                                      <IconButton
-                                        aria-label="toggle visibility"
-                                        onClick={() =>
-                                        setModalField({
-                                        ...modalField,
-                                        open: true,
-                                        field: 'Clasificación final Interna CyTG',
-                                        text:
-                                          catalog && catalog.clasifs_internas_cytg
-                                          ? (((catalog.clasifs_internas_cytg.find((item: any) => item.direccion_id === values.direccion_id) || {}).clasifs_internas_pairs || []).find((item: any) => item.sorting_val === values.seguimientos[index].clasif_final_interna_cytg) || {}).title || ''
-                                          : ''
-                                        })}
-                                        onMouseDown={() => {}}
-                                      >
-                                        <ZoomInIcon />
-                                      </IconButton>
-                                    </div>
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].clasif_final_interna_cytg &&
-                                      touched.seguimientos[index].clasif_final_interna_cytg && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            Ingrese Clasificación final Interna CyTG
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <TextField 
-                                      disabled={disabledModeOn}
-                                      // id="num_oficio_org_fiscalizador"
-                                      label="# Oficio para Organo fiscalizador"
-                                      onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_org_fiscalizador`, value.target.value)}
-                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_org_fiscalizador : ''}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].num_oficio_org_fiscalizador &&
-                                      touched.seguimientos[index].num_oficio_org_fiscalizador && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            Ingrese No. Oficio para Organo fiscalizador
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <Field
-                                      component={FormikDatePicker}
-                                      disabled={disabledModeOn}
-                                      label="Fecha del Oficio para Órgano fiscalizador"
-                                      name={`seguimientos.${index}.fecha_oficio_org_fiscalizador`}
-                                      // value={seguimiento.fecha_oficio_org_fiscalizador}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].fecha_oficio_org_fiscalizador &&
-                                      touched.seguimientos[index].fecha_oficio_org_fiscalizador && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            {errors.seguimientos[index].fecha_oficio_org_fiscalizador}
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    {/* <TextField id="estatus_id" label="Estatus" value={seguimiento.estatus_id} /> */}
-
-                                    <InputLabel>
-                                      Estatus
-                                    </InputLabel>
-                                    <Select
-                                      disabled={disabledModeOn}
-                                      // id="estatus_id-select"
-                                      labelId="estatus_id"
-                                      onChange={handleChange(`seguimientos.${index}.estatus_id`)}
-                                      value={catalog && catalog.estatus_ires_asf && values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].estatus_id : ''}
-                                    >
-                                      {catalog &&
-                                          catalog.estatus_ires_asf &&
-                                          catalog.estatus_ires_asf.map((item) => {
-                                            return (
-                                              <MenuItem
-                                                value={item.id}
-                                                key={`type-${item.id}`}
-                                              >
-                                                {item.title}
-                                              </MenuItem>
-                                            );
-                                          })}
-                                    </Select>
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].estatus_id &&
-                                      touched.seguimientos[index].estatus_id && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            Ingrese Estatus
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <TextField
-                                      disabled={disabledModeOn}
-                                      // id="monto_solventado"
-                                      InputProps={{
-                                        inputComponent: NumberFormatCustom as any,
-                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                      }}
-                                      label="Monto Solventado (cifra en miles de pesos)"
-                                      // name="monto_solventado"
-                                      // onChange={(value: any) => setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value)}
-                                      onChange={(value: any) => {
-                                        setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value === '.' ? '0.' : value.target.value)
-                                      }}
-                                      placeholder="0"
-                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado : ''}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].monto_solventado &&
-                                      touched.seguimientos[index].monto_solventado && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            Ingrese Monto Solventado
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>                              
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <FastField
-                                      component={TextField}
-                                      disabled={disabledModeOn}
-                                      // id="comentarios-seguimiento"
-                                      label="# de Oficio (monto solventado)"
-                                      name={`seguimientos.${index}.num_oficio_monto_solventado`}
-                                      onChange={(value: any) => setFieldValue(`seguimientos.${index}.num_oficio_monto_solventado`, value.target.value)}
-                                      rows={5}
-                                      rowsMax={5}
-                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].num_oficio_monto_solventado : ''}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].num_oficio_monto_solventado &&
-                                      touched.seguimientos[index].num_oficio_monto_solventado && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            Ingrese No. de Oficio (monto solventado)
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <Field
-                                      component={FormikDatePicker}
-                                      disabled={disabledModeOn}
-                                      label="Fecha de Oficio - acuse (monto solventado)"
-                                      name={`seguimientos.${index}.fecha_oficio_monto_solventado`}
-                                      // value={seguimiento.fecha_oficio_monto_solventado}
-                                    />
-                                    {
-                                      errors.seguimientos &&
-                                      errors.seguimientos[index] &&
-                                      errors.seguimientos[index].fecha_oficio_monto_solventado &&
-                                      touched.seguimientos[index].fecha_oficio_monto_solventado && (
-                                          <FormHelperText
-                                            error
-                                            classes={{ error: classes.textErrorHelper }}
-                                          >
-                                            {errors.seguimientos[index].fecha_oficio_monto_solventado}
-                                          </FormHelperText>
-                                        )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <TextField
-                                      disabled
-                                      id="monto_pendiente_solventar"
-                                      InputProps={{
-                                        inputComponent: NumberFormatCustom as any,
-                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                      }}
-                                      inputProps={{allowNegative: true,}}
-                                      label="Monto Pendiente de solventar (cifra en miles de pesos)"
-                                      name="monto_pendiente_solventar"
-                                      // onChange={handleChange('monto_pendiente_solventar')}
-                                      placeholder="0"
-                                      // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
-                                      value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
-                                      variant="filled"
-                                    />
-                                  </FormControl>
-                                </Grid>
-                              </Grid>
-
-                              <Grid container spacing={3}>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <TextField
-                                      disabled={disabledModeOn}
-                                      id="monto_a_reintegrar"
-                                      InputProps={{
-                                        inputComponent: NumberFormatCustom as any,
-                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                      }}
-                                      label="Monto a reintegrar (cifra en miles de pesos)"
-                                      name="monto_a_reintegrar"
-                                      placeholder="0"
-                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar : ''}
-                                      onChange={handleChange(`seguimientos.${index}.monto_a_reintegrar`)}
-                                    />
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <TextField
-                                      disabled={disabledModeOn}
-                                      id="monto_reintegrado"
-                                      InputProps={{
-                                        inputComponent: NumberFormatCustom as any,
-                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                      }}
-                                      label="Monto reintegrado (cifra en miles de pesos)"
-                                      name="monto_reintegrado"
-                                      placeholder="0"
-                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_reintegrado : ''}
-                                      onChange={handleChange(`seguimientos.${index}.monto_reintegrado`)}
-                                    />
-                                    {errors.monto_reintegrado &&
-                                      touched.monto_reintegrado &&
-                                      errors.monto_reintegrado && (
-                                        <FormHelperText
-                                          error
-                                          classes={{ error: classes.textErrorHelper }}
-                                        >
-                                          Ingrese Monto reintegrado
-                                        </FormHelperText>
-                                      )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <Field
-                                      component={FormikDatePicker}
-                                      disabled={disabledModeOn}
-                                      id="fecha_reintegro"
-                                      label="Fecha de reintegro"
-                                      name={`seguimientos.${index}.fecha_reintegro`}
-                                    />
-                                    {errors.fecha_reintegro &&
-                                      touched.fecha_reintegro && (
-                                        <FormHelperText
-                                          error
-                                          classes={{ error: classes.textErrorHelper }}
-                                        >
-                                          {errors.fecha_reintegro}
-                                        </FormHelperText>
-                                      )}
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <FormControl className={classes.formControl}>
-                                    <TextField
-                                      disabled
-                                      id="monto_por_reintegrar"
-                                      InputProps={{
-                                        inputComponent: NumberFormatCustom as any,
-                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                      }}
-                                      label="Monto por reintegrar (cifra en miles de pesos)"
-                                      name="monto_por_reintegrar"
-                                      placeholder="0"
-                                      value={
-                                        sub(
-                                          values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar || 0 : 0,
-                                          values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_reintegrado || 0 : 0
-                                        )
-                                      }
-                                      variant="filled"
-                                      inputProps={{
-                                        allowNegatives: true
-                                      }}
-                                    />
-                                    {errors.monto_por_reintegrar &&
-                                      touched.monto_por_reintegrar &&
-                                      errors.monto_por_reintegrar && (
-                                        <FormHelperText
-                                          error
-                                          classes={{ error: classes.textErrorHelper }}
-                                        >
-                                          Ingrese Monto por reintegrar
-                                        </FormHelperText>
-                                      )}
-                                  </FormControl>
-                                </Grid>
-                              </Grid>
-                            </Paper>
-                          );
-                        })}
-                      </>
-                    )}
-                  />
-                </fieldset>
-
-                <hr className={classes.hrSpacer} />
-                <hr className={classes.hrDivider} />
-
-                <fieldset className={classes.fieldset}>
-                  <legend className={classes.containerLegend}>
-                    <Typography variant="body2" align="center" classes={{root:classes.legend}}>
-                      Resumen Reintegros
-                    </Typography>
-                  </legend>
-                </fieldset>
-
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled
-                        id="monto_a_reintegrar"
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                        inputProps={{
-                          allowNegatives: true
-                        }}
-                        label="Monto a reintegrar (cifra en miles de pesos)"
-                        name="monto_a_reintegrar"
-                        onChange={handleChange('monto_a_reintegrar')}
-                        placeholder="0"
-                        // value={values.monto_a_reintegrar}
-                        value={
-                          add(values.seguimientos.map((seguimiento: any) => seguimiento.monto_a_reintegrar || 0))
-                        }
-                      />
-                      {errors.monto_a_reintegrar &&
-                        touched.monto_a_reintegrar &&
-                        errors.monto_a_reintegrar && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto a reintegrar
-                          </FormHelperText>
+                                              {errors.fecha_reintegro}
+                                            </FormHelperText>
+                                          )}
+                                      </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <FormControl className={classes.formControl}>
+                                        <TextField
+                                          disabled
+                                          id="monto_por_reintegrar"
+                                          InputProps={{
+                                            inputComponent: NumberFormatCustom as any,
+                                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                          }}
+                                          label="Monto por reintegrar (cifra en miles de pesos)"
+                                          name="monto_por_reintegrar"
+                                          placeholder="0"
+                                          value={
+                                            sub(
+                                              values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar || 0 : 0,
+                                              values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_reintegrado || 0 : 0
+                                            )
+                                          }
+                                          variant="filled"
+                                          inputProps={{
+                                            allowNegatives: true
+                                          }}
+                                        />
+                                        {errors.monto_por_reintegrar &&
+                                          touched.monto_por_reintegrar &&
+                                          errors.monto_por_reintegrar && (
+                                            <FormHelperText
+                                              error
+                                              classes={{ error: classes.textErrorHelper }}
+                                            >
+                                              Ingrese Monto por reintegrar
+                                            </FormHelperText>
+                                          )}
+                                      </FormControl>
+                                    </Grid>
+                                  </Grid>
+                                </Paper>
+                              );
+                            })}
+                          </>
                         )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled
-                        id="monto_reintegrado"
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                        inputProps={{
-                          allowNegatives: true
-                        }}
-                        label="Monto reintegrado (cifra en miles de pesos)"
-                        name="monto_reintegrado"
-                        onChange={handleChange('monto_reintegrado')}
-                        placeholder="0"
-                        value={
-                          add(values.seguimientos.map((seguimiento: any) => seguimiento.monto_reintegrado || 0))
-                        }
                       />
-                      {errors.monto_reintegrado &&
-                        touched.monto_reintegrado &&
-                        errors.monto_reintegrado && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto reintegrado
-                          </FormHelperText>
-                        )}
-                    </FormControl>
+                    </fieldset>
+
+                    <hr className={classes.hrSpacer} />
+                    <hr className={classes.hrDivider} />
+
+                    <fieldset className={classes.fieldset}>
+                      <legend className={classes.containerLegend}>
+                        <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                          Resumen Reintegros
+                        </Typography>
+                      </legend>
+                    </fieldset>
+
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          disabled
+                          id="monto_a_reintegrar"
+                          InputProps={{
+                            inputComponent: NumberFormatCustom as any,
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                          }}
+                          inputProps={{
+                            allowNegatives: true
+                          }}
+                          label="Monto a reintegrar (cifra en miles de pesos)"
+                          name="monto_a_reintegrar"
+                          onChange={handleChange('monto_a_reintegrar')}
+                          placeholder="0"
+                          // value={values.monto_a_reintegrar}
+                          value={
+                            add(values.seguimientos.map((seguimiento: any) => seguimiento.monto_a_reintegrar || 0))
+                          }
+                        />
+                        {errors.monto_a_reintegrar &&
+                          touched.monto_a_reintegrar &&
+                          errors.monto_a_reintegrar && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese Monto a reintegrar
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          disabled
+                          id="monto_reintegrado"
+                          InputProps={{
+                            inputComponent: NumberFormatCustom as any,
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                          }}
+                          inputProps={{
+                            allowNegatives: true
+                          }}
+                          label="Monto reintegrado (cifra en miles de pesos)"
+                          name="monto_reintegrado"
+                          onChange={handleChange('monto_reintegrado')}
+                          placeholder="0"
+                          value={
+                            add(values.seguimientos.map((seguimiento: any) => seguimiento.monto_reintegrado || 0))
+                          }
+                        />
+                        {errors.monto_reintegrado &&
+                          touched.monto_reintegrado &&
+                          errors.monto_reintegrado && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese Monto reintegrado
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    {/*
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          disabled={disabledModeOn}
+                          id="fecha_reintegro"
+                          label="Fecha de reintegro"
+                          name="fecha_reintegro"
+                        />
+                        {errors.fecha_reintegro &&
+                          touched.fecha_reintegro && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_reintegro}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    */}
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          disabled
+                          id="monto_por_reintegrar"
+                          InputProps={{
+                            inputComponent: NumberFormatCustom as any,
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                          }}
+                          inputProps={{
+                            allowNegatives: true
+                          }}
+                          label="Monto por reintegrar (cifra en miles de pesos)"
+                          name="monto_por_reintegrar"
+                          onChange={handleChange('monto_por_reintegrar')}
+                          placeholder="0"
+                          value={sub(values.monto_a_reintegrar || 0, values.monto_reintegrado || 0)}
+                          variant="filled"
+                        />
+                        {errors.monto_por_reintegrar &&
+                          touched.monto_por_reintegrar &&
+                          errors.monto_por_reintegrar && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese Monto por reintegrar
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
                   </Grid>
-                  {/*
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <Field
-                        component={FormikDatePicker}
-                        disabled={disabledModeOn}
-                        id="fecha_reintegro"
-                        label="Fecha de reintegro"
-                        name="fecha_reintegro"
-                      />
-                      {errors.fecha_reintegro &&
-                        touched.fecha_reintegro && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            {errors.fecha_reintegro}
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  */}
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled
-                        id="monto_por_reintegrar"
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                        inputProps={{
-                          allowNegatives: true
-                        }}
-                        label="Monto por reintegrar (cifra en miles de pesos)"
-                        name="monto_por_reintegrar"
-                        onChange={handleChange('monto_por_reintegrar')}
-                        placeholder="0"
-                        value={sub(values.monto_a_reintegrar || 0, values.monto_reintegrado || 0)}
-                        variant="filled"
-                      />
-                      {errors.monto_por_reintegrar &&
-                        touched.monto_por_reintegrar &&
-                        errors.monto_por_reintegrar && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto por reintegrar
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                </Grid>
+                </ExpansionPanel>
 
                 <hr className={classes.hrSpacer} />
                 <hr className={classes.hrDivider} />

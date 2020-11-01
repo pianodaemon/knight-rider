@@ -28,7 +28,7 @@ import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdow
 import { AutoCompleteLoadMoreDropdown } from 'src/shared/components/autocomplete-load-more-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { SingleTextResponsiveModal } from 'src/shared/components/modal/single-text-responsive-modal.component';
-import { sub } from 'src/shared/math/add.util';
+import { add, sub } from 'src/shared/math/add.util';
 import { Catalog, /* ObservationSFP */ } from '../state/results-report.reducer';
 
 type Props = {
@@ -207,6 +207,10 @@ export const ResultsReportForm = (props: Props) => {
     num_oficio_monto_solventado: "",
     fecha_oficio_monto_solventado: null,
     monto_pendiente_solventar: "",
+    fecha_reintegro:  null,
+    monto_a_reintegrar: "",
+    monto_por_reintegrar: "",
+    monto_reintegrado: "",
   };
   const seguimiento = {
     "observacion_id": 111,
@@ -1443,7 +1447,7 @@ export const ResultsReportForm = (props: Props) => {
                                 <Grid item xs={12} sm={6}>
                                   <FormControl className={classes.formControl}>
                                     <TextField
-                                      disabled={disabledModeOn}
+                                      disabled
                                       id="monto_pendiente_solventar"
                                       InputProps={{
                                         inputComponent: NumberFormatCustom as any,
@@ -1456,7 +1460,110 @@ export const ResultsReportForm = (props: Props) => {
                                       placeholder="0"
                                       // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
                                       value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
+                                      variant="filled"
                                     />
+                                  </FormControl>
+                                </Grid>
+                              </Grid>
+
+                              <Grid container spacing={3}>
+                                <Grid item xs={12} sm={6}>
+                                  <FormControl className={classes.formControl}>
+                                    <TextField
+                                      disabled={disabledModeOn}
+                                      id="monto_a_reintegrar"
+                                      InputProps={{
+                                        inputComponent: NumberFormatCustom as any,
+                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                      }}
+                                      label="Monto a reintegrar (cifra en miles de pesos)"
+                                      name="monto_a_reintegrar"
+                                      placeholder="0"
+                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar : ''}
+                                      onChange={handleChange(`seguimientos.${index}.monto_a_reintegrar`)}
+                                    />
+                                  </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                  <FormControl className={classes.formControl}>
+                                    <TextField
+                                      disabled={disabledModeOn}
+                                      id="monto_reintegrado"
+                                      InputProps={{
+                                        inputComponent: NumberFormatCustom as any,
+                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                      }}
+                                      label="Monto reintegrado (cifra en miles de pesos)"
+                                      name="monto_reintegrado"
+                                      placeholder="0"
+                                      value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_reintegrado : ''}
+                                      onChange={handleChange(`seguimientos.${index}.monto_reintegrado`)}
+                                    />
+                                    {errors.monto_reintegrado &&
+                                      touched.monto_reintegrado &&
+                                      errors.monto_reintegrado && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese Monto reintegrado
+                                        </FormHelperText>
+                                      )}
+                                  </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                  <FormControl className={classes.formControl}>
+                                    <Field
+                                      component={FormikDatePicker}
+                                      disabled={disabledModeOn}
+                                      id="fecha_reintegro"
+                                      label="Fecha de reintegro"
+                                      name={`seguimientos.${index}.fecha_reintegro`}
+                                    />
+                                    {errors.fecha_reintegro &&
+                                      touched.fecha_reintegro && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          {errors.fecha_reintegro}
+                                        </FormHelperText>
+                                      )}
+                                  </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                  <FormControl className={classes.formControl}>
+                                    <TextField
+                                      disabled
+                                      id="monto_por_reintegrar"
+                                      InputProps={{
+                                        inputComponent: NumberFormatCustom as any,
+                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                      }}
+                                      label="Monto por reintegrar (cifra en miles de pesos)"
+                                      name="monto_por_reintegrar"
+                                      placeholder="0"
+                                      value={
+                                        sub(
+                                          values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar || 0 : 0,
+                                          values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_reintegrado || 0 : 0
+                                        )
+                                      }
+                                      variant="filled"
+                                      inputProps={{
+                                        allowNegatives: true
+                                      }}
+                                    />
+                                    {errors.monto_por_reintegrar &&
+                                      touched.monto_por_reintegrar &&
+                                      errors.monto_por_reintegrar && (
+                                        <FormHelperText
+                                          error
+                                          classes={{ error: classes.textErrorHelper }}
+                                        >
+                                          Ingrese Monto por reintegrar
+                                        </FormHelperText>
+                                      )}
                                   </FormControl>
                                 </Grid>
                               </Grid>
@@ -1468,21 +1575,38 @@ export const ResultsReportForm = (props: Props) => {
                   />
                 </fieldset>
 
+                <hr className={classes.hrSpacer} />
+                <hr className={classes.hrDivider} />
+
+                <fieldset className={classes.fieldset}>
+                  <legend className={classes.containerLegend}>
+                    <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                      Resumen Reintegros
+                    </Typography>
+                  </legend>
+                </fieldset>
+
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        disabled={disabledModeOn}
+                        disabled
                         id="monto_a_reintegrar"
                         InputProps={{
                           inputComponent: NumberFormatCustom as any,
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
+                        inputProps={{
+                          allowNegatives: true
+                        }}
                         label="Monto a reintegrar (cifra en miles de pesos)"
                         name="monto_a_reintegrar"
                         onChange={handleChange('monto_a_reintegrar')}
                         placeholder="0"
-                        value={values.monto_a_reintegrar}
+                        // value={values.monto_a_reintegrar}
+                        value={
+                          add(values.seguimientos.map((seguimiento: any) => seguimiento.monto_a_reintegrar || 0))
+                        }
                       />
                       {errors.monto_a_reintegrar &&
                         touched.monto_a_reintegrar &&
@@ -1499,17 +1623,22 @@ export const ResultsReportForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        disabled={disabledModeOn}
+                        disabled
                         id="monto_reintegrado"
                         InputProps={{
                           inputComponent: NumberFormatCustom as any,
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
+                        inputProps={{
+                          allowNegatives: true
+                        }}
                         label="Monto reintegrado (cifra en miles de pesos)"
                         name="monto_reintegrado"
                         onChange={handleChange('monto_reintegrado')}
                         placeholder="0"
-                        value={values.monto_reintegrado}
+                        value={
+                          add(values.seguimientos.map((seguimiento: any) => seguimiento.monto_reintegrado || 0))
+                        }
                       />
                       {errors.monto_reintegrado &&
                         touched.monto_reintegrado &&
@@ -1523,6 +1652,7 @@ export const ResultsReportForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
+                  {/*
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <Field
@@ -1543,20 +1673,25 @@ export const ResultsReportForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
+                  */}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        disabled={disabledModeOn}
+                        disabled
                         id="monto_por_reintegrar"
                         InputProps={{
                           inputComponent: NumberFormatCustom as any,
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
+                        inputProps={{
+                          allowNegatives: true
+                        }}
                         label="Monto por reintegrar (cifra en miles de pesos)"
                         name="monto_por_reintegrar"
                         onChange={handleChange('monto_por_reintegrar')}
                         placeholder="0"
-                        value={values.monto_por_reintegrar}
+                        value={sub(values.monto_a_reintegrar || 0, values.monto_reintegrado || 0)}
+                        variant="filled"
                       />
                       {errors.monto_por_reintegrar &&
                         touched.monto_por_reintegrar &&

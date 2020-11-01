@@ -24,7 +24,7 @@ import { FormikDatePicker } from 'src/shared/components/formik/formik-date-picke
 import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { SingleTextResponsiveModal } from 'src/shared/components/modal/single-text-responsive-modal.component';
-import { sub } from 'src/shared/math/add.util';
+import { add, sub } from 'src/shared/math/add.util';
 import { Catalog, /* ObservationSFP */ } from '../state/observations-sfp.reducer';
 
 type Props = {
@@ -203,6 +203,10 @@ export const ObservationsSFPForm = (props: Props) => {
     estatus_id: 1, // @todo DO NOT HARDCODE, it has DB constraint, use valid value
     monto_solventado: 0,
     monto_pendiente_solventar: 0,
+    fecha_reintegro:  null,
+    monto_a_reintegrar: 0,
+    monto_por_reintegrar: 0,
+    monto_reintegrado: 0,
   };
   useEffect(() => {
     if (id) {
@@ -1138,6 +1142,9 @@ export const ObservationsSFPForm = (props: Props) => {
                                       inputComponent: NumberFormatCustom as any,
                                       startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                     }}
+                                    inputProps={{
+                                      allowNegatives: true
+                                    }}
                                     value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
                                     disabled
                                     variant="filled"
@@ -1155,6 +1162,89 @@ export const ObservationsSFPForm = (props: Props) => {
                                 </FormControl>
                               </Grid>
                             </Grid>
+                            <Grid container spacing={3}>
+                              <Grid item xs={12} sm={6}>
+                                <FormControl className={classes.formControl}>
+                                  <TextField
+                                    label="Monto a Reintegrar (miles de pesos)"
+                                    value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar : ''}
+                                    onChange={handleChange(`seguimientos.${index}.monto_a_reintegrar`)}
+                                    name={`seguimientos.${index}.monto_a_reintegrar`}
+                                    id={`seguimientos.${index}.monto_a_reintegrar`}
+                                    placeholder="0"
+                                    InputProps={{
+                                      inputComponent: NumberFormatCustom as any,
+                                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                    }}
+                                    disabled={(action === 'view')}
+                                  />
+                                </FormControl>
+                              </Grid>
+                              <Grid item xs={12} sm={6}>
+                                <FormControl className={classes.formControl}>
+                                  <TextField
+                                    label="Monto Reintegrado (miles de pesos)"
+                                    value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_reintegrado : ''}
+                                    onChange={handleChange(`seguimientos.${index}.monto_reintegrado`)}
+                                    name={`seguimientos.${index}.monto_reintegrado`}
+                                    id={`seguimientos.${index}.monto_reintegrado`}
+                                    placeholder="0"
+                                    InputProps={{
+                                      inputComponent: NumberFormatCustom as any,
+                                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                    }}
+                                    disabled={(action === 'view')}
+                                  />
+                                </FormControl>
+                              </Grid>
+                              <Grid item xs={12} sm={6}>
+                                <FormControl className={classes.formControl}>
+                                  <Field
+                                    component={FormikDatePicker}
+                                    label="Fecha Reintegro"
+                                    name={`seguimientos.${index}.fecha_reintegro`}
+                                    disabled={(action === 'view')}
+                                  />
+                                </FormControl>
+                              </Grid>
+                              <Grid item xs={12} sm={6}>
+                                <FormControl className={classes.formControl}>
+                                  <TextField
+                                    label="Monto por Reintegrar (miles de pesos)"
+                                    value={
+                                      sub(
+                                        values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar || 0 : 0,
+                                        values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_reintegrado || 0 : 0
+                                      )
+                                    }
+                                    // onChange={handleChange(`seguimientos.${index}.monto_por_reintegrar`)}
+                                    name="monto_por_reintegrar"
+                                    id="monto_por_reintegrar"
+                                    placeholder="0"
+                                    variant="filled"
+                                    disabled
+                                    InputProps={{
+                                      inputComponent: NumberFormatCustom as any,
+                                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                      readOnly: true,
+                                    }}
+                                    inputProps={{
+                                      allowNegatives: true
+                                    }}
+                                  />
+                                  {errors.monto_por_reintegrar &&
+                                    touched.monto_por_reintegrar &&
+                                    errors.monto_por_reintegrar && (
+                                      <FormHelperText
+                                        error
+                                        classes={{ error: classes.textErrorHelper }}
+                                      >
+                                        Ingrese Monto por Reintegrar
+                                      </FormHelperText>
+                                    )}
+                                </FormControl>
+                              </Grid>
+                            </Grid>
                           </Paper>
                         );
                       })}
@@ -1163,12 +1253,26 @@ export const ObservationsSFPForm = (props: Props) => {
                 />
               </fieldset>
 
+              <hr className={classes.hrSpacer} />
+              <hr className={classes.hrDivider} />
+
+              <fieldset className={classes.fieldset}>
+                <legend className={classes.containerLegend}>
+                  <Typography variant="body2" align="center" classes={{root:classes.legend}}>
+                    Resumen Reintegros
+                  </Typography>
+                </legend>
+              </fieldset>
+
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>
                     <TextField
                       label="Monto a Reintegrar (miles de pesos)"
-                      value={values.monto_a_reintegrar}
+                      // value={values.monto_a_reintegrar}
+                      value={
+                        add(values.seguimientos.map((seguimiento: any) => seguimiento.monto_a_reintegrar || 0))
+                      }
                       onChange={handleChange('monto_a_reintegrar')}
                       name="monto_a_reintegrar"
                       id="monto_a_reintegrar"
@@ -1177,7 +1281,7 @@ export const ObservationsSFPForm = (props: Props) => {
                         inputComponent: NumberFormatCustom as any,
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
                       }}
-                      disabled={(action === 'view')}
+                      disabled
                     />
                     {errors.monto_a_reintegrar &&
                       touched.monto_a_reintegrar &&
@@ -1195,7 +1299,9 @@ export const ObservationsSFPForm = (props: Props) => {
                   <FormControl className={classes.formControl}>
                     <TextField
                       label="Monto Reintegrado (miles de pesos)"
-                      value={values.monto_reintegrado}
+                      value={
+                        add(values.seguimientos.map((seguimiento: any) => seguimiento.monto_reintegrado || 0))
+                      }
                       onChange={handleChange('monto_reintegrado')}
                       name="monto_reintegrado"
                       id="monto_reintegrado"
@@ -1204,7 +1310,7 @@ export const ObservationsSFPForm = (props: Props) => {
                         inputComponent: NumberFormatCustom as any,
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
                       }}
-                      disabled={(action === 'view')}
+                      disabled
                     />
                     {errors.monto_reintegrado &&
                       touched.monto_reintegrado &&
@@ -1218,6 +1324,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       )}
                   </FormControl>
                 </Grid>
+                {/*
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>
                     <Field
@@ -1237,6 +1344,7 @@ export const ObservationsSFPForm = (props: Props) => {
                       )}
                   </FormControl>
                 </Grid>
+                */}
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>
                     <TextField
@@ -1252,6 +1360,9 @@ export const ObservationsSFPForm = (props: Props) => {
                         inputComponent: NumberFormatCustom as any,
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         readOnly: true,
+                      }}
+                      inputProps={{
+                        allowNegatives: true
                       }}
                     />
                     {errors.monto_por_reintegrar &&
@@ -1269,7 +1380,7 @@ export const ObservationsSFPForm = (props: Props) => {
               </Grid>
 
               <hr className={classes.hrSpacer} />
-              <hr className={classes.hrDivider} /> 
+              <hr className={classes.hrDivider} />
 
               <fieldset className={classes.fieldset}>
                 <legend className={classes.containerLegend}>

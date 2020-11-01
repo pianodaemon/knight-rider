@@ -142,9 +142,9 @@ export function AutoCompleteTreeDropdown(props: Props) {
         return groupField ? option[groupField] : option.firstLetter;
       }}
       noOptionsText="Sin opciones"
-      getOptionLabel={(option: any) => option[fieldLabel] || ''}
+      getOptionLabel={(option: any) => option?.[fieldLabel] || ''}
       getOptionSelected={(option: any, val: any) => {
-        return val[fieldValue] === option[fieldValue];
+        return val?.[fieldValue] === option[fieldValue];
       }}
       onChange={(event: any, newValue: any) => {
         onChange(

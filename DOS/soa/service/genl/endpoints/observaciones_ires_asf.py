@@ -29,6 +29,7 @@ obs_ires_asf_ns_captions = {
     'direccion_id': 'Id de la dirección (según obs preliminar)',
     'auditoria_id': 'Id de la auditoría (según obs preliminar)',
     'programa_social_id': 'Id del programa social (según obs preliminar)',
+    'num_observacion': 'Número de observación (según obs preliminar)',
     
     'observacion_id': 'Id de la observación a la que pertenece el seguimiento',
     'seguimiento_id': 'Id del seguimiento',
@@ -90,6 +91,10 @@ seguimiento = api.model('Seguimiento de una Observación de la ASF (Informe de R
     'num_oficio_monto_solventado': fields.String(description=obs_ires_asf_ns_captions['num_oficio_monto_solventado']),
     'fecha_oficio_monto_solventado': fields.Date(description=obs_ires_asf_ns_captions['fecha_oficio_monto_solventado']),
     'monto_pendiente_solventar': fields.Float(description=obs_ires_asf_ns_captions['monto_pendiente_solventar']),
+    'monto_a_reintegrar': fields.Float(description=obs_ires_asf_ns_captions['monto_a_reintegrar']),
+    'monto_reintegrado': fields.Float(description=obs_ires_asf_ns_captions['monto_reintegrado']),
+    'fecha_reintegro': fields.Date(description=obs_ires_asf_ns_captions['fecha_reintegro']),
+    'monto_por_reintegrar': fields.Float(description=obs_ires_asf_ns_captions['monto_por_reintegrar']),
 })
 
 pras = api.model('Campos de captura para un PRAS', {
@@ -132,6 +137,7 @@ obs_ires_asf = api.model('Observación de la ASF (Informe de Resultados)', {
     'direccion_id': fields.Integer(description=obs_ires_asf_ns_captions['direccion_id']),
     'auditoria_id': fields.Integer(description=obs_ires_asf_ns_captions['auditoria_id']),
     'programa_social_id': fields.Integer(description=obs_ires_asf_ns_captions['programa_social_id']),
+    'num_observacion': fields.String(description=obs_ires_asf_ns_captions['num_observacion']),
 })
 
 

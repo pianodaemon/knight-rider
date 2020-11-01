@@ -319,7 +319,11 @@ def seguimientos_to_comp_type_arr_lit(seguimientos):
             str(s['monto_solventado']) + ", " +
             "'" + s['num_oficio_monto_solventado'] + "', " +
             "'" + s['fecha_oficio_monto_solventado'] + "', " +
-            str(s['monto_pendiente_solventar']) +
+            str(s['monto_pendiente_solventar']) + ", " +
+            str(s['monto_a_reintegrar']) + ", " +
+            str(s['monto_reintegrado']) + ", " +
+            "'" + s['fecha_reintegro'] + "', " +
+            str(s['monto_por_reintegrar']) +
             ")"
         )
 
@@ -359,9 +363,10 @@ def add_preliminar_data(ent):
         ent['direccion_id'] = None
         ent['programa_social_id'] = None
         ent['auditoria_id'] = None
+        ent['num_observacion'] = None
     else:
         sql = '''
-            SELECT direccion_id, programa_social_id, auditoria_id
+            SELECT direccion_id, programa_social_id, auditoria_id, num_observacion
             FROM observaciones_pre_asf
             WHERE id = {}
             AND NOT blocked;
@@ -373,10 +378,12 @@ def add_preliminar_data(ent):
             ent['direccion_id'] = row['direccion_id']
             ent['programa_social_id'] = row['programa_social_id']
             ent['auditoria_id'] = row['auditoria_id']
+            ent['num_observacion'] = row['num_observacion']
         except Exception as err:
             ent['direccion_id'] = None
             ent['programa_social_id'] = None
             ent['auditoria_id'] = None
+            ent['num_observacion'] = None
 
 
 def transform_list_into_dict(input_list):

@@ -353,7 +353,11 @@ def seguimientos_to_comp_type_arr_lit(seguimientos):
             "'" + s['fecha_oficio_org_fiscalizador'] + "', " +
             str(s['estatus_id']) + ", " +
             str(s['monto_solventado']) + ", " +
-            str(s['monto_pendiente_solventar']) +
+            str(s['monto_pendiente_solventar']) + ", " +
+            str(s['monto_a_reintegrar']) + ", " +
+            str(s['monto_reintegrado']) + ", " +
+            "'" + s['fecha_reintegro'] + "', " +
+            str(s['monto_por_reintegrar']) +
             ")"
         )
         

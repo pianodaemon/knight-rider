@@ -59,6 +59,16 @@ export const AuditTable = (props: Props) => {
           sorting,
         },
         {
+          title: 'Órgano Fiscalizador',
+          field: 'fiscal',
+          sorting,
+        },
+        {
+          title: 'Dirección',
+          field: 'division',
+          sorting,
+        },
+        {
           title: 'Dependencia(s)',
           field: 'dependencies',
           sorting,

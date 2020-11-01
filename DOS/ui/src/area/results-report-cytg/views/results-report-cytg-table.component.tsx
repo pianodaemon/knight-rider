@@ -44,6 +44,11 @@ export const ResultsReportCYTGTable = (props: Props) => {
       sorting: !sorting,
     },
     {
+      title: 'Número o Clave de Observación',
+      field: 'num_observacion',
+      sorting,
+    },
+    {
       title: 'Dirección',
       field: 'direccion_id_title',
       sorting,

@@ -53,6 +53,7 @@ export const FilterChips = (props: Props) => {
       ...appliedFilters.filter(item => item.abbr !== filters[selectedFilter].abbr),
       {
         abbr: filters[selectedFilter].abbr,
+        type: filters[selectedFilter].type,
         filter: filters[selectedFilter].param,
         value: filterValue,
       }
@@ -147,7 +148,7 @@ export const FilterChips = (props: Props) => {
           <Chip
             key={`${index+1}`}
             avatar={<Avatar>{item.abbr}</Avatar>}
-            label={`${filters.find(f => f.abbr === item.abbr)?.options.find((option: any) => option.id === item.value)?.value}`}
+            label={`${item.type === 'dropdown' ? filters.find(f => f.abbr === item.abbr)?.options.find((option: any) => option.id === item.value)?.value : item.value}`}
             onDelete={() => removeFilter(index)}
             // color="secondary"
           />

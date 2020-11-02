@@ -8,6 +8,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux'
 import { resolvePermission } from 'src/shared/utils/permissions.util';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import { Decimal } from 'decimal.js';
 
 type Props = {
   loading: boolean,
@@ -84,6 +85,61 @@ const useStyles = makeStyles(() =>
   })
 );
 
+const TableReports = ( props: any ) => {
+  const {
+    report,
+    entidad,
+  } = props;
+  const classes = useStyles();
+  let sum = {
+    c_obs : 0, 
+    monto : new Decimal(0),
+  };
+  const sumRows = () => {
+    report.forEach( (dep:any) => {
+      sum.c_obs += dep.c_obs      ;
+      sum.monto  = Decimal.add( sum.monto, dep.monto )
+    })
+  };
+  sumRows();
+  return(
+    <table className={classes.tableWhole} id="table-to-xls"> 
+      <tbody className={classes.tableReports} >
+        <tr >    
+          <th colSpan={6}> {entidad} </th> 
+        </tr> 
+        <tr className={classes.titrow}>    
+          <th >Secretaría/Entidad/Municipio</th> 
+          <th >Cant. Obs.</th> 
+          <th >Número de Obs.</th> 
+          <th >Observación</th> 
+          <th >Tipo de Observación</th> 
+          <th >Estatus</th> 
+        </tr> 
+        {report.map((dep: any) =>
+          <tr> 
+            <td>{dep.dep}</td> 
+            <td style={{textAlign: 'center'}} >{dep.c_obs}</td>
+            <td style={{textAlign: 'center'}} >{dep.n_obs}</td>
+            <td style={{textAlign: 'center', overflow:'hidden',textOverflow:'ellipsis',display:'-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient:'vertical'}} >{dep.obs}</td>
+            <td className={classes.cantObs} >{dep.tipo}</td>
+            <td style={{textAlign: "center", whiteSpace: "nowrap"}} > { dep.estatus } </td>
+          </tr>
+        )
+        }   
+        <tr> 
+          <td style={{fontWeight: "bold"}} > Totales</td> 
+          <td style={{fontWeight: "bold", textAlign: "center"}}> { sum.c_obs } </td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}></td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}></td>
+        </tr>
+      </tbody>
+    </table>
+  );
+}
+
 export const Report63 = (props: Props) => {
   const {
     report,
@@ -92,7 +148,8 @@ export const Report63 = (props: Props) => {
     divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
-  const [yearIni, setYearIni] = useState<any>('2012');
+  const [yearIni, setYearIni] = useState<any>('2000');
+  const [dependency, setDependency] = useState<any>('Todas');
   const permissions: any = useSelector((state: any) => state.authSlice);
   const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   const optionsFiscalsAux: {[index: string]:any}   = {
@@ -113,10 +170,17 @@ export const Report63 = (props: Props) => {
     if( divisionId || divisionId === 0 ){
       loadReport61Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, obs_c: pre_ires, division_id: divisionId });
     }
+    setDependency('Todas');
     setEntidad(optionsFiscalsAux[optionS].label);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, optionS, divisionId]);
   const classes = useStyles();
+  const setVisibleRows = (dep: any): boolean => {
+    if(dep.dep === dependency || dependency === '' || dependency === 'Todas' || dependency === '0'){
+      return true;
+    }else{return false}
+  };
+  let auxObj:any = {};
   return (
     <div className={classes.Container}>
       <div>
@@ -170,7 +234,34 @@ export const Report63 = (props: Props) => {
             })}
           </Select>
         </div>
-
+        <div className={classes.selectYearContainer}>
+          <InputLabel className={classes.labelSelectYear}>Dependencia:</InputLabel>
+          <Select
+            labelId="dependency"
+            value={dependency}
+            onChange={(e)=> {setDependency(e.target.value);}}
+          >
+            <MenuItem
+              value={'Todas'}
+            >
+              -- Todas --
+            </MenuItem>
+            {report && report.data_rows && 
+              report.data_rows.map((item:any) => {
+              if( !(auxObj[item.dep]) ){
+                auxObj[item.dep] = 1;
+                return (
+                  <MenuItem
+                    value={item.dep}
+                  >
+                    {item.dep}
+                  </MenuItem>
+                );
+              }
+              return <React.Fragment />
+            })}
+          </Select>
+        </div>
       </div>
 
       <ReactHTMLTableToExcel
@@ -181,43 +272,10 @@ export const Report63 = (props: Props) => {
          sheet="tablexls"
          buttonText="Descargar Reporte"
       />
-      <table className={classes.tableWhole} id="table-to-xls"> 
-        <tbody className={classes.tableReports} >
-          <tr >    
-            <th colSpan={6}> {entidad} </th> 
-          </tr> 
-          <tr className={classes.titrow}>    
-            <th >Secretaría/Entidad/Municipio</th> 
-            <th >Cant. Obs.</th> 
-            <th >Número de Obs.</th> 
-            <th >Observación</th> 
-            <th >Tipo de Observación</th> 
-            <th >Estatus</th> 
-          </tr> 
-          {report && report.data_rows && report.data_rows.map((dep: any) =>
-            <tr> 
-              <td>{dep.dep}</td> 
-              <td style={{textAlign: 'center'}} >{dep.c_obs}</td>
-              <td style={{textAlign: 'center'}} >{dep.n_obs}</td>
-              <td style={{textAlign: 'center', overflow:'hidden',textOverflow:'ellipsis',display:'-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient:'vertical'}} >{dep.obs}</td>
-              <td className={classes.cantObs} >{dep.tipo}</td>
-              <td style={{textAlign: "center", whiteSpace: "nowrap"}} > { dep.estatus } </td>
-            </tr>
-          )
-          }   
-          { report && report.sum_rows &&
-            <tr> 
-              <td style={{fontWeight: "bold"}} > Totales</td> 
-              <td style={{fontWeight: "bold", textAlign: "center"}}> { report.sum_rows.c_obs } </td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}></td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}></td>
-            </tr>
-          }           
-          
-        </tbody>
-      </table>
+      {report && report.data_rows && 
+        <TableReports report={report.data_rows.filter(setVisibleRows)} entidad={entidad}  />
+      }
+      
     </div>
   );
 };

@@ -86,6 +86,76 @@ const useStyles = makeStyles(() =>
   })
 );
 
+const TableReports = ( props: any ) => {
+  const {
+    report,
+  } = props;
+  const classes = useStyles();
+  const formatPercent = (monto:number, total:number): string => {
+    if(total>0){
+      let m = new Decimal(monto)
+      let v = ((m.times(100)).dividedBy(total)).toFixed(1);
+      let vr = v[v.length-1] === '0' ? ((m.times(100)).dividedBy(total)).toFixed(0) : v;
+      return vr + ' %';
+    }else{
+      return '';
+    }
+  };
+  let sum = {
+      c_obs: 0,
+      monto: new Decimal(0),
+  };
+  const sumRows = () => {
+    report.forEach( (dep:any) => {
+      sum.c_obs += dep.c_obs      ;
+      sum.monto  = Decimal.add( sum.monto, dep.monto )
+    })
+  };
+  sumRows();
+  return(
+    <table className={classes.tableWhole} id="table-to-xls"> 
+      <tbody className={classes.tableReports} >
+        <tr>
+          <th colSpan={8}> Pendientes de Solventar </th> 
+        </tr>
+        <tr className={classes.titrow}>    
+          <th >Secretaría/Entidad/Municipio</th> 
+          <th >Ejercicio</th> 
+          <th >Tipo</th> 
+          <th >Clasificación</th> 
+          <th >Cantidad Obs.</th> 
+          <th >% Obs.</th> 
+          <th >Monto</th> 
+          <th >% Monto</th> 
+        </tr> 
+        {report.map((dep: any) =>
+          <tr> 
+            <td>{dep.dep}</td> 
+            <td style={{textAlign: 'center'}} >{dep.ej}</td>
+            <td style={{textAlign: 'center'}} >{dep.tipo}</td>
+            <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
+            <td className={classes.cantObs} >{dep.c_obs}</td>
+            <td style={{textAlign: "right", whiteSpace: "nowrap"}} > {formatPercent( dep.c_obs, sum.c_obs ) } </td>
+            <td className={classes.montos} >{ <NumberFormat value={dep.monto} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> }</td>
+            <td style={{textAlign: "right", whiteSpace: "nowrap"}} >{formatPercent( dep.monto, sum.monto.toNumber() ) }</td>
+          </tr>
+        )
+        }   
+        <tr> 
+          <td style={{fontWeight: "bold"}} > Totales</td> 
+          <td style={{fontWeight: "bold", textAlign: "center"}}></td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}></td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}> { sum.c_obs }</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> { <NumberFormat value={ sum.monto.valueOf() } displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> }</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
+        </tr>
+      </tbody>
+    </table>
+  );
+}
+
 export const Report56 = (props: Props) => {
   const {
     report,
@@ -94,7 +164,8 @@ export const Report56 = (props: Props) => {
     divisionId,
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
-  const [yearIni, setYearIni] = useState<any>('2012');
+  const [yearIni, setYearIni] = useState<any>('2000');
+  const [dependency, setDependency] = useState<any>('Todas');
   const permissions: any = useSelector((state: any) => state.authSlice);
   const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   const optionsFiscals = [
@@ -108,15 +179,16 @@ export const Report56 = (props: Props) => {
     if( divisionId || divisionId === 0 ){
       loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, reporte_num: 'reporte56', division_id: divisionId });
     }
+    setDependency('Todas');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearEnd, yearIni, fiscal, divisionId]);
   const classes = useStyles();
-  const formatPercent = (monto:number, total:number): string => {
-    let m = new Decimal(monto)
-    let v = ((m.times(100)).dividedBy(total)).toFixed(1);
-    let vr = v[v.length-1] === '0' ? ((m.times(100)).dividedBy(total)).toFixed(0) : v;
-    return vr + ' %';
+  const setVisibleRows = (dep: any): boolean => {
+    if(dep.dep === dependency || dependency === '' || dependency === 'Todas' || dependency === '0'){
+      return true;
+    }else{return false}
   };
+  let auxObj:any = {};
   return (
     <div className={classes.Container}>
       <div>
@@ -170,7 +242,34 @@ export const Report56 = (props: Props) => {
             })}
           </Select>
         </div>
-
+        <div className={classes.selectYearContainer}>
+          <InputLabel className={classes.labelSelectYear}>Dependencia:</InputLabel>
+          <Select
+            labelId="dependency"
+            value={dependency}
+            onChange={(e)=> {setDependency(e.target.value);}}
+          >
+            <MenuItem
+              value={'Todas'}
+            >
+              -- Todas --
+            </MenuItem>
+            {report && report.data_rows && 
+              report.data_rows.map((item:any) => {
+              if( !(auxObj[item.dep]) ){
+                auxObj[item.dep] = 1;
+                return (
+                  <MenuItem
+                    value={item.dep}
+                  >
+                    {item.dep}
+                  </MenuItem>
+                );
+              }
+              return <React.Fragment />
+            })}
+          </Select>
+        </div>
       </div>
 
       <ReactHTMLTableToExcel
@@ -181,50 +280,9 @@ export const Report56 = (props: Props) => {
          sheet="tablexls"
          buttonText="Descargar Reporte"
       />
-      <div style={{background: "rgba(0,0,0,0.03)", borderBottom: "1px solid rgba(0,0,0,0.05)", textAlign: "center", padding: "5px 0", fontWeight: "bold", marginBottom: "0px" }}>
-        Pendientes de Solventar
-      </div>
-
-      <table className={classes.tableWhole} id="table-to-xls"> 
-        <tbody className={classes.tableReports} >
-          <tr className={classes.titrow}>    
-            <th >Secretaría/Entidad/Municipio</th> 
-            <th >Ejercicio</th> 
-            <th >Tipo</th> 
-            <th >Clasificación</th> 
-            <th >Cantidad Obs.</th> 
-            <th >% Obs.</th> 
-            <th >Monto</th> 
-            <th >% Monto</th> 
-          </tr> 
-          {report && report.data_rows && report.data_rows.map((dep: any) =>
-            <tr> 
-              <td>{dep.dep}</td> 
-              <td style={{textAlign: 'center'}} >{dep.ej}</td>
-              <td style={{textAlign: 'center'}} >{dep.tipo}</td>
-              <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
-              <td className={classes.cantObs} >{dep.c_obs}</td>
-              <td style={{textAlign: "right", whiteSpace: "nowrap"}} > {formatPercent( dep.c_obs, report.sum_rows.c_obs ) } </td>
-              <td className={classes.montos} >{ <NumberFormat value={dep.monto} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> }</td>
-              <td style={{textAlign: "right", whiteSpace: "nowrap"}} >{formatPercent( dep.monto, report.sum_rows.monto ) }</td>
-            </tr>
-          )
-          }   
-          { report && report.sum_rows &&
-            <tr> 
-              <td style={{fontWeight: "bold"}} > Totales</td> 
-              <td style={{fontWeight: "bold", textAlign: "center"}}></td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}></td>
-              <td style={{fontWeight: "bold", textAlign: "center"}}> { report.sum_rows.c_obs }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}> { <NumberFormat value={ report.sum_rows.monto.valueOf() } displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> }</td>
-              <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
-            </tr>
-          }           
-          
-        </tbody>
-      </table>
+      {report && report.data_rows && 
+        <TableReports report={report.data_rows.filter(setVisibleRows) }  />
+      }
     </div>
   );
 };

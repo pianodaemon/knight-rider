@@ -87,7 +87,7 @@ def _setup_search_criteria(table, search_params):
     for field, value in search_params.items():
         # For text fields... a different condition syntax is needed
         # TODO: Figure out a better method to identify fields of text type
-        if field == 'title' or field[:11] == 'observacion':
+        if field == 'title' or field[:11] == 'observacion' or field == 'clave_observacion' or field == 'num_observacion':
             criteria.append("{}.{} ILIKE '%{}%'".format(table, field, value))
         else:
             criteria.append("{}.{} = {}".format(table, field, value))

@@ -4,7 +4,6 @@ import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { getReport54 } from '../../service/reports54.service';
 import { result54Reducer } from '../reports54.reducer';
 import { notificationAction } from 'src/area/main/state/usecase/notification.usecase';
-import { Decimal } from 'decimal.js';
 
 const postfix = '/app';
 const LOAD_REPORT54 = `LOAD_REPORT54${postfix}`;
@@ -43,19 +42,7 @@ function* loadReport54Worker(action?: any): Generator<any, any, any> {
 
     const result = yield call(getReport54, options);
 
-    var dat = result.data;
-    
-    var sum_obj = {c_sol:0, m_sol: new Decimal(0), c_analisis:0, m_analisis: new Decimal(0), c_no_sol:0, m_no_sol: new Decimal(0) };
-    dat.data_rows.forEach(function(x: any) {
-      sum_obj.c_sol      += x.c_sol                                         ;
-      sum_obj.m_sol = Decimal.add( sum_obj.m_sol, x.m_sol )                 ;
-      sum_obj.c_analisis += x.c_analisis                                    ;
-      sum_obj.m_analisis = Decimal.add( sum_obj.m_analisis, x.m_analisis )  ;
-      sum_obj.c_no_sol   += x.c_no_sol                                      ;
-      sum_obj.m_no_sol = Decimal.add( sum_obj.m_no_sol, x.m_no_sol )        ;
-    } )
-
-    var sendData = {data_rows: result.data.data_rows, sum_rows: sum_obj};
+    var sendData = {data_rows: result.data.data_rows};
     yield put(loadReport54SuccessAction( sendData ));
   } catch (e) {
     console.log(e);

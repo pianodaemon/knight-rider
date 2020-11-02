@@ -135,6 +135,8 @@ export const AuditsForm = (props: Props) => {
     title: '',
     dependency_ids: [],
     years: [],
+    direccion_id: 0,
+    org_fiscal_id: 0,
   };
   useEffect(() => {
     if (id) {
@@ -275,6 +277,61 @@ export const AuditsForm = (props: Props) => {
                           classes={{ error: classes.textErrorHelper }}
                         >
                           Ingrese año(s)
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl
+                      className={classes.formControl}
+                    >
+                      <InputLabel id="direccion-label">Dirección</InputLabel>
+                      <Select
+                        labelId="direccion-label"
+                        id="direccion"
+                        value={values.direccion_id || []}
+                        onChange={handleChange('direccion_id')}
+                      >
+                        {catalog && catalog.divisions && catalog.divisions.map((division) => (
+                          <MenuItem key={division.id} value={division.id}>
+                            {division.title}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.direccion_id && touched.direccion_id && errors.direccion_id && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese dirección
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6} />
+                  <Grid item xs={12} sm={6}>
+                    <FormControl
+                      className={classes.formControl}
+                    >
+                      <InputLabel id="fiscal-label">Órgano Fiscalizador</InputLabel>
+                      <Select
+                        labelId="fiscal-label"
+                        id="fiscal"
+                        value={values.org_fiscal_id || []}
+                        onChange={handleChange('org_fiscal_id')}
+                      >
+                        {catalog && catalog.fiscals && catalog.fiscals.map((fiscal) => (
+                          <MenuItem key={fiscal.id} value={fiscal.id}>
+                            {fiscal.title}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.org_fiscal_id && touched.org_fiscal_id && errors.org_fiscal_id && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese Órgano Fiscalizador
                         </FormHelperText>
                       )}
                     </FormControl>

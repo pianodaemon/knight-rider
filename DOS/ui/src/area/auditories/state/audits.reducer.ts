@@ -6,6 +6,8 @@ export interface Audit {
   title: string;
   dependency_ids: Array<number>;
   years: Array<number>;
+  direccion_id: number,
+  org_fiscal_id: number,
 }
 
 // Mutated Audit Interface to be used as a Request body on Create/Update Actions
@@ -13,6 +15,8 @@ export interface Audit {
 
 export type Catalog = {
   dependencies: Array<Dependency> | null,
+  fiscals: Array<any>,
+  divisions: Array<any>,
 };
 
 export type Dependency = {

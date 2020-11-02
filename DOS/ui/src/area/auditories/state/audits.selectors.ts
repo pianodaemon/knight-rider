@@ -56,9 +56,13 @@ export const auditsCatalogSelector = createSelector(
           slice.catalog.dependencies.find((item: any) => item.id === dependency)
         )
         .map((item: any) => (item ? item.title : ''));
+      const fiscal = slice.catalog.fiscals.find((item: any) => item.id === audit.org_fiscal_id)?.title;
+      const division = slice.catalog.divisions.find((item: any) => item.id === audit.direccion_id)?.title;
       return {
         ...audit,
         dependencies: dependencies.join(', '),
+        division,
+        fiscal,
         years: audit.years.join(', '),
       };
     })

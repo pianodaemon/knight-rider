@@ -69,6 +69,11 @@ export const ResultsReportTable = (props: Props) => {
       sorting,
     },
     {
+      title: 'Número o Clave de Observación',
+      field: 'num_observacion',
+      sorting,
+    },
+    {
       title: 'Auditoría',
       field: 'auditoria_id_title',
       sorting,

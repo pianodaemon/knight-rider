@@ -154,6 +154,17 @@ export const Report52Preliminaries = (props: Props) => {
       />
       <table className={classes.tableWhole} id="table-to-xls"> 
         <tbody className={classes.tableReports} >
+
+          <tr style={{display: 'none'}} >    
+            <th colSpan={8} > Reporte Ejecutivo Concentrado Total de Observaciones por Ente Fiscalizador Informe de Resultados </th> 
+          </tr> 
+          <tr style={{display: 'none'}} ></tr> 
+          <tr style={{display: 'none'}} >    
+            <td colSpan={2} > Desde: {yearIni} </td> 
+            <td colSpan={2} > Hasta: {yearEnd} </td> 
+          </tr> 
+          <tr style={{display: 'none'}} ></tr>
+
           <tr className={classes.titrow}>    
             <th colSpan={2}>ASF</th> 
             <th colSpan={2}>SFP</th> 

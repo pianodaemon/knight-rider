@@ -129,3 +129,57 @@ export const pagingSelector = createSelector(
   sliceSelector,
   (slice: any) => slice.paging
 );
+
+export const filterOptionsSelector = createSelector(
+  sliceSelector,
+  (slice: any) => slice.filters
+);
+
+export const filterSelector = createSelector(
+  sliceSelector,
+  (slice: any) => {
+    const { catalog } = slice;
+    return [
+      {
+        abbr: 'DIR',
+        type: 'dropdown',
+        param: 'direccion_id',
+        name: '(DIR) Dirección',
+        options: catalog && catalog.divisions ? [...catalog.divisions.map((item: any) => { return { id: item.id, value: item.title } })] : [],
+      },
+      {
+        abbr: 'AUD',
+        type: 'dropdown',
+        param: 'auditoria_id',
+        name: '(AUD) Auditoría',
+        options: catalog && catalog.audits ? [...catalog.audits.map((item: any) => { return { id: item.id, value: item.title } })] : [],
+      },
+      {
+        abbr: 'PRO',
+        type: 'dropdown',
+        param: 'programa_social_id',
+        name: '(PRO) Programa Social',
+        options: catalog && catalog.social_programs ? [...catalog.social_programs.map((item: any) => { return { id: item.id, value: item.title } })] : [],
+      },
+      {
+        abbr: 'TOB',
+        type: 'dropdown',
+        param: 'tipo_observacion_id',
+        name: '(TOB) Tipo de Observación',
+        options: catalog && catalog.observation_types ? [...catalog.observation_types.map((item: any) => { return { id: item.id, value: item.title } })] : [],
+      },
+      {
+        abbr: 'CLO',
+        type: 'text',
+        param: 'clave_observacion',
+        name: '(CLO) Clave o Num. de observacion',
+      },
+      {
+        abbr: 'O',
+        type: 'text',
+        param: 'observacion',
+        name: '(O) Observación',
+      },
+    ];
+  }
+);

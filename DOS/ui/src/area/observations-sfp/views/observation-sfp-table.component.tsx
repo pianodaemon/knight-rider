@@ -8,6 +8,8 @@ import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
+import { FilterChips } from 'src/shared/components/filter-chips.component';
+import Paper from '@material-ui/core/Paper';
 
 type Props = {
   observations: Array<Observation>,
@@ -17,6 +19,7 @@ type Props = {
   paging: any,
   isAllowed: Function,
   divisionId: number,
+  filters: Array<any>,
 };
 
 const useStyles = makeStyles(() =>
@@ -41,6 +44,7 @@ export const ObservationSFPTable = (props: Props) => {
     removeObservationSFPAction,
     isAllowed,
     divisionId,
+    filters,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -102,6 +106,13 @@ export const ObservationSFPTable = (props: Props) => {
     },
   ];
   return (
+    <>
+    <Paper elevation={0}>
+      <FilterChips
+        filters={filters}
+        loadObservationsSFPAction={loadObservationsSFPAction} 
+      />
+    </Paper>
     <MaterialTable
       localization={{
         body: {
@@ -214,5 +225,6 @@ export const ObservationSFPTable = (props: Props) => {
       ]}
       isLoading={loading}
     />
+    </>
   );
 };

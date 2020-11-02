@@ -5,6 +5,7 @@ import { loadObservationsSFPAction } from '../state/usecases/load-observations-s
 import { removeObservationSFPAction } from '../state/usecases/remove-observation.usecase';
 
 import {
+  filterSelector,
   isLoadingSelector,
   observationsCatalogSelector,
   pagingSelector,
@@ -17,6 +18,7 @@ const mapDispatchToProps = {
 
 function mapStateToProps(state: any) {
   return {
+    filters: filterSelector(state),
     observations: observationsCatalogSelector(state),
     loading: isLoadingSelector(state),
     paging: pagingSelector(state),

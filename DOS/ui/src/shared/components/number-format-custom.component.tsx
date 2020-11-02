@@ -5,10 +5,11 @@ interface NumberFormatCustomProps {
   inputRef: (instance: NumberFormat | null) => void;
   onChange: (event: { target: { name: string, value: string } }) => void;
   name: string;
+  allowNegatives: boolean;
 }
 
 export function NumberFormatCustom(props: NumberFormatCustomProps) {
-  const { inputRef, onChange, ...other } = props;
+  const { inputRef, onChange, allowNegatives, ...other } = props;
 
   return (
     <NumberFormat
@@ -24,7 +25,7 @@ export function NumberFormatCustom(props: NumberFormatCustomProps) {
       thousandSeparator
       isNumericString
       prefix=""
-      allowNegative={false}
+      allowNegative={allowNegatives || false}
       {...other}
     />
   );

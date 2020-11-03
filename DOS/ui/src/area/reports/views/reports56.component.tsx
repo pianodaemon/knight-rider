@@ -89,6 +89,10 @@ const useStyles = makeStyles(() =>
 const TableReports = ( props: any ) => {
   const {
     report,
+    entidad,
+    yearIni,
+    yearEnd,
+    dependency,
   } = props;
   const classes = useStyles();
   const formatPercent = (monto:number, total:number): string => {
@@ -115,6 +119,21 @@ const TableReports = ( props: any ) => {
   return(
     <table className={classes.tableWhole} id="table-to-xls"> 
       <tbody className={classes.tableReports} >
+
+        <tr style={{display: 'none'}} >    
+          <th colSpan={8} > Reporte Ejecutivo de Observaciones Pendientes de Solventar por Ente Fiscalizador </th> 
+        </tr> 
+        <tr style={{display: 'none'}} >    
+        </tr> 
+        <tr style={{display: 'none'}} >    
+          <td colSpan={2} > Desde: {yearIni}              </td> 
+          <td colSpan={2} > Hasta: {yearEnd}              </td> 
+          <td colSpan={2} > Ente Fiscalizador: {entidad}  </td> 
+          <td colSpan={2} > Dependencia: {dependency}     </td> 
+        </tr> 
+        <tr style={{display: 'none'}} >    
+        </tr> 
+
         <tr>
           <th colSpan={8}> Pendientes de Solventar </th> 
         </tr>
@@ -281,7 +300,7 @@ export const Report56 = (props: Props) => {
          buttonText="Descargar Reporte"
       />
       {report && report.data_rows && 
-        <TableReports report={report.data_rows.filter(setVisibleRows) }  />
+        <TableReports report={report.data_rows.filter(setVisibleRows) } entidad={fiscal} yearIni={yearIni} yearEnd={yearEnd} dependency={dependency} />
       }
     </div>
   );

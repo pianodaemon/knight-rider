@@ -90,6 +90,9 @@ const TableReports = ( props: any ) => {
   const {
     report,
     entidad,
+    yearIni,
+    yearEnd,
+    dependency,
   } = props;
   const classes = useStyles();
   let sum = {
@@ -105,33 +108,48 @@ const TableReports = ( props: any ) => {
   sumRows();
   return(
     <table className={classes.tableWhole} id="table-to-xls"> 
-        <tbody className={classes.tableReports} >
-          <tr >    
-            <th colSpan={4}> {entidad} </th> 
-          </tr> 
-          <tr className={classes.titrow}>    
-            <th >Secretaría/Entidad/Municipio</th> 
-            <th >Clasificación</th> 
-            <th >Cantidad Obs.</th> 
-            <th >Monto</th> 
-          </tr> 
-          {report.map((dep: any) =>
-            <tr> 
-              <td>{dep.dep}</td> 
-              <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
-              <td className={classes.cantObs} >{dep.c_obs}</td>
-              <td className={classes.montos} >{ <NumberFormat value={dep.monto} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> }</td>
-            </tr>
-          )
-          }   
+      <tbody className={classes.tableReports} >
+
+        <tr style={{display: 'none'}} >    
+          <th colSpan={8} > Reporte Ejecutivo Concentrado de Observaciones por Clasificación de Observación CyTG </th> 
+        </tr> 
+        <tr style={{display: 'none'}} >    
+        </tr> 
+        <tr style={{display: 'none'}} >    
+          <td colSpan={2} > Desde: {yearIni}              </td> 
+          <td colSpan={2} > Hasta: {yearEnd}              </td> 
+          <td colSpan={2} > Ente Fiscalizador: {entidad}  </td> 
+          <td colSpan={2} > Dependencia: {dependency}     </td> 
+        </tr> 
+        <tr style={{display: 'none'}} >    
+        </tr> 
+
+        <tr >    
+          <th colSpan={4}> {entidad} </th> 
+        </tr> 
+        <tr className={classes.titrow}>    
+          <th >Secretaría/Entidad/Municipio</th> 
+          <th >Clasificación</th> 
+          <th >Cantidad Obs.</th> 
+          <th >Monto</th> 
+        </tr> 
+        {report.map((dep: any) =>
           <tr> 
-            <td style={{fontWeight: "bold"}} > Totales</td> 
-            <td style={{fontWeight: "bold", textAlign: "center"}}></td>
-            <td style={{fontWeight: "bold", textAlign: "center"}}> { sum.c_obs }</td>
-            <td style={{fontWeight: "bold", textAlign: "right"}}> { <NumberFormat value={ sum.monto.valueOf() } displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
+            <td>{dep.dep}</td> 
+            <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
+            <td className={classes.cantObs} >{dep.c_obs}</td>
+            <td className={classes.montos} >{ <NumberFormat value={dep.monto} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> }</td>
           </tr>
-        </tbody>
-      </table>
+        )
+        }   
+        <tr> 
+          <td style={{fontWeight: "bold"}} > Totales</td> 
+          <td style={{fontWeight: "bold", textAlign: "center"}}></td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}> { sum.c_obs }</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> { <NumberFormat value={ sum.monto.valueOf() } displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
+        </tr>
+      </tbody>
+    </table>
   );
 }
 
@@ -263,7 +281,7 @@ export const Report58 = (props: Props) => {
          buttonText="Descargar Reporte"
       />
       {report && report.data_rows && 
-        <TableReports report={report.data_rows.filter(setVisibleRows) } entidad={entidad} />
+        <TableReports report={report.data_rows.filter(setVisibleRows) } entidad={entidad} yearIni={yearIni} yearEnd={yearEnd} dependency={dependency} />
       }
       
     </div>

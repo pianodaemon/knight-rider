@@ -273,7 +273,7 @@ export const ObservationsSFPForm = (props: Props) => {
               fields[field] = "";
             }
             if(/^fecha_/i.test(field) && !fields[field]) {
-              fields[field] = values.fecha_captura;
+              fields[field] = '2099-12-31'; // values.fecha_captura;
             }
             if((/^monto_/i.test(field) || "autoridad_invest_id" === field) && !fields[field]) {
               fields[field] = 0;
@@ -289,7 +289,7 @@ export const ObservationsSFPForm = (props: Props) => {
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
             Object.keys(item).forEach((field: any) => {
               if(/^fecha_/i.test(field) && !item[field]) {
-                item[field] = values.fecha_captura;
+                item[field] = '2099-12-31'; // values.fecha_captura;
               }
             });
             return { ...item, seguimiento_id: index };

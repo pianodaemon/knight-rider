@@ -254,7 +254,7 @@ export const ObservationsASFForm = (props: Props) => {
               fields[field] = "";
             }
             if(/^fecha_/i.test(field) && !fields[field]) {
-              fields[field] = values.fecha_captura;
+              fields[field] = '2099-12-31'; // values.fecha_captura;
             }
             if(/^monto_/i.test(field) && !fields[field]) {
               fields[field] = 0;

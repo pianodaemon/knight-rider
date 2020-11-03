@@ -89,6 +89,9 @@ const TableReports = ( props: any ) => {
   const {
     report,
     entidad,
+    yearIni,
+    yearEnd,
+    dependency,
   } = props;
   const classes = useStyles();
   let sum = {
@@ -105,7 +108,20 @@ const TableReports = ( props: any ) => {
   return(
     <table className={classes.tableWhole} id="table-to-xls"> 
       <tbody className={classes.tableReports} >
-        <tr >    
+        <tr style={{display: 'none'}} >    
+          <th colSpan={8} > Reporte de Detalle de la Observación, Estatus, Entidad, Tipo de Observación y Ente Fiscalizador </th> 
+        </tr> 
+        <tr style={{display: 'none'}} >    
+        </tr> 
+        <tr style={{display: 'none'}} >    
+          <td colSpan={2} > Desde: {yearIni}              </td> 
+          <td colSpan={2} > Hasta: {yearEnd}              </td> 
+          <td colSpan={2} > Ente Fiscalizador: {entidad}  </td> 
+          <td colSpan={2} > Dependencia: {dependency}     </td> 
+        </tr> 
+        <tr style={{display: 'none'}} >    
+        </tr> 
+        <tr>    
           <th colSpan={6}> {entidad} </th> 
         </tr> 
         <tr className={classes.titrow}>    
@@ -273,7 +289,7 @@ export const Report63 = (props: Props) => {
          buttonText="Descargar Reporte"
       />
       {report && report.data_rows && 
-        <TableReports report={report.data_rows.filter(setVisibleRows)} entidad={entidad}  />
+        <TableReports report={report.data_rows.filter(setVisibleRows)} entidad={entidad} yearIni={yearIni} yearEnd={yearEnd} dependency={dependency} />
       }
       
     </div>

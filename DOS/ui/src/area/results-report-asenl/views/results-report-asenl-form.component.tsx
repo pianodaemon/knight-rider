@@ -258,13 +258,13 @@ export const ResultsReportASENLForm = (props: Props) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = {...values };
           const today = new Date();
-          const defaultDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+          // const defaultDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
           Object.keys(fields).forEach((field: any) => {
             if (fields[field] === null) {
               fields[field] = "";
             }
             if(/^fecha_/i.test(field) && !fields[field]) {
-              fields[field] = defaultDate;
+              fields[field] = "2099-12-31"; // defaultDate;
             }
             if((/^monto_/i.test(field) || field === "compartida_monto" || field === "compartida_tipo_observacion_id") && !fields[field]) {
               fields[field] = 0;
@@ -803,7 +803,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto Observado (cifra en miles de pesos)"
+                        label="Monto Observado (cifra en pesos)"
                         value={values.monto_observado}
                         onChange={handleChange('monto_observado')}
                         name="monto_observado"
@@ -830,7 +830,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto solventado (cifra en miles de pesos)"
+                        label="Monto solventado (cifra en pesos)"
                         value={values.monto_solventado}
                         onChange={handleChange('monto_solventado')}
                         name="monto_solventado"
@@ -857,7 +857,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto pendiente de solventar  (cifra en miles de pesos)"
+                        label="Monto pendiente de solventar  (cifra en pesos)"
                         value={values.monto_pendiente_solventar}
                         onChange={handleChange('monto_pendiente_solventar')}
                         name="monto_pendiente_solventar"
@@ -884,7 +884,7 @@ export const ResultsReportASENLForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto a reintegrar (cifra en miles de pesos)"
+                        label="Monto a reintegrar (cifra en pesos)"
                         value={values.monto_a_reintegrar}
                         onChange={handleChange('monto_a_reintegrar')}
                         name="monto_a_reintegrar"

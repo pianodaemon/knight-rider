@@ -68,6 +68,7 @@ interface ObservationsSFPSlice {
     order: string,
     order_by: string,
   };
+  filters: Array<any>;
 }
 
 type Audit = {
@@ -122,6 +123,7 @@ const initialState: ObservationsSFPSlice = {
     order: 'desc',
     order_by: 'id',
   },
+  filters: [],
 };
 
 export const sliceName = 'observationsSFPSlice';

@@ -220,21 +220,25 @@ export const ResultsReportForm = (props: Props) => {
     "seguimiento_id": 0,
     "medio_notif_seguimiento_id": 1,
     "num_oficio_cytg_oic": "",
-    "fecha_oficio_cytg_oic": "2020-10-22",
-    "fecha_recibido_dependencia": "2020-10-22",
-    "fecha_vencimiento_cytg": "2020-10-22",
+    "fecha_oficio_cytg_oic": "2099-12-31",
+    "fecha_recibido_dependencia": "2099-12-31",
+    "fecha_vencimiento_cytg": "2099-12-31",
     "num_oficio_resp_dependencia": "",
-    "fecha_recibido_oficio_resp": "2020-10-22",
+    "fecha_recibido_oficio_resp": "2099-12-31",
     "resp_dependencia": "",
     "comentarios": "",
     "clasif_final_interna_cytg": 0,
     "num_oficio_org_fiscalizador": "",
-    "fecha_oficio_org_fiscalizador": "2020-10-22",
+    "fecha_oficio_org_fiscalizador": "2099-12-31",
     "estatus_id": 1,
     "monto_solventado": "0",
     "num_oficio_monto_solventado": "",
-    "fecha_oficio_monto_solventado": "2020-10-22",
-    "monto_pendiente_solventar": 0
+    "fecha_oficio_monto_solventado": "2099-12-31",
+    "monto_pendiente_solventar": 0,
+    fecha_reintegro:  "2099-12-31",
+    monto_a_reintegrar: 0,
+    monto_por_reintegrar: 0,
+    monto_reintegrado: 0,
   };
   const PRASTemplate = {
     autoridad_invest_id: "",
@@ -390,13 +394,13 @@ export const ResultsReportForm = (props: Props) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = {...values };
           const today = new Date();
-          const defaultDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+          // const defaultDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
           Object.keys(fields).forEach((field: any) => {
             if (fields[field] === null) {
               fields[field] = "";
             }
             if (/^fecha_/i.test(field) && !fields[field]) {
-              fields[field] = defaultDate;
+              fields[field] = '2099-12-31';
             }
             if (/^monto_/i.test(field) && !fields[field]) {
               fields[field] = 0;
@@ -857,7 +861,7 @@ export const ResultsReportForm = (props: Props) => {
                           inputComponent: NumberFormatCustom as any,
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
-                        label="Monto Observado (cifra en miles de pesos)"
+                        label="Monto Observado (cifra en pesos)"
                         name="monto_observado"
                         // onChange={handleChange('monto_observado')}
                         onChange={(value: any) => {
@@ -1384,7 +1388,7 @@ export const ResultsReportForm = (props: Props) => {
                                             inputComponent: NumberFormatCustom as any,
                                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                           }}
-                                          label="Monto Solventado (cifra en miles de pesos)"
+                                          label="Monto Solventado (cifra en pesos)"
                                           // name="monto_solventado"
                                           // onChange={(value: any) => setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value)}
                                           onChange={(value: any) => {
@@ -1467,7 +1471,7 @@ export const ResultsReportForm = (props: Props) => {
                                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                           }}
                                           inputProps={{allowNegative: true,}}
-                                          label="Monto Pendiente de solventar (cifra en miles de pesos)"
+                                          label="Monto Pendiente de solventar (cifra en pesos)"
                                           name="monto_pendiente_solventar"
                                           // onChange={handleChange('monto_pendiente_solventar')}
                                           placeholder="0"
@@ -1489,7 +1493,7 @@ export const ResultsReportForm = (props: Props) => {
                                             inputComponent: NumberFormatCustom as any,
                                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                           }}
-                                          label="Monto a reintegrar (cifra en miles de pesos)"
+                                          label="Monto a reintegrar (cifra en pesos)"
                                           name="monto_a_reintegrar"
                                           placeholder="0"
                                           value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar : ''}
@@ -1506,7 +1510,7 @@ export const ResultsReportForm = (props: Props) => {
                                             inputComponent: NumberFormatCustom as any,
                                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                           }}
-                                          label="Monto reintegrado (cifra en miles de pesos)"
+                                          label="Monto reintegrado (cifra en pesos)"
                                           name="monto_reintegrado"
                                           placeholder="0"
                                           value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_reintegrado : ''}
@@ -1553,7 +1557,7 @@ export const ResultsReportForm = (props: Props) => {
                                             inputComponent: NumberFormatCustom as any,
                                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                           }}
-                                          label="Monto por reintegrar (cifra en miles de pesos)"
+                                          label="Monto por reintegrar (cifra en pesos)"
                                           name="monto_por_reintegrar"
                                           placeholder="0"
                                           value={
@@ -1612,7 +1616,7 @@ export const ResultsReportForm = (props: Props) => {
                           inputProps={{
                             allowNegatives: true
                           }}
-                          label="Monto a reintegrar (cifra en miles de pesos)"
+                          label="Monto a reintegrar (cifra en pesos)"
                           name="monto_a_reintegrar"
                           onChange={handleChange('monto_a_reintegrar')}
                           placeholder="0"
@@ -1645,7 +1649,7 @@ export const ResultsReportForm = (props: Props) => {
                           inputProps={{
                             allowNegatives: true
                           }}
-                          label="Monto reintegrado (cifra en miles de pesos)"
+                          label="Monto reintegrado (cifra en pesos)"
                           name="monto_reintegrado"
                           onChange={handleChange('monto_reintegrado')}
                           placeholder="0"
@@ -1699,7 +1703,7 @@ export const ResultsReportForm = (props: Props) => {
                           inputProps={{
                             allowNegatives: true
                           }}
-                          label="Monto por reintegrar (cifra en miles de pesos)"
+                          label="Monto por reintegrar (cifra en pesos)"
                           name="monto_por_reintegrar"
                           onChange={handleChange('monto_por_reintegrar')}
                           placeholder="0"

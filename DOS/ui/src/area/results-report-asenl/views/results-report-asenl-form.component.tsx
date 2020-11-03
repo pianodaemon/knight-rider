@@ -258,13 +258,13 @@ export const ResultsReportASENLForm = (props: Props) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = {...values };
           const today = new Date();
-          const defaultDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+          // const defaultDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
           Object.keys(fields).forEach((field: any) => {
             if (fields[field] === null) {
               fields[field] = "";
             }
             if(/^fecha_/i.test(field) && !fields[field]) {
-              fields[field] = defaultDate;
+              fields[field] = "2099-12-31"; // defaultDate;
             }
             if((/^monto_/i.test(field) || field === "compartida_monto" || field === "compartida_tipo_observacion_id") && !fields[field]) {
               fields[field] = 0;

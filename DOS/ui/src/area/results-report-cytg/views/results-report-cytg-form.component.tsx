@@ -290,13 +290,13 @@ export const ResultsReportCYTGForm = (props: Props) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = { ...values };
           const today = new Date();
-          const defaultDate = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+          // const defaultDate = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
           Object.keys(fields).forEach((field: any) => {
             if (fields[field] === null) {
               fields[field] = "";
             }
             if(/^fecha_/i.test(field) && !fields[field]) {
-              fields[field] = defaultDate;
+              fields[field] = "2099-12-31"; // defaultDate;
             }
             if(/^monto_/i.test(field) && !fields[field]) {
               fields[field] = 0;
@@ -310,7 +310,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
             Object.keys(item).forEach((field: any) => {
               if(/^fecha_/i.test(field) && !item[field]) {
-                item[field] = defaultDate;
+                item[field] = "2099-12-31"; // defaultDate;
               }
               if(/^monto_/i.test(field) && !item[field]) {
                 item[field] = 0;

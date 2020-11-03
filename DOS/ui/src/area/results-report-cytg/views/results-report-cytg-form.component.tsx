@@ -859,7 +859,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto solventado (cifra en miles de pesos)"
+                        label="Monto solventado (cifra en pesos)"
                         value={values.monto_solventado}
                         onChange={handleChange('monto_solventado')}
                         name="monto_solventado"
@@ -886,7 +886,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto pendiente de solventar (cifra en miles de pesos)"
+                        label="Monto pendiente de solventar (cifra en pesos)"
                         value={values.monto_pendiente_solventar}
                         onChange={handleChange('monto_pendiente_solventar')}
                         name="monto_pendiente_solventar"
@@ -1408,7 +1408,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                           inputComponent: NumberFormatCustom as any,
                                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                         }}
-                                        label="Monto Solventado (cifra en miles de pesos)"
+                                        label="Monto Solventado (cifra en pesos)"
                                         // name="monto_solventado"
                                         onChange={(value: any) => setFieldValue(`seguimientos.${index}.monto_solventado`, value.target.value)}
                                         placeholder="0"
@@ -1435,7 +1435,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                           inputComponent: NumberFormatCustom as any,
                                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                         }}
-                                        label="Monto Pendiente de solventar (cifra en miles de pesos)"
+                                        label="Monto Pendiente de solventar (cifra en pesos)"
                                         name="monto_pendiente_solventar"
                                         onChange={handleChange(`seguimientos.${index}.monto_pendiente_solventar`)}
                                         placeholder="0"
@@ -1479,7 +1479,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         disabled={disabledModeOn}
-                        label="Monto a reintegrar (cifra en miles de pesos)"
+                        label="Monto a reintegrar (cifra en pesos)"
                         value={values.monto_a_reintegrar}
                         onChange={handleChange('monto_a_reintegrar')}
                         name="monto_a_reintegrar"
@@ -1505,7 +1505,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto Reintegrado (miles de pesos)"
+                        label="Monto Reintegrado (pesos)"
                         value={values.monto_reintegrado}
                         onChange={handleChange('monto_reintegrado')}
                         name="monto_reintegrado"
@@ -1552,7 +1552,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto por Reintegrar (miles de pesos)"
+                        label="Monto por Reintegrar (pesos)"
                         value={sub(values.monto_a_reintegrar || 0, values.monto_reintegrado || 0).toString() || "0"}
                         onChange={handleChange('monto_por_reintegrar')}
                         name="monto_por_reintegrar"

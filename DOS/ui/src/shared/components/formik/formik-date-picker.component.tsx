@@ -8,9 +8,9 @@ export const FormikDatePicker = ({
   field: { value, name, label },
   ...rest
 }: any) => {
-  const [selectedDate, handleDateChange] = useState(new Date());
+  const [selectedDate, handleDateChange] = useState(new Date('2099-12-31'));
   const date: Date | null =
-    value instanceof Date || value === null
+    value instanceof Date || value === null || value === '2099-12-31'
       ? null
       : new Date(value ? value.replace(/-/g, '/') : value);
   return (
@@ -26,7 +26,7 @@ export const FormikDatePicker = ({
       }}
       value={date}
       views={['date', 'month']}
-      placeholder="2099-12-31"
+      placeholder=""
       InputProps={{
         startAdornment: (
           <InputAdornment position="start"> {null} </InputAdornment>

@@ -257,7 +257,7 @@ export const ResultsReportASENLForm = (props: Props) => {
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
           const fields: any = {...values };
-          const today = new Date();
+          // const today = new Date();
           // const defaultDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
           Object.keys(fields).forEach((field: any) => {
             if (fields[field] === null) {

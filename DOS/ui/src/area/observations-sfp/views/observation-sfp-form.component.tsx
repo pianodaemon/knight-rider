@@ -273,7 +273,7 @@ export const ObservationsSFPForm = (props: Props) => {
               fields[field] = "";
             }
             if(/^fecha_/i.test(field) && !fields[field]) {
-              fields[field] = values.fecha_captura;
+              fields[field] = '2099-12-31'; // values.fecha_captura;
             }
             if((/^monto_/i.test(field) || "autoridad_invest_id" === field) && !fields[field]) {
               fields[field] = 0;
@@ -289,7 +289,7 @@ export const ObservationsSFPForm = (props: Props) => {
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
             Object.keys(item).forEach((field: any) => {
               if(/^fecha_/i.test(field) && !item[field]) {
-                item[field] = values.fecha_captura;
+                item[field] = '2099-12-31'; // values.fecha_captura;
               }
             });
             return { ...item, seguimiento_id: index };
@@ -732,7 +732,7 @@ export const ObservationsSFPForm = (props: Props) => {
                 <Grid item xs={12} sm={6}>
                   <FormControl className={classes.formControl}>
                     <TextField
-                      label="Monto Observado (miles de pesos)"
+                      label="Monto Observado (pesos)"
                       value={values.monto_observado}
                       onChange={handleChange('monto_observado')}
                       name="monto_observado"
@@ -1116,7 +1116,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                 <Grid item xs={12} sm={6}>
                                   <FormControl className={classes.formControl}>
                                     <TextField
-                                      label="Monto Solventado (miles de pesos)"
+                                      label="Monto Solventado (pesos)"
                                       // onChange={handleChange('monto_solventado')}
                                       // name="monto_solventado"
                                       // id="monto_solventado"
@@ -1144,7 +1144,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                 <Grid item xs={12} sm={6}>
                                   <FormControl className={classes.formControl}>
                                     <TextField
-                                      label="Monto Pendiente de solventar (miles de pesos)"
+                                      label="Monto Pendiente de solventar (pesos)"
                                       // onChange={handleChange('monto_pendiente_solventar')}
                                       // name="monto_pendiente_solventar"
                                       // id="monto_pendiente_solventar"
@@ -1178,7 +1178,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                 <Grid item xs={12} sm={6}>
                                   <FormControl className={classes.formControl}>
                                     <TextField
-                                      label="Monto a Reintegrar (miles de pesos)"
+                                      label="Monto a Reintegrar (pesos)"
                                       value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar : ''}
                                       onChange={handleChange(`seguimientos.${index}.monto_a_reintegrar`)}
                                       name={`seguimientos.${index}.monto_a_reintegrar`}
@@ -1195,7 +1195,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                 <Grid item xs={12} sm={6}>
                                   <FormControl className={classes.formControl}>
                                     <TextField
-                                      label="Monto Reintegrado (miles de pesos)"
+                                      label="Monto Reintegrado (pesos)"
                                       value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_reintegrado : ''}
                                       onChange={handleChange(`seguimientos.${index}.monto_reintegrado`)}
                                       name={`seguimientos.${index}.monto_reintegrado`}
@@ -1222,7 +1222,7 @@ export const ObservationsSFPForm = (props: Props) => {
                                 <Grid item xs={12} sm={6}>
                                   <FormControl className={classes.formControl}>
                                     <TextField
-                                      label="Monto por Reintegrar (miles de pesos)"
+                                      label="Monto por Reintegrar (pesos)"
                                       value={
                                         sub(
                                           values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_a_reintegrar || 0 : 0,
@@ -1280,7 +1280,7 @@ export const ObservationsSFPForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto a Reintegrar (miles de pesos)"
+                        label="Monto a Reintegrar (pesos)"
                         // value={values.monto_a_reintegrar}
                         value={
                           add(values.seguimientos.map((seguimiento: any) => seguimiento.monto_a_reintegrar || 0))
@@ -1310,7 +1310,7 @@ export const ObservationsSFPForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto Reintegrado (miles de pesos)"
+                        label="Monto Reintegrado (pesos)"
                         value={
                           add(values.seguimientos.map((seguimiento: any) => seguimiento.monto_reintegrado || 0))
                         }
@@ -1360,7 +1360,7 @@ export const ObservationsSFPForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto por Reintegrar (miles de pesos)"
+                        label="Monto por Reintegrar (pesos)"
                         value={sub(values.monto_a_reintegrar || 0, values.monto_reintegrado || 0)}
                         onChange={handleChange('monto_por_reintegrar')}
                         name="monto_por_reintegrar"

@@ -266,7 +266,7 @@ export const ObservationsCYTGForm = (props: Props) => {
               fields[field] = "";
             }
             if((/^fecha_/i.test(field) || /^periodo_/i.test(field)) && !fields[field]) {
-              fields[field] = values.fecha_captura;
+              fields[field] = '2099-12-31'; //values.fecha_captura;
             }
             if(/^monto_/i.test(field) && !fields[field]) {
               fields[field] = 0;
@@ -848,7 +848,7 @@ export const ObservationsCYTGForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        label="Monto Observado (cifra en miles de pesos)"
+                        label="Monto Observado (cifra en pesos)"
                         value={values.monto_observado}
                         onChange={handleChange('monto_observado')}
                         name="monto_observado"

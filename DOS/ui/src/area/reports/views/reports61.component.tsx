@@ -86,6 +86,18 @@ const useStyles = makeStyles(() =>
   })
 );
 
+const MoneyFormat = ( props: any ) => {
+  const {
+    monto,
+    isVisibleFiscal,
+  } = props;
+  const val = isVisibleFiscal ? Decimal.div(monto, 1000).toNumber() : '-';
+  const suf = val !== 0 && isVisibleFiscal ? '' : ''
+  return(
+    <NumberFormat value={val} displayType={'text'} thousandSeparator={true} decimalScale={1} fixedDecimalScale={true}  suffix={suf} />
+  )
+}
+
 const TableReports = ( props: any ) => {
   const {
     report,
@@ -133,7 +145,7 @@ const TableReports = ( props: any ) => {
           <th >Número de Obs.</th> 
           <th >Observación</th> 
           <th >Tipo de Observación</th> 
-          <th >Monto</th> 
+          <th >Monto (Miles)</th> 
           <th >Estatus</th> 
         </tr> 
         {report.map((dep: any) =>
@@ -143,7 +155,7 @@ const TableReports = ( props: any ) => {
             <td style={{textAlign: 'center'}} >{dep.n_obs}</td>
             <td style={{textAlign: 'center', overflow:'hidden',textOverflow:'ellipsis',display:'-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient:'vertical'}} >{dep.obs}</td>
             <td className={classes.cantObs} >{dep.tipo}</td>
-            <td className={classes.montos} >{ <NumberFormat value={dep.monto} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> }</td>
+            <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep.monto} /> </td>
             <td style={{textAlign: "center", whiteSpace: "nowrap"}} > { dep.estatus } </td>
           </tr>
         )
@@ -154,7 +166,7 @@ const TableReports = ( props: any ) => {
           <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
           <td style={{fontWeight: "bold", textAlign: "center"}}></td>
           <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}> { <NumberFormat value={ sum.monto.valueOf() } displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.monto.valueOf()} /> </td>
           <td style={{fontWeight: "bold", textAlign: "right"}}></td>
         </tr>
       </tbody>

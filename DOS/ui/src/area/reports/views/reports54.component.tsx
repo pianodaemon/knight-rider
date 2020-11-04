@@ -89,6 +89,18 @@ const useStyles = makeStyles(() =>
   })
 );
 
+const MoneyFormat = ( props: any ) => {
+  const {
+    monto,
+    isVisibleFiscal,
+  } = props;
+  const val = isVisibleFiscal ? Decimal.div(monto, 1000).toNumber() : '-';
+  const suf = val !== 0 && isVisibleFiscal ? '' : ''
+  return(
+    <NumberFormat value={val} displayType={'text'} thousandSeparator={true} decimalScale={1} fixedDecimalScale={true}  suffix={suf} />
+  )
+}
+
 const TableReports = ( props: any ) => {
   const {
     report,
@@ -144,33 +156,33 @@ const TableReports = ( props: any ) => {
         </tr> 
         <tr style={{ fontWeight: "bold"}}> 
           <td className={classes.cantObs} >Cant. Obs.</td> 
-          <td className={classes.montos} >Monto</td> 
+          <td className={classes.montos} >Monto (Miles)</td> 
           <td className={classes.cantObs} >Cant. Obs.</td> 
-          <td className={classes.montos} >Monto</td> 
+          <td className={classes.montos} >Monto (Miles)</td> 
           <td className={classes.cantObs} >Cant. Obs.</td> 
-          <td className={classes.montos} >Monto</td> 
+          <td className={classes.montos} >Monto (Miles)</td> 
         </tr> 
          {report.map((dep: any) =>
            <tr> 
              <td>{dep.dep}</td> 
              <td style={{textAlign: 'center'}} >{dep.tipo_obs}</td>
              <td className={classes.cantObs} >{dep.c_sol}</td>
-             <td className={classes.montos} >{<NumberFormat value={dep.m_sol} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
+             <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep.m_sol} /> </td>
              <td className={classes.cantObs} >{dep.c_analisis}</td>
-             <td className={classes.montos} >{<NumberFormat value={dep.m_analisis} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
+             <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep.m_analisis} /> </td>
              <td className={classes.cantObs} >{dep.c_no_sol}</td>
-             <td className={classes.montos} >{<NumberFormat value={dep.m_no_sol} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
+             <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep.m_no_sol} /> </td>
            </tr>
         )
         }   
         <tr> 
           <td style={{fontWeight: "bold"}} colSpan={2}> Totales</td> 
           <td style={{fontWeight: "bold", textAlign: "center"}}>{sum.c_sol}</td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}>{ <NumberFormat value={sum.m_sol.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.m_sol.valueOf()} /> </td>
           <td style={{fontWeight: "bold", textAlign: "center"}}>{sum.c_analisis}</td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}>{ <NumberFormat value={sum.m_analisis.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.m_analisis.valueOf()} /> </td>
           <td style={{fontWeight: "bold", textAlign: "center"}}>{sum.c_no_sol}</td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}>{ <NumberFormat value={sum.m_no_sol.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.m_no_sol.valueOf()} /> </td>
         </tr>
       </tbody>
     </table>

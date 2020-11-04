@@ -147,9 +147,11 @@ class ObservacionPreCytgList(Resource):
     @ns.param("order", "ASC or DESC, which ordering to use, default is ASC")
     @ns.param("per_page", "How many items per page, default is 10")
     @ns.param("page", "Which page to fetch, default is 1")
+    @ns.param("tipo_observacion_id", obs_pre_cytg_ns_captions['tipo_observacion_id'])
     @ns.param("programa_social_id", obs_pre_cytg_ns_captions['programa_social_id'])
     @ns.param("auditoria_id", obs_pre_cytg_ns_captions['auditoria_id'])
     @ns.param("observacion", obs_pre_cytg_ns_captions['observacion'])
+    @ns.param("num_observacion", obs_pre_cytg_ns_captions['num_observacion'])
     @ns.param("direccion_id", obs_pre_cytg_ns_captions['direccion_id'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
@@ -168,7 +170,7 @@ class ObservacionPreCytgList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['programa_social_id', 'auditoria_id', 'observacion', 'direccion_id']
+            ['tipo_observacion_id', 'programa_social_id', 'auditoria_id', 'observacion', 'num_observacion', 'direccion_id']
         )
 
         try:

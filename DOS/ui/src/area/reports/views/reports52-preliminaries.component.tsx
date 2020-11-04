@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux'
 import { resolvePermission } from 'src/shared/utils/permissions.util';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import NumberFormat from 'react-number-format';
+import { Decimal } from 'decimal.js';
 
 type Props = {
   loading: boolean,
@@ -87,6 +88,18 @@ const useStyles = makeStyles(() =>
     },
   })
 );
+
+const MoneyFormat = ( props: any ) => {
+  const {
+    monto,
+    isVisibleFiscal,
+  } = props;
+  const val = isVisibleFiscal ? Decimal.div(monto, 1000).toNumber() : '-';
+  const suf = val !== 0 && isVisibleFiscal ? '' : ''
+  return(
+    <NumberFormat value={val} displayType={'text'} thousandSeparator={true} decimalScale={1} fixedDecimalScale={true}  suffix={suf} />
+  )
+}
 
 export const Report52Preliminaries = (props: Props) => {
   const {
@@ -174,29 +187,29 @@ export const Report52Preliminaries = (props: Props) => {
           </tr> 
           <tr style={{ fontWeight: "bold"}}> 
             <td className={classes.cantObs} >Cant. Obs.</td> 
-            <td className={classes.montos} >Monto</td> 
+            <td className={classes.montos} >Monto (Miles)</td> 
             <td className={classes.cantObs} >Cant. Obs.</td> 
-            <td className={classes.montos} >Monto</td> 
+            <td className={classes.montos} >Monto (Miles)</td> 
             <td className={classes.cantObs} >Cant. Obs.</td> 
-            <td className={classes.montos} >Monto</td> 
+            <td className={classes.montos} >Monto (Miles)</td> 
             <td className={classes.cantObs} >Cant. Obs.</td> 
-            <td className={classes.montos} >Monto</td> 
+            <td className={classes.montos} >Monto (Miles)</td> 
             <td className={classes.cantObs} >Cant. Obs.</td> 
-            <td className={classes.montos} >Monto</td> 
+            <td className={classes.montos} >Monto (Miles)</td> 
           </tr> 
              { report && report.sum_rows &&
              <tr> 
                
                <td className={classes.cantObs}>{  isVisibleFiscal.asf   ? report.sum_rows.c_asf                : '-' }</td>
-               <td className={classes.montos} >{  isVisibleFiscal.asf   ? <NumberFormat value={report.sum_rows.m_asf.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
+               <td className={classes.montos} > <MoneyFormat isVisibleFiscal={isVisibleFiscal.asf} monto={report.sum_rows.m_asf.valueOf()} /> </td>
                <td className={classes.cantObs}>{  isVisibleFiscal.sfp   ? report.sum_rows.c_sfp                : '-' }</td>
-               <td className={classes.montos} >{  isVisibleFiscal.sfp   ? <NumberFormat value={report.sum_rows.m_sfp.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
+               <td className={classes.montos} > <MoneyFormat isVisibleFiscal={isVisibleFiscal.sfp} monto={report.sum_rows.m_sfp.valueOf()} /> </td>
                <td className={classes.cantObs}>{  isVisibleFiscal.asenl ? report.sum_rows.c_asenl              : '-' }</td>
-               <td className={classes.montos} >{  isVisibleFiscal.asenl ? <NumberFormat value={report.sum_rows.m_asenl.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
+               <td className={classes.montos} > <MoneyFormat isVisibleFiscal={isVisibleFiscal.asenl} monto={report.sum_rows.m_asenl.valueOf()} /> </td>
                <td className={classes.cantObs}>{  isVisibleFiscal.cytg  ? report.sum_rows.c_cytg               : '-' }</td>
-               <td className={classes.montos} >{  isVisibleFiscal.cytg  ? <NumberFormat value={report.sum_rows.m_cytg.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' }</td>
+               <td className={classes.montos} > <MoneyFormat isVisibleFiscal={isVisibleFiscal.cytg} monto={report.sum_rows.m_cytg.valueOf()} /> </td>
                <td className={classes.cantObs}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? (report.sum_rows.c_total)             : '-' } </td>
-               <td className={classes.montos} >{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? <NumberFormat value={report.sum_rows.m_total.valueOf()} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> : '-' } </td>
+               <td className={classes.montos} > <MoneyFormat isVisibleFiscal={(isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg)} monto={report.sum_rows.m_total.valueOf()} /> </td>
              </tr>
                
              }

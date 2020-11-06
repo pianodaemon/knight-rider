@@ -25,6 +25,7 @@ import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdow
 import { AutoCompleteLoadMoreDropdown } from 'src/shared/components/autocomplete-load-more-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { SingleTextResponsiveModal } from 'src/shared/components/modal/single-text-responsive-modal.component';
+import { sub } from 'src/shared/math/add.util';
 import { Catalog, ResultsReportASENL } from '../state/results-report-asenl.reducer';
 
 type Props = {
@@ -856,17 +857,19 @@ export const ResultsReportASENLForm = (props: Props) => {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <TextField
-                        disabled={disabledModeOn}
-                        label="Monto pendiente de solventar  (cifra en pesos)"
-                        value={values.monto_pendiente_solventar}
+                        disabled
+                        label="Monto pendiente de solventar (cifra en pesos)"
+                        value={sub(values.monto_observado || 0, values.monto_solventado || 0)}
                         onChange={handleChange('monto_pendiente_solventar')}
                         name="monto_pendiente_solventar"
                         id="monto_pendiente_solventar"
                         placeholder="0"
+                        inputProps={{allowNegative: true,}}
                         InputProps={{
                           inputComponent: NumberFormatCustom as any,
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
+                        variant="filled"
                       />
                       {errors.monto_pendiente_solventar &&
                         touched.monto_pendiente_solventar &&

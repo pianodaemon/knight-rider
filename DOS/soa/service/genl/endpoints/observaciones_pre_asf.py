@@ -128,6 +128,7 @@ class ObservacionPreAsfList(Resource):
     @ns.param("programa_social_id", obs_pre_asf_ns_captions['programa_social_id'])
     @ns.param("auditoria_id", obs_pre_asf_ns_captions['auditoria_id'])
     @ns.param("observacion", obs_pre_asf_ns_captions['observacion'])
+    @ns.param("num_observacion", obs_pre_asf_ns_captions['num_observacion'])
     @ns.param("direccion_id", obs_pre_asf_ns_captions['direccion_id'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
@@ -146,7 +147,7 @@ class ObservacionPreAsfList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['programa_social_id', 'auditoria_id', 'observacion', 'direccion_id']
+            ['programa_social_id', 'auditoria_id', 'observacion', 'num_observacion', 'direccion_id']
         )
 
         try:

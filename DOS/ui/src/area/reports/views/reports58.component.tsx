@@ -86,6 +86,18 @@ const useStyles = makeStyles(() =>
   })
 );
 
+const MoneyFormat = ( props: any ) => {
+  const {
+    monto,
+    isVisibleFiscal,
+  } = props;
+  const val = isVisibleFiscal ? Decimal.div(monto, 1000).toNumber() : '-';
+  const suf = val !== 0 && isVisibleFiscal ? '' : ''
+  return(
+    <NumberFormat value={val} displayType={'text'} thousandSeparator={true} decimalScale={1} fixedDecimalScale={true}  suffix={suf} />
+  )
+}
+
 const TableReports = ( props: any ) => {
   const {
     report,
@@ -131,14 +143,14 @@ const TableReports = ( props: any ) => {
           <th >Secretaría/Entidad/Municipio</th> 
           <th >Clasificación</th> 
           <th >Cantidad Obs.</th> 
-          <th >Monto</th> 
+          <th >Monto (Miles)</th> 
         </tr> 
         {report.map((dep: any) =>
           <tr> 
             <td>{dep.dep}</td> 
             <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
             <td className={classes.cantObs} >{dep.c_obs}</td>
-            <td className={classes.montos} >{ <NumberFormat value={dep.monto} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> }</td>
+            <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep.monto} /> </td>
           </tr>
         )
         }   
@@ -146,7 +158,7 @@ const TableReports = ( props: any ) => {
           <td style={{fontWeight: "bold"}} > Totales</td> 
           <td style={{fontWeight: "bold", textAlign: "center"}}></td>
           <td style={{fontWeight: "bold", textAlign: "center"}}> { sum.c_obs }</td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}> { <NumberFormat value={ sum.monto.valueOf() } displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} />}</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.monto.valueOf()} /> </td>
         </tr>
       </tbody>
     </table>

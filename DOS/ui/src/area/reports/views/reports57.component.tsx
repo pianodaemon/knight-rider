@@ -88,6 +88,17 @@ const useStyles = makeStyles(() =>
   })
 );
 
+const MoneyFormat = ( props: any ) => {
+  const {
+    monto,
+    isVisibleFiscal,
+  } = props;
+  const val = isVisibleFiscal ? Decimal.div(monto, 1000).toNumber() : '-';
+  const suf = val !== 0 && isVisibleFiscal ? '' : ''
+  return(
+    <NumberFormat value={val} displayType={'text'} thousandSeparator={true} decimalScale={1} fixedDecimalScale={true}  suffix={suf} />
+  )
+}
 
 const TableReports = ( props: any ) => {
   const {
@@ -143,7 +154,7 @@ const TableReports = ( props: any ) => {
           <th >Tipo</th> 
           <th >Cantidad Obs.</th> 
           <th >% Obs.</th> 
-          <th >Monto</th> 
+          <th >Monto (Miles)</th> 
           <th >% Monto</th> 
         </tr> 
         {report.map((dep: any) =>
@@ -152,7 +163,7 @@ const TableReports = ( props: any ) => {
             <td style={{textAlign: 'center'}} >{dep.tipo}</td>
             <td className={classes.cantObs} >{dep.c_obs}</td>
             <td style={{textAlign: "right", whiteSpace: "nowrap"}} > {formatPercent( dep.c_obs, sum_c_obs ) } </td>
-            <td className={classes.montos} >{ <NumberFormat value={dep.monto} displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> }</td>
+            <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep.monto} /> </td>
             <td style={{textAlign: "right", whiteSpace: "nowrap"}} >{formatPercent( dep.monto, sum_monto.toNumber() ) }</td>
           </tr>
         )
@@ -162,7 +173,7 @@ const TableReports = ( props: any ) => {
           <td style={{fontWeight: "bold", textAlign: "center"}}></td>
           <td style={{fontWeight: "bold", textAlign: "center"}}> {sum_c_obs} </td>
           <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}> { <NumberFormat value={ sum_monto.valueOf() } displayType={'text'} thousandSeparator={true} decimalScale={2} fixedDecimalScale={true} /> } </td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum_monto.valueOf()} /> </td>
           <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
         </tr>
       </tbody>

@@ -109,7 +109,7 @@ export const preObservationsSelector = createSelector(
           );
           return {
             id: item.id,
-            observation: `Observación: ${item.id} - Auditoría ${item.auditoria_id} : ${audit.title}`,
+            observation: `Observación ID: ${item.id} - Auditoría ${item.auditoria_id} : ${audit.title}`,
             direccion_id: item.direccion_id,
             programa_social_id: item.programa_social_id,
             auditoria_id: item.auditoria_id,

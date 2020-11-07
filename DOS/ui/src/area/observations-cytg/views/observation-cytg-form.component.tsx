@@ -965,6 +965,8 @@ export const ObservationsCYTGForm = (props: Props) => {
                                   setFieldValue('num_oficio_solic_prorroga', '');
                                   setFieldValue('fecha_oficio_solic_prorroga', null);
                                   setFieldValue('num_oficio_contest_prorroga_cytg', '');
+                                  setFieldValue('fecha_oficio_contest_cytg', null);
+                                  setFieldValue('fecha_vencimiento_pre_nueva', null);
                                 }
                               }
                             }
@@ -1035,48 +1037,48 @@ export const ObservationsCYTGForm = (props: Props) => {
                         )}
                       </FormControl>
                     </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de Contestación CyTG"
+                          name="fecha_oficio_contest_cytg"
+                          id="fecha_oficio_contest_cytg"
+                          disabled={disabledModeOn}
+                        />
+                        {errors.fecha_oficio_contest_cytg &&
+                          touched.fecha_oficio_contest_cytg && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_oficio_contest_cytg}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de nuevo vencimiento (informe preliminar)"
+                          name="fecha_vencimiento_pre_nueva"
+                          id="fecha_vencimiento_pre_nueva"
+                          disabled={disabledModeOn}
+                        />
+                        {errors.fecha_vencimiento_pre_nueva &&
+                          touched.fecha_vencimiento_pre_nueva && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_vencimiento_pre_nueva}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
                   </>
                   )}
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <Field
-                        component={FormikDatePicker}
-                        label="Fecha de Contestación CyTG"
-                        name="fecha_oficio_contest_cytg"
-                        id="fecha_oficio_contest_cytg"
-                        disabled={disabledModeOn}
-                      />
-                      {errors.fecha_oficio_contest_cytg &&
-                        touched.fecha_oficio_contest_cytg && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            {errors.fecha_oficio_contest_cytg}
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <Field
-                        component={FormikDatePicker}
-                        label="Fecha de nuevo vencimiento (informe preliminar)"
-                        name="fecha_vencimiento_pre_nueva"
-                        id="fecha_vencimiento_pre_nueva"
-                        disabled={disabledModeOn}
-                      />
-                      {errors.fecha_vencimiento_pre_nueva &&
-                        touched.fecha_vencimiento_pre_nueva && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            {errors.fecha_vencimiento_pre_nueva}
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <AutoCompleteDropdown

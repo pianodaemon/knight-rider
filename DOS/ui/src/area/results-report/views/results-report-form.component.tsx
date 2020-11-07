@@ -383,7 +383,7 @@ export const ResultsReportForm = (props: Props) => {
     text: '',
     open: false,
   });
-  const [currentSeg, setCurrenntSeg] = React.useState(0);
+  const [currentSeg, setCurrentSeg] = React.useState(0);
   return (
     <Paper className={classes.paper}>
       <Formik
@@ -916,7 +916,10 @@ export const ResultsReportForm = (props: Props) => {
                                 color="primary"
                                 startIcon={<PostAddIcon />}
                                 size="medium"
-                                onClick={() => arrayHelpers.push(seguimientoTemplate)}
+                                onClick={() => {
+                                  arrayHelpers.push(seguimientoTemplate);
+                                  setCurrentSeg(values.seguimientos.length);
+                                }}
                               >
                                 Agregar Seguimiento
                               </Button>
@@ -930,7 +933,7 @@ export const ResultsReportForm = (props: Props) => {
                                 <Select
                                   labelId="current_seguimiento"
                                   // id="estatus_id-select"
-                                  onChange={(event: any) => setCurrenntSeg(event.target.value)}
+                                  onChange={(event: any) => setCurrentSeg(event.target.value)}
                                   value={currentSeg}
                                   // disabled={(action === 'view')}
                                 >
@@ -964,7 +967,10 @@ export const ResultsReportForm = (props: Props) => {
                                           color="secondary"
                                           startIcon={<DeleteForeverIcon />}
                                           size="medium"
-                                          onClick={() => arrayHelpers.remove(index)}
+                                          onClick={() => {
+                                            arrayHelpers.remove(index);
+                                            setCurrentSeg(index ? index-1 : 0);
+                                          }}
                                         >
                                           Remover Seguimiento
                                         </Button>

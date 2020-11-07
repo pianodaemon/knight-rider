@@ -1,7 +1,7 @@
 from dal.helper import exec_steady, get_direction_str_condition, get_ignored_audit_structs, get_ignored_audits
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal, reporte_num, division_id, auth):
+def get(ej_ini, ej_fin, fiscal, reporte_num, division_id, auth, is_clasif):
     ''' Returns an instance of Reporte 56 and 58'''
     
     # Tratamiento de filtros
@@ -9,6 +9,7 @@ def get(ej_ini, ej_fin, fiscal, reporte_num, division_id, auth):
     ej_fin = int(ej_fin)
     reporte_num = str(reporte_num)
     str_filtro_direccion = get_direction_str_condition(int(division_id))
+    is_clasif = True if is_clasif == 'True' else False
 
     if ej_fin < ej_ini:
         raise Exception('Verifique los valores del ejercicio ingresados')
@@ -37,7 +38,10 @@ def get(ej_ini, ej_fin, fiscal, reporte_num, division_id, auth):
     else:
         l = []
 
-    data_rows = setDataObj56(l) if (reporte_num == 'reporte56') else (setDataObj58(l) if (reporte_num == 'reporte58') else [])
+    if is_clasif:
+        data_rows = setDataObj56(l) if (reporte_num == 'reporte56') else (setDataObj58(l) if (reporte_num == 'reporte58') else [])
+    else:
+        data_rows = setDataObjObs56(l) if (reporte_num == 'reporte56') else []
 
     return {
         'data_rows': data_rows,
@@ -200,6 +204,18 @@ def setDataObj56(l):
         data_rows.append(o)
     return data_rows
 
+def setDataObjObs56(l):
+    data_rows = []
+    for item in l:
+        o = {}
+        o['dep']              = item['dependencia']
+        o['ej']               = item['ejercicio']
+        o['tipo']             = item['tipo_observacion']
+        o['clasif_name']      = item['observacion']
+        o['c_obs']            = 1
+        o['monto']            = item['monto']
+        data_rows.append(o)
+    return data_rows
 
 def setDataObj58(l):
     data_rows = []
@@ -236,7 +252,7 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
 
     sqls = {
         'ASF': '''
-            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id
+            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.observacion_ir as observacion
             from observaciones_ires_asf as ires
             join observaciones_pre_asf as pre on ires.id = pre.observacion_ires_id
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
@@ -250,7 +266,7 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
             order by dependencia {};
         '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
         'SFP': '''
-            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} ires.direccion_id as direccion_id
+            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} ires.direccion_id as direccion_id, ires.observacion as observacion
             from observaciones_sfp as ires
             join auditoria_dependencias     as dep      on ires.auditoria_id        = dep.auditoria_id
             join dependencies               as dep_cat  on dep.dependencia_id       = dep_cat.id
@@ -262,7 +278,7 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
             order by dependencia {};
         '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
         'CYTG': '''
-            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
+            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.observacion as observacion
             from observaciones_ires_cytg as ires
             join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
@@ -276,7 +292,7 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
             order by dependencia {};
         '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
         'ASENL': '''
-            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
+            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar, ires.observacion_final as observacion
             from observaciones_ires_asenl as ires
             join observaciones_pre_asenl as pre on ires.observacion_pre_id = pre.id
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id

@@ -10,6 +10,9 @@ import { resolvePermission } from 'src/shared/utils/permissions.util';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import NumberFormat from 'react-number-format';
 import { Decimal } from 'decimal.js';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 type Props = {
   loading: boolean,
@@ -105,8 +108,10 @@ const TableReports = ( props: any ) => {
     yearIni,
     yearEnd,
     dependency,
+    isClasif,
   } = props;
   const classes = useStyles();
+  const titleColumn = isClasif === 'True' ? 'Clasificación' : 'Observación'
   const formatPercent = (monto:number, total:number): string => {
     if(total>0){
       let m = new Decimal(monto)
@@ -153,7 +158,7 @@ const TableReports = ( props: any ) => {
           <th >Secretaría/Entidad/Municipio</th> 
           <th >Ejercicio</th> 
           <th >Tipo</th> 
-          <th >Clasificación</th> 
+          <th > { titleColumn } </th> 
           <th >Cantidad Obs.</th> 
           <th >% Obs.</th> 
           <th >Monto (Miles)</th> 
@@ -196,6 +201,7 @@ export const Report56 = (props: Props) => {
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2000');
+  const [isClasif, setIsClasif] = useState<any>('True');
   const [dependency, setDependency] = useState<any>('Todas');
   const permissions: any = useSelector((state: any) => state.authSlice);
   const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
@@ -208,11 +214,11 @@ export const Report56 = (props: Props) => {
   const [fiscal , setFiscal ] = useState<any>(optionsFiscals.length ? optionsFiscals[0].value : null );
   useEffect(() => {
     if( divisionId || divisionId === 0 ){
-      loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, reporte_num: 'reporte56', division_id: divisionId });
+      loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, reporte_num: 'reporte56', division_id: divisionId, is_clasif: isClasif });
     }
     setDependency('Todas');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni, fiscal, divisionId]);
+  }, [yearEnd, yearIni, fiscal, divisionId, isClasif]);
   const classes = useStyles();
   const setVisibleRows = (dep: any): boolean => {
     if(dep.dep === dependency || dependency === '' || dependency === 'Todas' || dependency === '0'){
@@ -301,6 +307,11 @@ export const Report56 = (props: Props) => {
             })}
           </Select>
         </div>
+        <RadioGroup row aria-label="position" name="position" defaultValue="True" onChange={(e)=> {setIsClasif(e.target.value);}} >
+          <FormControlLabel value="True"  control={<Radio color="primary" />} label="Clasificación" />
+          <FormControlLabel value="False" control={<Radio color="primary" />} label="Observación" />
+        </RadioGroup>
+
       </div>
 
       <ReactHTMLTableToExcel
@@ -312,7 +323,7 @@ export const Report56 = (props: Props) => {
          buttonText="Descargar Reporte"
       />
       {report && report.data_rows && 
-        <TableReports report={report.data_rows.filter(setVisibleRows) } entidad={fiscal} yearIni={yearIni} yearEnd={yearEnd} dependency={dependency} />
+        <TableReports report={report.data_rows.filter(setVisibleRows) } entidad={fiscal} yearIni={yearIni} yearEnd={yearEnd} dependency={dependency} isClasif={isClasif} />
       }
     </div>
   );

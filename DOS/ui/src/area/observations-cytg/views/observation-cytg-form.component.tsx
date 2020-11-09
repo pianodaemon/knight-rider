@@ -955,109 +955,130 @@ export const ObservationsCYTGForm = (props: Props) => {
                     <FormGroup row>
                       <FormControlLabel
                         disabled={disabledModeOn}
-                        control={<Checkbox checked={values.prorroga} onChange={handleChange('prorroga')} name="prorroga" />}
+                        control={
+                          <Checkbox
+                            checked={values.prorroga}
+                            onChange={
+                              (event) => {
+                                setFieldValue('prorroga', event.target.checked);
+                                if (!event.target.checked) {
+                                  setFieldValue('num_oficio_solic_prorroga', '');
+                                  setFieldValue('fecha_oficio_solic_prorroga', null);
+                                  setFieldValue('num_oficio_contest_prorroga_cytg', '');
+                                  setFieldValue('fecha_oficio_contest_cytg', null);
+                                  setFieldValue('fecha_vencimiento_pre_nueva', null);
+                                }
+                              }
+                            }
+                            name="prorroga"
+                          />
+                        }
                         label="Prórroga (Sí o No)"
                       />
                     </FormGroup>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        id="num_oficio_solic_prorroga"
-                        label="# de Oficio de Solicitud de prórroga"
-                        value={values.num_oficio_solic_prorroga || ''}
-                        onChange={handleChange('num_oficio_solic_prorroga')}
-                        disabled={disabledModeOn}
-                      />
-                      {errors.num_oficio_solic_prorroga && touched.num_oficio_solic_prorroga && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese # de Oficio de Solicitud de prórroga
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <Field
-                        component={FormikDatePicker}
-                        label="Fecha de Oficio de Solicitud de prórroga"
-                        name="fecha_oficio_solic_prorroga"
-                        id="fecha_oficio_solic_prorroga"
-                        disabled={disabledModeOn}
-                      />
-                      {errors.fecha_oficio_solic_prorroga &&
-                        touched.fecha_oficio_solic_prorroga && (
+                  {values.prorroga && (
+                  <>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="num_oficio_solic_prorroga"
+                          label="# de Oficio de Solicitud de prórroga"
+                          value={values.num_oficio_solic_prorroga || ''}
+                          onChange={handleChange('num_oficio_solic_prorroga')}
+                          disabled={disabledModeOn}
+                        />
+                        {errors.num_oficio_solic_prorroga && touched.num_oficio_solic_prorroga && (
                           <FormHelperText
                             error
                             classes={{ error: classes.textErrorHelper }}
                           >
-                            {errors.fecha_oficio_solic_prorroga}
+                            Ingrese # de Oficio de Solicitud de prórroga
                           </FormHelperText>
                         )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        id="num_oficio_contest_prorroga_cytg"
-                        label="# de Oficio de Contestación de prórroga"
-                        value={values.num_oficio_contest_prorroga_cytg || ''}
-                        onChange={handleChange('num_oficio_contest_prorroga_cytg')}
-                        disabled={disabledModeOn}
-                      />
-                      {errors.num_oficio_contest_prorroga_cytg && touched.num_oficio_contest_prorroga_cytg && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese # de Oficio de Contestación de prórroga
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <Field
-                        component={FormikDatePicker}
-                        label="Fecha de Contestación CyTG"
-                        name="fecha_oficio_contest_cytg"
-                        id="fecha_oficio_contest_cytg"
-                        disabled={disabledModeOn}
-                      />
-                      {errors.fecha_oficio_contest_cytg &&
-                        touched.fecha_oficio_contest_cytg && (
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de Oficio de Solicitud de prórroga"
+                          name="fecha_oficio_solic_prorroga"
+                          id="fecha_oficio_solic_prorroga"
+                          disabled={disabledModeOn}
+                        />
+                        {errors.fecha_oficio_solic_prorroga &&
+                          touched.fecha_oficio_solic_prorroga && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_oficio_solic_prorroga}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          id="num_oficio_contest_prorroga_cytg"
+                          label="# de Oficio de Contestación de prórroga"
+                          value={values.num_oficio_contest_prorroga_cytg || ''}
+                          onChange={handleChange('num_oficio_contest_prorroga_cytg')}
+                          disabled={disabledModeOn}
+                        />
+                        {errors.num_oficio_contest_prorroga_cytg && touched.num_oficio_contest_prorroga_cytg && (
                           <FormHelperText
                             error
                             classes={{ error: classes.textErrorHelper }}
                           >
-                            {errors.fecha_oficio_contest_cytg}
+                            Ingrese # de Oficio de Contestación de prórroga
                           </FormHelperText>
                         )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <Field
-                        component={FormikDatePicker}
-                        label="Fecha de nuevo vencimiento (informe preliminar)"
-                        name="fecha_vencimiento_pre_nueva"
-                        id="fecha_vencimiento_pre_nueva"
-                        disabled={disabledModeOn}
-                      />
-                      {errors.fecha_vencimiento_pre_nueva &&
-                        touched.fecha_vencimiento_pre_nueva && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            {errors.fecha_vencimiento_pre_nueva}
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de Contestación CyTG"
+                          name="fecha_oficio_contest_cytg"
+                          id="fecha_oficio_contest_cytg"
+                          disabled={disabledModeOn}
+                        />
+                        {errors.fecha_oficio_contest_cytg &&
+                          touched.fecha_oficio_contest_cytg && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_oficio_contest_cytg}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <Field
+                          component={FormikDatePicker}
+                          label="Fecha de nuevo vencimiento (informe preliminar)"
+                          name="fecha_vencimiento_pre_nueva"
+                          id="fecha_vencimiento_pre_nueva"
+                          disabled={disabledModeOn}
+                        />
+                        {errors.fecha_vencimiento_pre_nueva &&
+                          touched.fecha_vencimiento_pre_nueva && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              {errors.fecha_vencimiento_pre_nueva}
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                  </>
+                  )}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
                       <AutoCompleteDropdown

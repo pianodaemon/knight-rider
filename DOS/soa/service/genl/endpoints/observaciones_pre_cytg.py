@@ -44,6 +44,7 @@ obs_pre_cytg_ns_captions = {
     'resp_dependencia': 'Respuesta de la dependencia',
     'comentarios': 'Comentarios',
     'observacion_ires_id': 'Id de la observación de informe de resultados correspondiente',
+    'estatus_id': 'Id del estatus de la observación',
 }
 
 ns = api.namespace("obs_pre_cytg", description="Servicios disponibles para Observaciones de la CyTG (Preliminares)")
@@ -84,6 +85,7 @@ obs_pre_cytg = api.model('Observación de la CyTG (Preliminar)', {
     'resp_dependencia': fields.String(description=obs_pre_cytg_ns_captions['resp_dependencia']),
     'comentarios': fields.String(description=obs_pre_cytg_ns_captions['comentarios']),
     'observacion_ires_id': fields.Integer(description=obs_pre_cytg_ns_captions['observacion_ires_id']),
+    'estatus_id': fields.Integer(description=obs_pre_cytg_ns_captions['estatus_id']),
 })
 
 pair = api.model('Id-Title pair', {
@@ -134,6 +136,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones de la CyTG (Pr
     'social_programs': fields.List(fields.Nested(program)),
     'clasifs_internas_cytg': fields.List(fields.Nested(clasif_interna_cytg)),
     'observation_types': fields.List(fields.Nested(pair)),
+    'estatus_pre_cytg': fields.List(fields.Nested(pair)),
 })
 
 @ns.route('/')
@@ -305,6 +308,7 @@ class Catalog(Resource):
                     'social_programs',
                     'clasifs_internas_cytg',
                     'observation_types',
+                    'estatus_pre_cytg',
                 ],
                 search_params
             )

@@ -195,6 +195,7 @@ export const ObservationsCYTGForm = (props: Props) => {
     resp_dependencia: '',
     comentarios: '',
     // observacion_ires_id: '',
+    estatus_id: '',
   };
   useEffect(() => {
     if (id) {
@@ -215,6 +216,7 @@ export const ObservationsCYTGForm = (props: Props) => {
       "tipo_auditoria_id",
       "tipo_observacion_id",
       "clasif_pre_cytg",
+      "estatus_id",
     ];
 
     // Mandatory fields (not empty)
@@ -1231,6 +1233,41 @@ export const ObservationsCYTGForm = (props: Props) => {
                             classes={{ error: classes.textErrorHelper }}
                           >
                             Ingrese Comentarios
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel>Estatus de la Observación</InputLabel>
+                      <Select
+                        labelId="estatus_id"
+                        id="estatus_id-select"
+                        value={
+                          catalog && catalog.estatus_pre_cytg
+                            ? values.estatus_id || ''
+                            : ''
+                        }
+                        onChange={handleChange('estatus_id')}
+                        disabled={disabledModeOn}
+                      >
+                        {catalog &&
+                          catalog.estatus_pre_cytg &&
+                          catalog.estatus_pre_cytg.map((item) => {
+                            return (
+                              <MenuItem value={item.id} key={`type-${item.id}`}>
+                                {item.title}
+                              </MenuItem>
+                            );
+                          })}
+                      </Select>
+                      {errors.estatus_id &&
+                        touched.estatus_id && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Estatus de la Observación
                           </FormHelperText>
                         )}
                     </FormControl>

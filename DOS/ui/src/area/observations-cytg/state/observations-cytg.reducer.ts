@@ -37,6 +37,7 @@ export interface ObservationCYTG {
   resp_dependencia: string; // Respuesta de la dependencia [DONE] - LONG
   comentarios: string; // Comentarios [DONE] - LONG
   // observacion_ires_id: number; // Id de la observación de informe de resultados correspondiente []
+  estatus_id: number;
 }
 
 interface ObservationsCYTGSlice {
@@ -78,6 +79,7 @@ type SocialPrograms = CatalogItem & {
   paraestatal: boolean,
   obra_pub: boolean,
 };
+type EstatusPreCytg = CatalogItem;
 
 export type Catalog = {
   audits: Array<Audit> | null,
@@ -87,6 +89,7 @@ export type Catalog = {
   divisions: Array<Division> | null,
   social_programs: Array<SocialPrograms> | null,
   observation_types: Array<ObservationTypes> | null,
+  estatus_pre_cytg: Array<EstatusPreCytg> | null,
 };
 
 const initialState: ObservationsCYTGSlice = {

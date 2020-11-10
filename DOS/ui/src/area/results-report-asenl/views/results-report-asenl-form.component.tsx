@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { Formik, Field } from 'formik';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
@@ -160,6 +160,7 @@ export const ResultsReportASENLForm = (props: Props) => {
   const classes = useStyles();
   const history = useHistory();
   const { action, id } = useParams<any>();
+  const [compartida, setCompartida] = useState(false);
   const initialValues = {
     id: '',
     observacion_pre_id: '',
@@ -207,7 +208,7 @@ export const ResultsReportASENLForm = (props: Props) => {
     const errors: any = {};
     const fields = Object.keys(initialValues);
     const dateFields: Array<string> = fields.filter((item: string) => /^fecha_/i.test(item)) || [];
-    const noMandatoryFields: Array<string> = ["id","observacion_reincidente"];
+    const noMandatoryFields: Array<string> = ["id","observacion_reincidente", "compartida_tipo_observacion_id"];
     const mandatoryFields: Array<string> = [
       "observacion_pre_id",
       "tipo_observacion_id",
@@ -328,6 +329,11 @@ export const ResultsReportASENLForm = (props: Props) => {
                   : ''
               )
               .join(', ');
+          const direccion = ((
+            catalog &&
+            catalog.divisions &&
+            catalog.divisions.find((division: any) => division.id === values.direccion_id)
+          ) || {}).title || '';
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>Observación de Resultados ASENL</h1>
@@ -653,90 +659,130 @@ export const ResultsReportASENLForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        id="compartida_observacion"
-                        label="Observación (compartida)"
-                        value={values.compartida_observacion || ''}
-                        onChange={handleChange('compartida_observacion')}
-                      />
-                      {errors.compartida_observacion &&
-                        touched.compartida_observacion && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Observación (compartida)
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <InputLabel id="compartida_tipo_observacion_id">
-                        Tipo de observación (compartida)
-                      </InputLabel>
-                      <Select
-                        disabled={disabledModeOn}
-                        id="compartida_tipo_observacion_id-select"
-                        labelId="compartida_tipo_observacion_id"
-                        onChange={handleChange('compartida_tipo_observacion_id')}
-                        value={catalog && catalog.observation_types ? values.compartida_tipo_observacion_id || '' : ''}
-                      >
-                        {catalog &&
-                            catalog.observation_types &&
-                            catalog.observation_types.map((item) => {
-                              return (
-                                <MenuItem
-                                  value={item.id}
-                                  key={`type-${item.id}`}
-                                >
-                                  {item.title}
-                                </MenuItem>
-                              );
-                            })}
-                      </Select>
-                      {errors.compartida_tipo_observacion_id &&
-                          touched.compartida_tipo_observacion_id &&
-                          errors.compartida_tipo_observacion_id && (
+                  {(direccion).toLocaleLowerCase() === 'central' && (
+                    <>
+                      <Grid item xs={12} sm={6}>
+                        <FormGroup row>
+                          <FormControlLabel
+                            disabled={disabledModeOn}
+                            control={
+                              <Checkbox
+                                checked={
+                                  Boolean(values.compartida_observacion) ||
+                                  Boolean(values.compartida_tipo_observacion_id) ||
+                                  Boolean(values.compartida_monto) ||
+                                  compartida
+                                }
+                                onChange={(event: any) => {
+                                  if (!event.currentTarget.checked) {
+                                    setFieldValue('compartida_observacion', '');
+                                    setFieldValue('compartida_tipo_observacion_id', 0);
+                                    setFieldValue('compartida_monto', 0);
+                                  }
+                                  setCompartida(event.currentTarget.checked);
+                                }}
+                                name="compartida"
+                              />
+                            }
+                            label="Observación compartida (Sí/No)"
+                          />
+                        </FormGroup>
+                      </Grid>
+                      <Grid item xs={12} sm={6}></Grid>
+                    </>
+                  )}
+                  {(compartida ||
+                    Boolean(values.compartida_observacion)  ||
+                    Boolean(values.compartida_tipo_observacion_id) ||
+                    Boolean(values.compartida_monto)) &&
+                    (direccion).toLocaleLowerCase() === 'central' && (
+                  <>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          disabled={disabledModeOn}
+                          id="compartida_observacion"
+                          label="Observación (compartida)"
+                          value={values.compartida_observacion || ''}
+                          onChange={handleChange('compartida_observacion')}
+                        />
+                        {errors.compartida_observacion &&
+                          touched.compartida_observacion && (
                             <FormHelperText
                               error
                               classes={{ error: classes.textErrorHelper }}
                             >
-                              Seleccione un Tipo de observación (compartida)
+                              Ingrese Observación (compartida)
                             </FormHelperText>
                           )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        id="compartida_monto"
-                        InputProps={{
-                          inputComponent: NumberFormatCustom as any,
-                          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                        label="Monto (compartida)"
-                        name="compartida_monto"
-                        onChange={handleChange('compartida_monto')}
-                        placeholder="0"
-                        value={values.compartida_monto}
-                      />
-                      {errors.compartida_monto &&
-                        touched.compartida_monto &&
-                        errors.compartida_monto && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Monto (compartida)
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <InputLabel id="compartida_tipo_observacion_id">
+                          Tipo de observación (compartida)
+                        </InputLabel>
+                        <Select
+                          disabled={disabledModeOn}
+                          id="compartida_tipo_observacion_id-select"
+                          labelId="compartida_tipo_observacion_id"
+                          onChange={handleChange('compartida_tipo_observacion_id')}
+                          value={catalog && catalog.observation_types ? values.compartida_tipo_observacion_id || '' : ''}
+                        >
+                          {catalog &&
+                              catalog.observation_types &&
+                              catalog.observation_types.map((item) => {
+                                return (
+                                  <MenuItem
+                                    value={item.id}
+                                    key={`type-${item.id}`}
+                                  >
+                                    {item.title}
+                                  </MenuItem>
+                                );
+                              })}
+                        </Select>
+                        {errors.compartida_tipo_observacion_id &&
+                            touched.compartida_tipo_observacion_id &&
+                            errors.compartida_tipo_observacion_id && (
+                              <FormHelperText
+                                error
+                                classes={{ error: classes.textErrorHelper }}
+                              >
+                                Seleccione un Tipo de observación (compartida)
+                              </FormHelperText>
+                            )}
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl className={classes.formControl}>
+                        <TextField
+                          disabled={disabledModeOn}
+                          id="compartida_monto"
+                          InputProps={{
+                            inputComponent: NumberFormatCustom as any,
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                          }}
+                          label="Monto (compartida)"
+                          name="compartida_monto"
+                          onChange={handleChange('compartida_monto')}
+                          placeholder="0"
+                          value={values.compartida_monto}
+                        />
+                        {errors.compartida_monto &&
+                          touched.compartida_monto &&
+                          errors.compartida_monto && (
+                            <FormHelperText
+                              error
+                              classes={{ error: classes.textErrorHelper }}
+                            >
+                              Ingrese Monto (compartida)
+                            </FormHelperText>
+                          )}
+                      </FormControl>
+                    </Grid>
+                  </>
+                  )}
                   <Grid item xs={12} sm={12} md={6}>
                     <FormControl className={classes.formControlFull}>
                       <TextField

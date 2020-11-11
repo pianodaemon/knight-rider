@@ -19,7 +19,7 @@ reporte_54_ns_captions = {
     'monto_en_analisis': 'Monto (en analisis)',
     'ejercicio_ini': 'Ejercicio (desde)',
     'ejercicio_fin': 'Ejercicio (hasta)',
-    'fiscal': 'Ente Fiscalizador (asenl, asf o "")',
+    'fiscal': 'Ente Fiscalizador (asenl, asf, cytg o "")',
     'division_id': 'Id de la direccion del usuario',
 }
 

@@ -205,6 +205,7 @@ export const Report54 = (props: Props) => {
   const optionsFiscals = [
     { value: 'asf',   label: 'ASF'  ,  tk:'ASFP'},
     { value: 'asenl', label: 'ASENL',  tk:'ASEP'},
+    { value: 'cytg',  label: 'CyTG',   tk:'CYTP'},
   ].filter( option => isVisible( option.tk ));
   if (optionsFiscals.length >= 2){
     optionsFiscals.push( { value: 'Todas', label: 'Todas',  tk:''    } )

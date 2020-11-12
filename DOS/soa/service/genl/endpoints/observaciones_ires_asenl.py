@@ -44,6 +44,7 @@ obs_ires_asenl_ns_captions = {
     'num_vai': 'Num. VAI',
     'direccion_id': 'Id de la dirección (según obs preliminar)',
     'auditoria_id': 'Id de la auditoría (según obs preliminar)',
+    'tipificacion_id': 'Id de la tipificación',
 }
 
 ns = api.namespace("obs_ires_asenl", description="Servicios disponibles para Observaciones de la ASENL (Informe de Resultados)")
@@ -82,6 +83,7 @@ obs_ires_asenl = api.model('Observación de la ASENL (Informe de Resultados)', {
     'fecha_oficio_enviar_resp_asenl': fields.Date(description=obs_ires_asenl_ns_captions['fecha_oficio_enviar_resp_asenl']),
     'unidad_investigadora': fields.String(description=obs_ires_asenl_ns_captions['unidad_investigadora']),
     'num_vai': fields.String(description=obs_ires_asenl_ns_captions['num_vai']),
+    'tipificacion_id': fields.Integer(description=obs_ires_asenl_ns_captions['tipificacion_id']),
     'direccion_id': fields.Integer(description=obs_ires_asenl_ns_captions['direccion_id']),
     'auditoria_id': fields.Integer(description=obs_ires_asenl_ns_captions['auditoria_id']),
 })
@@ -131,6 +133,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASENL (I
     'dependencies': fields.List(fields.Nested(dependency)),
     'divisions': fields.List(fields.Nested(pair)),
     'acciones_asenl': fields.List(fields.Nested(accion)),
+    'tipificaciones_ires_asenl': fields.List(fields.Nested(pair)),
 })
 
 @ns.route('/')
@@ -294,6 +297,7 @@ class Catalog(Resource):
                 'dependencies',
                 'divisions',
                 'acciones_asenl',
+                'tipificaciones_ires_asenl',
             ])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))

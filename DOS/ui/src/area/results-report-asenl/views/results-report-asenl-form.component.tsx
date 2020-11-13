@@ -197,6 +197,7 @@ export const ResultsReportASENLForm = (props: Props) => {
     num_vai: '',
     direccion_id: '',
     auditoria_id: '',
+    tipificacion_id: '',
   };
   useEffect(() => {
     if (id) {
@@ -636,6 +637,20 @@ export const ResultsReportASENLForm = (props: Props) => {
                         disabled={disabledModeOn}
                         control={<Checkbox checked={values.observacion_reincidente} onChange={handleChange('observacion_reincidente')} name="observacion_reincidente" />}
                         label="Observación reincidente (Sí/No)"
+                      />
+                    </FormGroup>
+                    <FormGroup row>
+                      <FormControlLabel
+                        disabled={disabledModeOn}
+                        control={
+                          <Checkbox
+                            checked={values.tipificacion_id === 1}
+                            onChange={(e: any) => {
+                              const checked = e.target.checked ? 1 : 2;
+                              setFieldValue("tipificacion_id", checked);
+                            }}
+                            name="tipificacion_id" />}
+                            label="Tipificación Grave (Sí/No)"
                       />
                     </FormGroup>
                   </Grid>

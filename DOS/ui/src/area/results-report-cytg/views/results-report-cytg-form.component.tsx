@@ -496,6 +496,8 @@ export const ResultsReportCYTGForm = (props: Props) => {
                               auditoria_id,
                               direccion_id,
                               programa_social_id,
+                              // monto_observado,
+                              observacion,
                             } =
                               (observations &&
                                 observations.find(
@@ -508,6 +510,10 @@ export const ResultsReportCYTGForm = (props: Props) => {
                               'programa_social_id',
                               programa_social_id,
                             );
+                            if (!id) {
+                              // setFieldValue('monto_observado', monto_observado);
+                              setFieldValue('observacion', observacion);
+                            }
                           }
                           return setFieldValue('observacion_pre_id', value);
                         }}

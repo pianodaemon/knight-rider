@@ -447,11 +447,17 @@ export const ResultsReportASENLForm = (props: Props) => {
                             const {
                               auditoria_id,
                               direccion_id,
-                              programa_social_id
+                              programa_social_id,
+                              monto_observado,
+                              observacion,
                             } = (observations && observations.find((item: any) => item.id === value[0])) || {};
                             setFieldValue('auditoria_id', auditoria_id);
                             setFieldValue('direccion_id', direccion_id);
                             setFieldValue('programa_social_id', programa_social_id);
+                            if (!id) {
+                              setFieldValue('monto_observado', monto_observado);
+                              setFieldValue('observacion_final', observacion);
+                            }
                           }
                           return setFieldValue('observacion_pre_id', value);
                         }}

@@ -149,6 +149,8 @@ export const preObservationsSelector = createSelector(
             direccion_id: item.direccion_id,
             programa_social_id: item.programa_social_id,
             auditoria_id: item.auditoria_id,
+            observacion: item.observacion,
+            monto_observado: item.monto_observado,
           };
         })
       : [];

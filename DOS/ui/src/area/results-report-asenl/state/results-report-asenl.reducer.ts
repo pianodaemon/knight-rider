@@ -37,6 +37,7 @@ export interface ResultsReportASENL {
   num_vai: string; // Num. VAI [DONE]
   direccion_id: number; // Id de la dirección (según obs preliminar) [DONE]
   auditoria_id: number; // Id de la auditoría (según obs preliminar) [DONE]
+  tipificacion_id: number;
 }
 
 interface ResultsReportASENLSlice {

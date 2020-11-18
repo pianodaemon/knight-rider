@@ -239,6 +239,7 @@ export const ObservationsSFPForm = (props: Props) => {
     });
     
     // Verificar que todas las fechas no podrán ser posteriores a la fecha de captura, excepto fechas vencimientos.
+    /*
     dateFields.forEach(field => {
       if (
         (values[field] && new Date(values[field].replace(/-/g, '/')).getTime() > new Date(values.fecha_captura.replace(/-/g, '/')).getTime())
@@ -246,6 +247,7 @@ export const ObservationsSFPForm = (props: Props) => {
         errors[field] = errors[field] || 'Revise que la fecha que ingresó no sea posterior a la Fecha de Captura';
       }
     });
+    */
     /* @todo use scroll to view
     const element = document.getElementById(Object.keys(errors)[0]);
     if (element) {
@@ -1434,7 +1436,7 @@ export const ObservationsSFPForm = (props: Props) => {
                   <FormControl className={classes.formControl}>
                     <Field
                       component={FormikDatePicker}
-                      label="Fecha Fecha de oficio que da vista a la CyTG"
+                      label="Fecha de oficio que da vista a la CyTG"
                       name="fecha_oficio_of_vista_cytg"
                       disabled={(action === 'view')}
                     />

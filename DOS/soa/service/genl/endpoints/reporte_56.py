@@ -21,6 +21,8 @@ reporte_56_ns_captions = {
     'reporte_num': 'Numero de reporte (reporte56 o reporte58)',
     'division_id': 'Id de la direccion del usuario',
     'is_clasif': 'True si obtendra la clasificacion',
+    'm_obs': 'Monto observado',
+    'm_sol': 'Monto solventado',
 }
 
 ns = api.namespace("reporte_56", description="(Reporte 56 y 58) Observaciones Pendientes de Solventar por Ente Fiscalizador")
@@ -32,6 +34,8 @@ data_row = api.model('Data row (Reporte 56)', {
     'clasif_name':  fields.String(description=reporte_56_ns_captions['clasif_name']),
     'c_obs':        fields.Integer(description=reporte_56_ns_captions['c_obs']),
     'monto':        fields.Float(description=reporte_56_ns_captions['monto']),
+    'm_obs':        fields.Float(description=reporte_56_ns_captions['m_obs']),
+    'm_sol':        fields.Float(description=reporte_56_ns_captions['m_sol']),
 })
 
 report = api.model('Reporte 56', {

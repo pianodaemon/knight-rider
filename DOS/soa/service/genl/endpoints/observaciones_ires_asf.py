@@ -124,7 +124,7 @@ obs_ires_asf = api.model('Observación de la ASF (Informe de Resultados)', {
     'fecha_vencimiento': fields.Date(description=obs_ires_asf_ns_captions['fecha_vencimiento']),
     'observacion_ir': fields.String(description=obs_ires_asf_ns_captions['observacion_ir']),
     'tipo_observacion_id': fields.Integer(description=obs_ires_asf_ns_captions['tipo_observacion_id']),
-    'accion': fields.String(description=obs_ires_asf_ns_captions['accion']),
+    'accion': fields.Integer(description=obs_ires_asf_ns_captions['accion']),
     'clave_accion': fields.String(description=obs_ires_asf_ns_captions['clave_accion']),
     'monto_observado': fields.Float(description=obs_ires_asf_ns_captions['monto_observado']),
     'monto_a_reintegrar': fields.Float(description=obs_ires_asf_ns_captions['monto_a_reintegrar']),
@@ -191,6 +191,7 @@ catalog = api.model('Leyendas y datos para la UI de Observaciones de la ASF (Inf
     'dependencies': fields.List(fields.Nested(dependency)),
     'divisions': fields.List(fields.Nested(pair)),
     'social_programs': fields.List(fields.Nested(program)),
+    'acciones_asf': fields.List(fields.Nested(pair)),
 })
 
 @ns.route('/')
@@ -356,7 +357,8 @@ class Catalog(Resource):
                 'audits',
                 'dependencies',
                 'divisions',
-                'social_programs'
+                'social_programs',
+                'acciones_asf',
             ])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))

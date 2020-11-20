@@ -121,6 +121,7 @@ type ClasifInternas = {
   direccion_id: number,
   clasifs_internas_pairs: Array<{ sorting_val: number, title: string }>,
 };
+type AccionesASF = CatalogItem;
 
 export type Catalog = {
   audits: Array<Audit>,
@@ -133,6 +134,7 @@ export type Catalog = {
   observation_types: Array<ObservationTypes>,
   social_programs: Array<SocialProgram>,
   clasifs_internas_cytg: Array<ClasifInternas> | null,
+  acciones_asf: Array<AccionesASF>,
 };
 
 const initialState: ResultsReportSlice = {

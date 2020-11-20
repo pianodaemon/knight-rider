@@ -1165,7 +1165,16 @@ export const ObservationsSFPForm = (props: Props) => {
                                       inputProps={{
                                         allowNegatives: true
                                       }}
-                                      value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
+                                      value={
+                                        // @todo implement useMemo to enhance rendering performance
+                                        (() => {
+                                          let montos = [];
+                                          for(let i = 0; i<=index; i++) {
+                                            montos.push(values.seguimientos && values.seguimientos[i] ? values.seguimientos[i].monto_solventado || 0 : 0);
+                                          }
+                                          return sub(values.monto_observado || 0, add(montos));
+                                        })()
+                                      }
                                       disabled
                                       variant="filled"
                                     />

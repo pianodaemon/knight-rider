@@ -22,6 +22,7 @@ reporte_61_ns_captions = {
     'obs': 'Observacion',
     'estatus': 'Estatus de la observacion',
     'division_id': 'Id de la direccion del usuario',
+    'm_sol': 'Monto solventado',
 }
 
 ns = api.namespace("reporte_61", description="(Reporte 61 y 63) Reporte de Detalle de la Observación, Estatus, Entidad, Tipo de Observación y Ente Fiscalizador")
@@ -34,6 +35,7 @@ data_row = api.model('Data row (Reporte 61)', {
     'estatus':      fields.String(description=reporte_61_ns_captions['estatus']),
     'c_obs':        fields.Integer(description=reporte_61_ns_captions['c_obs']),
     'monto':        fields.Float(description=reporte_61_ns_captions['monto']),
+    'm_sol':        fields.Float(description=reporte_61_ns_captions['m_sol']),
 })
 
 report = api.model('Reporte 61', {

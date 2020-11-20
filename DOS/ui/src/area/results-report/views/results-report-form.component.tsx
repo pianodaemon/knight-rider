@@ -820,22 +820,37 @@ export const ResultsReportForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <TextField
+                      <InputLabel id="accion">
+                        Acción
+                      </InputLabel>
+                      <Select
                         disabled={disabledModeOn}
-                        id="accion"
-                        label="Acción"
+                        id="accion-select"
+                        labelId="accion"
                         onChange={handleChange('accion')}
-                        value={values.accion || ''}
-                      />
-                      {errors.accion &&
-                        touched.accion && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Acción
-                          </FormHelperText>
-                        )}
+                        value={catalog && catalog.acciones_asf ? values.accion || '' : ''}
+                      >
+                        {catalog &&
+                            catalog.acciones_asf &&
+                            catalog.acciones_asf.map((item) => {
+                              return (
+                                <MenuItem
+                                  value={item.id}
+                                  key={`type-${item.id}`}
+                                >
+                                  {item.title}
+                                </MenuItem>
+                              );
+                            })}
+                      </Select>
+                      {errors.accion && touched.accion && (
+                      <FormHelperText
+                        error
+                        classes={{ error: classes.textErrorHelper }}
+                      >
+                        Ingrese Acción
+                      </FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -1488,7 +1503,17 @@ export const ResultsReportForm = (props: Props) => {
                                           // onChange={handleChange('monto_pendiente_solventar')}
                                           placeholder="0"
                                           // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
-                                          value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
+                                          // value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
+                                          value={
+                                            // @todo implement useMemo to enhance rendering performance
+                                            (() => {
+                                              let montos = [];
+                                              for(let i = 0; i<=index; i++) {
+                                                montos.push(values.seguimientos && values.seguimientos[i] ? values.seguimientos[i].monto_solventado || 0 : 0);
+                                              }
+                                              return sub(values.monto_observado || 0, add(montos));
+                                            })()
+                                          }
                                           variant="filled"
                                         />
                                       </FormControl>

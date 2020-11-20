@@ -31,7 +31,7 @@ import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdow
 import { AutoCompleteLoadMoreDropdown } from 'src/shared/components/autocomplete-load-more-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { SingleTextResponsiveModal } from 'src/shared/components/modal/single-text-responsive-modal.component';
-import { sub } from 'src/shared/math/add.util';
+import { add, sub } from 'src/shared/math/add.util';
 import {
   Catalog,
   ResultsReportCYTG,
@@ -1344,17 +1344,31 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                   <Grid item xs={12} sm={6}>
                                     <FormControl className={classes.formControl}>
                                       <TextField
-                                        disabled={disabledModeOn}
+                                        disabled
                                         // id="monto_pendiente_solventar"
                                         InputProps={{
                                           inputComponent: NumberFormatCustom as any,
                                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                         }}
+                                        inputProps={{
+                                          allowNegatives: true
+                                        }}
                                         label="Monto Pendiente de solventar (cifra en pesos)"
                                         name="monto_pendiente_solventar"
                                         onChange={handleChange(`seguimientos.${index}.monto_pendiente_solventar`)}
                                         placeholder="0"
-                                        value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
+                                        // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
+                                        value={
+                                          // @todo implement useMemo to enhance rendering performance
+                                          (() => {
+                                            let montos = [];
+                                            for(let i = 0; i<=index; i++) {
+                                              montos.push(values.seguimientos && values.seguimientos[i] ? values.seguimientos[i].monto_solventado || 0 : 0);
+                                            }
+                                            return sub(values.monto_pendiente_solventar || 0, add(montos));
+                                          })()
+                                        }
+                                        variant="filled"
                                       />
                                       {errors.monto_pendiente_solventar &&
                                         touched.monto_pendiente_solventar &&
@@ -1479,6 +1493,9 @@ export const ResultsReportCYTGForm = (props: Props) => {
                           inputComponent: NumberFormatCustom as any,
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                           readOnly: true,
+                        }}
+                        inputProps={{
+                          allowNegatives: true
                         }}
                       />
                       {errors.monto_por_reintegrar &&

@@ -197,6 +197,7 @@ export const ResultsReportASENLForm = (props: Props) => {
     num_vai: '',
     direccion_id: '',
     auditoria_id: '',
+    tipificacion_id: '',
   };
   useEffect(() => {
     if (id) {
@@ -446,11 +447,17 @@ export const ResultsReportASENLForm = (props: Props) => {
                             const {
                               auditoria_id,
                               direccion_id,
-                              programa_social_id
+                              programa_social_id,
+                              monto_observado,
+                              observacion,
                             } = (observations && observations.find((item: any) => item.id === value[0])) || {};
                             setFieldValue('auditoria_id', auditoria_id);
                             setFieldValue('direccion_id', direccion_id);
                             setFieldValue('programa_social_id', programa_social_id);
+                            if (!id) {
+                              setFieldValue('monto_observado', monto_observado);
+                              setFieldValue('observacion_final', observacion);
+                            }
                           }
                           return setFieldValue('observacion_pre_id', value);
                         }}
@@ -636,6 +643,20 @@ export const ResultsReportASENLForm = (props: Props) => {
                         disabled={disabledModeOn}
                         control={<Checkbox checked={values.observacion_reincidente} onChange={handleChange('observacion_reincidente')} name="observacion_reincidente" />}
                         label="Observación reincidente (Sí/No)"
+                      />
+                    </FormGroup>
+                    <FormGroup row>
+                      <FormControlLabel
+                        disabled={disabledModeOn}
+                        control={
+                          <Checkbox
+                            checked={values.tipificacion_id === 1}
+                            onChange={(e: any) => {
+                              const checked = e.target.checked ? 1 : 2;
+                              setFieldValue("tipificacion_id", checked);
+                            }}
+                            name="tipificacion_id" />}
+                            label="Tipificación Grave (Sí/No)"
                       />
                     </FormGroup>
                   </Grid>

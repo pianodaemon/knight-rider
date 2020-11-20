@@ -3,6 +3,7 @@ import {
   observationsCYTGReducer,
   ObservationCYTG,
 } from './observations-cytg.reducer';
+import { FISCALS } from "src/shared/constants/observations.constants";
 
 const sliceSelector = (state: any) => state[observationsCYTGReducer.sliceName];
 
@@ -14,7 +15,7 @@ export const observationsSelector = createSelector(
 export const catalogSelector = createSelector(sliceSelector, (slice: any) => {
   const audits =
     slice && slice.catalog && slice.catalog.audits
-      ? slice.catalog.audits.sort((a: any, b: any) => b.id - a.id)
+      ? slice.catalog.audits.sort((a: any, b: any) => b.id - a.id).filter((audit: any) => audit.org_fiscal_id === FISCALS.CYTG)
       : [];
   /* @todo Add when backend ready
   const observation_types =

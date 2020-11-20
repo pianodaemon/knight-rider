@@ -234,8 +234,9 @@ def setDataObj58(l):
         if key in data_rowsl:
             data_rowsl[key]['cant_obs'] += 1
             data_rowsl[key]['monto'] += i['monto']
+            data_rowsl[key]['monto_observado'] += i['monto_observado']
         else:
-            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'clasif_name': i['clasif_name']}
+            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'monto_observado': i['monto_observado'], 'clasif_name': i['clasif_name']}
     for item in data_rowsl:
         value = data_rowsl[item]
         o = {}
@@ -245,7 +246,7 @@ def setDataObj58(l):
         o['clasif_name']      = value['clasif_name']
         o['c_obs']            = value['cant_obs']
         o['monto']            = value['monto']
-        o['m_obs']            = 0
+        o['m_obs']            = value['monto_observado']
         o['m_sol']            = 0
         data_rows.append(o)
     return data_rows

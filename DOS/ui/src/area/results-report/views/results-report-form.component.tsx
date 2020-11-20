@@ -820,22 +820,37 @@ export const ResultsReportForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <TextField
+                      <InputLabel id="accion">
+                        Acción
+                      </InputLabel>
+                      <Select
                         disabled={disabledModeOn}
-                        id="accion"
-                        label="Acción"
+                        id="accion-select"
+                        labelId="accion"
                         onChange={handleChange('accion')}
-                        value={values.accion || ''}
-                      />
-                      {errors.accion &&
-                        touched.accion && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Acción
-                          </FormHelperText>
-                        )}
+                        value={catalog && catalog.acciones_asf ? values.accion || '' : ''}
+                      >
+                        {catalog &&
+                            catalog.acciones_asf &&
+                            catalog.acciones_asf.map((item) => {
+                              return (
+                                <MenuItem
+                                  value={item.id}
+                                  key={`type-${item.id}`}
+                                >
+                                  {item.title}
+                                </MenuItem>
+                              );
+                            })}
+                      </Select>
+                      {errors.accion && touched.accion && (
+                      <FormHelperText
+                        error
+                        classes={{ error: classes.textErrorHelper }}
+                      >
+                        Ingrese Acción
+                      </FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>

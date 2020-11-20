@@ -114,7 +114,7 @@ const TableReports = ( props: any ) => {
   const sumRows = () => {
     report.forEach( (dep:any) => {
       sum.c_obs += dep.c_obs      ;
-      sum.monto  = Decimal.add( sum.monto, dep.monto )
+      sum.monto  = Decimal.add( sum.monto, dep.m_obs )
     })
   };
   sumRows();
@@ -150,7 +150,7 @@ const TableReports = ( props: any ) => {
             <td>{dep.dep}</td> 
             <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
             <td className={classes.cantObs} >{dep.c_obs}</td>
-            <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep.monto} /> </td>
+            <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep.m_obs} /> </td>
           </tr>
         )
         }   
@@ -158,7 +158,7 @@ const TableReports = ( props: any ) => {
           <td style={{fontWeight: "bold"}} > Totales</td> 
           <td style={{fontWeight: "bold", textAlign: "center"}}></td>
           <td style={{fontWeight: "bold", textAlign: "center"}}> { sum.c_obs }</td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.monto.valueOf()} /> </td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.monto.toNumber()} /> </td>
         </tr>
       </tbody>
     </table>

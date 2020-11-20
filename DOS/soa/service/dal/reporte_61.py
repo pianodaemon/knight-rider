@@ -71,6 +71,7 @@ def setDataObj(l):
         o['estatus']  = item['estatus']
         o['c_obs']    = item['cant_obs']
         o['monto']    = item['monto']
+        o['m_sol']    = item['monto_solventado']
 
         data_rows.append(o)
     return data_rows
@@ -99,6 +100,7 @@ def preASF( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, permi
     for row in rows:
         r = dict(row)
         r['tipo_observacion'] = ''  #Pre no tiene este campo
+        r['monto_solventado'] = 0  #Pre no tiene este campo
         l.append(r)
 
     return l
@@ -151,6 +153,7 @@ def preCYTG( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, perm
     for row in rows:
         r = dict(row)
         r['estatus'] = ''
+        r['monto_solventado'] = 0
         l.append(r)
 
     return l
@@ -177,6 +180,7 @@ def preASENL( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, per
     l = []
     for row in rows:
         r = dict(row)
+        r['monto_solventado'] = 0
         l.append(r)
 
     return l
@@ -207,7 +211,7 @@ def iresASF( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, perm
     for row in rows:
         r = dict(row)
         sql = '''
-            select seg.estatus_id estatus_id, estatus_ires.title as estatus 
+            select seg.estatus_id estatus_id, estatus_ires.title as estatus, seg.monto_solventado 
             from seguimientos_obs_asf as seg 
             join estatus_ires_asf as estatus_ires on seg.estatus_id = estatus_ires.id
             where observacion_id = {}
@@ -220,12 +224,14 @@ def iresASF( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, perm
         except EmptySetError:
             seg = []            
             
-        r['estatus']         = ''
-        r['num_observacion'] = ''   #No lo tiene como campo 
-        r['cant_obs']        = 1    #No se agrupa -> 1
+        r['estatus']          = ''
+        r['num_observacion']  = ''   #No lo tiene como campo 
+        r['cant_obs']         = 1    #No se agrupa -> 1
+        r['monto_solventado'] = 0
         if seg:
             segd = dict(seg[0])
-            r['estatus']         = segd['estatus']
+            r['estatus']           = segd['estatus']
+            r['monto_solventado']  = segd['monto_solventado']
         
         l.append(r)
 
@@ -235,7 +241,7 @@ def iresASF( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, perm
 
 def iresCYTG( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, permission ):
     sql = '''
-        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, ires.clasif_final_cytg as clasif_final_cytg, ires.num_observacion as num_observacion, ires.observacion as observacion
+        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, ires.clasif_final_cytg as clasif_final_cytg, ires.num_observacion as num_observacion, ires.observacion as observacion, ires.monto_solventado as monto_solventado
         from observaciones_ires_cytg as ires
         join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
@@ -284,7 +290,7 @@ def iresCYTG( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, per
 
 def iresASENL( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, permission ):
     sql = '''
-        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, ires.num_observacion as num_observacion, ires.observacion_final as observacion, count(pre.id) as cant_obs, sum(ires.monto_observado) as monto
+        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, ires.num_observacion as num_observacion, ires.observacion_final as observacion, count(pre.id) as cant_obs, sum(ires.monto_observado) as monto, ires.monto_solventado as monto_solventado
         from observaciones_ires_asenl as ires
         join observaciones_pre_asenl as pre on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
@@ -335,7 +341,7 @@ def iresSFP( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, perm
     for row in rows:
         r = dict(row)
         sql = '''
-            select seg.estatus_id estatus_id, estatus_ires.title as estatus 
+            select seg.estatus_id estatus_id, estatus_ires.title as estatus, seg.monto_solventado
             from seguimientos_obs_sfp as seg 
             join estatus_sfp as estatus_ires on seg.estatus_id = estatus_ires.id
             where observacion_id = {}
@@ -348,11 +354,13 @@ def iresSFP( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, perm
         except EmptySetError:
             seg = []            
 
-        r['estatus']  = ''
-        r['cant_obs'] = 1
+        r['estatus']          = ''
+        r['cant_obs']         = 1
+        r['monto_solventado'] = 0
         if seg:
             segd = dict(seg[0])
-            r['estatus']    = segd['estatus']
+            r['estatus']          = segd['estatus']
+            r['monto_solventado'] = segd['monto_solventado']
 
         l.append(r)
     return l

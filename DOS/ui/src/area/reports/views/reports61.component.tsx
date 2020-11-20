@@ -105,16 +105,17 @@ const TableReports = ( props: any ) => {
     yearIni,
     yearEnd,
     dependency,
+    atributoNameTipoMonto,
   } = props;
   const classes = useStyles();
   let sum = {
     c_obs : 0, 
-    monto : new Decimal(0),
+    m     : new Decimal(0),
   };
   const sumRows = () => {
     report.forEach( (dep:any) => {
       sum.c_obs += dep.c_obs      ;
-      sum.monto  = Decimal.add( sum.monto, dep.monto )
+      sum.m      = Decimal.add( sum.m, dep[atributoNameTipoMonto] )
     })
   };
   sumRows();
@@ -155,8 +156,8 @@ const TableReports = ( props: any ) => {
             <td style={{textAlign: 'center'}} >{dep.n_obs}</td>
             <td style={{textAlign: 'center', overflow:'hidden',textOverflow:'ellipsis',display:'-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient:'vertical'}} >{dep.obs}</td>
             <td className={classes.cantObs} >{dep.tipo}</td>
-            <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep.monto} /> </td>
-            <td style={{textAlign: "center", whiteSpace: "nowrap"}} > { dep.estatus } </td>
+            <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep[atributoNameTipoMonto]} /> </td>
+            <td style={{textAlign: "center"}} > { dep.estatus } </td>
           </tr>
         )
         }   
@@ -166,7 +167,7 @@ const TableReports = ( props: any ) => {
           <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
           <td style={{fontWeight: "bold", textAlign: "center"}}></td>
           <td style={{fontWeight: "bold", textAlign: "center"}}> </td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.monto.valueOf()} /> </td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.m.toNumber()} /> </td>
           <td style={{fontWeight: "bold", textAlign: "right"}}></td>
         </tr>
       </tbody>
@@ -184,10 +185,11 @@ export const Report61 = (props: Props) => {
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2000');
   const [dependency, setDependency] = useState<any>('Todas');
+  const [tipoMonto, setTipoMonto] = useState<any>('observado');
   const permissions: any = useSelector((state: any) => state.authSlice);
   const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   const optionsFiscalsAux: {[index: string]:any}   = {
-    'SFPR' : { value:'SFPR' ,label: 'SFP'                   ,isVisible: isVisible('SFPR'), fiscal: 'SFP'   ,pre_ires: 'pre'},
+    'SFPR' : { value:'SFPR' ,label: 'SFP'                   ,isVisible: isVisible('SFPR'), fiscal: 'SFP'   ,pre_ires: 'ires'},
     'ASFP' : { value:'ASFP' ,label: 'ASF Preliminares'      ,isVisible: isVisible('ASFP'), fiscal: 'ASF'   ,pre_ires: 'pre'},
     'ASEP' : { value:'ASEP' ,label: 'ASENL Preliminares'    ,isVisible: isVisible('ASEP'), fiscal: 'ASENL' ,pre_ires: 'pre'},
     'CYTP' : { value:'CYTP' ,label: 'CYTG Preliminares'     ,isVisible: isVisible('CYTP'), fiscal: 'CYTG'  ,pre_ires: 'pre'},
@@ -213,6 +215,14 @@ export const Report61 = (props: Props) => {
     if(dep.dep === dependency || dependency === '' || dependency === 'Todas' || dependency === '0'){
       return true;
     }else{return false}
+  };
+  const optionsTipoMonto = [
+    { value: 'observado',   label: 'Observados'}, 
+    { value: 'solventado',  label: 'Solventados'}, 
+  ];
+  const valTipoMonto:any = {
+    'observado'  :{nameAttr:'monto'}, 
+    'solventado' :{nameAttr:'m_sol'}, 
   };
   let auxObj:any = {};
   return (
@@ -296,6 +306,24 @@ export const Report61 = (props: Props) => {
             })}
           </Select>
         </div>
+        <div className={classes.selectYearContainer}>
+          <InputLabel className={classes.labelSelectYear}> Tipo de Monto:</InputLabel>
+          <Select
+            labelId="tipoMonto"
+            value={tipoMonto}
+            onChange={(e)=> {setTipoMonto(e.target.value);}}
+          >
+            {optionsTipoMonto.map((item) => {
+              return (
+                <MenuItem
+                  value={item.value}
+                >
+                  {item.label}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </div>
       </div>
 
       <ReactHTMLTableToExcel
@@ -307,7 +335,7 @@ export const Report61 = (props: Props) => {
          buttonText="Descargar Reporte"
       />
       {report && report.data_rows && 
-        <TableReports report={report.data_rows.filter(setVisibleRows)} entidad={entidad} yearIni={yearIni} yearEnd={yearEnd} dependency={dependency} />
+        <TableReports report={report.data_rows.filter(setVisibleRows)} entidad={entidad} yearIni={yearIni} yearEnd={yearEnd} dependency={dependency} atributoNameTipoMonto={valTipoMonto[tipoMonto].nameAttr} />
       }
     </div>
   );

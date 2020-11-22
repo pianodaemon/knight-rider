@@ -169,7 +169,7 @@ export const Report63 = (props: Props) => {
   const permissions: any = useSelector((state: any) => state.authSlice);
   const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   const optionsFiscalsAux: {[index: string]:any}   = {
-    'SFPR' : { value:'SFPR' ,label: 'SFP'                   ,isVisible: isVisible('SFPR'), fiscal: 'SFP'   ,pre_ires: 'pre'},
+    'SFPR' : { value:'SFPR' ,label: 'SFP'                   ,isVisible: isVisible('SFPR'), fiscal: 'SFP'   ,pre_ires: 'ires'},
     'ASFP' : { value:'ASFP' ,label: 'ASF Preliminares'      ,isVisible: isVisible('ASFP'), fiscal: 'ASF'   ,pre_ires: 'pre'},
     'ASEP' : { value:'ASEP' ,label: 'ASENL Preliminares'    ,isVisible: isVisible('ASEP'), fiscal: 'ASENL' ,pre_ires: 'pre'},
     'CYTP' : { value:'CYTP' ,label: 'CYTG Preliminares'     ,isVisible: isVisible('CYTP'), fiscal: 'CYTG'  ,pre_ires: 'pre'},

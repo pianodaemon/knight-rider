@@ -108,10 +108,10 @@ export const observationsCatalogSelector = createSelector(
                 .map((dependency: number) =>
                   catalog.dependencies.find(
                     (item: any) => item.id === dependency,
-                  ),
+                  )
                 )
-                .map((item: any) => item.title)
-                .join(', ')
+                .map((item: any) => item && item.title)
+                .join(', ').replace(/,+.$|^,/, '') // @todo remove workaround for trailing commas
             : '';
         return {
           ...observation,

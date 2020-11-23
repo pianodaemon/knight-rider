@@ -383,7 +383,7 @@ export const ResultsReportForm = (props: Props) => {
     text: '',
     open: false,
   });
-  const [currentSeg, setCurrenntSeg] = React.useState(0);
+  const [currentSeg, setCurrentSeg] = React.useState(0);
   return (
     <Paper className={classes.paper}>
       <Formik
@@ -628,11 +628,17 @@ export const ResultsReportForm = (props: Props) => {
                             const {
                               auditoria_id,
                               direccion_id,
-                              programa_social_id
+                              programa_social_id,
+                              monto_observado,
+                              observacion,
                             } = (observations && observations.find((item: any) => item.id === value[0])) || {};
                             setFieldValue('auditoria_id', auditoria_id);
                             setFieldValue('direccion_id', direccion_id);
                             setFieldValue('programa_social_id', programa_social_id);
+                            if (!id) {
+                              setFieldValue('monto_observado', monto_observado);
+                              setFieldValue('observacion_ir', observacion);
+                            }
                           }
                           return setFieldValue('observacion_pre_id', value);
                         }}
@@ -814,22 +820,37 @@ export const ResultsReportForm = (props: Props) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <TextField
+                      <InputLabel id="accion">
+                        Acción
+                      </InputLabel>
+                      <Select
                         disabled={disabledModeOn}
-                        id="accion"
-                        label="Acción"
+                        id="accion-select"
+                        labelId="accion"
                         onChange={handleChange('accion')}
-                        value={values.accion || ''}
-                      />
-                      {errors.accion &&
-                        touched.accion && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            Ingrese Acción
-                          </FormHelperText>
-                        )}
+                        value={catalog && catalog.acciones_asf ? values.accion || '' : ''}
+                      >
+                        {catalog &&
+                            catalog.acciones_asf &&
+                            catalog.acciones_asf.map((item) => {
+                              return (
+                                <MenuItem
+                                  value={item.id}
+                                  key={`type-${item.id}`}
+                                >
+                                  {item.title}
+                                </MenuItem>
+                              );
+                            })}
+                      </Select>
+                      {errors.accion && touched.accion && (
+                      <FormHelperText
+                        error
+                        classes={{ error: classes.textErrorHelper }}
+                      >
+                        Ingrese Acción
+                      </FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -916,7 +937,10 @@ export const ResultsReportForm = (props: Props) => {
                                 color="primary"
                                 startIcon={<PostAddIcon />}
                                 size="medium"
-                                onClick={() => arrayHelpers.push(seguimientoTemplate)}
+                                onClick={() => {
+                                  arrayHelpers.push(seguimientoTemplate);
+                                  setCurrentSeg(values.seguimientos.length);
+                                }}
                               >
                                 Agregar Seguimiento
                               </Button>
@@ -930,7 +954,7 @@ export const ResultsReportForm = (props: Props) => {
                                 <Select
                                   labelId="current_seguimiento"
                                   // id="estatus_id-select"
-                                  onChange={(event: any) => setCurrenntSeg(event.target.value)}
+                                  onChange={(event: any) => setCurrentSeg(event.target.value)}
                                   value={currentSeg}
                                   // disabled={(action === 'view')}
                                 >
@@ -964,7 +988,10 @@ export const ResultsReportForm = (props: Props) => {
                                           color="secondary"
                                           startIcon={<DeleteForeverIcon />}
                                           size="medium"
-                                          onClick={() => arrayHelpers.remove(index)}
+                                          onClick={() => {
+                                            arrayHelpers.remove(index);
+                                            setCurrentSeg(index ? index-1 : 0);
+                                          }}
                                         >
                                           Remover Seguimiento
                                         </Button>
@@ -1476,7 +1503,17 @@ export const ResultsReportForm = (props: Props) => {
                                           // onChange={handleChange('monto_pendiente_solventar')}
                                           placeholder="0"
                                           // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
-                                          value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
+                                          // value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
+                                          value={
+                                            // @todo implement useMemo to enhance rendering performance
+                                            (() => {
+                                              let montos = [];
+                                              for(let i = 0; i<=index; i++) {
+                                                montos.push(values.seguimientos && values.seguimientos[i] ? values.seguimientos[i].monto_solventado || 0 : 0);
+                                              }
+                                              return sub(values.monto_observado || 0, add(montos));
+                                            })()
+                                          }
                                           variant="filled"
                                         />
                                       </FormControl>

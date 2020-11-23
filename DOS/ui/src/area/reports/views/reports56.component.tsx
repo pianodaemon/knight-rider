@@ -10,6 +10,9 @@ import { resolvePermission } from 'src/shared/utils/permissions.util';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import NumberFormat from 'react-number-format';
 import { Decimal } from 'decimal.js';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 type Props = {
   loading: boolean,
@@ -105,8 +108,12 @@ const TableReports = ( props: any ) => {
     yearIni,
     yearEnd,
     dependency,
+    isClasif,
+    atributoNameTipoMonto,
+    titleTable,
   } = props;
   const classes = useStyles();
+  const titleColumn = isClasif === 'True' ? 'Clasificación' : 'Observación'
   const formatPercent = (monto:number, total:number): string => {
     if(total>0){
       let m = new Decimal(monto)
@@ -114,24 +121,24 @@ const TableReports = ( props: any ) => {
       let vr = v[v.length-1] === '0' ? ((m.times(100)).dividedBy(total)).toFixed(0) : v;
       return vr + ' %';
     }else{
-      return '';
+      return '0 %';
     }
   };
   let sum = {
       c_obs: 0,
-      monto: new Decimal(0),
+      m: new Decimal(0),
   };
   const sumRows = () => {
     report.forEach( (dep:any) => {
       sum.c_obs += dep.c_obs      ;
-      sum.monto  = Decimal.add( sum.monto, dep.monto )
+      sum.m      = Decimal.add( sum.m, dep[atributoNameTipoMonto] )
     })
   };
   sumRows();
   return(
     <table className={classes.tableWhole} id="table-to-xls"> 
       <tbody className={classes.tableReports} >
-
+        {/* tr auxiliares para el archivo */}
         <tr style={{display: 'none'}} >    
           <th colSpan={8} > Reporte Ejecutivo de Observaciones Pendientes de Solventar por Ente Fiscalizador </th> 
         </tr> 
@@ -147,13 +154,13 @@ const TableReports = ( props: any ) => {
         </tr> 
 
         <tr>
-          <th colSpan={8}> Pendientes de Solventar </th> 
+          <th colSpan={8}> {titleTable} </th> 
         </tr>
         <tr className={classes.titrow}>    
           <th >Secretaría/Entidad/Municipio</th> 
           <th >Ejercicio</th> 
           <th >Tipo</th> 
-          <th >Clasificación</th> 
+          <th > { titleColumn } </th> 
           <th >Cantidad Obs.</th> 
           <th >% Obs.</th> 
           <th >Monto (Miles)</th> 
@@ -167,8 +174,8 @@ const TableReports = ( props: any ) => {
             <td style={{textAlign: 'center'}} >{dep.clasif_name}</td>
             <td className={classes.cantObs} >{dep.c_obs}</td>
             <td style={{textAlign: "right", whiteSpace: "nowrap"}} > {formatPercent( dep.c_obs, sum.c_obs ) } </td>
-            <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={dep.monto} /> </td>
-            <td style={{textAlign: "right", whiteSpace: "nowrap"}} >{formatPercent( dep.monto, sum.monto.toNumber() ) }</td>
+            <td className={classes.montos} > <MoneyFormat isVisibleFiscal={true} monto={ dep[atributoNameTipoMonto] } /> </td>
+            <td style={{textAlign: "right", whiteSpace: "nowrap"}} >{formatPercent( dep[atributoNameTipoMonto], sum.m.toNumber() ) }</td>
           </tr>
         )
         }   
@@ -179,8 +186,8 @@ const TableReports = ( props: any ) => {
           <td style={{fontWeight: "bold", textAlign: "center"}}></td>
           <td style={{fontWeight: "bold", textAlign: "center"}}> { sum.c_obs }</td>
           <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.monto.valueOf()} /> </td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}> 100 %</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={true} monto={sum.m.toNumber()} /> </td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> { sum.m.toNumber() === 0 ? '0' : '100' } %</td>
         </tr>
       </tbody>
     </table>
@@ -196,7 +203,9 @@ export const Report56 = (props: Props) => {
   } = props;
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2000');
+  const [isClasif, setIsClasif] = useState<any>('True');
   const [dependency, setDependency] = useState<any>('Todas');
+  const [tipoMonto, setTipoMonto] = useState<any>('pendiente');
   const permissions: any = useSelector((state: any) => state.authSlice);
   const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   const optionsFiscals = [
@@ -208,16 +217,27 @@ export const Report56 = (props: Props) => {
   const [fiscal , setFiscal ] = useState<any>(optionsFiscals.length ? optionsFiscals[0].value : null );
   useEffect(() => {
     if( divisionId || divisionId === 0 ){
-      loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, reporte_num: 'reporte56', division_id: divisionId });
+      loadReport56Action({ ejercicio_fin: yearEnd, ejercicio_ini: yearIni, fiscal: fiscal, reporte_num: 'reporte56', division_id: divisionId, is_clasif: isClasif });
     }
     setDependency('Todas');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearEnd, yearIni, fiscal, divisionId]);
+  }, [yearEnd, yearIni, fiscal, divisionId, isClasif]);
   const classes = useStyles();
   const setVisibleRows = (dep: any): boolean => {
+    //Si en el select esta seleccionada una dependencia y el la dep del tr es igual o esta seleccionado 'Todas'
     if(dep.dep === dependency || dependency === '' || dependency === 'Todas' || dependency === '0'){
       return true;
     }else{return false}
+  };
+  const optionsTipoMonto = [
+    { value: 'pendiente',   label: 'Pendientes de Solventar'}, 
+    { value: 'observado',   label: 'Observados'}, 
+    { value: 'solventado',  label: 'Solventados'}, 
+  ];
+  const valTipoMonto:any = {
+    'pendiente'  :{title:'Pendientes de Solventar', nameAttr:'monto'}, 
+    'observado'  :{title:'Observados',              nameAttr:'m_obs'}, 
+    'solventado' :{title:'Solventados',             nameAttr:'m_sol'}, 
   };
   let auxObj:any = {};
   return (
@@ -301,6 +321,29 @@ export const Report56 = (props: Props) => {
             })}
           </Select>
         </div>
+        <div className={classes.selectYearContainer}>
+          <InputLabel className={classes.labelSelectYear}> Tipo de Monto:</InputLabel>
+          <Select
+            labelId="tipoMonto"
+            value={tipoMonto}
+            onChange={(e)=> {setTipoMonto(e.target.value);}}
+          >
+            {optionsTipoMonto.map((item) => {
+              return (
+                <MenuItem
+                  value={item.value}
+                >
+                  {item.label}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </div>
+        <RadioGroup row aria-label="position" name="position" defaultValue="True" onChange={(e)=> {setIsClasif(e.target.value);}} >
+          <FormControlLabel value="True"  control={<Radio color="primary" />} label="Clasificación" />
+          <FormControlLabel value="False" control={<Radio color="primary" />} label="Observación" />
+        </RadioGroup>
+
       </div>
 
       <ReactHTMLTableToExcel
@@ -312,7 +355,7 @@ export const Report56 = (props: Props) => {
          buttonText="Descargar Reporte"
       />
       {report && report.data_rows && 
-        <TableReports report={report.data_rows.filter(setVisibleRows) } entidad={fiscal} yearIni={yearIni} yearEnd={yearEnd} dependency={dependency} />
+        <TableReports report={report.data_rows.filter(setVisibleRows) } entidad={fiscal} yearIni={yearIni} yearEnd={yearEnd} dependency={dependency} isClasif={isClasif} atributoNameTipoMonto={valTipoMonto[tipoMonto].nameAttr} titleTable={valTipoMonto[tipoMonto].title} />
       }
     </div>
   );

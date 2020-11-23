@@ -31,7 +31,7 @@ import { AutoCompleteDropdown } from 'src/shared/components/autocomplete-dropdow
 import { AutoCompleteLoadMoreDropdown } from 'src/shared/components/autocomplete-load-more-dropdown.component';
 import { NumberFormatCustom } from 'src/shared/components/number-format-custom.component';
 import { SingleTextResponsiveModal } from 'src/shared/components/modal/single-text-responsive-modal.component';
-import { sub } from 'src/shared/math/add.util';
+import { add, sub } from 'src/shared/math/add.util';
 import {
   Catalog,
   ResultsReportCYTG,
@@ -116,6 +116,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     textErrorHelper: { color: theme.palette.error.light, maxWidth: 350 },
     submitInput: {
+      marginTop: theme.spacing(5),
       backgroundColor: '#FFFFFF',
       color: '#008aba',
       border: '1px solid #008aba',
@@ -279,7 +280,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
     text: '',
     open: false,
   });
-  const [currentSeg, setCurrenntSeg] = React.useState(0);
+  const [currentSeg, setCurrentSeg] = React.useState(0);
   return (
     <Paper className={classes.paper}>
       <Formik
@@ -495,6 +496,8 @@ export const ResultsReportCYTGForm = (props: Props) => {
                               auditoria_id,
                               direccion_id,
                               programa_social_id,
+                              // monto_observado,
+                              observacion,
                             } =
                               (observations &&
                                 observations.find(
@@ -507,6 +510,10 @@ export const ResultsReportCYTGForm = (props: Props) => {
                               'programa_social_id',
                               programa_social_id,
                             );
+                            if (!id) {
+                              // setFieldValue('monto_observado', monto_observado);
+                              setFieldValue('observacion', observacion);
+                            }
                           }
                           return setFieldValue('observacion_pre_id', value);
                         }}
@@ -909,104 +916,6 @@ export const ResultsReportCYTGForm = (props: Props) => {
                         )}
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        id="num_oficio_vai_municipio"
-                        label="# de Oficio VAI a municipio"
-                        value={values.num_oficio_vai_municipio || ''}
-                        onChange={handleChange('num_oficio_vai_municipio')}
-                      />
-                      {errors.num_oficio_vai_municipio && touched.num_oficio_vai_municipio && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese # de Oficio VAI a municipio
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <Field
-                        disabled={disabledModeOn}
-                        component={FormikDatePicker}
-                        label="Fecha de Oficio VAI a municipio"
-                        name="fecha_oficio_vai_municipio"
-                        id="fecha_oficio_vai_municipio"
-                      />
-                      {errors.fecha_oficio_vai_municipio &&
-                        touched.fecha_oficio_vai_municipio && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            {errors.fecha_oficio_vai_municipio}
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        id="num_oficio_pras_cytg_dependencia"
-                        label="# de Oficio PRAS/PFRA de la CyTG para la Dependencia"
-                        value={values.num_oficio_pras_cytg_dependencia || ''}
-                        onChange={handleChange('num_oficio_pras_cytg_dependencia')}
-                        InputLabelProps={{ shrink: true }}
-                      />
-                      {errors.num_oficio_pras_cytg_dependencia && touched.num_oficio_pras_cytg_dependencia && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese # de Oficio PRAS/PFRA de la CyTG para la Dependencia
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <TextField
-                        disabled={disabledModeOn}
-                        id="num_oficio_resp_dependencia"
-                        label="# de Oficio de respuesta de la Dependencia"
-                        value={values.num_oficio_resp_dependencia || ''}
-                        onChange={handleChange('num_oficio_resp_dependencia')}
-                      />
-                      {errors.num_oficio_resp_dependencia && touched.num_oficio_resp_dependencia && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese # de Oficio de respuesta de la Dependencia
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl}>
-                      <Field
-                        disabled={disabledModeOn}
-                        component={FormikDatePicker}
-                        label="Fecha de oficio (acuse)"
-                        name="fecha_oficio_resp_dependencia"
-                        id="fecha_oficio_resp_dependencia"
-                      />
-                      {errors.fecha_oficio_resp_dependencia &&
-                        touched.fecha_oficio_resp_dependencia && (
-                          <FormHelperText
-                            error
-                            classes={{ error: classes.textErrorHelper }}
-                          >
-                            {errors.fecha_oficio_resp_dependencia}
-                          </FormHelperText>
-                        )}
-                    </FormControl>
-                  </Grid>
                 </Grid>
 
                 <ExpansionPanel elevation={4}>
@@ -1041,7 +950,10 @@ export const ResultsReportCYTGForm = (props: Props) => {
                               color="primary"
                               startIcon={<PostAddIcon />}
                               size="medium"
-                              onClick={() => arrayHelpers.push(seguimientoTemplate)}
+                              onClick={() => {
+                                arrayHelpers.push(seguimientoTemplate);
+                                setCurrentSeg(values.seguimientos.length);
+                              }}
                             >
                               Agregar Seguimiento
                             </Button>
@@ -1055,7 +967,7 @@ export const ResultsReportCYTGForm = (props: Props) => {
                               <Select
                                 labelId="current_seguimiento"
                                 // id="estatus_id-select"
-                                onChange={(event: any) => setCurrenntSeg(event.target.value)}
+                                onChange={(event: any) => setCurrentSeg(event.target.value)}
                                 value={currentSeg}
                                 // disabled={(action === 'view')}
                               >
@@ -1089,7 +1001,10 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                         color="secondary"
                                         startIcon={<DeleteForeverIcon />}
                                         size="medium"
-                                        onClick={() => arrayHelpers.remove(index)}
+                                        onClick={() => {
+                                          arrayHelpers.remove(index);
+                                          setCurrentSeg(index ? index-1 : 0);
+                                        }}
                                       >
                                         Remover Seguimiento
                                       </Button>
@@ -1429,17 +1344,31 @@ export const ResultsReportCYTGForm = (props: Props) => {
                                   <Grid item xs={12} sm={6}>
                                     <FormControl className={classes.formControl}>
                                       <TextField
-                                        disabled={disabledModeOn}
+                                        disabled
                                         // id="monto_pendiente_solventar"
                                         InputProps={{
                                           inputComponent: NumberFormatCustom as any,
                                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                         }}
+                                        inputProps={{
+                                          allowNegatives: true
+                                        }}
                                         label="Monto Pendiente de solventar (cifra en pesos)"
                                         name="monto_pendiente_solventar"
                                         onChange={handleChange(`seguimientos.${index}.monto_pendiente_solventar`)}
                                         placeholder="0"
-                                        value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
+                                        // value={values && values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_pendiente_solventar : ''}
+                                        value={
+                                          // @todo implement useMemo to enhance rendering performance
+                                          (() => {
+                                            let montos = [];
+                                            for(let i = 0; i<=index; i++) {
+                                              montos.push(values.seguimientos && values.seguimientos[i] ? values.seguimientos[i].monto_solventado || 0 : 0);
+                                            }
+                                            return sub(values.monto_pendiente_solventar || 0, add(montos));
+                                          })()
+                                        }
+                                        variant="filled"
                                       />
                                       {errors.monto_pendiente_solventar &&
                                         touched.monto_pendiente_solventar &&
@@ -1565,6 +1494,9 @@ export const ResultsReportCYTGForm = (props: Props) => {
                           startAdornment: <InputAdornment position="start">$</InputAdornment>,
                           readOnly: true,
                         }}
+                        inputProps={{
+                          allowNegatives: true
+                        }}
                       />
                       {errors.monto_por_reintegrar &&
                         touched.monto_por_reintegrar &&
@@ -1635,6 +1567,104 @@ export const ResultsReportCYTGForm = (props: Props) => {
                           Ingrese # de carpeta de investigación
                         </FormHelperText>
                       )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        disabled={disabledModeOn}
+                        id="num_oficio_vai_municipio"
+                        label="# de Oficio VAI a municipio"
+                        value={values.num_oficio_vai_municipio || ''}
+                        onChange={handleChange('num_oficio_vai_municipio')}
+                      />
+                      {errors.num_oficio_vai_municipio && touched.num_oficio_vai_municipio && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese # de Oficio VAI a municipio
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <Field
+                        disabled={disabledModeOn}
+                        component={FormikDatePicker}
+                        label="Fecha de Oficio VAI a municipio"
+                        name="fecha_oficio_vai_municipio"
+                        id="fecha_oficio_vai_municipio"
+                      />
+                      {errors.fecha_oficio_vai_municipio &&
+                        touched.fecha_oficio_vai_municipio && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            {errors.fecha_oficio_vai_municipio}
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        disabled={disabledModeOn}
+                        id="num_oficio_pras_cytg_dependencia"
+                        label="# de Oficio PRAS/PFRA de la CyTG para la Dependencia"
+                        value={values.num_oficio_pras_cytg_dependencia || ''}
+                        onChange={handleChange('num_oficio_pras_cytg_dependencia')}
+                        InputLabelProps={{ shrink: true }}
+                      />
+                      {errors.num_oficio_pras_cytg_dependencia && touched.num_oficio_pras_cytg_dependencia && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese # de Oficio PRAS/PFRA de la CyTG para la Dependencia
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <TextField
+                        disabled={disabledModeOn}
+                        id="num_oficio_resp_dependencia"
+                        label="# de Oficio de respuesta de la Dependencia"
+                        value={values.num_oficio_resp_dependencia || ''}
+                        onChange={handleChange('num_oficio_resp_dependencia')}
+                      />
+                      {errors.num_oficio_resp_dependencia && touched.num_oficio_resp_dependencia && (
+                        <FormHelperText
+                          error
+                          classes={{ error: classes.textErrorHelper }}
+                        >
+                          Ingrese # de Oficio de respuesta de la Dependencia
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl}>
+                      <Field
+                        disabled={disabledModeOn}
+                        component={FormikDatePicker}
+                        label="Fecha de oficio (acuse)"
+                        name="fecha_oficio_resp_dependencia"
+                        id="fecha_oficio_resp_dependencia"
+                      />
+                      {errors.fecha_oficio_resp_dependencia &&
+                        touched.fecha_oficio_resp_dependencia && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            {errors.fecha_oficio_resp_dependencia}
+                          </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
                 </Grid>

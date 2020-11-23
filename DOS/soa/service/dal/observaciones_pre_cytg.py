@@ -40,7 +40,8 @@ def _alter_observation(**kwargs):
         '{}'::character varying,
         '{}'::date,
         '{}'::text,
-        '{}'::text)
+        '{}'::text,
+        {}::integer)
         AS result( rc integer, msg text )""".format(
             kwargs['id'],
             kwargs['periodo_revision_de'],
@@ -76,6 +77,7 @@ def _alter_observation(**kwargs):
             kwargs['fecha_oficio_resp'],
             kwargs['resp_dependencia'],
             kwargs['comentarios'],
+            kwargs['estatus_id'],
         )
 
     rcode, rmsg = run_stored_procedure(sql)
@@ -315,6 +317,7 @@ def add_observacion_data(ent):
         'resp_dependencia',
         'comentarios',
         'observacion_ires_id',
+        'estatus_id',
     ])
     mod_ent = {attr: ent[attr] for attr in attributes}
 

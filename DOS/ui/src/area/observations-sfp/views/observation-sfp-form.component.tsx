@@ -239,6 +239,7 @@ export const ObservationsSFPForm = (props: Props) => {
     });
     
     // Verificar que todas las fechas no podrán ser posteriores a la fecha de captura, excepto fechas vencimientos.
+    /*
     dateFields.forEach(field => {
       if (
         (values[field] && new Date(values[field].replace(/-/g, '/')).getTime() > new Date(values.fecha_captura.replace(/-/g, '/')).getTime())
@@ -246,6 +247,7 @@ export const ObservationsSFPForm = (props: Props) => {
         errors[field] = errors[field] || 'Revise que la fecha que ingresó no sea posterior a la Fecha de Captura';
       }
     });
+    */
     /* @todo use scroll to view
     const element = document.getElementById(Object.keys(errors)[0]);
     if (element) {
@@ -258,7 +260,7 @@ export const ObservationsSFPForm = (props: Props) => {
     return errors;
   };
   const [modalField, setModalField] = React.useState({field: '', text: '', open: false});
-  const [currentSeg, setCurrenntSeg] = React.useState(0);
+  const [currentSeg, setCurrentSeg] = React.useState(0);
   return (
     <Paper className={classes.paper}>
       <Formik
@@ -789,7 +791,10 @@ export const ObservationsSFPForm = (props: Props) => {
                               color="primary"
                               startIcon={<PostAddIcon />}
                               size="medium"
-                              onClick={() => arrayHelpers.push(seguimientoTemplate)}
+                              onClick={() => {
+                                arrayHelpers.push(seguimientoTemplate);
+                                setCurrentSeg(values.seguimientos.length);
+                              }}
                             >
                               Agregar Seguimiento
                             </Button>
@@ -803,7 +808,7 @@ export const ObservationsSFPForm = (props: Props) => {
                             <Select
                               labelId="current_seguimiento"
                               // id="estatus_id-select"
-                              onChange={(event: any) => setCurrenntSeg(event.target.value)}
+                              onChange={(event: any) => setCurrentSeg(event.target.value)}
                               value={currentSeg}
                               // disabled={(action === 'view')}
                             >
@@ -837,7 +842,10 @@ export const ObservationsSFPForm = (props: Props) => {
                                       color="secondary"
                                       startIcon={<DeleteForeverIcon />}
                                       size="medium"
-                                      onClick={() => arrayHelpers.remove(index)}
+                                      onClick={() => {
+                                        arrayHelpers.remove(index);
+                                        setCurrentSeg(index ? index-1 : 0);
+                                      }}
                                     >
                                       Remover Seguimiento
                                     </Button>
@@ -1157,7 +1165,16 @@ export const ObservationsSFPForm = (props: Props) => {
                                       inputProps={{
                                         allowNegatives: true
                                       }}
-                                      value={sub(values.monto_observado || 0, values.seguimientos && values.seguimientos[index] ? values.seguimientos[index].monto_solventado || 0 : 0)}
+                                      value={
+                                        // @todo implement useMemo to enhance rendering performance
+                                        (() => {
+                                          let montos = [];
+                                          for(let i = 0; i<=index; i++) {
+                                            montos.push(values.seguimientos && values.seguimientos[i] ? values.seguimientos[i].monto_solventado || 0 : 0);
+                                          }
+                                          return sub(values.monto_observado || 0, add(montos));
+                                        })()
+                                      }
                                       disabled
                                       variant="filled"
                                     />
@@ -1428,7 +1445,7 @@ export const ObservationsSFPForm = (props: Props) => {
                   <FormControl className={classes.formControl}>
                     <Field
                       component={FormikDatePicker}
-                      label="Fecha Fecha de oficio que da vista a la CyTG"
+                      label="Fecha de oficio que da vista a la CyTG"
                       name="fecha_oficio_of_vista_cytg"
                       disabled={(action === 'view')}
                     />

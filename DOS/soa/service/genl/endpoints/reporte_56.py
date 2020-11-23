@@ -20,6 +20,9 @@ reporte_56_ns_captions = {
     'fiscal': 'Ente Fiscalizador (ASENL/ASF/SFP/CYTG)',
     'reporte_num': 'Numero de reporte (reporte56 o reporte58)',
     'division_id': 'Id de la direccion del usuario',
+    'is_clasif': 'True si obtendra la clasificacion',
+    'm_obs': 'Monto observado',
+    'm_sol': 'Monto solventado',
 }
 
 ns = api.namespace("reporte_56", description="(Reporte 56 y 58) Observaciones Pendientes de Solventar por Ente Fiscalizador")
@@ -31,6 +34,8 @@ data_row = api.model('Data row (Reporte 56)', {
     'clasif_name':  fields.String(description=reporte_56_ns_captions['clasif_name']),
     'c_obs':        fields.Integer(description=reporte_56_ns_captions['c_obs']),
     'monto':        fields.Float(description=reporte_56_ns_captions['monto']),
+    'm_obs':        fields.Float(description=reporte_56_ns_captions['m_obs']),
+    'm_sol':        fields.Float(description=reporte_56_ns_captions['m_sol']),
 })
 
 report = api.model('Reporte 56', {
@@ -51,6 +56,7 @@ class Reporte56(Resource):
     @ns.param('fiscal',        reporte_56_ns_captions['fiscal'],        required=False)
     @ns.param('reporte_num',   reporte_56_ns_captions['reporte_num'],   required=False)
     @ns.param('division_id',   reporte_56_ns_captions['division_id'],   required=True)
+    @ns.param('is_clasif',     reporte_56_ns_captions['is_clasif'],     required=False)
     def get(self):
         ''' Obtiene un arreglo con Entidad, Ejercicio, Tipo, Clasificacion, Cant Obs y Monto para IRES, se filtra por ente '''
         try:
@@ -64,9 +70,10 @@ class Reporte56(Resource):
         fiscal        = request.args.get('fiscal',        'SFP')
         reporte_num   = request.args.get('reporte_num',   'reporte56')
         division_id   = request.args.get('division_id',   '0')
+        is_clasif     = request.args.get('is_clasif',   'True')
 
         try:
-            rep = reporte_56.get(ejercicio_ini, ejercicio_fin, fiscal, reporte_num, division_id, auth)
+            rep = reporte_56.get(ejercicio_ini, ejercicio_fin, fiscal, reporte_num, division_id, auth, is_clasif)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

@@ -41,6 +41,7 @@ interface ObservationsASFSlice {
     order: string,
     order_by: string,
   };
+  filters: Array<any>;
 }
 
 type CatalogItem = {
@@ -51,6 +52,8 @@ type CatalogItem = {
 type Audit = CatalogItem & {
   dependency_ids: Array<number>,
   years: Array<number>,
+  org_fiscal_id: number,
+  direccion_id: number,
 };
 
 type Division = CatalogItem;
@@ -90,6 +93,7 @@ const initialState: ObservationsASFSlice = {
     order: 'desc',
     order_by: 'id',
   },
+  filters: [],
 };
 
 export const sliceName = 'observationsASFSlice';

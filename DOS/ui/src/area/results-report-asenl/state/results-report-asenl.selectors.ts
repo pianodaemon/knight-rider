@@ -138,3 +138,30 @@ export const auditIdSelector = createSelector(sliceSelector, (slice: any) => {
   const { auditoria_id } = slice.observacion_pre;
   return auditoria_id;
 });
+
+export const filterOptionsSelector = createSelector(
+  sliceSelector,
+  (slice: any) => slice.filters
+);
+
+export const filterSelector = createSelector(
+  sliceSelector,
+  (slice: any) => {
+    const { catalog } = slice;
+    return [
+      {
+        abbr: 'TO',
+        type: 'dropdown',
+        param: 'tipo_observacion_id',
+        name: '(TO) Tipo de observación preliminar',
+        options: catalog && catalog.observation_types ? [...catalog.observation_types.map((item: any) => { return { id: item.id, value: item.title } })] : [],
+      },
+      {
+        abbr: 'O',
+        type: 'text',
+        param: 'observacion_final',
+        name: '(O) Observación final (análisis)',
+      },
+    ];
+  }
+);

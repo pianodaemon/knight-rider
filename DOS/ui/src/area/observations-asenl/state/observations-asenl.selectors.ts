@@ -119,3 +119,50 @@ export const pagingSelector = createSelector(
   sliceSelector,
   (slice: any) => slice.paging
 );
+
+export const filterOptionsSelector = createSelector(
+  sliceSelector,
+  (slice: any) => slice.filters
+);
+
+export const filterSelector = createSelector(
+  sliceSelector,
+  (slice: any) => {
+    const { catalog } = slice;
+    return [
+      {
+        abbr: 'DIR',
+        type: 'dropdown',
+        param: 'direccion_id',
+        name: '(DIR) Dirección',
+        options: catalog && catalog.divisions ? [...catalog.divisions.map((item: any) => { return { id: item.id, value: item.title } })] : [],
+      },
+      {
+        abbr: 'AUD',
+        type: 'dropdown',
+        param: 'auditoria_id',
+        name: '(AUD) Auditoría',
+        options: catalog && catalog.audits ? [...catalog.audits.filter((audit: any) => audit.org_fiscal_id === FISCALS.ASENL).map((item: any) => { return { id: item.id, value: item.title } })] : [],
+      },
+      {
+        abbr: 'TO',
+        type: 'dropdown',
+        param: 'tipo_observacion_id',
+        name: '(TO) Tipo de observación preliminar',
+        options: catalog && catalog.observation_types ? [...catalog.observation_types.map((item: any) => { return { id: item.id, value: item.title } })] : [],
+      },
+      {
+        abbr: 'CLO',
+        type: 'text',
+        param: 'num_observacion',
+        name: '(CLO) Clave o Num. de observacion',
+      },
+      {
+        abbr: 'O',
+        type: 'text',
+        param: 'observacion',
+        name: '(O) Observación',
+      },
+    ];
+  }
+);

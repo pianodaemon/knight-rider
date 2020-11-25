@@ -6,8 +6,10 @@ import MaterialTable, { MTableToolbar } from 'material-table';
 import TablePagination from '@material-ui/core/TablePagination';
 import Button from '@material-ui/core/Button';
 import PostAddIcon from '@material-ui/icons/PostAdd';
-import { ObservationCYTG } from '../state/observations-cytg.reducer';
+import Paper from '@material-ui/core/Paper';
 import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
+import { FilterChips } from 'src/shared/components/filter-chips.component';
+import { ObservationCYTG } from '../state/observations-cytg.reducer';
 
 type Props = {
   observations: Array<ObservationCYTG>,
@@ -17,6 +19,7 @@ type Props = {
   paging: any,
   isAllowed: Function,
   divisionId: number,
+  filters: Array<any>,
 };
 
 const useStyles = makeStyles(() =>
@@ -41,6 +44,7 @@ export const ObservationCYTGTable = (props: Props) => {
     removeObservationCYTGAction,
     isAllowed,
     divisionId,
+    filters,
   } = props;
   const { count, page, per_page, order } = paging;
   const history = useHistory();
@@ -97,117 +101,125 @@ export const ObservationCYTGTable = (props: Props) => {
     },
   ];
   return (
-    <MaterialTable
-      localization={{
-        body: {
-          emptyDataSourceMessage: loading ? 'Cargando registros' : 'No hay registros para mostrar'
-        }
-      }}
-      title="Observaciones Preliminares CyTG"
-      onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
-        loadObservationsCYTGAction({
-          ...paging,
-          order: orderDirection,
-          order_by: 'id',
-        });
-      }}
-      columns={columns}
-      data={observations || []}
-      options={{
-        draggable,
-        initialPage: 1, // @todo include this settings value in a CONSTANTS file
-        paging: true,
-        pageSize: per_page,
-        thirdSortClick: false,
-        actionsColumnIndex: columns.length,
-        toolbar: true,
-        toolbarButtonAlignment: 'right',
-        emptyRowsWhenPaging: false,
-        maxBodyHeight: 500,
-        rowStyle: (_data: any, index: number, _level: number) => {
-          return index % 2 
-            ? { backgroundColor: 'rgb(204,204,204,0.3)' }
-            : {};
-        }
-      }}
-      components={{
-        Pagination: (componentProps) => {
-          return (
-            <TablePagination
-              {...componentProps}
-              count={count}
-              page={page - 1 || 0}
-              rowsPerPage={per_page}
-              rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
-              onChangePage={(event, currentPage: number) => {
-                loadObservationsCYTGAction({
-                  per_page,
-                  page: currentPage + 1,
-                  order,
-                  // offset: nextPage * 1,
-                });
-              }}
-              onChangeRowsPerPage={(event: any) => {
-                componentProps.onChangeRowsPerPage(event);
-                loadObservationsCYTGAction({
-                  per_page: event.target.value,
-                });
-              }}
-            />
-          );
-        },
-        Toolbar: (componentProps) => {
-          return (
-            <div>
-              <MTableToolbar {...componentProps} />
-              <div style={{ padding: '0px 10px', textAlign: 'right' }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<PostAddIcon />}
-                  size="medium"
-                  onClick={() => history.push('/observation-cytg/create')}
-                  disabled={!isAllowed('CYTP', PERMISSIONS.CREATE)}
-                >
-                  Agregar Observaciones Preliminares CyTG
-                </Button>
-              </div>
-            </div>
-          );
-        },
-      }}
-      actions={[
-        {
-          icon: 'search',
-          tooltip: 'Visualizar Observación',
-          onClick: (event, rowData: any) =>
-            history.push(`/observation-cytg/${rowData.id}/view`),
-          disabled: !isAllowed('CYTP', PERMISSIONS.READ),
-        },
-        {
-          icon: 'edit',
-          tooltip: 'Editar Observación',
-          onClick: (event, rowData: any) =>
-            history.push(`/observation-cytg/${rowData.id}/edit`),
-          disabled: !isAllowed('CYTP', PERMISSIONS.UPDATE),
-        },
-        {
-          icon: 'delete',
-          tooltip: 'Eliminar Observación',
-          onClick: (event, rowData: any) => {
-            if (
-              // eslint-disable-next-line no-restricted-globals
-              confirm(
-                `¿Realmente quieres eliminar la Observación Preliminar CyTG ${rowData.id}?\n Esta acción es irreversible`
-              )
-            ) {
-              removeObservationCYTGAction(rowData.id);
-            }
+    <>
+      <Paper elevation={0}>
+        <FilterChips
+          filters={filters}
+          loadAction={loadObservationsCYTGAction} 
+        />
+      </Paper>
+      <MaterialTable
+        localization={{
+          body: {
+            emptyDataSourceMessage: loading ? 'Cargando registros' : 'No hay registros para mostrar'
+          }
+        }}
+        title="Observaciones Preliminares CyTG"
+        onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
+          loadObservationsCYTGAction({
+            ...paging,
+            order: orderDirection,
+            order_by: 'id',
+          });
+        }}
+        columns={columns}
+        data={observations || []}
+        options={{
+          draggable,
+          initialPage: 1, // @todo include this settings value in a CONSTANTS file
+          paging: true,
+          pageSize: per_page,
+          thirdSortClick: false,
+          actionsColumnIndex: columns.length,
+          toolbar: true,
+          toolbarButtonAlignment: 'right',
+          emptyRowsWhenPaging: false,
+          maxBodyHeight: 500,
+          rowStyle: (_data: any, index: number, _level: number) => {
+            return index % 2 
+              ? { backgroundColor: 'rgb(204,204,204,0.3)' }
+              : {};
+          }
+        }}
+        components={{
+          Pagination: (componentProps) => {
+            return (
+              <TablePagination
+                {...componentProps}
+                count={count}
+                page={page - 1 || 0}
+                rowsPerPage={per_page}
+                rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+                onChangePage={(event, currentPage: number) => {
+                  loadObservationsCYTGAction({
+                    per_page,
+                    page: currentPage + 1,
+                    order,
+                    // offset: nextPage * 1,
+                  });
+                }}
+                onChangeRowsPerPage={(event: any) => {
+                  componentProps.onChangeRowsPerPage(event);
+                  loadObservationsCYTGAction({
+                    per_page: event.target.value,
+                  });
+                }}
+              />
+            );
           },
-          disabled: !isAllowed('CYTP', PERMISSIONS.DELETE),
-        },
-      ]}
-      isLoading={loading}
-    />
+          Toolbar: (componentProps) => {
+            return (
+              <div>
+                <MTableToolbar {...componentProps} />
+                <div style={{ padding: '0px 10px', textAlign: 'right' }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<PostAddIcon />}
+                    size="medium"
+                    onClick={() => history.push('/observation-cytg/create')}
+                    disabled={!isAllowed('CYTP', PERMISSIONS.CREATE)}
+                  >
+                    Agregar Observaciones Preliminares CyTG
+                  </Button>
+                </div>
+              </div>
+            );
+          },
+        }}
+        actions={[
+          {
+            icon: 'search',
+            tooltip: 'Visualizar Observación',
+            onClick: (event, rowData: any) =>
+              history.push(`/observation-cytg/${rowData.id}/view`),
+            disabled: !isAllowed('CYTP', PERMISSIONS.READ),
+          },
+          {
+            icon: 'edit',
+            tooltip: 'Editar Observación',
+            onClick: (event, rowData: any) =>
+              history.push(`/observation-cytg/${rowData.id}/edit`),
+            disabled: !isAllowed('CYTP', PERMISSIONS.UPDATE),
+          },
+          {
+            icon: 'delete',
+            tooltip: 'Eliminar Observación',
+            onClick: (event, rowData: any) => {
+              if (
+                // eslint-disable-next-line no-restricted-globals
+                confirm(
+                  `¿Realmente quieres eliminar la Observación Preliminar CyTG ${rowData.id}?\n Esta acción es irreversible`
+                )
+              ) {
+                removeObservationCYTGAction(rowData.id);
+              }
+            },
+            disabled: !isAllowed('CYTP', PERMISSIONS.DELETE),
+          },
+        ]}
+        isLoading={loading}
+      />
+    </>
   );
 };

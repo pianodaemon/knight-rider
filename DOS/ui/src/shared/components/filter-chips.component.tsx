@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
@@ -9,10 +9,11 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import { useNonInitialEffect } from 'src/shared/hooks/use-non-initial-effect.hook';
 
 type Props = {
   filters: Array<any>,
-  loadObservationsSFPAction: Function,
+  loadAction: Function,
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -40,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const FilterChips = (props: Props) => {
-  const { filters, loadObservationsSFPAction } = props;
+  const { filters, loadAction } = props;
   const [selectedFilter, setSelectedFilter] = useState<number>(0);
   const [filterValue, setFilterValue] = useState<any>(null);
   const [appliedFilters, setAppliedFilters] = useState<Array<any>>([]);
@@ -65,15 +66,14 @@ export const FilterChips = (props: Props) => {
     setAppliedFilters([...newFilters]);
   };
 
-  useEffect(() => {
+  useNonInitialEffect(() => {
     const f = appliedFilters.reduce((acc: any, next: any) => {
       return {...acc, [next.filter]: next.value}
     }, {});
-
-    loadObservationsSFPAction(
+    loadAction(
       Object.keys(f).length ? {...f, filters: f} : { filters: {}}
     );
-  }, [appliedFilters, loadObservationsSFPAction]);
+  }, [appliedFilters, loadAction]);
 
   return (
     <div className={classes.root}>

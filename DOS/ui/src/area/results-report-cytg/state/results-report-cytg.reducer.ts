@@ -79,6 +79,7 @@ interface ResultsReportCYTGSlice {
     observations: Array<any> | null,
     error: any,
   };
+  filters: Array<any>;
 }
 
 type CatalogItem = {
@@ -140,6 +141,7 @@ const initialState: ResultsReportCYTGSlice = {
     loading: false,
     observations: [],
   },
+  filters: [],
 };
 
 export const sliceName = 'resultsReportCYTGSlice';

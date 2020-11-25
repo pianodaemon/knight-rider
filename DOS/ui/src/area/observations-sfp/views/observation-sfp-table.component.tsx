@@ -110,7 +110,7 @@ export const ObservationSFPTable = (props: Props) => {
     <Paper elevation={0}>
       <FilterChips
         filters={filters}
-        loadObservationsSFPAction={loadObservationsSFPAction} 
+        loadAction={loadObservationsSFPAction} 
       />
     </Paper>
     <MaterialTable

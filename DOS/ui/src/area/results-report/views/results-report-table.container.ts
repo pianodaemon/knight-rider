@@ -8,6 +8,7 @@ import {
   isLoadingSelector,
   reportsCatalogSelector,
   pagingSelector,
+  filterSelector,
 } from '../state/results-report.selectors';
 
 const mapDispatchToProps = {
@@ -17,6 +18,7 @@ const mapDispatchToProps = {
 
 function mapStateToProps(state: any) {
   return {
+    filters: filterSelector(state),
     reports: reportsCatalogSelector(state),
     loading: isLoadingSelector(state),
     paging: pagingSelector(state),

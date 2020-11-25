@@ -4,7 +4,7 @@ import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { currentUserDivisionIdSelector } from 'src/area/auth/state/auth.selectors';
 import { getObservations } from '../../service/observations-asf.service';
 import { observationsASFReducer } from '../observations-asf.reducer';
-import { pagingSelector } from '../observations-asf.selectors';
+import { pagingSelector, filterOptionsSelector } from '../observations-asf.selectors';
 
 const postfix = '/app';
 const LOAD_OBSERVATIONS_ASF = `LOAD_OBSERVATIONS_ASF${postfix}`;
@@ -23,16 +23,18 @@ export const loadObservationsASFErrorAction: ActionFunctionAny<
 
 function* loadObservationsASFWorker(action?: any): Generator<any, any, any> {
   try {
-    const { per_page, page, order, order_by } = action.payload || {};
+    const { per_page, page, order, order_by, filters } = action.payload || {};
     const paging = yield select(pagingSelector);
     const divisionId = yield select(currentUserDivisionIdSelector);
+    const f = yield select(filterOptionsSelector);
     const options = {
       ...action.payload,
       per_page: per_page || paging.per_page,
       page: page || paging.page,
       pages: paging.pages,
       order: order || paging.order,
-      ...(divisionId === 0 ? {} : {direccion_id: divisionId})
+      ...(divisionId === 0 ? {} : {direccion_id: divisionId}),
+      ...(filters ? filters : f),
     };
     const result = yield call(getObservations, options);
     yield put(
@@ -46,6 +48,9 @@ function* loadObservationsASFWorker(action?: any): Generator<any, any, any> {
           order: order || paging.order,
           order_by: order_by || paging.order_by,
         },
+        filters: {
+          ...(filters ? filters: f)
+        }
       })
     );
   } catch (e) {
@@ -65,7 +70,7 @@ const observationsReducerHandlers = {
     };
   },
   [LOAD_OBSERVATIONS_ASF_SUCCESS]: (state: any, action: any) => {
-    const { observations, paging } = action.payload;
+    const { observations, paging, filters } = action.payload;
     return {
       ...state,
       loading: false,
@@ -73,6 +78,7 @@ const observationsReducerHandlers = {
       paging: {
         ...paging,
       },
+      filters,
     };
   },
   [LOAD_OBSERVATIONS_ASF_ERROR]: (state: any) => {

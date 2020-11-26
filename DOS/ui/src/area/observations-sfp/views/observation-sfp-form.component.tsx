@@ -274,10 +274,10 @@ export const ObservationsSFPForm = (props: Props) => {
             if (fields[field] === null) {
               fields[field] = "";
             }
-            if(/^fecha_/i.test(field) && !fields[field]) {
+            if (/^fecha_/i.test(field) && !fields[field]) {
               fields[field] = '2099-12-31'; // values.fecha_captura;
             }
-            if((/^monto_/i.test(field) || "autoridad_invest_id" === field) && !fields[field]) {
+            if ((/^monto_/i.test(field) || "autoridad_invest_id" === field) && !fields[field]) {
               fields[field] = 0;
             }
           });
@@ -290,8 +290,11 @@ export const ObservationsSFPForm = (props: Props) => {
           }
           fields.seguimientos = fields.seguimientos.map((item: any, index: number) => { 
             Object.keys(item).forEach((field: any) => {
-              if(/^fecha_/i.test(field) && !item[field]) {
+              if (/^fecha_/i.test(field) && !item[field]) {
                 item[field] = '2099-12-31'; // values.fecha_captura;
+              }
+              if (/^monto_/i.test(field) && !item[field]) {
+                item[field] = 0;
               }
             });
             return { ...item, seguimiento_id: index };

@@ -92,6 +92,7 @@ interface ResultsReportSlice {
     observations: Array<any> | null,
     error: any,
   };
+  filters: Array<any>;
 }
 
 type CatalogItem = {
@@ -164,6 +165,7 @@ const initialState: ResultsReportSlice = {
     loading: false,
     observations: [],
   },
+  filters: [],
 };
 
 export const sliceName = 'resultsReportSlice';

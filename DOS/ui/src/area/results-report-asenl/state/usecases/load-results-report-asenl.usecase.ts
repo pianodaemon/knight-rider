@@ -3,7 +3,7 @@ import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { getResultReportsASENL } from '../../service/results-report-asenl.service';
 import { resultsReportASENLReducer } from '../results-report-asenl.reducer';
-import { pagingSelector } from '../results-report-asenl.selectors';
+import { pagingSelector, filterOptionsSelector } from '../results-report-asenl.selectors';
 
 const postfix = '/app';
 const LOAD_RESULTS_REPORT_ASENL = `LOAD_RESULTS_REPORT_ASENL${postfix}`;
@@ -22,14 +22,16 @@ export const loadResultsReportASENLErrorAction: ActionFunctionAny<
 
 function* loadResultsReportASENLWorker(action?: any): Generator<any, any, any> {
   try {
-    const { per_page, page, order, order_by } = action.payload || {};
+    const { per_page, page, order, order_by, filters } = action.payload || {};
     const paging = yield select(pagingSelector);
+    const f = yield select(filterOptionsSelector);
     const options = {
       ...action.payload,
       per_page: per_page || paging.per_page,
       page: page || paging.page,
       pages: paging.pages,
       order: order || paging.order,
+      ...(filters ? filters : f),
     };
     const result = yield call(getResultReportsASENL, options);
     yield put(
@@ -43,6 +45,9 @@ function* loadResultsReportASENLWorker(action?: any): Generator<any, any, any> {
           order: order || paging.order,
           order_by: order_by || paging.order_by,
         },
+        filters: {
+          ...(filters ? filters: f)
+        }
       })
     );
   } catch (e) {
@@ -62,7 +67,7 @@ const resultsReportASENLReducerHandlers = {
     };
   },
   [LOAD_RESULTS_REPORT_ASENL_SUCCESS]: (state: any, action: any) => {
-    const { reports, paging } = action.payload;
+    const { reports, paging, filters } = action.payload;
     return {
       ...state,
       loading: false,
@@ -70,6 +75,7 @@ const resultsReportASENLReducerHandlers = {
       paging: {
         ...paging,
       },
+      filters
     };
   },
   [LOAD_RESULTS_REPORT_ASENL_ERROR]: (state: any) => {

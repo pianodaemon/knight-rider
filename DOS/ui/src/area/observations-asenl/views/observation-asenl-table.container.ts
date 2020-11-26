@@ -8,6 +8,7 @@ import {
   isLoadingSelector,
   observationsCatalogSelector,
   pagingSelector,
+  filterSelector,
 } from '../state/observations-asenl.selectors';
 
 const mapDispatchToProps = {
@@ -17,6 +18,7 @@ const mapDispatchToProps = {
 
 function mapStateToProps(state: any) {
   return {
+    filters: filterSelector(state),
     observations: observationsCatalogSelector(state),
     loading: isLoadingSelector(state),
     paging: pagingSelector(state),

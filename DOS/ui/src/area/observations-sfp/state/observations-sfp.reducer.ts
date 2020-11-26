@@ -76,6 +76,8 @@ type Audit = {
   title: string,
   dependency_ids: Array<number>,
   years: Array<number>,
+  org_fiscal_id: number,
+  direccion_id: number,
 };
 
 type CatalogItem = {

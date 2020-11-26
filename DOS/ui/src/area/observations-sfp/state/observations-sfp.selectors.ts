@@ -108,10 +108,10 @@ export const observationsCatalogSelector = createSelector(
                 .map((dependency: number) =>
                   catalog.dependencies.find(
                     (item: any) => item.id === dependency,
-                  ),
+                  )
                 )
-                .map((item: any) => item.title)
-                .join(', ')
+                .map((item: any) => item && item.title)
+                .join(', ').replace(/,+.$|^,/, '') // @todo remove workaround for trailing commas
             : '';
         return {
           ...observation,
@@ -153,7 +153,7 @@ export const filterSelector = createSelector(
         type: 'dropdown',
         param: 'auditoria_id',
         name: '(AUD) Auditoría',
-        options: catalog && catalog.audits ? [...catalog.audits.map((item: any) => { return { id: item.id, value: item.title } })] : [],
+        options: catalog && catalog.audits ? [...catalog.audits.filter((audit: any) => audit.org_fiscal_id === FISCALS.SFP).map((item: any) => { return { id: item.id, value: item.title } })] : [],
       },
       {
         abbr: 'PRO',

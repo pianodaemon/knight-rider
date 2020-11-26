@@ -46,6 +46,7 @@ interface ObservationsASENLSlice {
     order: string,
     order_by: string,
   };
+  filters: Array<any>;
 }
 
 type CatalogItem = {
@@ -57,6 +58,8 @@ type Audit = CatalogItem & {
   id: number,
   dependency_ids: Array<number>,
   years: Array<number>,
+  org_fiscal_id: number,
+  direccion_id: number,
 };
 
 type AuditoriaTipos = CatalogItem;
@@ -94,6 +97,7 @@ const initialState: ObservationsASENLSlice = {
     order: 'desc',
     order_by: 'id',
   },
+  filters: [],
 };
 
 export const sliceName = 'observationsASENLSlice';

@@ -67,6 +67,7 @@ interface ResultsReportASENLSlice {
     observations: Array<any> | null,
     error: any,
   };
+  filters: Array<any>;
 }
 
 type CatalogItem = {
@@ -122,6 +123,7 @@ const initialState: ResultsReportASENLSlice = {
     loading: false,
     observations: [],
   },
+  filters: [],
 };
 
 export const sliceName = 'resultsReportASENLSlice';

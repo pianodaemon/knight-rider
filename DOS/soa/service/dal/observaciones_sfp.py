@@ -47,13 +47,13 @@ def _alter_observation(**kwargs):
             kwargs['fecha_captura'],
             kwargs['programa_social_id'],
             kwargs['auditoria_id'],
-            kwargs['acta_cierre'],
+            kwargs['acta_cierre'].replace("'", "''"),
             kwargs['fecha_firma_acta_cierre'],
             kwargs['fecha_compromiso'],
-            kwargs['clave_observacion'],
-            kwargs['observacion'],
-            kwargs['acciones_correctivas'],
-            kwargs['acciones_preventivas'],
+            kwargs['clave_observacion'].replace("'", "''"),
+            kwargs['observacion'].replace("'", "''"),
+            kwargs['acciones_correctivas'].replace("'", "''"),
+            kwargs['acciones_preventivas'].replace("'", "''"),
             kwargs['tipo_observacion_id'],
             kwargs['monto_observado'],
             seguimientos_str,
@@ -61,18 +61,18 @@ def _alter_observation(**kwargs):
             kwargs['monto_reintegrado'],
             kwargs['fecha_reintegro'],
             kwargs['monto_por_reintegrar'],
-            kwargs['num_oficio_of_vista_cytg'],
+            kwargs['num_oficio_of_vista_cytg'].replace("'", "''"),
             kwargs['fecha_oficio_of_vista_cytg'],
-            kwargs['num_oficio_cytg_aut_invest'],
+            kwargs['num_oficio_cytg_aut_invest'].replace("'", "''"),
             kwargs['fecha_oficio_cytg_aut_invest'],
-            kwargs['num_carpeta_investigacion'],
-            kwargs['num_oficio_vai_municipio'],
+            kwargs['num_carpeta_investigacion'].replace("'", "''"),
+            kwargs['num_oficio_vai_municipio'].replace("'", "''"),
             kwargs['fecha_oficio_vai_municipio'],
             kwargs['autoridad_invest_id'],
-            kwargs['num_oficio_pras_of'],
+            kwargs['num_oficio_pras_of'].replace("'", "''"),
             kwargs['fecha_oficio_pras_of'],
-            kwargs['num_oficio_pras_cytg_dependencia'],
-            kwargs['num_oficio_resp_dependencia'],
+            kwargs['num_oficio_pras_cytg_dependencia'].replace("'", "''"),
+            kwargs['num_oficio_resp_dependencia'].replace("'", "''"),
             kwargs['fecha_oficio_resp_dependencia'],
         )
 
@@ -340,16 +340,16 @@ def seguimientos_to_comp_type_arr_lit(seguimientos):
             "(" +
             str(s['observacion_id']) + ", " +
             str(s['seguimiento_id']) + ", " +
-            "'" + s['num_oficio_cytg_oic'] + "', " +
+            "'" + s['num_oficio_cytg_oic'].replace("'", "''") + "', " +
             "'" + s['fecha_oficio_cytg_oic'] + "', " +
             "'" + s['fecha_recibido_dependencia'] + "', " +
             "'" + s['fecha_vencimiento_cytg'] + "', " +
-            "'" + s['num_oficio_resp_dependencia'] + "', " +
+            "'" + s['num_oficio_resp_dependencia'].replace("'", "''") + "', " +
             "'" + s['fecha_recibido_oficio_resp'] + "', " +
-            "'" + s['resp_dependencia'] + "', " +
-            "'" + s['comentarios'] + "', " +
+            "'" + s['resp_dependencia'].replace("'", "''") + "', " +
+            "'" + s['comentarios'].replace("'", "''") + "', " +
             str(s['clasif_final_interna_cytg']) + ", " +
-            "'" + s['num_oficio_org_fiscalizador'] + "', " +
+            "'" + s['num_oficio_org_fiscalizador'].replace("'", "''") + "', " +
             "'" + s['fecha_oficio_org_fiscalizador'] + "', " +
             str(s['estatus_id']) + ", " +
             str(s['monto_solventado']) + ", " +

@@ -129,7 +129,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
         raise Exception("Value of param 'limit' should be >= 1")
 
     order_by_values = (
-        'id', 'tipo_observacion_id', 'observacion_final'
+        'id', 'tipo_observacion_id', 'observacion_final', 'num_observacion'
     )
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
@@ -171,10 +171,6 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
                     continue
             if 'auditoria_id' in preliminar_search_params:
                 if e['auditoria_id'] != int(preliminar_search_params['auditoria_id']):
-                    deletion_idx.append(i)
-                    continue
-            if 'num_observacion' in preliminar_search_params:
-                if e['num_observacion'].find(preliminar_search_params['num_observacion']) < 0:
                     deletion_idx.append(i)
                     continue
     

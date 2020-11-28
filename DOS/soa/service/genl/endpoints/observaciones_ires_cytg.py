@@ -199,11 +199,11 @@ class ObservacionCyTGList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['tipo_observacion_id', 'observacion']
+            ['tipo_observacion_id', 'observacion', 'num_observacion']
         )
         preliminar_search_params = get_search_params(
             request.args,
-            ['direccion_id', 'auditoria_id', 'num_observacion']
+            ['direccion_id', 'auditoria_id']
         )
 
         try:

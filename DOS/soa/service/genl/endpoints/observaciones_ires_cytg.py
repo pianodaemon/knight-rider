@@ -79,6 +79,10 @@ seguimiento = api.model('Seguimiento de una Observación CyTG (resultados)', {
     'estatus_seguimiento_id': fields.Integer(description=obs_ires_cytg_ns_captions['estatus_seguimiento_id']),
     'monto_solventado': fields.Float(description=obs_ires_cytg_ns_captions['monto_solventado']),
     'monto_pendiente_solventar': fields.Float(description=obs_ires_cytg_ns_captions['monto_pendiente_solventar']),
+    'monto_a_reintegrar': fields.Float(description=obs_ires_cytg_ns_captions['monto_a_reintegrar']),
+    'monto_reintegrado': fields.Float(description=obs_ires_cytg_ns_captions['monto_reintegrado']),
+    'fecha_reintegro': fields.Date(description=obs_ires_cytg_ns_captions['fecha_reintegro']),
+    'monto_por_reintegrar': fields.Float(description=obs_ires_cytg_ns_captions['monto_por_reintegrar']),
 })
 
 obs_ires_cytg = api.model('Observación CyTG (resultados)', {
@@ -175,6 +179,9 @@ class ObservacionCyTGList(Resource):
     @ns.param("page", "Which page to fetch, default is 1")
     @ns.param("tipo_observacion_id", obs_ires_cytg_ns_captions['tipo_observacion_id'])
     @ns.param("observacion", obs_ires_cytg_ns_captions['observacion'])
+    @ns.param("direccion_id", obs_ires_cytg_ns_captions['direccion_id'])
+    @ns.param("auditoria_id", obs_ires_cytg_ns_captions['auditoria_id'])
+    @ns.param("num_observacion", obs_ires_cytg_ns_captions['num_observacion'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations (CyTG (resultados)). On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -194,10 +201,14 @@ class ObservacionCyTGList(Resource):
             request.args,
             ['tipo_observacion_id', 'observacion']
         )
+        preliminar_search_params = get_search_params(
+            request.args,
+            ['direccion_id', 'auditoria_id', 'num_observacion']
+        )
 
         try:
             obs_ires_cytg_list, total_items, total_pages = observaciones_ires_cytg.read_per_page(
-                offset, limit, order_by, order, search_params, per_page, page
+                offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params
             )
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))

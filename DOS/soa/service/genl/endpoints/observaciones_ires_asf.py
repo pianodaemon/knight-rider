@@ -207,6 +207,10 @@ class ObservacionIResASFList(Resource):
     @ns.param("page", "Which page to fetch, default is 1")
     @ns.param("tipo_observacion_id", obs_ires_asf_ns_captions['tipo_observacion_id'])
     @ns.param("observacion_ir", obs_ires_asf_ns_captions['observacion_ir'])
+    @ns.param("direccion_id", obs_ires_asf_ns_captions['direccion_id'])
+    @ns.param("auditoria_id", obs_ires_asf_ns_captions['auditoria_id'])
+    @ns.param("programa_social_id", obs_ires_asf_ns_captions['programa_social_id'])
+    @ns.param("num_observacion", obs_ires_asf_ns_captions['num_observacion'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations (Informes de Resultados de la ASF). On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -226,10 +230,14 @@ class ObservacionIResASFList(Resource):
             request.args,
             ['tipo_observacion_id', 'observacion_ir']
         )
+        preliminar_search_params = get_search_params(
+            request.args,
+            ['direccion_id', 'auditoria_id', 'programa_social_id', 'num_observacion']
+        )
 
         try:
             obs_ires_asf_list, total_items, total_pages = observaciones_ires_asf.read_per_page(
-                offset, limit, order_by, order, search_params, per_page, page
+                offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params
             )
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))

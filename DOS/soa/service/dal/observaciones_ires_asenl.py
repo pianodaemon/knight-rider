@@ -45,37 +45,37 @@ def _alter_observation(**kwargs):
         AS result( rc integer, msg text )""".format(
             kwargs['id'],
             kwargs['observacion_pre_id'],
-            kwargs['num_oficio_of'],
+            kwargs['num_oficio_of'].replace("'", "''"),
             kwargs['fecha_publicacion'],
             kwargs['tipo_observacion_id'],
-            kwargs['num_observacion'],
-            kwargs['observacion_final'],
+            kwargs['num_observacion'].replace("'", "''"),
+            kwargs['observacion_final'].replace("'", "''"),
             kwargs['observacion_reincidente'],
             kwargs['anios_reincidencia'],
             kwargs['monto_observado'],
-            kwargs['compartida_observacion'],
+            kwargs['compartida_observacion'].replace("'", "''"),
             kwargs['compartida_tipo_observacion_id'],
             kwargs['compartida_monto'],
-            kwargs['comentarios'],
+            kwargs['comentarios'].replace("'", "''"),
             kwargs['clasif_final_cytg'],
             kwargs['monto_solventado'],
             kwargs['monto_pendiente_solventar'],
             kwargs['monto_a_reintegrar'],
             str(set(kwargs['acciones'])),
-            kwargs['recomendaciones'],
-            kwargs['num_oficio_recomendacion'],
+            kwargs['recomendaciones'].replace("'", "''"),
+            kwargs['num_oficio_recomendacion'].replace("'", "''"),
             kwargs['fecha_oficio_recomendacion'],
             kwargs['fecha_vencimiento_enviar_asenl'],
-            kwargs['num_oficio_dependencia'],
+            kwargs['num_oficio_dependencia'].replace("'", "''"),
             kwargs['fecha_oficio_dependencia'],
             kwargs['fecha_vencimiento_interna_cytg'],
-            kwargs['num_oficio_resp_dependencia'],
+            kwargs['num_oficio_resp_dependencia'].replace("'", "''"),
             kwargs['fecha_acuse_resp_dependencia'],
-            kwargs['resp_dependencia'],
-            kwargs['num_oficio_enviar_resp_asenl'],
+            kwargs['resp_dependencia'].replace("'", "''"),
+            kwargs['num_oficio_enviar_resp_asenl'].replace("'", "''"),
             kwargs['fecha_oficio_enviar_resp_asenl'],
-            kwargs['unidad_investigadora'],
-            kwargs['num_vai'],
+            kwargs['unidad_investigadora'].replace("'", "''"),
+            kwargs['num_vai'].replace("'", "''"),
             kwargs['tipificacion_id'],
         )
 
@@ -116,7 +116,7 @@ def delete(id):
     return add_observacion_data(ent)
 
 
-def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
+def read_per_page(offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params):
     ''' Reads a page of observations '''
     
     # Some validations
@@ -161,8 +161,30 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     entities = page_entities('observaciones_ires_asenl', offset + whole_pages_offset, target_items, order_by, order, search_params)
 
     # Adding some obs preliminares' data
-    for e in entities:
+    deletion_idx = []
+    for i, e in enumerate(entities):
         add_preliminar_data(e)
+        if preliminar_search_params:
+            if 'direccion_id' in preliminar_search_params:
+                if e['direccion_id'] != int(preliminar_search_params['direccion_id']):
+                    deletion_idx.append(i)
+                    continue
+            if 'auditoria_id' in preliminar_search_params:
+                if e['auditoria_id'] != int(preliminar_search_params['auditoria_id']):
+                    deletion_idx.append(i)
+                    continue
+            if 'num_observacion' in preliminar_search_params:
+                if e['num_observacion'].find(preliminar_search_params['num_observacion']) < 0:
+                    deletion_idx.append(i)
+                    continue
+    
+    deletion_idx.reverse()
+    
+    for idx in deletion_idx:
+        del entities[idx]
+    
+    total_items -= len(deletion_idx)
+    total_pages = math.ceil(total_items / per_page)
 
     return (entities, total_items, total_pages)
 

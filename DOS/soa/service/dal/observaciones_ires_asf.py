@@ -30,13 +30,13 @@ def _alter_observation(**kwargs):
         AS result( rc integer, msg text )""".format(
             kwargs['id'],
             kwargs['observacion_pre_id'],
-            kwargs['num_oficio_of'],
+            kwargs['num_oficio_of'].replace("'", "''"),
             kwargs['fecha_recibido'],
             kwargs['fecha_vencimiento'],
-            kwargs['observacion_ir'],
+            kwargs['observacion_ir'].replace("'", "''"),
             kwargs['tipo_observacion_id'],
             kwargs['accion'],
-            kwargs['clave_accion'],
+            kwargs['clave_accion'].replace("'", "''"),
             kwargs['monto_observado'],
             kwargs['monto_a_reintegrar'],
             kwargs['monto_reintegrado'],
@@ -84,7 +84,7 @@ def delete(id):
     return add_observacion_data(ent)
 
 
-def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
+def read_per_page(offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params):
     ''' Reads a page of observations '''
     
     # Some validations
@@ -129,8 +129,34 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     entities = page_entities('observaciones_ires_asf', offset + whole_pages_offset, target_items, order_by, order, search_params)
 
     # Adding some obs preliminares' data
-    for e in entities:
+    deletion_idx = []
+    for i, e in enumerate(entities):
         add_preliminar_data(e)
+        if preliminar_search_params:
+            if 'direccion_id' in preliminar_search_params:
+                if e['direccion_id'] != int(preliminar_search_params['direccion_id']):
+                    deletion_idx.append(i)
+                    continue
+            if 'auditoria_id' in preliminar_search_params:
+                if e['auditoria_id'] != int(preliminar_search_params['auditoria_id']):
+                    deletion_idx.append(i)
+                    continue
+            if 'programa_social_id' in preliminar_search_params:
+                if e['programa_social_id'] != int(preliminar_search_params['programa_social_id']):
+                    deletion_idx.append(i)
+                    continue
+            if 'num_observacion' in preliminar_search_params:
+                if e['num_observacion'].find(preliminar_search_params['num_observacion']) < 0:
+                    deletion_idx.append(i)
+                    continue
+    
+    deletion_idx.reverse()
+    
+    for idx in deletion_idx:
+        del entities[idx]
+    
+    total_items -= len(deletion_idx)
+    total_pages = math.ceil(total_items / per_page)
 
     return (entities, total_items, total_pages)
 
@@ -304,20 +330,20 @@ def seguimientos_to_comp_type_arr_lit(seguimientos):
             str(s['observacion_id']) + ", " +
             str(s['seguimiento_id']) + ", " +
             str(s['medio_notif_seguimiento_id']) + ", " +
-            "'" + s['num_oficio_cytg_oic'] + "', " +
+            "'" + s['num_oficio_cytg_oic'].replace("'", "''") + "', " +
             "'" + s['fecha_oficio_cytg_oic'] + "', " +
             "'" + s['fecha_recibido_dependencia'] + "', " +
             "'" + s['fecha_vencimiento_cytg'] + "', " +
-            "'" + s['num_oficio_resp_dependencia'] + "', " +
+            "'" + s['num_oficio_resp_dependencia'].replace("'", "''") + "', " +
             "'" + s['fecha_recibido_oficio_resp'] + "', " +
-            "'" + s['resp_dependencia'] + "', " +
-            "'" + s['comentarios'] + "', " +
+            "'" + s['resp_dependencia'].replace("'", "''") + "', " +
+            "'" + s['comentarios'].replace("'", "''") + "', " +
             str(s['clasif_final_interna_cytg']) + ", " +
-            "'" + s['num_oficio_org_fiscalizador'] + "', " +
+            "'" + s['num_oficio_org_fiscalizador'].replace("'", "''") + "', " +
             "'" + s['fecha_oficio_org_fiscalizador'] + "', " +
             str(s['estatus_id']) + ", " +
             str(s['monto_solventado']) + ", " +
-            "'" + s['num_oficio_monto_solventado'] + "', " +
+            "'" + s['num_oficio_monto_solventado'].replace("'", "''") + "', " +
             "'" + s['fecha_oficio_monto_solventado'] + "', " +
             str(s['monto_pendiente_solventar']) + ", " +
             str(s['monto_a_reintegrar']) + ", " +
@@ -337,20 +363,20 @@ def seguimientos_to_comp_type_arr_lit(seguimientos):
 def pras_to_comp_type_lit(pras):
     l = []
     l.append(pras['pras_observacion_id'])
-    l.append(pras['num_oficio_of_vista_cytg'])
+    l.append(pras['num_oficio_of_vista_cytg'].replace("'", "''"))
     l.append(pras['fecha_oficio_of_vista_cytg'])
-    l.append(pras['num_oficio_cytg_aut_invest'])
+    l.append(pras['num_oficio_cytg_aut_invest'].replace("'", "''"))
     l.append(pras['fecha_oficio_cytg_aut_invest'])
-    l.append(pras['num_carpeta_investigacion'])
-    l.append(pras['num_oficio_cytg_org_fiscalizador'])
+    l.append(pras['num_carpeta_investigacion'].replace("'", "''"))
+    l.append(pras['num_oficio_cytg_org_fiscalizador'].replace("'", "''"))
     l.append(pras['fecha_oficio_cytg_org_fiscalizador'])
-    l.append(pras['num_oficio_vai_municipio'])
+    l.append(pras['num_oficio_vai_municipio'].replace("'", "''"))
     l.append(pras['fecha_oficio_vai_municipio'])
     l.append(pras['autoridad_invest_id'])
-    l.append(pras['num_oficio_pras_of'])
+    l.append(pras['num_oficio_pras_of'].replace("'", "''"))
     l.append(pras['fecha_oficio_pras_of'])
-    l.append(pras['num_oficio_pras_cytg_dependencia'])
-    l.append(pras['num_oficio_resp_dependencia'])
+    l.append(pras['num_oficio_pras_cytg_dependencia'].replace("'", "''"))
+    l.append(pras['num_oficio_resp_dependencia'].replace("'", "''"))
     l.append(pras['fecha_oficio_resp_dependencia'])
     m = str(l)
     pras_str = "(" + m[1:-1] + ")"

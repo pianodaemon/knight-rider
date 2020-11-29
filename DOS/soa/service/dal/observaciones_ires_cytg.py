@@ -36,12 +36,12 @@ def _alter_observation(**kwargs):
         AS result( rc integer, msg text )""".format(
             kwargs['id'],
             kwargs['observacion_pre_id'],
-            kwargs['num_observacion'],
-            kwargs['observacion'],
+            kwargs['num_observacion'].replace("'", "''"),
+            kwargs['observacion'].replace("'", "''"),
             kwargs['tipo_observacion_id'],
             kwargs['estatus_info_resultados_id'],
-            kwargs['acciones_preventivas'],
-            kwargs['acciones_correctivas'],
+            kwargs['acciones_preventivas'].replace("'", "''"),
+            kwargs['acciones_correctivas'].replace("'", "''"),
             kwargs['clasif_final_cytg'],
             kwargs['monto_solventado'],
             kwargs['monto_pendiente_solventar'],
@@ -49,13 +49,13 @@ def _alter_observation(**kwargs):
             kwargs['monto_reintegrado'],
             kwargs['fecha_reintegro'],
             kwargs['monto_por_reintegrar'],
-            kwargs['num_oficio_cytg_aut_invest'],
+            kwargs['num_oficio_cytg_aut_invest'].replace("'", "''"),
             kwargs['fecha_oficio_cytg_aut_invest'],
-            kwargs['num_carpeta_investigacion'],
-            kwargs['num_oficio_vai_municipio'],
+            kwargs['num_carpeta_investigacion'].replace("'", "''"),
+            kwargs['num_oficio_vai_municipio'].replace("'", "''"),
             kwargs['fecha_oficio_vai_municipio'],
-            kwargs['num_oficio_pras_cytg_dependencia'],
-            kwargs['num_oficio_resp_dependencia'],
+            kwargs['num_oficio_pras_cytg_dependencia'].replace("'", "''"),
+            kwargs['num_oficio_resp_dependencia'].replace("'", "''"),
             kwargs['fecha_oficio_resp_dependencia'],
             seguimientos_str,
         )
@@ -97,7 +97,7 @@ def delete(id):
     return add_observacion_data(ent)
 
 
-def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
+def read_per_page(offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params):
     ''' Reads a page of observations '''
     
     # Some validations
@@ -110,7 +110,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         raise Exception("Value of param 'limit' should be >= 1")
 
     order_by_values = (
-        'id', 'tipo_observacion_id', 'observacion'
+        'id', 'tipo_observacion_id', 'observacion', 'num_observacion'
     )
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
@@ -142,8 +142,26 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     entities = page_entities('observaciones_ires_cytg', offset + whole_pages_offset, target_items, order_by, order, search_params)
 
     # Adding some obs preliminares' data
-    for e in entities:
+    deletion_idx = []
+    for i, e in enumerate(entities):
         add_preliminar_data(e)
+        if preliminar_search_params:
+            if 'direccion_id' in preliminar_search_params:
+                if e['direccion_id'] != int(preliminar_search_params['direccion_id']):
+                    deletion_idx.append(i)
+                    continue
+            if 'auditoria_id' in preliminar_search_params:
+                if e['auditoria_id'] != int(preliminar_search_params['auditoria_id']):
+                    deletion_idx.append(i)
+                    continue
+    
+    deletion_idx.reverse()
+    
+    for idx in deletion_idx:
+        del entities[idx]
+    
+    total_items -= len(deletion_idx)
+    total_pages = math.ceil(total_items / per_page)
     
     return (entities, total_items, total_pages)
 
@@ -311,22 +329,26 @@ def seguimientos_to_comp_type_arr_lit(seguimientos):
             "(" +
             str(s['observacion_id']) + ", " +
             str(s['seguimiento_id']) + ", " +
-            "'" + s['num_oficio_ires'] + "', " +
+            "'" + s['num_oficio_ires'].replace("'", "''") + "', " +
             "'" + s['fecha_notif_ires'] + "', " +
             "'" + s['fecha_vencimiento_ires'] + "', " +
             str(s['prorroga']) + ", " +
-            "'" + s['num_oficio_solic_prorroga'] + "', " +
+            "'" + s['num_oficio_solic_prorroga'].replace("'", "''") + "', " +
             "'" + s['fecha_oficio_solic_prorroga'] + "', " +
-            "'" + s['num_oficio_contest_prorroga'] + "', " +
+            "'" + s['num_oficio_contest_prorroga'].replace("'", "''") + "', " +
             "'" + s['fecha_oficio_contest'] + "', " +
             "'" + s['fecha_vencimiento_ires_nueva'] + "', " +
-            "'" + s['num_oficio_resp_dependencia'] + "', " +
+            "'" + s['num_oficio_resp_dependencia'].replace("'", "''") + "', " +
             "'" + s['fecha_oficio_resp_dependencia'] + "', " +
-            "'" + s['resp_dependencia'] + "', " +
-            "'" + s['comentarios'] + "', " +
+            "'" + s['resp_dependencia'].replace("'", "''") + "', " +
+            "'" + s['comentarios'].replace("'", "''") + "', " +
             str(s['estatus_seguimiento_id']) + ", " +
             str(s['monto_solventado']) + ", " +
-            str(s['monto_pendiente_solventar']) +
+            str(s['monto_pendiente_solventar']) + ", " +
+            str(s['monto_a_reintegrar']) + ", " +
+            str(s['monto_reintegrado']) + ", " +
+            "'" + s['fecha_reintegro'] + "', " +
+            str(s['monto_por_reintegrar']) +
             ")"
         )
         

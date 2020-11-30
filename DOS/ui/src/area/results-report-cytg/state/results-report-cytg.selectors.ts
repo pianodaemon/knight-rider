@@ -3,6 +3,7 @@ import {
   resultsReportCYTGReducer,
   ResultsReportCYTG,
 } from './results-report-cytg.reducer';
+import { FISCALS } from "src/shared/constants/observations.constants";
 
 const sliceSelector = (state: any) => state[resultsReportCYTGReducer.sliceName];
 
@@ -148,6 +149,26 @@ export const filterSelector = createSelector(
   (slice: any) => {
     const { catalog } = slice;
     return [
+      {
+        abbr: 'DIR',
+        type: 'dropdown',
+        param: 'direccion_id',
+        name: '(DIR) Dirección',
+        options: catalog && catalog.divisions ? [...catalog.divisions.map((item: any) => { return { id: item.id, value: item.title } })] : [],
+      },
+      {
+        abbr: 'AUD',
+        type: 'dropdown',
+        param: 'auditoria_id',
+        name: '(AUD) Auditoría',
+        options: catalog && catalog.audits ? [...catalog.audits.filter((audit: any) => audit.org_fiscal_id === FISCALS.CYTG).map((item: any) => { return { id: item.id, value: item.title } })] : [],
+      },
+      {
+        abbr: 'CLO',
+        type: 'text',
+        param: 'num_observacion',
+        name: '(CLO) Clave o Num. de observacion',
+      },
       {
         abbr: 'TO',
         type: 'dropdown',

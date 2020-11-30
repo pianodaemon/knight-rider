@@ -50,6 +50,10 @@ type Seguimiento = {
   estatus_seguimiento_id: number, // Id del estatus del seguimiento []
   monto_solventado: number, // Monto solventado [DONE]
   monto_pendiente_solventar: number, // Monto pendiente de solventar [DONE]
+  fecha_reintegro: string,
+  monto_a_reintegrar: number,
+  monto_reintegrado: number,
+  monto_por_reintegrar: number,
 };
 
 interface ResultsReportCYTGSlice {

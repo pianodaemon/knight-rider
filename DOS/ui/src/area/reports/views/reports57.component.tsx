@@ -191,6 +191,7 @@ export const Report57 = (props: Props) => {
   const [yearEnd, setYearEnd] = useState<any>('2020');
   const [yearIni, setYearIni] = useState<any>('2000');
   const [dependency, setDependency] = useState<any>('Todas');
+  const [tipoObs   , setTipoObs]    = useState<any>('Todas');
   const permissions: any = useSelector((state: any) => state.authSlice);
   const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
   const optionsFiscals = [
@@ -212,10 +213,13 @@ export const Report57 = (props: Props) => {
   const classes = useStyles();
   const setVisibleRows = (dep: any): boolean => {
     if(dep.dep === dependency || dependency === '' || dependency === 'Todas' || dependency === '0'){
-      return true;
+      if(dep.tipo === tipoObs || tipoObs === '' || tipoObs === 'Todas' || tipoObs === '0'){
+        return true;
+      }else{return false}
     }else{return false}
   };
-  let auxObj:any = {};
+  let auxObjOfDependencies:any = {};
+  let auxObjOfTipoObs:any = {};
   return (
     <div className={classes.Container}>
       <div>
@@ -283,13 +287,41 @@ export const Report57 = (props: Props) => {
             </MenuItem>
             {report && report.data_rows && 
               report.data_rows.map((item:any) => {
-              if( !(auxObj[item.dep]) ){
-                auxObj[item.dep] = 1;
+              if( !(auxObjOfDependencies[item.dep]) ){
+                auxObjOfDependencies[item.dep] = 1;
                 return (
                   <MenuItem
                     value={item.dep}
                   >
                     {item.dep}
+                  </MenuItem>
+                );
+              }
+              return <React.Fragment />
+            })}
+          </Select>
+        </div>
+        <div className={classes.selectYearContainer}>
+          <InputLabel className={classes.labelSelectYear}>Tipo de Observación:</InputLabel>
+          <Select
+            labelId="tipoObs"
+            value={tipoObs}
+            onChange={(e)=> {setTipoObs(e.target.value);}}
+          >
+            <MenuItem
+              value={'Todas'}
+            >
+              -- Todas --
+            </MenuItem>
+            {report && report.data_rows && 
+              report.data_rows.map((item:any) => {
+              if( !(auxObjOfTipoObs[item.tipo]) ){
+                auxObjOfTipoObs[item.tipo] = 1;
+                return (
+                  <MenuItem
+                    value={item.tipo}
+                  >
+                    {item.tipo}
                   </MenuItem>
                 );
               }

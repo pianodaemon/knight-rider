@@ -41,6 +41,8 @@ obs_sfp_ns_captions = {
     'num_oficio_resp_dependencia': 'Num. de Oficio de respuesta de la Dependencia',
     'fecha_oficio_resp_dependencia': 'Fecha de Oficio de respuesta de la Dependencia',
     'seguimientos': 'Seguimientos (lista de cédulas)',
+    'dependencia_id': 'Id de la Dependencia, indicada por la Auditoría',
+    'anio_cuenta_pub': 'Año de la cuenta pública, indicada por la Auditoría',
 }
 
 ns = api.namespace("obs_sfp", description="Servicios disponibles para Observaciones de la SFP (Informe de Resultados)")
@@ -172,6 +174,8 @@ class ObservacionSfpList(Resource):
     @ns.param("observacion", obs_sfp_ns_captions['observacion'])
     @ns.param("clave_observacion", obs_sfp_ns_captions['clave_observacion'])
     @ns.param("direccion_id", obs_sfp_ns_captions['direccion_id'])
+    @ns.param("dependencia_id", obs_sfp_ns_captions['dependencia_id'])
+    @ns.param("anio_cuenta_pub", obs_sfp_ns_captions['anio_cuenta_pub'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations (SFP). On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -191,10 +195,14 @@ class ObservacionSfpList(Resource):
             request.args,
             ['tipo_observacion_id', 'programa_social_id', 'auditoria_id', 'observacion', 'clave_observacion', 'direccion_id']
         )
+        indirect_search_params = get_search_params(
+            request.args,
+            ['dependencia_id', 'anio_cuenta_pub']
+        )
 
         try:
             obs_sfp_list, total_items, total_pages = observaciones_sfp.read_per_page(
-                offset, limit, order_by, order, search_params, per_page, page
+                offset, limit, order_by, order, search_params, per_page, page, indirect_search_params
             )
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))

@@ -33,6 +33,8 @@ obs_pre_asf_ns_captions = {
     'fecha_oficio_org_fiscalizador': 'Fecha de Oficio para Órgano Fiscalizador',
     'estatus_criterio_int_id': 'Estatus (criterio interno)',
     'proyecciones': 'Proyecciones',
+    'dependencia_id': 'Id de la Dependencia, indicada por la Auditoría',
+    'anio_cuenta_pub': 'Año de la cuenta pública, indicada por la Auditoría',
 }
 
 ns = api.namespace("obs_pre_asf", description="Servicios disponibles para Observaciones de la ASF (Preliminares)")
@@ -130,6 +132,8 @@ class ObservacionPreAsfList(Resource):
     @ns.param("observacion", obs_pre_asf_ns_captions['observacion'])
     @ns.param("num_observacion", obs_pre_asf_ns_captions['num_observacion'])
     @ns.param("direccion_id", obs_pre_asf_ns_captions['direccion_id'])
+    @ns.param("dependencia_id", obs_pre_asf_ns_captions['dependencia_id'])
+    @ns.param("anio_cuenta_pub", obs_pre_asf_ns_captions['anio_cuenta_pub'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations (preliminares de la ASF). On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -149,10 +153,14 @@ class ObservacionPreAsfList(Resource):
             request.args,
             ['programa_social_id', 'auditoria_id', 'observacion', 'num_observacion', 'direccion_id']
         )
+        indirect_search_params = get_search_params(
+            request.args,
+            ['dependencia_id', 'anio_cuenta_pub']
+        )
 
         try:
             obs_pre_asf_list, total_items, total_pages = observaciones_pre_asf.read_per_page(
-                offset, limit, order_by, order, search_params, per_page, page
+                offset, limit, order_by, order, search_params, per_page, page, indirect_search_params
             )
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))

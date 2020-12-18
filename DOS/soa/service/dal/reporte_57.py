@@ -42,7 +42,7 @@ def get(ej_ini, ej_fin, fiscal, onlyObras, division_id, auth):
 def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion, permission ):
     data_rows = []
     sql = '''
-        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id
+        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.monto_observado as monto_observado
         from observaciones_ires_asf as ires
         join observaciones_pre_asf as pre on ires.id = pre.observacion_ires_id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
@@ -82,7 +82,7 @@ def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_
         if seg:
             segd = dict(seg[0])
             r['clasif_id']   = segd['clasif_final_interna_cytg']
-            r['monto']       = segd['monto_pendiente_solventar']
+            r['monto']       = r['monto_observado']
             r['clasif_name'] = segd['title']
             l.append(r)
 
@@ -151,7 +151,7 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro
         if seg:
             segd = dict(seg[0])
             r['clasif_id']   = r['clasif_final_cytg']
-            r['monto']       = segd['monto_pendiente_solventar']
+            r['monto']       = 0
             r['clasif_name'] = segd['title']
             l.append(r)
     
@@ -183,7 +183,7 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro
 def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion, permission ):
     data_rows = []
     sql = '''
-        select ires.id as ires_id, dep_cat.title, anio.anio_cuenta_pub, tipos.title as tipo_observacion, ires.direccion_id
+        select ires.id as ires_id, dep_cat.title, anio.anio_cuenta_pub, tipos.title as tipo_observacion, ires.direccion_id, ires.monto_observado as monto_observado
         from observaciones_sfp as ires
         join auditoria_dependencias     as dep      on ires.auditoria_id        = dep.auditoria_id
         join dependencies               as dep_cat  on dep.dependencia_id       = dep_cat.id
@@ -222,7 +222,7 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_
         if seg:
             segd = dict(seg[0])
             r['clasif_id']   = segd['clasif_final_interna_cytg']
-            r['monto']       = segd['monto_pendiente_solventar']
+            r['monto']       = r['monto_observado']
             r['clasif_name'] = segd['title']
             l.append(r)
 
@@ -253,7 +253,7 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_
 def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion, permission ):
     data_rows = []
     sql = '''
-        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar  
+        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar, ires.monto_observado as monto_observado  
         from observaciones_ires_asenl as ires
         join observaciones_pre_asenl as pre on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
@@ -276,7 +276,7 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtr
         r = dict(row)
  
         r['clasif_id']   = r['clasif_final_cytg']
-        r['monto']       = r['monto_pendiente_solventar']
+        r['monto']       = r['monto_observado']
         l.append(r)
     
     data_rowsl = {}

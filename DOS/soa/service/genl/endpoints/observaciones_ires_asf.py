@@ -30,6 +30,8 @@ obs_ires_asf_ns_captions = {
     'auditoria_id': 'Id de la auditoría (según obs preliminar)',
     'programa_social_id': 'Id del programa social (según obs preliminar)',
     'num_observacion': 'Número de observación (según obs preliminar)',
+    'dependencia_id': 'Id de la Dependencia, indicada por la Auditoría',
+    'anio_cuenta_pub': 'Año de la cuenta pública, indicada por la Auditoría',
     
     'observacion_id': 'Id de la observación a la que pertenece el seguimiento',
     'seguimiento_id': 'Id del seguimiento',
@@ -211,6 +213,8 @@ class ObservacionIResASFList(Resource):
     @ns.param("auditoria_id", obs_ires_asf_ns_captions['auditoria_id'])
     @ns.param("programa_social_id", obs_ires_asf_ns_captions['programa_social_id'])
     @ns.param("num_observacion", obs_ires_asf_ns_captions['num_observacion'])
+    @ns.param("dependencia_id", obs_ires_asf_ns_captions['dependencia_id'])
+    @ns.param("anio_cuenta_pub", obs_ires_asf_ns_captions['anio_cuenta_pub'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations (Informes de Resultados de la ASF). On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -234,10 +238,15 @@ class ObservacionIResASFList(Resource):
             request.args,
             ['direccion_id', 'auditoria_id', 'programa_social_id', 'num_observacion']
         )
+        indirect_search_params = get_search_params(
+            request.args,
+            ['dependencia_id', 'anio_cuenta_pub']
+        )
 
         try:
             obs_ires_asf_list, total_items, total_pages = observaciones_ires_asf.read_per_page(
-                offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params
+                offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params,
+                indirect_search_params
             )
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))

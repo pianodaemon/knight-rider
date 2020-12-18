@@ -45,6 +45,8 @@ obs_ires_asenl_ns_captions = {
     'direccion_id': 'Id de la dirección (según obs preliminar)',
     'auditoria_id': 'Id de la auditoría (según obs preliminar)',
     'tipificacion_id': 'Id de la tipificación',
+    'dependencia_id': 'Id de la Dependencia, indicada por la Auditoría',
+    'anio_cuenta_pub': 'Año de la cuenta pública, indicada por la Auditoría',
 }
 
 ns = api.namespace("obs_ires_asenl", description="Servicios disponibles para Observaciones de la ASENL (Informe de Resultados)")
@@ -152,6 +154,8 @@ class ObservacionIResAsenlList(Resource):
     @ns.param("direccion_id", obs_ires_asenl_ns_captions['direccion_id'])
     @ns.param("auditoria_id", obs_ires_asenl_ns_captions['auditoria_id'])
     @ns.param("num_observacion", obs_ires_asenl_ns_captions['num_observacion'])
+    @ns.param("dependencia_id", obs_ires_asenl_ns_captions['dependencia_id'])
+    @ns.param("anio_cuenta_pub", obs_ires_asenl_ns_captions['anio_cuenta_pub'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations (Informes de Resultados de la ASENL). On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -175,10 +179,15 @@ class ObservacionIResAsenlList(Resource):
             request.args,
             ['direccion_id', 'auditoria_id']
         )
+        indirect_search_params = get_search_params(
+            request.args,
+            ['dependencia_id', 'anio_cuenta_pub']
+        )
 
         try:
             obs_ires_asenl_list, total_items, total_pages = observaciones_ires_asenl.read_per_page(
-                offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params
+                offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params,
+                indirect_search_params
             )
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))

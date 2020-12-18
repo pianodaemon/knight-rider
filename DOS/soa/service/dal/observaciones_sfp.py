@@ -1,6 +1,10 @@
 import math
 
-from dal.helper import run_stored_procedure, exec_steady
+from dal.helper import (
+    run_stored_procedure,
+    exec_steady,
+    filter_entities,
+)
 from dal.entity import page_entities, count_entities, fetch_entity, delete_entity
 from misc.helperpg import EmptySetError
 
@@ -113,7 +117,7 @@ def delete(id):
     return add_observacion_data(ent)
 
 
-def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
+def read_per_page(offset, limit, order_by, order, search_params, per_page, page, indirect_search_params):
     ''' Reads a page of observations '''
     
     # Some validations
@@ -155,11 +159,14 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if target_items > per_page:
         target_items = per_page
 
-    return (
-        page_entities('observaciones_sfp', offset + whole_pages_offset, target_items, order_by, order, search_params),
-        total_items,
-        total_pages
-    )
+    entities = page_entities('observaciones_sfp', offset + whole_pages_offset, target_items, order_by, order, search_params)
+
+    del_ent_qty = filter_entities(entities, indirect_search_params)
+
+    total_items -= del_ent_qty
+    total_pages = math.ceil(total_items / per_page)
+    
+    return (entities, total_items, total_pages)
 
 
 def get_catalogs(table_name_list, search_params):

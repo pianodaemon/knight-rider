@@ -1,9 +1,10 @@
 import { createSelector } from 'reselect';
+import { FISCALS } from 'src/shared/constants/observations.constants';
+import { range } from 'src/shared/utils/range.util';
 import {
   resultsReportASENLReducer,
   ResultsReportASENL,
 } from './results-report-asenl.reducer';
-import { FISCALS } from "src/shared/constants/observations.constants";
 
 const sliceSelector = (state: any) =>
   state[resultsReportASENLReducer.sliceName];
@@ -169,6 +170,20 @@ export const filterSelector = createSelector(
         type: 'text',
         param: 'num_observacion',
         name: '(CLO) Clave o Num. de observacion',
+      },
+      {
+        abbr: 'ACP',
+        type: 'dropdown',
+        param: 'anio_cuenta_pub',
+        name: '(ACP) Año de la cuenta pública',
+        options: range(2000, new Date().getFullYear()).map((year: number) => { return { id: year, value: year } }),
+      },
+      {
+        abbr: 'DEP',
+        type: 'dropdown',
+        param: 'dependencia_id',
+        name: '(DEP) Dependencia',
+        options: catalog && catalog.dependencies ? [...catalog.dependencies.map((item: any) => { return { id: item.id, value: item.title } })] : [],
       },
       {
         abbr: 'TO',

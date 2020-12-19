@@ -86,8 +86,7 @@ def get_audit_set_from_anio_cuenta_pub(indirect_search_params):
     if indirect_search_params and 'anio_cuenta_pub' in indirect_search_params:
         existe = True
     else:
-        existe = False
-        return existe, set()
+        return False, set()
     
     audit_set = set()
     sql = '''
@@ -97,9 +96,12 @@ def get_audit_set_from_anio_cuenta_pub(indirect_search_params):
         ORDER BY auditoria_id ASC;
     '''.format(indirect_search_params['anio_cuenta_pub'])
     
-    rows = exec_steady(sql)
-    for row in rows:
-        audit_set.add(row[0])
+    try:
+        rows = exec_steady(sql)
+        for row in rows:
+            audit_set.add(row[0])
+    except:
+        pass
 
     return existe, audit_set
 
@@ -109,8 +111,7 @@ def get_audit_set_from_dependencia(indirect_search_params):
     if indirect_search_params and 'dependencia_id' in indirect_search_params:
         existe = True
     else:
-        existe = False
-        return existe, set()
+        return False, set()
     
     audit_set = set()
     sql = '''
@@ -120,9 +121,12 @@ def get_audit_set_from_dependencia(indirect_search_params):
         ORDER BY auditoria_id ASC;
     '''.format(indirect_search_params['dependencia_id'])
     
-    rows = exec_steady(sql)
-    for row in rows:
-        audit_set.add(row[0])
+    try:
+        rows = exec_steady(sql)
+        for row in rows:
+            audit_set.add(row[0])
+    except:
+        pass
 
     return existe, audit_set
 
@@ -137,9 +141,9 @@ def filter_entities(entities, indirect_search_params):
     else:
         if existe_dep_param and existe_anio_param:
             audit_result_set = audit_dep_set.intersection(audit_anio_set)
-        elif existe_dep_param and not existe_anio_param:
+        elif existe_dep_param:
             audit_result_set = audit_dep_set
-        elif existe_anio_param and not existe_dep_param:
+        else:
             audit_result_set = audit_anio_set
 
         deletion_idx = []
@@ -153,3 +157,21 @@ def filter_entities(entities, indirect_search_params):
             del entities[idx]
         
         return len(deletion_idx)
+
+
+def get_audit_result_set(indirect_search_params):
+
+    existe_dep_param, audit_dep_set = get_audit_set_from_dependencia(indirect_search_params)
+    existe_anio_param, audit_anio_set = get_audit_set_from_anio_cuenta_pub(indirect_search_params)
+
+    if not existe_dep_param and not existe_anio_param:
+        return False, set()
+    else:
+        if existe_dep_param and existe_anio_param:
+            audit_result_set = audit_dep_set.intersection(audit_anio_set)
+        elif existe_dep_param:
+            audit_result_set = audit_dep_set
+        else:
+            audit_result_set = audit_anio_set
+        
+        return  True, audit_result_set

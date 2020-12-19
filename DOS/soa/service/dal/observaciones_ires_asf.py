@@ -1,6 +1,6 @@
 import math
 
-from dal.helper import run_stored_procedure, exec_steady
+from dal.helper import run_stored_procedure, exec_steady, get_audit_result_set
 from dal.entity import page_entities, count_entities, fetch_entity, delete_entity
 from misc.helperpg import EmptySetError
 
@@ -84,7 +84,7 @@ def delete(id):
     return add_observacion_data(ent)
 
 
-def read_per_page(offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params):
+def read_per_page(offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params, indirect_search_params):
     ''' Reads a page of observations '''
     
     # Some validations
@@ -128,6 +128,8 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
 
     entities = page_entities('observaciones_ires_asf', offset + whole_pages_offset, target_items, order_by, order, search_params)
 
+    existe_indirect_param, audit_result_set = get_audit_result_set(indirect_search_params)
+    
     # Adding some obs preliminares' data
     deletion_idx = []
     for i, e in enumerate(entities):
@@ -149,6 +151,10 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
                 if e['num_observacion'].find(preliminar_search_params['num_observacion']) < 0:
                     deletion_idx.append(i)
                     continue
+        if existe_indirect_param:
+            if e['auditoria_id'] not in audit_result_set:
+                deletion_idx.append(i)
+                continue
     
     deletion_idx.reverse()
     

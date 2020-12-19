@@ -32,6 +32,8 @@ obs_ires_cytg_ns_captions = {
     'num_oficio_pras_cytg_dependencia': 'Num. de Oficio PRAS/PFRA de la CyTG para la Dependencia',
     'num_oficio_resp_dependencia': 'Num. de Oficio de respuesta de la Dependencia',
     'fecha_oficio_resp_dependencia': 'Fecha de Oficio de respuesta de la Dependencia',
+    'dependencia_id': 'Id de la Dependencia, indicada por la Auditoría',
+    'anio_cuenta_pub': 'Año de la cuenta pública, indicada por la Auditoría',
 
     'observacion_id': 'Id de la observación de informe de resultados a la que pertenece el seguimiento',
     'seguimiento_id': 'Id del seguimiento',
@@ -182,6 +184,8 @@ class ObservacionCyTGList(Resource):
     @ns.param("direccion_id", obs_ires_cytg_ns_captions['direccion_id'])
     @ns.param("auditoria_id", obs_ires_cytg_ns_captions['auditoria_id'])
     @ns.param("num_observacion", obs_ires_cytg_ns_captions['num_observacion'])
+    @ns.param("dependencia_id", obs_ires_cytg_ns_captions['dependencia_id'])
+    @ns.param("anio_cuenta_pub", obs_ires_cytg_ns_captions['anio_cuenta_pub'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' To fetch several observations (CyTG (resultados)). On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -205,10 +209,15 @@ class ObservacionCyTGList(Resource):
             request.args,
             ['direccion_id', 'auditoria_id']
         )
+        indirect_search_params = get_search_params(
+            request.args,
+            ['dependencia_id', 'anio_cuenta_pub']
+        )
 
         try:
             obs_ires_cytg_list, total_items, total_pages = observaciones_ires_cytg.read_per_page(
-                offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params
+                offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params,
+                indirect_search_params
             )
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))

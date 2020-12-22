@@ -123,21 +123,9 @@ def count_entities(table, search_params):
     return rows.pop()['total']
 
 
-def count_entities_join_tables(table, search_params, indirect_search_params):
+def count_entities_join_tables(table, search_params, joins, conditions):
     ''' Counts non-blocked entities '''
-    
-    field_table_map = {
-        'dependencia_id': 'auditoria_dependencias',
-        'anio_cuenta_pub': 'auditoria_anios_cuenta_pub',
-    }
-    
-    joins = ''
-    conditions = ''
-    if indirect_search_params is not None:
-        for k, v in indirect_search_params.items():
-            joins += ' JOIN {} ON {}.auditoria_id = {}.auditoria_id'.format(field_table_map[k], field_table_map[k], table)
-            conditions += ' AND {}.{} = {}'.format(field_table_map[k], k, indirect_search_params[k])
-    
+
     query = '''
         SELECT count({}.id)::integer as total
             FROM {}
@@ -161,21 +149,9 @@ def count_entities_join_tables(table, search_params, indirect_search_params):
     return rows.pop()['total']
 
 
-def page_entities_join_tables(table, offset, limit, order_by, order, search_params, indirect_search_params):
+def page_entities_join_tables(table, offset, limit, order_by, order, search_params, joins, conditions):
     ''' Returns a set of entities '''
-    
-    field_table_map = {
-        'dependencia_id': 'auditoria_dependencias',
-        'anio_cuenta_pub': 'auditoria_anios_cuenta_pub',
-    }
 
-    joins = ''
-    conditions = ''
-    if indirect_search_params is not None:
-        for k, v in indirect_search_params.items():
-            joins += ' JOIN {} ON {}.auditoria_id = {}.auditoria_id'.format(field_table_map[k], field_table_map[k], table)
-            conditions += ' AND {}.{} = {}'.format(field_table_map[k], k, indirect_search_params[k])
-    
     query = '''
         SELECT {}.*
         FROM {}
@@ -202,3 +178,21 @@ def page_entities_join_tables(table, offset, limit, order_by, order, search_para
         entities.append(r)
 
     return entities
+
+
+def get_joins_and_conditions(table, indirect_search_params, join_details):
+
+    joins = ''
+    conditions = ''
+
+    if indirect_search_params is None:
+        return joins, conditions
+
+    for k, v in indirect_search_params.items():
+        if k not in join_details:
+            continue
+        join_table, join_field = join_details[k]
+        joins += ' JOIN {} ON {}.{} = {}.{}'.format(join_table, join_table, join_field, table, join_field)
+        conditions += ' AND {}.{} = {}'.format(join_table, k, indirect_search_params[k])
+    
+    return joins, conditions

@@ -1,11 +1,13 @@
 import math
 
-from dal.helper import (
-    run_stored_procedure,
-    exec_steady,
-    filter_entities,
+from dal.helper import run_stored_procedure, exec_steady
+from dal.entity import (
+    page_entities_join_tables,
+    count_entities_join_tables,
+    get_joins_and_conditions,
+    fetch_entity,
+    delete_entity,
 )
-from dal.entity import page_entities, count_entities, fetch_entity, delete_entity
 from misc.helperpg import EmptySetError
 
 def _alter_observation(**kwargs):
@@ -145,7 +147,14 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
         raise Exception("Value of params 'per_page' and 'page' should be >= 1")
 
     # Counting total number of items and fetching target page
-    total_items = count_entities('observaciones_sfp', search_params)
+    table = 'observaciones_sfp'
+    join_details = {
+        'dependencia_id': ('auditoria_dependencias', 'auditoria_id'),
+        'anio_cuenta_pub': ('auditoria_anios_cuenta_pub', 'auditoria_id'),
+    }
+    joins, conditions = get_joins_and_conditions(table, indirect_search_params, join_details)
+
+    total_items = count_entities_join_tables(table, search_params, joins, conditions)
     if total_items > limit:
         total_items = limit
     
@@ -159,12 +168,9 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
     if target_items > per_page:
         target_items = per_page
 
-    entities = page_entities('observaciones_sfp', offset + whole_pages_offset, target_items, order_by, order, search_params)
-
-    del_ent_qty = filter_entities(entities, indirect_search_params)
-
-    total_items -= del_ent_qty
-    total_pages = math.ceil(total_items / per_page)
+    entities = page_entities_join_tables(
+        table, offset + whole_pages_offset, target_items, order_by, order, search_params, joins, conditions
+    )
     
     return (entities, total_items, total_pages)
 

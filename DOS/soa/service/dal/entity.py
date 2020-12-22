@@ -121,3 +121,78 @@ def count_entities(table, search_params):
         raise MultipleResultsFound('Multiple results found, but only one expected')
 
     return rows.pop()['total']
+
+
+def count_entities_join_tables(table, search_params, joins, conditions):
+    ''' Counts non-blocked entities '''
+
+    query = '''
+        SELECT count({}.id)::integer as total
+            FROM {}
+            {}
+            WHERE NOT {}.blocked
+    '''.format(table, table, joins, table)
+
+    if search_params is not None:
+        query += ' AND ' + _setup_search_criteria(table, search_params)
+    
+    query += conditions
+    
+    rows = exec_steady(query)
+
+    # For this case we are just expecting one row
+    if len(rows) == 0:
+        raise NoResultFound('Just expecting one total as a result')
+    elif len(rows) > 1:
+        raise MultipleResultsFound('Multiple results found, but only one expected')
+
+    return rows.pop()['total']
+
+
+def page_entities_join_tables(table, offset, limit, order_by, order, search_params, joins, conditions):
+    ''' Returns a set of entities '''
+
+    query = '''
+        SELECT {}.*
+        FROM {}
+        {}
+        WHERE NOT {}.blocked
+    '''.format(table, table, joins, table)
+
+    if search_params is not None:
+        query += ' AND ' + _setup_search_criteria(table, search_params)
+    
+    query += conditions
+    query += ' ORDER BY {} {} LIMIT {} OFFSET {};'.format(order_by, order, limit, offset)
+
+    try:
+        rows = exec_steady(query)
+    except psycopg2.Error:
+        raise
+    except:
+        return []
+
+    entities = []
+    for row in rows:
+        r = dict(row)
+        entities.append(r)
+
+    return entities
+
+
+def get_joins_and_conditions(table, indirect_search_params, join_details):
+
+    joins = ''
+    conditions = ''
+
+    if indirect_search_params is None:
+        return joins, conditions
+
+    for k, v in indirect_search_params.items():
+        if k not in join_details:
+            continue
+        join_table, join_field = join_details[k]
+        joins += ' JOIN {} ON {}.{} = {}.{}'.format(join_table, join_table, join_field, table, join_field)
+        conditions += ' AND {}.{} = {}'.format(join_table, k, indirect_search_params[k])
+    
+    return joins, conditions

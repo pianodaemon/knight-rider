@@ -110,8 +110,8 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     entities = page_entities('audits', offset + whole_pages_offset, target_items, order_by, order, search_params)
     
     # Adding dependency and year (public account) data
-    deps_por_audit = get_dependencias_por_auditoria(entities)
-    anios_por_audit = get_anios_por_auditoria(entities)
+    deps_por_audit = get_dependencias_por_auditoria()
+    anios_por_audit = get_anios_por_auditoria()
     for e in entities:
         e['dependency_ids'] = deps_por_audit[e['id']] if deps_por_audit else []
         e['years']          = anios_por_audit[e['id']] if anios_por_audit else []
@@ -192,7 +192,7 @@ def add_audit_data(ent):
     return mod_ent
 
 
-def get_dependencias_por_auditoria(entities):
+def get_dependencias_por_auditoria():
     query = '''
         SELECT dep.*
         FROM audits AS aud
@@ -215,7 +215,7 @@ def get_dependencias_por_auditoria(entities):
     return res_dict
 
 
-def get_anios_por_auditoria(entities):
+def get_anios_por_auditoria():
     query = '''
         SELECT anio.*
         FROM audits AS aud

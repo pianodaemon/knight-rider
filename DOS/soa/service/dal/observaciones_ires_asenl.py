@@ -1,7 +1,13 @@
 import math
 
-from dal.helper import run_stored_procedure, exec_steady, get_audit_result_set
-from dal.entity import page_entities, count_entities, fetch_entity, delete_entity
+from dal.helper import run_stored_procedure, exec_steady
+from dal.entity import (
+    page_entities_join_tables,
+    count_entities_join_tables,
+    get_joins_and_conditions,
+    fetch_entity,
+    delete_entity,
+)
 from misc.helperpg import EmptySetError
 
 def _alter_observation(**kwargs):
@@ -116,7 +122,7 @@ def delete(id):
     return add_observacion_data(ent)
 
 
-def read_per_page(offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params, indirect_search_params):
+def read_per_page(offset, limit, order_by, order, search_params, per_page, page, indirect_search_params):
     ''' Reads a page of observations '''
     
     # Some validations
@@ -144,7 +150,20 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
         raise Exception("Value of params 'per_page' and 'page' should be >= 1")
 
     # Counting total number of items and fetching target page
-    total_items = count_entities('observaciones_ires_asenl', search_params)
+    table = 'observaciones_ires_asenl'
+    join_details = {
+        'direccion_id'   : ('observaciones_pre_asenl',    'id',           table,                     'observacion_pre_id', '',             False),
+        'auditoria_id'   : ('observaciones_pre_asenl',    'id',           table,                     'observacion_pre_id', '',             False),
+        'dependencia_id' : ('auditoria_dependencias',     'auditoria_id', 'observaciones_pre_asenl', 'auditoria_id',       'auditoria_id', False),
+        'anio_cuenta_pub': ('auditoria_anios_cuenta_pub', 'auditoria_id', 'observaciones_pre_asenl', 'auditoria_id',       'auditoria_id', False),
+    }
+    selects = ', observaciones_pre_asenl.direccion_id, observaciones_pre_asenl.auditoria_id'
+    joins, conditions, join_list = get_joins_and_conditions(indirect_search_params, join_details)
+    join = ' JOIN observaciones_pre_asenl ON observaciones_pre_asenl.id = {}.observacion_pre_id'.format(table)
+    if join not in join_list:
+        joins += join
+
+    total_items = count_entities_join_tables(table, search_params, joins, conditions)
     if total_items > limit:
         total_items = limit
     
@@ -158,35 +177,9 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
     if target_items > per_page:
         target_items = per_page
 
-    entities = page_entities('observaciones_ires_asenl', offset + whole_pages_offset, target_items, order_by, order, search_params)
-
-    existe_indirect_param, audit_result_set = get_audit_result_set(indirect_search_params)
-
-    # Adding some obs preliminares' data
-    deletion_idx = []
-    for i, e in enumerate(entities):
-        add_preliminar_data(e)
-        if preliminar_search_params:
-            if 'direccion_id' in preliminar_search_params:
-                if e['direccion_id'] != int(preliminar_search_params['direccion_id']):
-                    deletion_idx.append(i)
-                    continue
-            if 'auditoria_id' in preliminar_search_params:
-                if e['auditoria_id'] != int(preliminar_search_params['auditoria_id']):
-                    deletion_idx.append(i)
-                    continue
-        if existe_indirect_param:
-            if e['auditoria_id'] not in audit_result_set:
-                deletion_idx.append(i)
-                continue
-    
-    deletion_idx.reverse()
-    
-    for idx in deletion_idx:
-        del entities[idx]
-    
-    total_items -= len(deletion_idx)
-    total_pages = math.ceil(total_items / per_page)
+    entities = page_entities_join_tables(
+        table, offset + whole_pages_offset, target_items, order_by, order, search_params, selects, joins, conditions
+    )
 
     return (entities, total_items, total_pages)
 

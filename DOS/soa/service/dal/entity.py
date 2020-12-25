@@ -149,15 +149,15 @@ def count_entities_join_tables(table, search_params, joins, conditions):
     return rows.pop()['total']
 
 
-def page_entities_join_tables(table, offset, limit, order_by, order, search_params, joins, conditions):
+def page_entities_join_tables(table, offset, limit, order_by, order, search_params, selects, joins, conditions):
     ''' Returns a set of entities '''
 
     query = '''
-        SELECT {}.*
+        SELECT {}.*{}
         FROM {}
         {}
         WHERE NOT {}.blocked
-    '''.format(table, table, joins, table)
+    '''.format(table, selects, table, joins, table)
 
     if search_params is not None:
         query += ' AND ' + _setup_search_criteria(table, search_params)
@@ -180,19 +180,47 @@ def page_entities_join_tables(table, offset, limit, order_by, order, search_para
     return entities
 
 
-def get_joins_and_conditions(table, indirect_search_params, join_details):
+def get_joins_and_conditions(indirect_search_params, join_details):
 
-    joins = ''
-    conditions = ''
+    joins       = ''
+    conditions  = ''
 
     if indirect_search_params is None:
-        return joins, conditions
+        return joins, conditions, []
 
-    for k, v in indirect_search_params.items():
-        if k not in join_details:
+    target_fields_joined = []
+    join_list = []
+
+    for target_field, target_value in indirect_search_params.items():
+        
+        if target_field not in join_details:
             continue
-        join_table, join_field = join_details[k]
-        joins += ' JOIN {} ON {}.{} = {}.{}'.format(join_table, join_table, join_field, table, join_field)
-        conditions += ' AND {}.{} = {}'.format(join_table, k, indirect_search_params[k])
+        
+        join_table, join_field, from_table, from_field, dependent_upon, text_field = join_details[target_field]
+        
+        if dependent_upon and dependent_upon not in target_fields_joined:
+            join = get_join(dependent_upon, join_details)
+            if join not in join_list:
+                joins += join
+                join_list.append(join)
+            target_fields_joined.append(dependent_upon)
+        
+        if target_field not in target_fields_joined:
+            join = ' JOIN {} ON {}.{} = {}.{}'.format(join_table, join_table, join_field, from_table, from_field)
+            if join not in join_list:
+                joins += join
+                join_list.append(join)
+            target_fields_joined.append(target_field)
+        
+        if text_field:
+            conditions += " AND {}.{} ILIKE '%{}%'".format(join_table, target_field, target_value)
+        else:
+            conditions += ' AND {}.{} = {}'.format(join_table, target_field, target_value)
     
-    return joins, conditions
+    return joins, conditions, join_list
+
+
+def get_join(target_field, join_details):
+
+    join_table, join_field, from_table, from_field, _, _ = join_details[target_field]
+    return ' JOIN {} ON {}.{} = {}.{}'.format(join_table, join_table, join_field, from_table, from_field)

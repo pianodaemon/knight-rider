@@ -6,7 +6,7 @@ from misc.helperpg import EmptySetError
 
 def _alter_audit(**kwargs):
     """Calls sp in charge of create and edit a audit"""
-    dependecy_ids_str = str(set(kwargs['dependency_ids']))
+    dependency_ids_str = str(set(kwargs['dependency_ids']))
     years_str = str(set(kwargs['years']))
 
     sql = """SELECT * FROM alter_audit(
@@ -19,7 +19,7 @@ def _alter_audit(**kwargs):
         AS result( rc integer, msg text )""".format(
             kwargs["id"],
             kwargs["title"],
-            dependecy_ids_str,
+            dependency_ids_str,
             years_str,
             kwargs["org_fiscal_id"],
             kwargs["direccion_id"],

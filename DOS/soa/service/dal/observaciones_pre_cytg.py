@@ -157,7 +157,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
         'anio_cuenta_pub': ('auditoria_anios_cuenta_pub', 'auditoria_id', table, 'auditoria_id', '', False),
     }
     selects = ''
-    joins, conditions, join_list = get_joins_and_conditions(indirect_search_params, join_details)
+    joins, conditions, _ = get_joins_and_conditions(indirect_search_params, join_details)
 
     total_items = count_entities_join_tables(table, search_params, joins, conditions)
     if total_items > limit:

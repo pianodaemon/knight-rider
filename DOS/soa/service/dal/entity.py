@@ -53,14 +53,16 @@ def delete_entity(table, id):
     return dict(rows.pop())
 
 
-def page_entities(table, offset, limit, order_by, order, search_params):
+def page_entities(table, offset, limit, order_by, order, search_params, not_blocked_clause):
     ''' Returns a set of entities '''
     
+    clause = ' AND NOT blocked' if not_blocked_clause else ''
+
     query = '''
         SELECT *
         FROM {}
-        WHERE NOT blocked
-    '''.format(table)
+        WHERE TRUE {}
+    '''.format(table, clause)
 
     if search_params is not None:
         query += ' AND ' + _setup_search_criteria(table, search_params)
@@ -88,26 +90,29 @@ def _setup_search_criteria(table, search_params):
         'title',
         'clave_observacion',
         'num_observacion',
+        'description'
     }
     for field, value in search_params.items():
         # For text fields... a different condition syntax is needed
         # TODO: Figure out a better method to identify fields of text type
         if field in text_field or field[:11] == 'observacion':
-            criteria.append("{}.{} ILIKE '%{}%'".format(table, field, value))
+            criteria.append("{}.{} ILIKE '%{}%'".format(table, field, value.replace("'", "''")))
         else:
             criteria.append("{}.{} = {}".format(table, field, value))
 
     return ' AND '.join(criteria)
 
 
-def count_entities(table, search_params):
+def count_entities(table, search_params, not_blocked_clause):
     ''' Counts non-blocked entities '''
     
+    clause = ' AND NOT blocked' if not_blocked_clause else ''
+
     query = '''
         SELECT count(id)::int as total
         FROM {}
-        WHERE NOT blocked
-    '''.format(table)
+        WHERE TRUE {}
+    '''.format(table, clause)
 
     if search_params is not None:
         query += ' AND ' + _setup_search_criteria(table, search_params)
@@ -213,7 +218,7 @@ def get_joins_and_conditions(indirect_search_params, join_details):
             target_fields_joined.append(target_field)
         
         if text_field:
-            conditions += " AND {}.{} ILIKE '%{}%'".format(join_table, target_field, target_value)
+            conditions += " AND {}.{} ILIKE '%{}%'".format(join_table, target_field, target_value.replace("'", "''"))
         else:
             conditions += ' AND {}.{} = {}'.format(join_table, target_field, target_value)
     

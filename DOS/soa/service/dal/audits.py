@@ -93,7 +93,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
             search_params = None
 
     # Counting total number of items and fetching target page
-    total_items = count_entities('audits', search_params)
+    total_items = count_entities('audits', search_params, True)
     if total_items > limit:
         total_items = limit
 
@@ -107,7 +107,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if target_items > per_page:
         target_items = per_page
 
-    entities = page_entities('audits', offset + whole_pages_offset, target_items, order_by, order, search_params)
+    entities = page_entities('audits', offset + whole_pages_offset, target_items, order_by, order, search_params, True)
     
     # Adding dependency and year (public account) data
     deps_por_audit = get_dependencias_por_auditoria()

@@ -104,7 +104,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         raise Exception("Value of params 'per_page' and 'page' should be >= 1")
 
     # Counting total number of items and fetching target page
-    total_items = count_entities('users', search_params)
+    total_items = count_entities('users', search_params, True)
     if total_items > limit:
         total_items = limit
     
@@ -118,7 +118,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if target_items > per_page:
         target_items = per_page
 
-    entities = page_entities('users', offset + whole_pages_offset, target_items, order_by, order, search_params)
+    entities = page_entities('users', offset + whole_pages_offset, target_items, order_by, order, search_params, True)
 
     for e in entities:
         del e['passwd']

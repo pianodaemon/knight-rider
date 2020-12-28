@@ -6,7 +6,7 @@ from misc.helperpg import EmptySetError
 
 def _alter_audit(**kwargs):
     """Calls sp in charge of create and edit a audit"""
-    dependecy_ids_str = str(set(kwargs['dependency_ids']))
+    dependency_ids_str = str(set(kwargs['dependency_ids']))
     years_str = str(set(kwargs['years']))
 
     sql = """SELECT * FROM alter_audit(
@@ -19,7 +19,7 @@ def _alter_audit(**kwargs):
         AS result( rc integer, msg text )""".format(
             kwargs["id"],
             kwargs["title"],
-            dependecy_ids_str,
+            dependency_ids_str,
             years_str,
             kwargs["org_fiscal_id"],
             kwargs["direccion_id"],
@@ -93,7 +93,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
             search_params = None
 
     # Counting total number of items and fetching target page
-    total_items = count_entities('audits', search_params)
+    total_items = count_entities('audits', search_params, True)
     if total_items > limit:
         total_items = limit
 
@@ -107,18 +107,16 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if target_items > per_page:
         target_items = per_page
 
-    entities = page_entities('audits', offset + whole_pages_offset, target_items, order_by, order, search_params)
+    entities = page_entities('audits', offset + whole_pages_offset, target_items, order_by, order, search_params, True)
     
-    # Adding some dependency and year (public account) data
-    enriched_list = []
+    # Adding dependency and year (public account) data
+    deps_por_audit = get_dependencias_por_auditoria()
+    anios_por_audit = get_anios_por_auditoria()
     for e in entities:
-        enriched_list.append(add_audit_data(e))
+        e['dependency_ids'] = deps_por_audit[e['id']] if deps_por_audit else []
+        e['years']          = anios_por_audit[e['id']] if anios_por_audit else []
 
-    return (
-        enriched_list,
-        total_items,
-        total_pages
-    )
+    return (entities, total_items, total_pages)
 
 
 def get_catalogs(table_name_list, search_params):
@@ -192,3 +190,49 @@ def add_audit_data(ent):
         mod_ent['years'].append(row[0])
 
     return mod_ent
+
+
+def get_dependencias_por_auditoria():
+    query = '''
+        SELECT dep.*
+        FROM audits AS aud
+        JOIN auditoria_dependencias AS dep ON dep.auditoria_id = aud.id
+        WHERE NOT aud.blocked
+        ORDER BY dep.auditoria_id, dep.dependencia_id
+    '''
+    try:
+        rows = exec_steady(query)
+    except:
+        return {}
+
+    res_dict = {}
+    for row in rows:
+        if row[0] not in res_dict:
+            res_dict[row[0]] = [row[1]]
+        else:
+            res_dict[row[0]].append(row[1])
+
+    return res_dict
+
+
+def get_anios_por_auditoria():
+    query = '''
+        SELECT anio.*
+        FROM audits AS aud
+        JOIN auditoria_anios_cuenta_pub AS anio ON anio.auditoria_id = aud.id
+        WHERE NOT aud.blocked
+        ORDER BY anio.auditoria_id, anio.anio_cuenta_pub
+    '''
+    try:
+        rows = exec_steady(query)
+    except:
+        return {}
+
+    res_dict = {}
+    for row in rows:
+        if row[0] not in res_dict:
+            res_dict[row[0]] = [row[1]]
+        else:
+            res_dict[row[0]].append(row[1])
+
+    return res_dict

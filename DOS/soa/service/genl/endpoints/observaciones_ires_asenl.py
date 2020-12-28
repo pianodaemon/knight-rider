@@ -175,19 +175,14 @@ class ObservacionIResAsenlList(Resource):
             request.args,
             ['tipo_observacion_id', 'observacion_final', 'num_observacion']
         )
-        preliminar_search_params = get_search_params(
-            request.args,
-            ['direccion_id', 'auditoria_id']
-        )
         indirect_search_params = get_search_params(
             request.args,
-            ['dependencia_id', 'anio_cuenta_pub']
+            ['direccion_id', 'auditoria_id', 'dependencia_id', 'anio_cuenta_pub']
         )
 
         try:
             obs_ires_asenl_list, total_items, total_pages = observaciones_ires_asenl.read_per_page(
-                offset, limit, order_by, order, search_params, per_page, page, preliminar_search_params,
-                indirect_search_params
+                offset, limit, order_by, order, search_params, per_page, page, indirect_search_params
             )
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))

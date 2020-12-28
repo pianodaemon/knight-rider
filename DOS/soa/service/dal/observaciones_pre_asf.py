@@ -133,10 +133,11 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
     # Counting total number of items and fetching target page
     table = 'observaciones_pre_asf'
     join_details = {
-        'dependencia_id': ('auditoria_dependencias', 'auditoria_id'),
-        'anio_cuenta_pub': ('auditoria_anios_cuenta_pub', 'auditoria_id'),
+        'dependencia_id' : ('auditoria_dependencias',     'auditoria_id', table, 'auditoria_id', '', False),
+        'anio_cuenta_pub': ('auditoria_anios_cuenta_pub', 'auditoria_id', table, 'auditoria_id', '', False),
     }
-    joins, conditions = get_joins_and_conditions(table, indirect_search_params, join_details)
+    selects = ''
+    joins, conditions, _ = get_joins_and_conditions(indirect_search_params, join_details)
 
     total_items = count_entities_join_tables(table, search_params, joins, conditions)
     if total_items > limit:
@@ -153,7 +154,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page,
         target_items = per_page
 
     entities = page_entities_join_tables(
-        table, offset + whole_pages_offset, target_items, order_by, order, search_params, joins, conditions
+        table, offset + whole_pages_offset, target_items, order_by, order, search_params, selects, joins, conditions
     )
 
     return (entities, total_items, total_pages)

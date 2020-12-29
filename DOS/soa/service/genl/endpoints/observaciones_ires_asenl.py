@@ -105,9 +105,9 @@ audit = api.model('Auditoría', {
     'years': fields.List(fields.Integer(), description='List of years (public account)'),
 })
 
-dependency = api.model('Datos de una Dependencia', {
+dependency = api.model('Dependencia', {
     'id': fields.Integer(description='Id de la Dependencia'),
-    'title': fields.String(description='Título de la Dependencia'),
+    'title': fields.String(description='Título o siglas de la Dependencia'),
     'description': fields.String(description='Descripción de la Dependencia'),
     'clasif_title': fields.String(description='Clasificación de la Dependencia'),
 })

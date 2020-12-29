@@ -132,14 +132,14 @@ audit = api.model('Datos de una Auditoría', {
     'years': fields.List(fields.Integer(), description='List of years (public account)'),
 })
 
-dependency = api.model('Datos de una Dependencia', {
+dependency = api.model('Dependencia', {
     'id': fields.Integer(description='Id de la Dependencia'),
-    'title': fields.String(description='Título de la Dependencia'),
+    'title': fields.String(description='Título o siglas de la Dependencia'),
     'description': fields.String(description='Descripción de la Dependencia'),
     'clasif_title': fields.String(description='Clasificación de la Dependencia'),
 })
 
-program  = api.model('Datos de un Programa social', {
+program  = api.model('Programa social', {
     'id': fields.Integer(description='Id del programa social'),
     'title': fields.String(description='Siglas del programa social'),
     'description': fields.String(description='Nombre del programa social'),

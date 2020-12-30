@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { History } from 'history';
 import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom';
 import { AuditTableContainer } from '../../auditories/views/audit-table.container';
+import { DependencyTableContainer } from '../../dependencies/views/dependency-table.container';
+import { DependencyFormContainer } from '../../dependencies/views/dependency-form.container';
 // import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
 // import { FormContainer } from '../../auditories/views/form.container';
@@ -78,6 +80,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <AuditTableContainer />,
     app: 'AUD',
+  },
+  {
+    props: {
+      path: ['/dependency/list'],
+      exact: true,
+    },
+    component: <DependencyTableContainer />,
+    app: 'DEP',
   },
   {
     props: {
@@ -218,6 +228,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <UsersFormContainer />,
     app: 'USR',
+  },
+  {
+    props: {
+      path: ['/dependency/create', '/dependency/:id/:action(edit|view)'],
+      exact: true,
+    },
+    component: <DependencyFormContainer />,
+    app: 'DEP',
   },
   {
     props: {

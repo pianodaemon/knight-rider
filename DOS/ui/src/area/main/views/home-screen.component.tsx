@@ -98,6 +98,14 @@ const tabCategories = {
           name: "Auditorías",
           path: "/audit/list"
         },
+      },
+      {
+        DEP: {
+          color: '#5232C2',
+          icon: "AccountBalanceIcon",
+          name: "Dependencias",
+          path: "/dependency/list"
+        },
       }
     ],
     path: "/catalogos",

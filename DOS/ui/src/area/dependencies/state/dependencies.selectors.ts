@@ -59,10 +59,6 @@ export const dependencyCatalogSelector = createSelector(
             )
           : null;
       let clasif_title = clasif_id ? clasif_id.title : null;
-      console.log({
-        ...dependency,
-        clasif_title,
-      });
       return {
         ...dependency,
         clasif_title,

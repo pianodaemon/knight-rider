@@ -184,6 +184,12 @@ export function AppBarComponent(props: Props) {
       icon: <AccountBalanceIcon />,
       open: true,
     },
+    socialProgram: {
+      url: '/social-program/list',
+      text: 'Programas Sociales',
+      icon: <AccountBalanceIcon />,
+      open: true,
+    },
     observationSfp: {
       url: '/observation-sfp/list',
       text: 'Observaciones SFP',

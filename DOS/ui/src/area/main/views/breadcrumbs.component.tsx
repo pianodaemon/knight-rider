@@ -36,6 +36,8 @@ const modules = (module: string): string => {
       return "Informe de Resultados CYTG";
     case "user":
       return "Usuarios";
+    case "dependency":
+      return "Dependencias";
     default:
       return "";
   }
@@ -44,6 +46,7 @@ const modules = (module: string): string => {
 const categories =  (module: string): string => {
   switch(module) {
     case "audit":
+    case "dependency":
       return "catalogos";
     case "observation-sfp":
     case "observation-asf":

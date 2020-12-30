@@ -178,6 +178,12 @@ export function AppBarComponent(props: Props) {
       icon: <AccountBalanceIcon />,
       open: true,
     },
+    dependency: {
+      url: '/dependency/list',
+      text: 'Dependencias',
+      icon: <AccountBalanceIcon />,
+      open: true,
+    },
     observationSfp: {
       url: '/observation-sfp/list',
       text: 'Observaciones SFP',

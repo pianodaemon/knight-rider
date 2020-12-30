@@ -38,6 +38,8 @@ const modules = (module: string): string => {
       return "Usuarios";
     case "dependency":
       return "Dependencias";
+    case "social-program":
+      return "Programas Sociales";
     default:
       return "";
   }
@@ -47,6 +49,7 @@ const categories =  (module: string): string => {
   switch(module) {
     case "audit":
     case "dependency":
+    case "social-program":
       return "catalogos";
     case "observation-sfp":
     case "observation-asf":

@@ -8,25 +8,25 @@ import PostAddIcon from '@material-ui/icons/PostAdd';
 import Paper from '@material-ui/core/Paper';
 import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 import { FilterChips } from 'src/shared/components/filter-chips.component';
-import { Dependency } from '../state/dependencies.reducer';
+import { SocialProgram } from '../state/social-programs.reducer';
 
 type Props = {
-  dependencies: Array<Dependency>,
-  loadDependenciesAction: Function,
-  removeDependencyAction: Function,
+  socialPrograms: Array<SocialProgram> | null,
+  loadSocialProgramsAction: Function,
+  removeSocialProgramAction: Function,
   loading: boolean,
   paging: any,
   isAllowed: Function,
   filters: Array<any>,
 };
 
-export const DependencyTable = (props: Props) => {
+export const SocialProgramTable = (props: Props) => {
   const {
     loading,
-    loadDependenciesAction,
-    dependencies,
+    loadSocialProgramsAction,
+    socialPrograms,
     paging,
-    removeDependencyAction,
+    removeSocialProgramAction,
     isAllowed,
     filters,
   } = props;
@@ -36,7 +36,7 @@ export const DependencyTable = (props: Props) => {
   const draggable: boolean = false;
   const sorting: boolean = false;
   useEffect(() => {
-    loadDependenciesAction({ per_page: paging.per_page, order });
+    loadSocialProgramsAction({ per_page: paging.per_page, order });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const columns = [
@@ -48,19 +48,29 @@ export const DependencyTable = (props: Props) => {
       sorting: !sorting,
     },
     {
-      title: 'Título o siglas de la Dependencia',
+      title: 'Siglas del Programa Social',
       field: 'title',
       sorting,
     },
     {
-      title: 'Descripción',
+      title: 'Nombre del Programa Social',
       field: 'description',
       sorting,
       customSort,
     },
     {
-      title: 'Clasificación',
-      field: 'clasif_title',
+      title: 'Central',
+      field: 'central_str',
+      sorting,
+    },
+    {
+      title: 'Paraestatal',
+      field: 'paraestatal_str',
+      sorting,
+    },
+    {
+      title: 'Obra Pública',
+      field: 'obra_pub_str',
       sorting,
     },
   ];
@@ -69,7 +79,7 @@ export const DependencyTable = (props: Props) => {
       <Paper elevation={0}>
         <FilterChips
           filters={filters}
-          loadAction={loadDependenciesAction} 
+          loadAction={loadSocialProgramsAction} 
         />
       </Paper>
       <MaterialTable
@@ -78,16 +88,16 @@ export const DependencyTable = (props: Props) => {
             emptyDataSourceMessage: loading ? 'Cargando registros' : 'No hay registros para mostrar'
           }
         }}
-        title="Dependencias"
+        title="Programas Sociales"
         onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
-          loadDependenciesAction({
+          loadSocialProgramsAction({
             ...paging,
             order: orderDirection,
             order_by: 'id',
           });
         }}
         columns={columns}
-        data={dependencies || []}
+        data={socialPrograms || []}
         options={{
           draggable,
           initialPage: 1, // @todo include this settings value in a CONSTANTS file
@@ -115,7 +125,7 @@ export const DependencyTable = (props: Props) => {
                 rowsPerPage={per_page}
                 rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
                 onChangePage={(event, currentPage: number) => {
-                  loadDependenciesAction({
+                  loadSocialProgramsAction({
                     per_page,
                     page: currentPage + 1,
                     order,
@@ -124,7 +134,7 @@ export const DependencyTable = (props: Props) => {
                 }}
                 onChangeRowsPerPage={(event: any) => {
                   componentProps.onChangeRowsPerPage(event);
-                  loadDependenciesAction({
+                  loadSocialProgramsAction({
                     per_page: event.target.value,
                   });
                 }}
@@ -141,10 +151,10 @@ export const DependencyTable = (props: Props) => {
                     color="primary"
                     startIcon={<PostAddIcon />}
                     size="medium"
-                    onClick={() => history.push('/dependency/create')}
-                    disabled={!isAllowed('DEP', PERMISSIONS.CREATE)}
+                    onClick={() => history.push('/social-program/create')}
+                    disabled={!isAllowed('PGM', PERMISSIONS.CREATE)}
                   >
-                    Agregar Dependencia
+                    Agregar Programa Social
                   </Button>
                 </div>
               </div>
@@ -154,32 +164,32 @@ export const DependencyTable = (props: Props) => {
         actions={[
           {
             icon: 'search',
-            tooltip: 'Visualizar Dependencia',
+            tooltip: 'Visualizar Programa Social',
             onClick: (event, rowData: any) =>
-              history.push(`/dependency/${rowData.id}/view`),
-            disabled: !isAllowed('DEP', PERMISSIONS.READ),
+              history.push(`/social-program/${rowData.id}/view`),
+            disabled: !isAllowed('PGM', PERMISSIONS.READ),
           },
           {
             icon: 'edit',
-            tooltip: 'Editar Dependencia',
+            tooltip: 'Editar Programa Social',
             onClick: (event, rowData: any) =>
-              history.push(`/dependency/${rowData.id}/edit`),
-            disabled: !isAllowed('DEP', PERMISSIONS.UPDATE)
+              history.push(`/social-program/${rowData.id}/edit`),
+            disabled: !isAllowed('PGM', PERMISSIONS.UPDATE)
           },
           {
             icon: 'delete',
-            tooltip: 'Eliminar Dependencia',
+            tooltip: 'Eliminar Programa Social',
             onClick: (event, rowData: any) => {
               if (
                 // eslint-disable-next-line no-restricted-globals
                 confirm(
-                  `¿Realmente quieres eliminar la Dependencia ${rowData.id}?\n Esta acción es irreversible`
+                  `¿Realmente quieres eliminar el Programa Social ${rowData.id}?\n Esta acción es irreversible`
                 )
               ) {
-                removeDependencyAction(rowData.id);
+                removeSocialProgramAction(rowData.id);
               }
             },
-            disabled: !isAllowed('DEP', PERMISSIONS.DELETE)
+            disabled: !isAllowed('PGM', PERMISSIONS.DELETE)
           },
         ]}
         isLoading={loading}

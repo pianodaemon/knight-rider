@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { permissionSelector, currentUserDivisionIdSelector } from 'src/area/auth/state/auth.selectors';
+import { permissionSelector } from 'src/area/auth/state/auth.selectors';
 import { DependencyTable } from './dependency-table.component';
 import { loadDependenciesAction } from '../state/usecases/load-dependencies.usecase';
 import { removeDependencyAction } from '../state/usecases/remove-dependency.usecase';
@@ -22,7 +22,6 @@ function mapStateToProps(state: any) {
     dependencies: dependencyCatalogSelector(state),
     loading: isLoadingSelector(state),
     paging: pagingSelector(state),
-    divisionId: currentUserDivisionIdSelector(state),
     isAllowed: permissionSelector(state),
   };
 }

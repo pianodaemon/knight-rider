@@ -4,6 +4,8 @@ import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom';
 import { AuditTableContainer } from '../../auditories/views/audit-table.container';
 import { DependencyTableContainer } from '../../dependencies/views/dependency-table.container';
 import { DependencyFormContainer } from '../../dependencies/views/dependency-form.container';
+import { SocialProgramTableContainer } from '../../social-programs/views/social-program-table.container';
+import { SocialProgramFormContainer } from '../../social-programs/views/social-program-form.container';
 // import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
 // import { FormContainer } from '../../auditories/views/form.container';
@@ -88,6 +90,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <DependencyTableContainer />,
     app: 'DEP',
+  },
+  {
+    props: {
+      path: ['/social-program/list'],
+      exact: true,
+    },
+    component: <SocialProgramTableContainer />,
+    app: 'PGM',
   },
   {
     props: {
@@ -236,6 +246,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <DependencyFormContainer />,
     app: 'DEP',
+  },
+  {
+    props: {
+      path: ['/social-program/create', '/social-program/:id/:action(edit|view)'],
+      exact: true,
+    },
+    component: <SocialProgramFormContainer />,
+    app: 'PGM',
   },
   {
     props: {

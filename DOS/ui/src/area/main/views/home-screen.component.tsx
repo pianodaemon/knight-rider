@@ -106,7 +106,15 @@ const tabCategories = {
           name: "Dependencias",
           path: "/dependency/list"
         },
-      }
+      },
+      {
+        DEP: {
+          color: '#5232C2',
+          icon: "AccountBalanceIcon",
+          name: "Programas Sociales",
+          path: "/social-program/list"
+        },
+      },
     ],
     path: "/catalogos",
   },

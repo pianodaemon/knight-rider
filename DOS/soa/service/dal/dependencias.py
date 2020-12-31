@@ -2,6 +2,7 @@ import math
 
 from dal.helper import exec_steady
 from dal.entity import page_entities, count_entities
+from misc.helperpg import EmptySetError
 
 def create(**kwargs):
     ''' Crear una entidad Dependencia '''
@@ -57,7 +58,13 @@ def delete(id):
         RETURNING *
     """.format(id)
 
-    rows = exec_steady(sql)
+    try:
+        rows = exec_steady(sql)
+    except EmptySetError:
+        raise
+    except:
+        raise Exception('No fue posible eliminar la dependencia (id = {}). Verifique que ninguna auditoría esté asociada a esta.'.format(id))
+
     return dict(rows[0])
 
 

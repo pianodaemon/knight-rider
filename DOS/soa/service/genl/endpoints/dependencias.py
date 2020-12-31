@@ -164,8 +164,6 @@ class Dependencia(Resource):
 
         try:
             dep = dependencias.delete(id)
-        except psycopg2.Error as err:
-            ns.abort(400, message=get_msg_pgerror(err))
         except EmptySetError:
             ns.abort(404, message=self.dep_not_found)
         except Exception as err:

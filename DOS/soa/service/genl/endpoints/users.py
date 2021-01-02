@@ -42,15 +42,16 @@ pair = api.model('Id-Title pair', {
     'title': fields.String(description='Entry title'),
 })
 
-pair2 = api.model('Id-Description pair', {
+authority = api.model('Authority', {
     'id': fields.Integer(description='An integer as entry identifier'),
     'description': fields.String(description='Entry description'),
+    'screen_order': fields.Integer(description="An integer showing the entry's order in the UI"),
 })
 
 catalog = api.model('Users screen data (catalog of Id-Title pairs for screen fields)', {
     'divisions': fields.List(fields.Nested(pair)),
     'orgchart_roles': fields.List(fields.Nested(pair)),
-    'authorities': fields.List(fields.Nested(pair2)),
+    'authorities': fields.List(fields.Nested(authority)),
 })
 
 @ns.route('/')

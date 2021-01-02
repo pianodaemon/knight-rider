@@ -103,16 +103,16 @@ def _setup_search_criteria(table, search_params):
     return ' AND '.join(criteria)
 
 
-def count_entities(table, search_params, not_blocked_clause):
+def count_entities(table, search_params, not_blocked_clause, count_by_field='id'):
     ''' Counts non-blocked entities '''
     
     clause = ' AND NOT blocked' if not_blocked_clause else ''
 
     query = '''
-        SELECT count(id)::int as total
+        SELECT count({})::int as total
         FROM {}
         WHERE TRUE {}
-    '''.format(table, clause)
+    '''.format(count_by_field, table, clause)
 
     if search_params is not None:
         query += ' AND ' + _setup_search_criteria(table, search_params)

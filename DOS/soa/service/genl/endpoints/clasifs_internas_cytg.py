@@ -3,25 +3,25 @@ from flask import request
 import psycopg2
 
 from genl.restplus import api
-from dal import dependencias
+from dal import clasifs_internas_cytg
 from misc.helper import get_search_params, verify_token
 from misc.helperpg import get_msg_pgerror, EmptySetError
 
 
-dependencia_ns_captions = {
-    'id': 'Id de la Dependencia',
-    'title': 'Título o siglas de la Dependencia',
-    'description': 'Descripción de la Dependencia',
-    'clasif_id': 'Id de la clasificación de la Dependencia',
+clasif_interna_ns_captions = {
+    'org_fiscal_id': 'Id del órgano fiscalizador para la Clasificación interna',
+    'direccion_id': 'Id de la dirección para la Clasificación interna',
+    'sorting_val': 'Id de la Clasificación interna',
+    'title': 'Título o siglas de la Clasificación interna',
 }
 
-ns = api.namespace("dependencias", description="Servicios disponibles para las dependencias")
+ns = api.namespace("clasifs_internas", description="Servicios disponibles para las clasificaciones internas de CyTG")
 
-dependencia = api.model('Dependencia (con id de su clasificación)', {
-    'id': fields.Integer(description=dependencia_ns_captions['id']),
-    'title': fields.String(description=dependencia_ns_captions['title']),
-    'description': fields.String(description=dependencia_ns_captions['description']),
-    'clasif_id': fields.Integer(description=dependencia_ns_captions['clasif_id']),
+clasif_interna = api.model('Clasificaciones internas de CyTG', {
+    'org_fiscal_id': fields.Integer(description=clasif_interna_ns_captions['org_fiscal_id']),
+    'direccion_id': fields.Integer(description=clasif_interna_ns_captions['direccion_id']),
+    'sorting_val': fields.Integer(description=clasif_interna_ns_captions['sorting_val']),
+    'title': fields.String(description=clasif_interna_ns_captions['title']),
 })
 
 pair = api.model('Id-Title pair', {
@@ -29,28 +29,29 @@ pair = api.model('Id-Title pair', {
     'title': fields.String(description='Entry title'),
 })
 
-catalog = api.model('Leyendas relacionadas con las Dependencias', {
-    'dependencia_clasif': fields.List(fields.Nested(pair)),
+catalog = api.model('Leyendas relacionadas con las Clasificaciones internas de CyTG', {
+    'fiscals': fields.List(fields.Nested(pair)),
+    'divisions': fields.List(fields.Nested(pair)),
 })
 
 
 @ns.route('/')
 @ns.response(401, 'Unauthorized')
-class DependenciaList(Resource):
+class ClasificacionInternaCyTGList(Resource):
 
-    @ns.marshal_list_with(dependencia)
+    @ns.marshal_list_with(clasif_interna)
     @ns.param("offset", "Which record to start from, default is 0")
     @ns.param("limit", "How many records will be returned at most, default is 10")
     @ns.param("order_by", "Which field to order by, default is id column")
     @ns.param("order", "ASC or DESC, which ordering to use, default is ASC")
     @ns.param("per_page", "How many items per page, default is 10")
     @ns.param("page", "Which page to fetch, default is 1")
-    @ns.param("title", dependencia_ns_captions['title'])
-    @ns.param("description", dependencia_ns_captions['description'])
-    @ns.param("clasif_id", dependencia_ns_captions['clasif_id'])
+    @ns.param("org_fiscal_id", clasif_interna_ns_captions["org_fiscal_id"])
+    @ns.param("direccion_id", clasif_interna_ns_captions["direccion_id"])
+    @ns.param("title", clasif_interna_ns_captions["title"])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
-        ''' Listado de dependencias. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
+        ''' Listado de clasificaciones internas de CyTG. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
         try:
             verify_token(request.headers)
         except Exception as err:
@@ -58,18 +59,18 @@ class DependenciaList(Resource):
 
         offset   = request.args.get('offset',   '0'  )
         limit    = request.args.get('limit',    '10' )
-        order_by = request.args.get('order_by', 'id' )
+        order_by = request.args.get('order_by', 'sorting_val')
         order    = request.args.get('order',    'ASC')
         per_page = request.args.get('per_page', '10' )
         page     = request.args.get('page',     '1'  )
 
         search_params = get_search_params(
             request.args,
-            ['title', 'description', 'clasif_id']
+            ['org_fiscal_id', 'direccion_id', 'title']
         )
 
         try:
-            dependencia_list, total_items, total_pages = dependencias.read_per_page(
+            clasif_interna_list, total_items, total_pages = clasifs_internas_cytg.read_per_page(
                 offset, limit, order_by, order, search_params, per_page, page
             )
         except psycopg2.Error as err:
@@ -77,21 +78,21 @@ class DependenciaList(Resource):
         except Exception as err:
             ns.abort(400, message=err)
         
-        return dependencia_list, 200, {'X-SOA-Total-Items': total_items, 'X-SOA-Total-Pages': total_pages}
+        return clasif_interna_list, 200, {'X-SOA-Total-Items': total_items, 'X-SOA-Total-Pages': total_pages}
 
 
-    @ns.expect(dependencia)
-    @ns.marshal_with(dependencia, code=201)
+    @ns.expect(clasif_interna)
+    @ns.marshal_with(clasif_interna, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
-        ''' Crear una dependencia '''
+        ''' Crear una Clasificación interna '''
         try:
             verify_token(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
         try:
-            dep = dependencias.create(**api.payload)
+            clasif = clasifs_internas_cytg.create(**api.payload)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except KeyError as err:
@@ -99,77 +100,77 @@ class DependenciaList(Resource):
         except Exception as err:
             ns.abort(400, message=err)
         
-        return dep, 201
+        return clasif, 201
 
 
 
-@ns.route('/<int:id>')
-@ns.param('id', 'Id de una dependencia')
-@ns.response(404, 'Dependencia not found')
+@ns.route('/<int:org_fiscal_id>/<int:direccion_id>/<int:id>')
+@ns.param('id', 'Id de una Clasificación interna')
+@ns.response(404, 'Clasificación interna not found')
 @ns.response(400, 'There is a problem with your request data')
 @ns.response(401, 'Unauthorized')
-class Dependencia(Resource):
-    dep_not_found = 'Dependencia no encontrada'
+class ClasificacionInternaCyTG(Resource):
+    clasif_not_found = 'Clasificación interna no encontrada'
 
-    @ns.marshal_with(dependencia)
-    def get(self, id):
-        ''' Recuperar una dependencia '''
+    @ns.marshal_with(clasif_interna)
+    def get(self, org_fiscal_id, direccion_id, id):
+        ''' Recuperar una Clasificación interna '''
         try:
             verify_token(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
         try:
-            dep = dependencias.read(id)
+            clasif = clasifs_internas_cytg.read(org_fiscal_id, direccion_id, id)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except EmptySetError:
-            ns.abort(404, message=self.dep_not_found)
+            ns.abort(404, message=self.clasif_not_found)
         except Exception as err:
             ns.abort(400, message=err)
         
-        return dep
+        return clasif
 
 
-    @ns.expect(dependencia)
-    @ns.marshal_with(dependencia)
-    def put(self, id):
-        ''' Actualizar una dependencia '''
+    @ns.expect(clasif_interna)
+    @ns.marshal_with(clasif_interna)
+    def put(self, org_fiscal_id, direccion_id, id):
+        ''' Actualizar una Clasificación interna '''
         try:
             verify_token(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
         try:
-            dep = dependencias.update(id, **api.payload)
+            clasif = clasifs_internas_cytg.update(org_fiscal_id, direccion_id, id, **api.payload)
         except psycopg2.Error as err:
             ns.abort(400, message=get_msg_pgerror(err))
         except KeyError as err:
             ns.abort(400, message='Review the attributes in your payload: {}'.format(err))
         except EmptySetError as err:
-            ns.abort(404, message=self.dep_not_found + '. ' + str(err))
+            ns.abort(404, message=self.clasif_not_found + '. ' + str(err))
         except Exception as err:
             ns.abort(400, message=err)
         
-        return dep
+        return clasif
 
 
-    @ns.marshal_with(dependencia)
-    def delete(self, id):
-        ''' Eliminar una dependencia '''
+    @ns.marshal_with(clasif_interna)
+    def delete(self, org_fiscal_id, direccion_id, id):
+        ''' Eliminar una Clasificación interna '''
         try:
             verify_token(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
         try:
-            dep = dependencias.delete(id)
+            clasif = clasifs_internas_cytg.delete(org_fiscal_id, direccion_id, id)
         except EmptySetError:
-            ns.abort(404, message=self.dep_not_found)
+            ns.abort(404, message=self.clasif_not_found)
         except Exception as err:
             ns.abort(400, message=err)
         
-        return dep
+        return clasif
 
 
 
@@ -187,7 +188,10 @@ class Catalog(Resource):
             ns.abort(401, message=err)
 
         try:
-            field_catalog = dependencias.get_catalogs(['dependencia_clasif'])
+            field_catalog = clasifs_internas_cytg.get_catalogs([
+                'fiscals',
+                'divisions',
+            ])
         except psycopg2.Error as err:
             ns.abort(500, message=get_msg_pgerror(err))
         except Exception as err:

@@ -20,6 +20,7 @@ from genl.endpoints import (
     file_services,
     programas_sociales,
     dependencias,
+    clasifs_internas_cytg,
 )
 from genl.restplus import api
 
@@ -47,6 +48,7 @@ def setup_app(flask_app):
     api.add_namespace(file_services.ns)
     api.add_namespace(programas_sociales.ns)
     api.add_namespace(dependencias.ns)
+    api.add_namespace(clasifs_internas_cytg.ns)
 
     flask_app.register_blueprint(blueprint)
 

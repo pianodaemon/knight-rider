@@ -5,71 +5,99 @@ from dal.entity import page_entities, count_entities
 from misc.helperpg import EmptySetError
 
 def create(**kwargs):
-    ''' Crear una entidad Dependencia '''
+    ''' Crear una entidad Clasificación interna de CyTG '''
+
+    org_fiscal_id = kwargs['org_fiscal_id']
+    direccion_id = kwargs['direccion_id']
+
     sql = """
-        INSERT INTO dependencies
-        VALUES (DEFAULT, '{}', '{}', {})
+        SELECT title
+        FROM fiscals
+        WHERE id = {}
+    """.format(org_fiscal_id)
+    
+    rows = exec_steady(sql)
+    org_fiscal = rows.pop()[0]
+
+    sql = """
+        SELECT title
+        FROM divisions
+        WHERE id = {}
+    """.format(direccion_id)
+    
+    rows = exec_steady(sql)
+    direccion = rows.pop()[0]
+
+    seq_name = 'clasifs_internas_' + org_fiscal.lower() + '_' + direccion.lower() + '_seq'
+    title = kwargs['title'].replace("'", "''")
+
+    sql = """
+        INSERT INTO clasifs_internas_cytg
+        VALUES ({}, {}, nextval('{}'::regclass), '{}')
         RETURNING *
-    """.format(
-        kwargs['title'].replace("'", "''"),
-        kwargs['description'].replace("'", "''"),
-        kwargs['clasif_id']
-    )
+    """.format(org_fiscal_id, direccion_id, seq_name, title)
 
     rows = exec_steady(sql)
     return dict(rows[0])
 
 
-def read(id):
-    ''' Recuperar una entidad Dependencia '''
+def read(org_fiscal_id, direccion_id, id):
+    ''' Recuperar una entidad Clasificación interna de CyTG '''
     sql = """
         SELECT *
-        FROM dependencies
-        WHERE id = {}
-    """.format(id)
+        FROM clasifs_internas_cytg
+        WHERE NOT blocked
+        AND org_fiscal_id = {}
+        AND direccion_id = {}
+        AND sorting_val = {}
+    """.format(org_fiscal_id, direccion_id, id)
 
     rows = exec_steady(sql)
     return dict(rows[0])
 
 
-def update(id, **kwargs):
-    ''' Actualizar una entidad Dependencia '''
+def update(org_fiscal_id, direccion_id, id, **kwargs):
+    ''' Actualizar una entidad Clasificación interna de CyTG '''
+    title = kwargs['title'].replace("'", "''")
+    
     sql = """
-        UPDATE dependencies
-        SET title = '{}', description = '{}', clasif_id = {}
-        WHERE id = {}
+        UPDATE clasifs_internas_cytg
+        SET title = '{}'
+        WHERE NOT blocked
+        AND org_fiscal_id = {}
+        AND direccion_id = {}
+        AND sorting_val = {}
         RETURNING *
-    """.format(
-        kwargs['title'].replace("'", "''"),
-        kwargs['description'].replace("'", "''"),
-        kwargs['clasif_id'],
-        id
-    )
+    """.format(title, org_fiscal_id, direccion_id, id)
 
     rows = exec_steady(sql)
     return dict(rows[0])
 
 
-def delete(id):
-    ''' Eliminar una entidad Dependencia '''
+def delete(org_fiscal_id, direccion_id, id):
+    ''' Eliminar una entidad Clasificación interna de CyTG '''
     sql = """
-        DELETE FROM dependencies
-        WHERE id = {}
+        UPDATE clasifs_internas_cytg
+        SET blocked = TRUE
+        WHERE NOT blocked
+        AND org_fiscal_id = {}
+        AND direccion_id = {}
+        AND sorting_val = {}
         RETURNING *
-    """.format(id)
+    """.format(org_fiscal_id, direccion_id, id)
 
     try:
         rows = exec_steady(sql)
     except EmptySetError:
         raise
     except:
-        raise Exception('No fue posible eliminar la dependencia (id = {}). Verifique que ninguna auditoría esté asociada a esta.'.format(id))
+        raise Exception('No fue posible eliminar la clasificación interna (id = {}). Verifique que ninguna auditoría esté asociada a esta.'.format(id))
 
     return dict(rows[0])
 
 
 def read_per_page(offset, limit, order_by, order, search_params, per_page, page):
-    ''' Recuperar una página de entidades Dependencia '''
+    ''' Recuperar una página de entidades Clasificación interna de CyTG '''
 
     # Some validations
     offset = int(offset)
@@ -81,7 +109,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         raise Exception("Value of param 'limit' should be >= 1")
 
     order_by_values = (
-        'id', 'title', 'description', 'clasif_id'
+        'sorting_val', 'org_fiscal_id', 'direccion_id', 'title'
     )
     if order_by not in order_by_values:
         raise Exception("Value of param 'order_by' should be one of the following: " + str(order_by_values))
@@ -96,8 +124,8 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
         raise Exception("Value of params 'per_page' and 'page' should be >= 1")
 
     # Counting total number of items and fetching target page
-    table = 'dependencies'
-    total_items = count_entities(table, search_params, False)
+    table = 'clasifs_internas_cytg'
+    total_items = count_entities(table, search_params, True, 'sorting_val')
     if total_items > limit:
         total_items = limit
     
@@ -111,7 +139,7 @@ def read_per_page(offset, limit, order_by, order, search_params, per_page, page)
     if target_items > per_page:
         target_items = per_page
 
-    entities = page_entities(table, offset + whole_pages_offset, target_items, order_by, order, search_params, False)
+    entities = page_entities(table, offset + whole_pages_offset, target_items, order_by, order, search_params, True)
 
     return (entities, total_items, total_pages)
 

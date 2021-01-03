@@ -2,6 +2,7 @@ import math
 
 from dal.helper import exec_steady
 from dal.entity import page_entities, count_entities
+from misc.helperpg import EmptySetError
 
 def create(**kwargs):
     ''' Creates a social program entity '''
@@ -61,7 +62,13 @@ def delete(id):
         RETURNING *
     """.format(id)
 
-    rows = exec_steady(sql)
+    try:
+        rows = exec_steady(sql)
+    except EmptySetError:
+        raise
+    except:
+        raise Exception('No fue posible eliminar el programa social (id = {}). Verifique que ninguna observación esté asociada a este.'.format(id))
+
     return dict(rows[0])
 
 

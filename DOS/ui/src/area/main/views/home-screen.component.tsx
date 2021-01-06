@@ -115,6 +115,14 @@ const tabCategories = {
           path: "/social-program/list"
         },
       },
+      {
+        CLSF: {
+          color: '#5232C2',
+          icon: "AccountBalanceIcon",
+          name: "Clasificaciones Internas de CyTG",
+          path: "/internal-clas/list"
+        },
+      },
     ],
     path: "/catalogos",
   },

@@ -6,6 +6,8 @@ import { DependencyTableContainer } from '../../dependencies/views/dependency-ta
 import { DependencyFormContainer } from '../../dependencies/views/dependency-form.container';
 import { SocialProgramTableContainer } from '../../social-programs/views/social-program-table.container';
 import { SocialProgramFormContainer } from '../../social-programs/views/social-program-form.container';
+import { InternalClasTableContainer } from '../../internal-clas/views/internal-clas-table.container';
+import { InternalClasFormContainer } from '../../internal-clas/views/internal-clas-form.container';
 // import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
 // import { FormContainer } from '../../auditories/views/form.container';
@@ -98,6 +100,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <SocialProgramTableContainer />,
     app: 'PGM',
+  },
+  {
+    props: {
+      path: ['/internal-clas/list'],
+      exact: true,
+    },
+    component: <InternalClasTableContainer />,
+    app: 'CLSF',
   },
   {
     props: {
@@ -254,6 +264,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <SocialProgramFormContainer />,
     app: 'PGM',
+  },
+  {
+    props: {
+      path: ['/internal-clas/create', '/internal-clas/:org_fiscal_id/:direccion_id/:id/:action(edit|view)'],
+      exact: true,
+    },
+    component: <InternalClasFormContainer />,
+    app: 'CLSF',
   },
   {
     props: {

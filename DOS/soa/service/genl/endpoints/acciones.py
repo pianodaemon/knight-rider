@@ -10,6 +10,7 @@ from misc.helperpg import get_msg_pgerror, EmptySetError
 ns = api.namespace("acciones", description="Servicios disponibles para el catálogo de acciones (ASF y ASENL)")
 
 accion = api.model('Acción (ASENL)', {
+    'org_fiscal_id': fields.Integer(description='Id del órgano fiscalizador'),
     'id': fields.Integer(description='Id de la acción'),
     'title': fields.String(description='Siglas de la acción'),
     'description': fields.String(description='Nombre de la acción'),
@@ -38,6 +39,7 @@ class AccionList(Resource):
     @ns.param("page", "Which page to fetch, default is 1")
     @ns.param("org_fiscal_id", "Id del órgano fiscalizador para la acción")
     @ns.param("title", "Título o siglas de la acción")
+    @ns.param("description", "Descripción de la acción")
     @ns.response(400, 'There is a problem with your query')
     def get(self):
         ''' Listado de acciones. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
@@ -55,7 +57,7 @@ class AccionList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['org_fiscal_id', 'title']
+            ['org_fiscal_id', 'title', 'description']
         )
 
         try:

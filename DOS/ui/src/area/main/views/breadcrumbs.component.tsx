@@ -40,6 +40,8 @@ const modules = (module: string): string => {
       return "Dependencias";
     case "social-program":
       return "Programas Sociales";
+    case "internal-clas":
+      return "Clasificaciones Internas de CyTG";
     default:
       return "";
   }
@@ -50,6 +52,7 @@ const categories =  (module: string): string => {
     case "audit":
     case "dependency":
     case "social-program":
+    case "internal-clas":
       return "catalogos";
     case "observation-sfp":
     case "observation-asf":

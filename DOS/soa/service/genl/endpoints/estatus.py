@@ -2,18 +2,24 @@ from flask_restplus import Resource, fields
 from flask import request
 
 from genl.restplus import api
-from dal import acciones
+from dal import estatus
 from misc.helper import get_search_params, verify_token
 from misc.helperpg import EmptySetError
 
+estatus_captions = {
+    'org_fiscal_id': 'Id del órgano fiscalizador',
+    'pre_ires': 'Preliminar o Informe de Resultados {pre | ires}',
+    'id': 'Id del estatus',
+    'title': 'Título del estatus',
+}
 
-ns = api.namespace("acciones", description="Servicios disponibles para el catálogo de acciones (ASF y ASENL)")
+ns = api.namespace("estatus", description="Servicios disponibles para el catálogo de estatus")
 
-accion = api.model('Acción (ASENL)', {
-    'org_fiscal_id': fields.Integer(description='Id del órgano fiscalizador'),
-    'id': fields.Integer(description='Id de la acción'),
-    'title': fields.String(description='Siglas de la acción'),
-    'description': fields.String(description='Nombre de la acción'),
+estatus_model = api.model('Estatus', {
+    'org_fiscal_id': fields.Integer(description=estatus_captions['org_fiscal_id']),
+    'pre_ires': fields.String(description=estatus_captions['pre_ires']),
+    'id': fields.Integer(description=estatus_captions['id']),
+    'title': fields.String(description=estatus_captions['title']),
 })
 
 pair = api.model('Id-Title pair', {
@@ -21,28 +27,28 @@ pair = api.model('Id-Title pair', {
     'title': fields.String(description='Entry title'),
 })
 
-catalog = api.model('Leyendas relacionadas al catálogo de Acciones (ASF y ASENL)', {
+catalog = api.model('Leyendas relacionadas al catálogo de Estatus', {
     'fiscals': fields.List(fields.Nested(pair)),
 })
 
 
 @ns.route('/')
 @ns.response(401, 'Unauthorized')
-class AccionList(Resource):
+class EstatusList(Resource):
 
-    @ns.marshal_list_with(accion)
+    @ns.marshal_list_with(estatus_model)
     @ns.param("offset", "Which record to start from, default is 0")
     @ns.param("limit", "How many records will be returned at most, default is 10")
     @ns.param("order_by", "Which field to order by, default is id column")
     @ns.param("order", "ASC or DESC, which ordering to use, default is ASC")
     @ns.param("per_page", "How many items per page, default is 10")
     @ns.param("page", "Which page to fetch, default is 1")
-    @ns.param("org_fiscal_id", "Id del órgano fiscalizador para la acción")
-    @ns.param("title", "Título o siglas de la acción")
-    @ns.param("description", "Descripción de la acción")
+    @ns.param("org_fiscal_id", estatus_captions['org_fiscal_id'])
+    @ns.param("pre_ires", estatus_captions['pre_ires'])
+    @ns.param("title", estatus_captions['title'])
     @ns.response(400, 'There is a problem with your query')
     def get(self):
-        ''' Listado de acciones. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
+        ''' Listado de estatus. On Success it returns two custom headers: X-SOA-Total-Items, X-SOA-Total-Pages '''
         try:
             verify_token(request.headers)
         except Exception as err:
@@ -57,11 +63,11 @@ class AccionList(Resource):
 
         search_params = get_search_params(
             request.args,
-            ['org_fiscal_id', 'title', 'description']
+            ['org_fiscal_id', 'pre_ires', 'title']
         )
 
         try:
-            accion_list, total_items, total_pages = acciones.read_per_page(
+            estatus_list, total_items, total_pages = estatus.read_per_page(
                 offset, limit, order_by, order, search_params, per_page, page
             )
         except EmptySetError as err:
@@ -69,94 +75,95 @@ class AccionList(Resource):
         except Exception as err:
             ns.abort(400, message=err)
         
-        return accion_list, 200, {'X-SOA-Total-Items': total_items, 'X-SOA-Total-Pages': total_pages}
+        return estatus_list, 200, {'X-SOA-Total-Items': total_items, 'X-SOA-Total-Pages': total_pages}
 
 
-    @ns.expect(accion)
-    @ns.marshal_with(accion, code=201)
+    @ns.expect(estatus_model)
+    @ns.marshal_with(estatus_model, code=201)
     @ns.response(400, 'There is a problem with your request data')
     def post(self):
-        ''' Crear una Acción '''
+        ''' Crear un Estatus '''
         try:
             verify_token(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
         try:
-            acc = acciones.create(**api.payload)
+            estat = estatus.create(**api.payload)
         except KeyError as err:
             ns.abort(400, message='Review the attributes in your payload: {}'.format(err))
         except Exception as err:
             ns.abort(400, message=err)
         
-        return acc, 201
+        return estat, 201
 
 
 
-@ns.route('/<int:org_fiscal_id>/<int:id>')
-@ns.param('org_fiscal_id', 'Id del órgano fiscalizador')
-@ns.param('id', 'Id de una Acción')
-@ns.response(404, 'Acción not found')
+@ns.route('/<int:org_fiscal_id>/<string:pre_ires>/<int:id>')
+@ns.param('org_fiscal_id', estatus_captions['org_fiscal_id'])
+@ns.param('pre_ires', estatus_captions['pre_ires'])
+@ns.param('id', estatus_captions['id'])
+@ns.response(404, 'Estatus not found')
 @ns.response(400, 'There is a problem with your request data')
 @ns.response(401, 'Unauthorized')
-class Accion(Resource):
-    accion_not_found = 'Acción no encontrada'
+class Estatus(Resource):
+    estatus_not_found = 'Estatus no encontrado'
 
-    @ns.marshal_with(accion)
-    def get(self, org_fiscal_id, id):
-        ''' Recuperar una Acción '''
+    @ns.marshal_with(estatus_model)
+    def get(self, org_fiscal_id, pre_ires, id):
+        ''' Recuperar un Estatus '''
         try:
             verify_token(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
         try:
-            acc = acciones.read(org_fiscal_id, id)
+            estat = estatus.read(org_fiscal_id, pre_ires, id)
         except EmptySetError:
-            ns.abort(404, message=self.accion_not_found)
+            ns.abort(404, message=self.estatus_not_found)
         except Exception as err:
             ns.abort(400, message=err)
         
-        return acc
+        return estat
 
 
-    @ns.expect(accion)
-    @ns.marshal_with(accion)
-    def put(self, org_fiscal_id, id):
-        ''' Actualizar una Acción '''
+    @ns.expect(estatus_model)
+    @ns.marshal_with(estatus_model)
+    def put(self, org_fiscal_id, pre_ires, id):
+        ''' Actualizar un Estatus '''
         try:
             verify_token(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
         try:
-            acc = acciones.update(org_fiscal_id, id, **api.payload)
+            estat = estatus.update(org_fiscal_id, pre_ires, id, **api.payload)
         except KeyError as err:
             ns.abort(400, message='Review the attributes in your payload: {}'.format(err))
         except EmptySetError as err:
-            ns.abort(404, message=self.accion_not_found + '. ' + str(err))
+            ns.abort(404, message=self.estatus_not_found + '. ' + str(err))
         except Exception as err:
             ns.abort(400, message=err)
         
-        return acc
+        return estat
 
 
-    @ns.marshal_with(accion)
-    def delete(self, org_fiscal_id, id):
-        ''' Eliminar una Acción '''
+    @ns.marshal_with(estatus_model)
+    def delete(self, org_fiscal_id, pre_ires, id):
+        ''' Eliminar un Estatus '''
         try:
             verify_token(request.headers)
         except Exception as err:
             ns.abort(401, message=err)
 
         try:
-            acc = acciones.delete(org_fiscal_id, id)
+            estat = estatus.delete(org_fiscal_id, pre_ires, id)
         except EmptySetError:
-            ns.abort(404, message=self.accion_not_found)
+            ns.abort(404, message=self.estatus_not_found)
         except Exception as err:
             ns.abort(400, message=err)
         
-        return acc
+        return estat
 
 
 
@@ -174,7 +181,7 @@ class Catalog(Resource):
             ns.abort(401, message=err)
 
         try:
-            field_catalog = acciones.get_catalogs(['fiscals'])
+            field_catalog = estatus.get_catalogs(['fiscals'])
         except Exception as err:
             ns.abort(500, message=err)
                 

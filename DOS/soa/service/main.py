@@ -22,6 +22,7 @@ from genl.endpoints import (
     dependencias,
     clasifs_internas_cytg,
     acciones,
+    estatus,
 )
 from genl.restplus import api
 
@@ -51,6 +52,7 @@ def setup_app(flask_app):
     api.add_namespace(dependencias.ns)
     api.add_namespace(clasifs_internas_cytg.ns)
     api.add_namespace(acciones.ns)
+    api.add_namespace(estatus.ns)
 
     flask_app.register_blueprint(blueprint)
 

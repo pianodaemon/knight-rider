@@ -14,6 +14,7 @@ import { loadAuditCatalogAction } from 'src/area/auditories/state/usecases/load-
 import { loadUsersCatalogAction } from 'src/area/users/state/usecases/load-users-catalog.usecase';
 import { loadCatalogDependenciesAction } from 'src/area/dependencies/state/usecases/load-catalog.usecase';
 import { loadCatalogInternalClasAction } from 'src/area/internal-clas/state/usecases/load-catalog.usecase';
+import { loadCatalogActionAction } from 'src/area/actions/state/usecases/load-catalog.usecase';
 import { loadUserProfileAction, loadUserProfileErrorAction, loadUserProfileSuccessAction } from './load-user-profile.usecase';
 
 const postfix = '/app';
@@ -49,6 +50,7 @@ function* checkAuthWorker(): Generator<any, any, any> {
       yield put(loadCatalogResultsReportCYTGAction());
       yield put(loadCatalogDependenciesAction());
       yield put(loadCatalogInternalClasAction());
+      yield put(loadCatalogActionAction());
       return;
     }
     // throw new Error('Not Logged In!');

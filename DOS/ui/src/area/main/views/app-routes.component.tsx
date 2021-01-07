@@ -8,6 +8,8 @@ import { SocialProgramTableContainer } from '../../social-programs/views/social-
 import { SocialProgramFormContainer } from '../../social-programs/views/social-program-form.container';
 import { InternalClasTableContainer } from '../../internal-clas/views/internal-clas-table.container';
 import { InternalClasFormContainer } from '../../internal-clas/views/internal-clas-form.container';
+import { ActionTableContainer } from '../../actions/views/actions-table.container';
+import { ActionFormContainer } from '../../actions/views/actions-form.container';
 // import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
 // import { FormContainer } from '../../auditories/views/form.container';
@@ -108,6 +110,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <InternalClasTableContainer />,
     app: 'CLSF',
+  },
+  {
+    props: {
+      path: ['/acciones/list'],
+      exact: true,
+    },
+    component: <ActionTableContainer />,
+    app: 'ACC',
   },
   {
     props: {
@@ -272,6 +282,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <InternalClasFormContainer />,
     app: 'CLSF',
+  },
+  {
+    props: {
+      path: ['/acciones/create', '/acciones/:org_fiscal_id/:id/:action(edit|view)'],
+      exact: true,
+    },
+    component: <ActionFormContainer />,
+    app: 'ACC',
   },
   {
     props: {

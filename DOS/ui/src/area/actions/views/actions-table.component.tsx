@@ -8,25 +8,25 @@ import PostAddIcon from '@material-ui/icons/PostAdd';
 import Paper from '@material-ui/core/Paper';
 import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 import { FilterChips } from 'src/shared/components/filter-chips.component';
-import { InternalClas } from '../state/internal-clas.reducer';
+import { Action } from '../state/actions.reducer';
 
 type Props = {
-  internalClasses: Array<InternalClas> | null,
-  loadInternalClasAction: Function,
-  removeInternalClasAction: Function,
+  actions: Array<Action> | null,
+  loadActionsAction: Function,
+  removeActionAction: Function,
   loading: boolean,
   paging: any,
   isAllowed: Function,
   filters: Array<any>,
 };
 
-export const InternalClasTable = (props: Props) => {
+export const ActionTable = (props: Props) => {
   const {
     loading,
-    loadInternalClasAction,
-    internalClasses,
+    loadActionsAction,
+    actions,
     paging,
-    removeInternalClasAction,
+    removeActionAction,
     isAllowed,
     filters,
   } = props;
@@ -36,31 +36,31 @@ export const InternalClasTable = (props: Props) => {
   const draggable: boolean = false;
   const sorting: boolean = false;
   useEffect(() => {
-    loadInternalClasAction({ per_page: paging.per_page, order });
+    loadActionsAction({ per_page: paging.per_page, order });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const columns = [
     {
       title: 'ID',
-      field: 'sorting_val',
+      field: 'id',
       defaultSort: order,
       customSort,
       sorting: !sorting,
     },
     {
-      title: 'Órgano fiscalizador para la Clasificación interna',
+      title: 'Órgano fiscalizador Acción',
       field: 'org_fiscal_id_title',
       sorting,
     },
     {
-      title: 'Dirección para la Clasificación interna',
-      field: 'direccion_id_title',
+      title: 'Siglas de la acción',
+      field: 'title',
       sorting,
       customSort,
     },
     {
-      title: 'Título o siglas de la Clasificación interna',
-      field: 'title',
+      title: 'Nombre de la acción',
+      field: 'description',
       sorting,
     },
   ];
@@ -69,7 +69,7 @@ export const InternalClasTable = (props: Props) => {
       <Paper elevation={0}>
         <FilterChips
           filters={filters}
-          loadAction={loadInternalClasAction} 
+          loadAction={loadActionsAction}
         />
       </Paper>
       <MaterialTable
@@ -78,16 +78,16 @@ export const InternalClasTable = (props: Props) => {
             emptyDataSourceMessage: loading ? 'Cargando registros' : 'No hay registros para mostrar'
           }
         }}
-        title="Clasificación Interna CyTG"
+        title="Acción (ASF y ASENL)"
         onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
-          loadInternalClasAction({
+          loadActionsAction({
             ...paging,
             order: orderDirection,
             order_by: 'id',
           });
         }}
         columns={columns}
-        data={internalClasses || []}
+        data={actions || []}
         options={{
           draggable,
           initialPage: 1, // @todo include this settings value in a CONSTANTS file
@@ -115,7 +115,7 @@ export const InternalClasTable = (props: Props) => {
                 rowsPerPage={per_page}
                 rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
                 onChangePage={(event, currentPage: number) => {
-                  loadInternalClasAction({
+                  loadActionsAction({
                     per_page,
                     page: currentPage + 1,
                     order,
@@ -124,7 +124,7 @@ export const InternalClasTable = (props: Props) => {
                 }}
                 onChangeRowsPerPage={(event: any) => {
                   componentProps.onChangeRowsPerPage(event);
-                  loadInternalClasAction({
+                  loadActionsAction({
                     per_page: event.target.value,
                   });
                 }}
@@ -141,10 +141,10 @@ export const InternalClasTable = (props: Props) => {
                     color="primary"
                     startIcon={<PostAddIcon />}
                     size="medium"
-                    onClick={() => history.push('/internal-clas/create')}
+                    onClick={() => history.push('/acciones/create')}
                     disabled={!isAllowed('CLSF', PERMISSIONS.CREATE)}
                   >
-                    Agregar Clasificación Interna de CyTG
+                    Agregar Acción (ASF y ASENL)
                   </Button>
                 </div>
               </div>
@@ -154,34 +154,33 @@ export const InternalClasTable = (props: Props) => {
         actions={[
           {
             icon: 'search',
-            tooltip: 'Visualizar Clasificación Interna de CyTG',
+            tooltip: 'Visualizar Acción (ASF y ASENL)',
             onClick: (event, rowData: any) =>
-              history.push(`/internal-clas/${rowData.org_fiscal_id}/${rowData.direccion_id}/${rowData.sorting_val}/view`),
+              history.push(`/acciones/${rowData.org_fiscal_id}/${rowData.id}/view`),
             disabled: !isAllowed('CLSF', PERMISSIONS.READ),
           },
           {
             icon: 'edit',
-            tooltip: 'Editar Clasificación Interna de CyTG',
+            tooltip: 'Editar Acción (ASF y ASENL)',
             onClick: (event, rowData: any) =>
-              history.push(`/internal-clas/${rowData.org_fiscal_id}/${rowData.direccion_id}/${rowData.sorting_val}/edit`),
+              history.push(`/acciones/${rowData.org_fiscal_id}/${rowData.id}/edit`),
             disabled: !isAllowed('CLSF', PERMISSIONS.UPDATE)
           },
           {
             icon: 'delete',
-            tooltip: 'Eliminar Clasificación Interna de CyTG',
+            tooltip: 'Eliminar Acción (ASF y ASENL)',
             onClick: (event, rowData: any) => {
               if (
                 // eslint-disable-next-line no-restricted-globals
                 confirm(
-                  `¿Realmente quieres eliminar la Clasificación Interna de CyTG ${rowData.sorting_val}?\n Esta acción es irreversible`
+                  `¿Realmente quieres eliminar la Acción (ASF y ASENL) ${rowData.id}?\n Esta acción es irreversible`
                 )
               ) {
-                const { org_fiscal_id, direccion_id, sorting_val } = rowData;
-                const id = sorting_val;
-                removeInternalClasAction({ org_fiscal_id, direccion_id, id });
+                const { org_fiscal_id, id } = rowData;
+                removeActionAction({ org_fiscal_id, id });
               }
             },
-            disabled: !isAllowed('CLSF', PERMISSIONS.DELETE)
+            disabled: !isAllowed('ACC', PERMISSIONS.DELETE)
           },
         ]}
         isLoading={loading}

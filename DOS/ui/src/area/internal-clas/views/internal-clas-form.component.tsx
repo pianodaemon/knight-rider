@@ -251,7 +251,7 @@ export const InternalClasForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <InputLabel>Dirección para la Clasificación interna</InputLabel>
                       <Select
-                        disabled={disabledModeOn}
+                        disabled={disabledModeOn || action === "edit"}
                         labelId="direccion_id"
                         id="direccion_id-select"
                         value={catalog && catalog.divisions ? values.direccion_id || '' : ''}
@@ -281,7 +281,7 @@ export const InternalClasForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <InputLabel>Órgano fiscalizador para la Clasificación interna</InputLabel>
                       <Select
-                        disabled={disabledModeOn}
+                        disabled={disabledModeOn || action === "edit"}
                         labelId="org_fiscal_id"
                         id="org_fiscal_id-select"
                         value={catalog && catalog.divisions ? values.org_fiscal_id || '' : ''}

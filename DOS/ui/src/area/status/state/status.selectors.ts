@@ -86,7 +86,7 @@ export const filterSelector = createSelector(
         abbr: 'FIS',
         type: 'dropdown',
         param: 'org_fiscal_id',
-        name: '(FIS) Órgano fiscalizador para la Clasificación interna',
+        name: '(FIS) Órgano fiscalizador',
         options: catalog && catalog.fiscals ? [...catalog.fiscals.map((item: any) => { return { id: item.id, value: item.title } })] : [],
       },
     ];

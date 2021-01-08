@@ -10,6 +10,8 @@ import { InternalClasTableContainer } from '../../internal-clas/views/internal-c
 import { InternalClasFormContainer } from '../../internal-clas/views/internal-clas-form.container';
 import { ActionTableContainer } from '../../actions/views/actions-table.container';
 import { ActionFormContainer } from '../../actions/views/actions-form.container';
+import { StatusTableContainer } from '../../status/views/status-table.container';
+import { StatusFormContainer } from '../../status/views/status-form.container';
 // import { TableContainer } from '../../auditories/views/table.container';
 import { UsersTableContainer } from '../../users/views/users-table.container';
 // import { FormContainer } from '../../auditories/views/form.container';
@@ -118,6 +120,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <ActionTableContainer />,
     app: 'ACC',
+  },
+  {
+    props: {
+      path: ['/estatus/list'],
+      exact: true,
+    },
+    component: <StatusTableContainer />,
+    app: 'EST',
   },
   {
     props: {
@@ -290,6 +300,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <ActionFormContainer />,
     app: 'ACC',
+  },
+  {
+    props: {
+      path: ['/estatus/create', '/estatus/:org_fiscal_id/:pre_ires/:id/:action(edit|view)'],
+      exact: true,
+    },
+    component: <StatusFormContainer />,
+    app: 'EST',
   },
   {
     props: {

@@ -8,25 +8,25 @@ import PostAddIcon from '@material-ui/icons/PostAdd';
 import Paper from '@material-ui/core/Paper';
 import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 import { FilterChips } from 'src/shared/components/filter-chips.component';
-import { Action } from '../state/actions.reducer';
+import { Status } from '../state/status.reducer';
 
 type Props = {
-  actions: Array<Action> | null,
-  loadActionsAction: Function,
-  removeActionAction: Function,
+  statuses: Array<Status> | null,
+  loadStatusesAction: Function,
+  removeStatusAction: Function,
   loading: boolean,
   paging: any,
   isAllowed: Function,
   filters: Array<any>,
 };
 
-export const ActionTable = (props: Props) => {
+export const StatusTable = (props: Props) => {
   const {
     loading,
-    loadActionsAction,
-    actions,
+    loadStatusesAction,
+    statuses,
     paging,
-    removeActionAction,
+    removeStatusAction,
     isAllowed,
     filters,
   } = props;
@@ -36,7 +36,7 @@ export const ActionTable = (props: Props) => {
   const draggable: boolean = false;
   const sorting: boolean = false;
   useEffect(() => {
-    loadActionsAction({ per_page: paging.per_page, order });
+    loadStatusesAction({ per_page: paging.per_page, order });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const columns = [
@@ -48,19 +48,19 @@ export const ActionTable = (props: Props) => {
       sorting: !sorting,
     },
     {
-      title: 'Órgano fiscalizador Acción',
+      title: 'Órgano fiscalizador',
       field: 'org_fiscal_id_title',
       sorting,
     },
     {
-      title: 'Siglas de la acción',
+      title: 'Título del estatus',
       field: 'title',
       sorting,
       customSort,
     },
     {
-      title: 'Nombre de la acción',
-      field: 'description',
+      title: 'Preliminar o Informe de Resultados {pre | ires}',
+      field: 'pre_ires',
       sorting,
     },
   ];
@@ -69,7 +69,7 @@ export const ActionTable = (props: Props) => {
       <Paper elevation={0}>
         <FilterChips
           filters={filters}
-          loadAction={loadActionsAction}
+          loadAction={loadStatusesAction}
         />
       </Paper>
       <MaterialTable
@@ -78,16 +78,16 @@ export const ActionTable = (props: Props) => {
             emptyDataSourceMessage: loading ? 'Cargando registros' : 'No hay registros para mostrar'
           }
         }}
-        title="Acción (ASF y ASENL)"
+        title="Estatus"
         onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
-          loadActionsAction({
+          loadStatusesAction({
             ...paging,
             order: orderDirection,
             order_by: 'id',
           });
         }}
         columns={columns}
-        data={actions || []}
+        data={statuses || []}
         options={{
           draggable,
           initialPage: 1, // @todo include this settings value in a CONSTANTS file
@@ -115,7 +115,7 @@ export const ActionTable = (props: Props) => {
                 rowsPerPage={per_page}
                 rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
                 onChangePage={(event, currentPage: number) => {
-                  loadActionsAction({
+                  loadStatusesAction({
                     per_page,
                     page: currentPage + 1,
                     order,
@@ -124,7 +124,7 @@ export const ActionTable = (props: Props) => {
                 }}
                 onChangeRowsPerPage={(event: any) => {
                   componentProps.onChangeRowsPerPage(event);
-                  loadActionsAction({
+                  loadStatusesAction({
                     per_page: event.target.value,
                   });
                 }}
@@ -141,10 +141,10 @@ export const ActionTable = (props: Props) => {
                     color="primary"
                     startIcon={<PostAddIcon />}
                     size="medium"
-                    onClick={() => history.push('/acciones/create')}
-                    disabled={!isAllowed('ACC', PERMISSIONS.CREATE)}
+                    onClick={() => history.push('/estatus/create')}
+                    disabled={!isAllowed('EST', PERMISSIONS.CREATE)}
                   >
-                    Agregar Acción (ASF y ASENL)
+                    Agregar Estatus (Pre e IRes)
                   </Button>
                 </div>
               </div>
@@ -154,30 +154,30 @@ export const ActionTable = (props: Props) => {
         actions={[
           {
             icon: 'search',
-            tooltip: 'Visualizar Acción (ASF y ASENL)',
+            tooltip: 'Visualizar Estatus (Pre e IRes)',
             onClick: (event, rowData: any) =>
-              history.push(`/acciones/${rowData.org_fiscal_id}/${rowData.id}/view`),
-            disabled: !isAllowed('ACC', PERMISSIONS.READ),
+              history.push(`/estatus/${rowData.org_fiscal_id}/${rowData.pre_ires}/${rowData.id}/view`),
+            disabled: !isAllowed('EST', PERMISSIONS.READ),
           },
           {
             icon: 'edit',
-            tooltip: 'Editar Acción (ASF y ASENL)',
+            tooltip: 'Editar Estatus (Pre e IRes)',
             onClick: (event, rowData: any) =>
-              history.push(`/acciones/${rowData.org_fiscal_id}/${rowData.id}/edit`),
-            disabled: !isAllowed('ACC', PERMISSIONS.UPDATE)
+              history.push(`/estatus/${rowData.org_fiscal_id}/${rowData.pre_ires}/${rowData.id}/edit`),
+            disabled: !isAllowed('EST', PERMISSIONS.UPDATE)
           },
           {
             icon: 'delete',
-            tooltip: 'Eliminar Acción (ASF y ASENL)',
+            tooltip: 'Eliminar Estatus (Pre e IRes)',
             onClick: (event, rowData: any) => {
               if (
                 // eslint-disable-next-line no-restricted-globals
                 confirm(
-                  `¿Realmente quieres eliminar la Acción (ASF y ASENL) ${rowData.id}?\n Esta acción es irreversible`
+                  `¿Realmente quieres eliminar el Estatus (Pre e IRes) ${rowData.id}?\n Esta acción es irreversible`
                 )
               ) {
-                const { org_fiscal_id, id } = rowData;
-                removeActionAction({ org_fiscal_id, id });
+                const { org_fiscal_id, pre_ires, id } = rowData;
+                removeStatusAction({ org_fiscal_id, pre_ires, id });
               }
             },
             disabled: !isAllowed('ACC', PERMISSIONS.DELETE)

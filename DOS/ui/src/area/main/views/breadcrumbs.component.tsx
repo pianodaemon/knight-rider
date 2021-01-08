@@ -44,6 +44,8 @@ const modules = (module: string): string => {
       return "Clasificaciones Internas de CyTG";
     case "acciones":
       return "Acciones (ASF y ASENL)";
+    case "estatus":
+      return "Estatus";
     default:
       return "";
   }
@@ -56,6 +58,7 @@ const categories =  (module: string): string => {
     case "social-program":
     case "internal-clas":
     case "actions":
+    case "status":
       return "catalogos";
     case "observation-sfp":
     case "observation-asf":

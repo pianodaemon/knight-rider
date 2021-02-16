@@ -14,13 +14,13 @@ import TextField from '@material-ui/core/TextField';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import mxLocale from 'date-fns/locale/es';
 import DateFnsUtils from '@date-io/date-fns';
-import { Catalog, InternalClas } from '../state/internal-clas.reducer';
+import { Catalog, Action } from '../state/actions.reducer';
 
 type Props = {
-  createInternalClasAction: Function,
-  readInternalClasAction: Function,
-  updateInternalClasAction: Function,
-  internalClas: InternalClas | null,
+  createActionAction: Function,
+  readActionAction: Function,
+  updateActionAction: Function,
+  actionRecord: Action | null,
   catalog: Catalog | null,
 };
 
@@ -136,27 +136,34 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const InternalClasForm = (props: Props) => {
+export const ActionsForm = (props: Props) => {
   const {
-    createInternalClasAction,
-    internalClas,
-    updateInternalClasAction,
+    createActionAction,
+    actionRecord,
+    updateActionAction,
     catalog,
   } = props;
   const classes = useStyles();
   const history = useHistory();
-  const { action, id, direccion_id, org_fiscal_id } = useParams<any>();
+  const { action, id, org_fiscal_id } = useParams<any>();
   const disabledModeOn = action === 'view';
   const initialValues = {
     id: '',
+    org_fiscal_id: org_fiscal_id,
     title: '',
-    direccion_id: '',
-    org_fiscal_id: '',
-    sorting_val: '',
+    description: '',
   };
+  const fiscal =
+    catalog &&
+    catalog.fiscals &&
+    catalog.fiscals.find((fiscal: any) => fiscal.id === parseInt(org_fiscal_id, 10))?.title;
+  const getFiscal = (id: number): string | null | undefined => 
+    catalog &&
+    catalog.fiscals &&
+    catalog.fiscals.find((fiscal: any) => fiscal.id === id)?.title;
   useEffect(() => {
     if (id) {
-      props.readInternalClasAction({ id, direccion_id, org_fiscal_id, history });
+      props.readActionAction({ id, org_fiscal_id, history });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -169,13 +176,22 @@ export const InternalClasForm = (props: Props) => {
     const mandatoryFields: Array<string> = [
       "title",
       "org_fiscal_id",
-      "direccion_id",
+      "description",
     ];
     // Mandatory fields (not empty)
     fields
       .filter((field) => !noMandatoryFields.includes(field))
       .filter(field => mandatoryFields.includes(field))
       .forEach((field: string) => {
+        if (!values[field] && field === "org_fiscal_id" && !action) {
+          errors[field] = 'Required';
+          return;
+        } else if (field === "org_fiscal_id" && action !== "create") {
+          return;
+        }
+        if (field === "description" && (fiscal === "ASF" || getFiscal(values.org_fiscal_id) === "ASF")) {
+          return;
+        }
         if (!values[field] || values[field] instanceof Date) {
           errors[field] = 'Required';
         }
@@ -186,7 +202,7 @@ export const InternalClasForm = (props: Props) => {
     <Paper className={classes.paper}>
       <Formik
         // validateOnChange={false}
-        initialValues={id ? internalClas || initialValues : initialValues}
+        initialValues={id ? actionRecord || initialValues : initialValues}
         validate={validate}
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
@@ -200,12 +216,12 @@ export const InternalClasForm = (props: Props) => {
           });
           if (id) {
             delete fields.id;
-            let direccion_id = fields.direccion_id;
-            let org_fiscal_id = fields.org_fiscal_id;
+            let description = fields.description;
+            let fiscal_id = fields.org_fiscal_id || org_fiscal_id;
             const { title } = fields;
-            updateInternalClasAction({ id, direccion_id, org_fiscal_id, title, history, releaseForm });
+            updateActionAction({ id, description, org_fiscal_id: fiscal_id, title, history, releaseForm });
           } else {
-            createInternalClasAction({ fields, history, releaseForm });
+            createActionAction({ fields, history, releaseForm });
           }
         }}
         enableReinitialize
@@ -217,12 +233,11 @@ export const InternalClasForm = (props: Props) => {
           handleChange,
           handleSubmit,
           isSubmitting,
-          setFieldValue,
         }) => {
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>
-                Clasificación Interna de CyTG
+                Acción (ASF y ASENL)
               </h1>
               <hr className={classes.hrDivider} />
               <form onSubmit={handleSubmit} className={classes.form}>
@@ -231,7 +246,7 @@ export const InternalClasForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         id="title"
-                        label="Título o siglas de la Clasificación interna"
+                        label="Siglas de la acción"
                         value={values.title || ''}
                         onChange={handleChange('title')}
                         disabled={disabledModeOn}
@@ -242,49 +257,42 @@ export const InternalClasForm = (props: Props) => {
                             error
                             classes={{ error: classes.textErrorHelper }}
                           >
-                            Ingrese Siglas de la Clasificación interna
+                            Ingrese Siglas de la acción
                           </FormHelperText>
                         )}
                     </FormControl>
                   </Grid>
+                  {/* @hardcoded value */}
+                  {(getFiscal(values.org_fiscal_id) !== "ASF") && (
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel>Dirección para la Clasificación interna</InputLabel>
-                      <Select
-                        disabled={disabledModeOn || action === "edit"}
-                        labelId="direccion_id"
-                        id="direccion_id-select"
-                        value={catalog && catalog.divisions ? values.direccion_id || '' : ''}
-                        onChange={handleChange('direccion_id')}
-                      >
-                        {catalog &&
-                          catalog.divisions &&
-                          catalog.divisions.map((item) => {
-                            return (
-                              <MenuItem value={item.id} key={`type-${item.id}`}>
-                                {item.title}
-                              </MenuItem>
-                            );
-                          })}
-                      </Select>
-                      {errors.direccion_id && touched.direccion_id && (
-                        <FormHelperText
-                          error
-                          classes={{ error: classes.textErrorHelper }}
-                        >
-                          Ingrese una Dirección
-                        </FormHelperText>
-                      )}
+                      <TextField
+                        id="description"
+                        label="Nombre de la acción"
+                        value={values.description || ''}
+                        onChange={handleChange('description')}
+                        disabled={disabledModeOn}
+                      />
+                      {errors.description &&
+                        touched.description && (
+                          <FormHelperText
+                            error
+                            classes={{ error: classes.textErrorHelper }}
+                          >
+                            Ingrese Nombre de la acción
+                          </FormHelperText>
+                        )}
                     </FormControl>
                   </Grid>
+                  )}
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel>Órgano fiscalizador para la Clasificación interna</InputLabel>
+                      <InputLabel>Órgano fiscalizador</InputLabel>
                       <Select
-                        disabled={disabledModeOn || action === "edit"}
+                        disabled={disabledModeOn || action === 'edit'}
                         labelId="org_fiscal_id"
                         id="org_fiscal_id-select"
-                        value={catalog && catalog.divisions ? values.org_fiscal_id || '' : ''}
+                        value={catalog && catalog.fiscals ? values.org_fiscal_id || org_fiscal_id || '' : ''}
                         onChange={handleChange('org_fiscal_id')}
                       >
                         {catalog &&
@@ -302,12 +310,11 @@ export const InternalClasForm = (props: Props) => {
                           error
                           classes={{ error: classes.textErrorHelper }}
                         >
-                          Ingrese un Órgano fiscalizador para la Clasificación interna
+                          Ingrese órgano fiscalizador
                         </FormHelperText>
                       )}
                     </FormControl>
                   </Grid>
-                  
                 </Grid>
                 {action !== 'view' && (
                   <Button

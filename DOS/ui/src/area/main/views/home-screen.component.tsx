@@ -123,6 +123,22 @@ const tabCategories = {
           path: "/internal-clas/list"
         },
       },
+      {
+        ACC: {
+          color: '#5232C2',
+          icon: "AccountBalanceIcon",
+          name: "Acciones (ASF y ASENL)",
+          path: "/acciones/list"
+        },
+      },
+      {
+        EST: {
+          color: '#5232C2',
+          icon: "AccountBalanceIcon",
+          name: "Estatus",
+          path: "/estatus/list"
+        },
+      },
     ],
     path: "/catalogos",
   },

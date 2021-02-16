@@ -14,13 +14,13 @@ import TextField from '@material-ui/core/TextField';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import mxLocale from 'date-fns/locale/es';
 import DateFnsUtils from '@date-io/date-fns';
-import { Catalog, InternalClas } from '../state/internal-clas.reducer';
+import { Catalog, Status } from '../state/status.reducer';
 
 type Props = {
-  createInternalClasAction: Function,
-  readInternalClasAction: Function,
-  updateInternalClasAction: Function,
-  internalClas: InternalClas | null,
+  createStatusAction: Function,
+  readStatusAction: Function,
+  updateStatusAction: Function,
+  status: Status | null,
   catalog: Catalog | null,
 };
 
@@ -136,27 +136,26 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const InternalClasForm = (props: Props) => {
+export const StatusForm = (props: Props) => {
   const {
-    createInternalClasAction,
-    internalClas,
-    updateInternalClasAction,
+    createStatusAction,
+    status,
+    updateStatusAction,
     catalog,
   } = props;
   const classes = useStyles();
   const history = useHistory();
-  const { action, id, direccion_id, org_fiscal_id } = useParams<any>();
+  const { action, id, org_fiscal_id, pre_ires } = useParams<any>();
   const disabledModeOn = action === 'view';
   const initialValues = {
     id: '',
+    org_fiscal_id: org_fiscal_id,
     title: '',
-    direccion_id: '',
-    org_fiscal_id: '',
-    sorting_val: '',
+    pre_ires: pre_ires,
   };
   useEffect(() => {
     if (id) {
-      props.readInternalClasAction({ id, direccion_id, org_fiscal_id, history });
+      props.readStatusAction({ id, org_fiscal_id, pre_ires, history });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -169,14 +168,20 @@ export const InternalClasForm = (props: Props) => {
     const mandatoryFields: Array<string> = [
       "title",
       "org_fiscal_id",
-      "direccion_id",
+      "description",
     ];
     // Mandatory fields (not empty)
     fields
       .filter((field) => !noMandatoryFields.includes(field))
       .filter(field => mandatoryFields.includes(field))
       .forEach((field: string) => {
-        if (!values[field] || values[field] instanceof Date) {
+        if (!values[field] && (field === "org_fiscal_id" || field === "pre_ires") && !action) {
+          errors[field] = 'Required';
+          return;
+        } else if ((field === "org_fiscal_id" || field === "pre_ires") && action !== "create") {
+          return;
+        }
+        if (!values[field]) {
           errors[field] = 'Required';
         }
       });
@@ -186,7 +191,7 @@ export const InternalClasForm = (props: Props) => {
     <Paper className={classes.paper}>
       <Formik
         // validateOnChange={false}
-        initialValues={id ? internalClas || initialValues : initialValues}
+        initialValues={id ? status || initialValues : initialValues}
         validate={validate}
         onSubmit={(values, { setSubmitting }) => {
           const releaseForm: () => void = () => setSubmitting(false);
@@ -200,12 +205,10 @@ export const InternalClasForm = (props: Props) => {
           });
           if (id) {
             delete fields.id;
-            let direccion_id = fields.direccion_id;
-            let org_fiscal_id = fields.org_fiscal_id;
             const { title } = fields;
-            updateInternalClasAction({ id, direccion_id, org_fiscal_id, title, history, releaseForm });
+            updateStatusAction({ id, org_fiscal_id, pre_ires, title, history, releaseForm });
           } else {
-            createInternalClasAction({ fields, history, releaseForm });
+            createStatusAction({ fields, history, releaseForm });
           }
         }}
         enableReinitialize
@@ -217,12 +220,11 @@ export const InternalClasForm = (props: Props) => {
           handleChange,
           handleSubmit,
           isSubmitting,
-          setFieldValue,
         }) => {
           return (
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={mxLocale}>
               <h1 style={{ color: '#128aba' }}>
-                Clasificación Interna de CyTG
+                Estatus (Pre | IRes)
               </h1>
               <hr className={classes.hrDivider} />
               <form onSubmit={handleSubmit} className={classes.form}>
@@ -231,7 +233,7 @@ export const InternalClasForm = (props: Props) => {
                     <FormControl className={classes.formControl}>
                       <TextField
                         id="title"
-                        label="Título o siglas de la Clasificación interna"
+                        label="Título del estatus"
                         value={values.title || ''}
                         onChange={handleChange('title')}
                         disabled={disabledModeOn}
@@ -242,24 +244,22 @@ export const InternalClasForm = (props: Props) => {
                             error
                             classes={{ error: classes.textErrorHelper }}
                           >
-                            Ingrese Siglas de la Clasificación interna
+                            Ingrese Siglas de la acción
                           </FormHelperText>
                         )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel>Dirección para la Clasificación interna</InputLabel>
+                      <InputLabel>Órgano fiscalizador</InputLabel>
                       <Select
-                        disabled={disabledModeOn || action === "edit"}
-                        labelId="direccion_id"
-                        id="direccion_id-select"
-                        value={catalog && catalog.divisions ? values.direccion_id || '' : ''}
-                        onChange={handleChange('direccion_id')}
+                        disabled={disabledModeOn || action === 'edit'}
+                        labelId="pre_ires"
+                        id="pre_ires-select"
+                        value={values.pre_ires || pre_ires || ''}
+                        onChange={handleChange('pre_ires')}
                       >
-                        {catalog &&
-                          catalog.divisions &&
-                          catalog.divisions.map((item) => {
+                        {[{id: 'pre', title: 'Preliminar'},{id: 'ires', title: 'Informe de Resultados'}].map((item) => {
                             return (
                               <MenuItem value={item.id} key={`type-${item.id}`}>
                                 {item.title}
@@ -267,24 +267,25 @@ export const InternalClasForm = (props: Props) => {
                             );
                           })}
                       </Select>
-                      {errors.direccion_id && touched.direccion_id && (
+                      {errors.org_fiscal_id && touched.org_fiscal_id && (
                         <FormHelperText
                           error
                           classes={{ error: classes.textErrorHelper }}
                         >
-                          Ingrese una Dirección
+                          Ingrese órgano fiscalizador
                         </FormHelperText>
                       )}
                     </FormControl>
                   </Grid>
+                  
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl}>
-                      <InputLabel>Órgano fiscalizador para la Clasificación interna</InputLabel>
+                      <InputLabel>Órgano fiscalizador</InputLabel>
                       <Select
-                        disabled={disabledModeOn || action === "edit"}
+                        disabled={disabledModeOn || action === 'edit'}
                         labelId="org_fiscal_id"
                         id="org_fiscal_id-select"
-                        value={catalog && catalog.divisions ? values.org_fiscal_id || '' : ''}
+                        value={catalog && catalog.fiscals ? values.org_fiscal_id || org_fiscal_id || '' : ''}
                         onChange={handleChange('org_fiscal_id')}
                       >
                         {catalog &&
@@ -302,12 +303,11 @@ export const InternalClasForm = (props: Props) => {
                           error
                           classes={{ error: classes.textErrorHelper }}
                         >
-                          Ingrese un Órgano fiscalizador para la Clasificación interna
+                          Ingrese órgano fiscalizador
                         </FormHelperText>
                       )}
                     </FormControl>
                   </Grid>
-                  
                 </Grid>
                 {action !== 'view' && (
                   <Button

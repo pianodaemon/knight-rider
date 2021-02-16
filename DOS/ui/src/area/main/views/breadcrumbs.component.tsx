@@ -42,6 +42,10 @@ const modules = (module: string): string => {
       return "Programas Sociales";
     case "internal-clas":
       return "Clasificaciones Internas de CyTG";
+    case "acciones":
+      return "Acciones (ASF y ASENL)";
+    case "estatus":
+      return "Estatus";
     default:
       return "";
   }
@@ -53,6 +57,8 @@ const categories =  (module: string): string => {
     case "dependency":
     case "social-program":
     case "internal-clas":
+    case "actions":
+    case "status":
       return "catalogos";
     case "observation-sfp":
     case "observation-asf":
@@ -98,6 +104,8 @@ const action = (type: string) => {
 export const BreadcrumbsBar = () => {
   const classes = useStyles();
   let match: any | null = useRouteMatch([
+    '/:module/:id/:id/:id/:action(edit|view)',
+    '/:module/:id/:id/:action(edit|view)',
     '/:module/:view(list|create)',
     '/:module/:id/:action(edit|view)',
     '/reports-:report(\\d+)',

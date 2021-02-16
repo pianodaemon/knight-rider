@@ -2,26 +2,26 @@ import { Action, createAction, ActionFunctionAny } from 'redux-actions';
 import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { mergeSaga } from 'src/redux-utils/merge-saga';
 import { currentUserDivisionIdSelector } from 'src/area/auth/state/auth.selectors';
-import { getInternalClas } from '../../service/internal-clas.service';
-import { internalClasReducer } from '../internal-clas.reducer';
-import { pagingSelector, filterOptionsSelector } from '../internal-clas.selectors';
+import { getStatuses } from '../../service/status.service';
+import { statusReducer } from '../status.reducer';
+import { pagingSelector, filterOptionsSelector } from '../status.selectors';
 
 const postfix = '/app';
-const LOAD_INTERNAL_CLAS = `LOAD_INTERNAL_CLAS${postfix}`;
-const LOAD_INTERNAL_CLAS_SUCCESS = `LOAD_INTERNAL_CLAS_SUCCESS${postfix}`;
-const LOAD_INTERNAL_CLAS_ERROR = `LOAD_INTERNAL_CLAS_ERROR${postfix}`;
+const LOAD_STATUSES = `LOAD_STATUSES${postfix}`;
+const LOAD_STATUSES_SUCCESS = `LOAD_STATUSES_SUCCESS${postfix}`;
+const LOAD_STATUSES_ERROR = `LOAD_STATUSES_ERROR${postfix}`;
 
-export const loadInternalClasAction: ActionFunctionAny<
+export const loadStatusesAction: ActionFunctionAny<
   Action<any>
-> = createAction(LOAD_INTERNAL_CLAS);
-export const loadInternalClasSuccessAction: ActionFunctionAny<
+> = createAction(LOAD_STATUSES);
+export const loadStatusesSuccessAction: ActionFunctionAny<
   Action<any>
-> = createAction(LOAD_INTERNAL_CLAS_SUCCESS);
-export const loadInternalClasErrorAction: ActionFunctionAny<
+> = createAction(LOAD_STATUSES_SUCCESS);
+export const loadStatusesErrorAction: ActionFunctionAny<
   Action<any>
-> = createAction(LOAD_INTERNAL_CLAS_ERROR);
+> = createAction(LOAD_STATUSES_ERROR);
 
-function* loadInternalClasWorker(action?: any): Generator<any, any, any> {
+function* loadStatusesWorker(action?: any): Generator<any, any, any> {
   try {
     const { per_page, page, order, order_by, filters } = action.payload || {};
     const paging = yield select(pagingSelector);
@@ -36,10 +36,10 @@ function* loadInternalClasWorker(action?: any): Generator<any, any, any> {
       ...(divisionId === 0 || !divisionId ? {} : {direccion_id: divisionId}),
       ...(filters ? filters : f),
     };
-    const result = yield call(getInternalClas, options);
+    const result = yield call(getStatuses, options);
     yield put(
-      loadInternalClasSuccessAction({
-        internalClasses: result.data,
+      loadStatusesSuccessAction({
+        statuses: result.data,
         paging: {
           count: parseInt(result.headers['x-soa-total-items'], 10) || 0,
           pages: parseInt(result.headers['x-soa-total-pages'], 10) || 0,
@@ -54,34 +54,34 @@ function* loadInternalClasWorker(action?: any): Generator<any, any, any> {
       })
     );
   } catch (e) {
-    yield put(loadInternalClasErrorAction());
+    yield put(loadStatusesErrorAction());
   }
 }
 
-function* loadInternalClasWatcher(): Generator<any, any, any> {
-  yield takeLatest(LOAD_INTERNAL_CLAS, loadInternalClasWorker);
+function* loadStatusesWatcher(): Generator<any, any, any> {
+  yield takeLatest(LOAD_STATUSES, loadStatusesWorker);
 }
 
-const internalClasReducerHandlers = {
-  [LOAD_INTERNAL_CLAS]: (state: any) => {
+const statusReducerHandlers = {
+  [LOAD_STATUSES]: (state: any) => {
     return {
       ...state,
       loading: true,
     };
   },
-  [LOAD_INTERNAL_CLAS_SUCCESS]: (state: any, action: any) => {
-    const { internalClasses, paging, filters } = action.payload;
+  [LOAD_STATUSES_SUCCESS]: (state: any, action: any) => {
+    const { statuses, paging, filters } = action.payload;
     return {
       ...state,
       loading: false,
-      internalClasses,
+      statuses,
       paging: {
         ...paging,
       },
       filters,
     };
   },
-  [LOAD_INTERNAL_CLAS_ERROR]: (state: any) => {
+  [LOAD_STATUSES_ERROR]: (state: any) => {
     return {
       ...state,
       loading: false,
@@ -90,5 +90,5 @@ const internalClasReducerHandlers = {
   },
 };
 
-mergeSaga(loadInternalClasWatcher);
-internalClasReducer.addHandlers(internalClasReducerHandlers);
+mergeSaga(loadStatusesWatcher);
+statusReducer.addHandlers(statusReducerHandlers);

@@ -8,25 +8,25 @@ import PostAddIcon from '@material-ui/icons/PostAdd';
 import Paper from '@material-ui/core/Paper';
 import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 import { FilterChips } from 'src/shared/components/filter-chips.component';
-import { InternalClas } from '../state/internal-clas.reducer';
+import { Status } from '../state/status.reducer';
 
 type Props = {
-  internalClasses: Array<InternalClas> | null,
-  loadInternalClasAction: Function,
-  removeInternalClasAction: Function,
+  statuses: Array<Status> | null,
+  loadStatusesAction: Function,
+  removeStatusAction: Function,
   loading: boolean,
   paging: any,
   isAllowed: Function,
   filters: Array<any>,
 };
 
-export const InternalClasTable = (props: Props) => {
+export const StatusTable = (props: Props) => {
   const {
     loading,
-    loadInternalClasAction,
-    internalClasses,
+    loadStatusesAction,
+    statuses,
     paging,
-    removeInternalClasAction,
+    removeStatusAction,
     isAllowed,
     filters,
   } = props;
@@ -36,31 +36,31 @@ export const InternalClasTable = (props: Props) => {
   const draggable: boolean = false;
   const sorting: boolean = false;
   useEffect(() => {
-    loadInternalClasAction({ per_page: paging.per_page, order });
+    loadStatusesAction({ per_page: paging.per_page, order });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const columns = [
     {
       title: 'ID',
-      field: 'sorting_val',
+      field: 'id',
       defaultSort: order,
       customSort,
       sorting: !sorting,
     },
     {
-      title: 'Órgano fiscalizador para la Clasificación interna',
+      title: 'Órgano fiscalizador',
       field: 'org_fiscal_id_title',
       sorting,
     },
     {
-      title: 'Dirección para la Clasificación interna',
-      field: 'direccion_id_title',
+      title: 'Título del estatus',
+      field: 'title',
       sorting,
       customSort,
     },
     {
-      title: 'Título o siglas de la Clasificación interna',
-      field: 'title',
+      title: 'Preliminar o Informe de Resultados {pre | ires}',
+      field: 'pre_ires',
       sorting,
     },
   ];
@@ -69,7 +69,7 @@ export const InternalClasTable = (props: Props) => {
       <Paper elevation={0}>
         <FilterChips
           filters={filters}
-          loadAction={loadInternalClasAction} 
+          loadAction={loadStatusesAction}
         />
       </Paper>
       <MaterialTable
@@ -78,16 +78,16 @@ export const InternalClasTable = (props: Props) => {
             emptyDataSourceMessage: loading ? 'Cargando registros' : 'No hay registros para mostrar'
           }
         }}
-        title="Clasificación Interna CyTG"
+        title="Estatus"
         onOrderChange={(orderBy: number, orderDirection: 'asc' | 'desc') => {
-          loadInternalClasAction({
+          loadStatusesAction({
             ...paging,
             order: orderDirection,
             order_by: 'id',
           });
         }}
         columns={columns}
-        data={internalClasses || []}
+        data={statuses || []}
         options={{
           draggable,
           initialPage: 1, // @todo include this settings value in a CONSTANTS file
@@ -115,7 +115,7 @@ export const InternalClasTable = (props: Props) => {
                 rowsPerPage={per_page}
                 rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
                 onChangePage={(event, currentPage: number) => {
-                  loadInternalClasAction({
+                  loadStatusesAction({
                     per_page,
                     page: currentPage + 1,
                     order,
@@ -124,7 +124,7 @@ export const InternalClasTable = (props: Props) => {
                 }}
                 onChangeRowsPerPage={(event: any) => {
                   componentProps.onChangeRowsPerPage(event);
-                  loadInternalClasAction({
+                  loadStatusesAction({
                     per_page: event.target.value,
                   });
                 }}
@@ -141,10 +141,10 @@ export const InternalClasTable = (props: Props) => {
                     color="primary"
                     startIcon={<PostAddIcon />}
                     size="medium"
-                    onClick={() => history.push('/internal-clas/create')}
-                    disabled={!isAllowed('CLSF', PERMISSIONS.CREATE)}
+                    onClick={() => history.push('/estatus/create')}
+                    disabled={!isAllowed('EST', PERMISSIONS.CREATE)}
                   >
-                    Agregar Clasificación Interna de CyTG
+                    Agregar Estatus (Pre e IRes)
                   </Button>
                 </div>
               </div>
@@ -154,34 +154,33 @@ export const InternalClasTable = (props: Props) => {
         actions={[
           {
             icon: 'search',
-            tooltip: 'Visualizar Clasificación Interna de CyTG',
+            tooltip: 'Visualizar Estatus (Pre e IRes)',
             onClick: (event, rowData: any) =>
-              history.push(`/internal-clas/${rowData.org_fiscal_id}/${rowData.direccion_id}/${rowData.sorting_val}/view`),
-            disabled: !isAllowed('CLSF', PERMISSIONS.READ),
+              history.push(`/estatus/${rowData.org_fiscal_id}/${rowData.pre_ires}/${rowData.id}/view`),
+            disabled: !isAllowed('EST', PERMISSIONS.READ),
           },
           {
             icon: 'edit',
-            tooltip: 'Editar Clasificación Interna de CyTG',
+            tooltip: 'Editar Estatus (Pre e IRes)',
             onClick: (event, rowData: any) =>
-              history.push(`/internal-clas/${rowData.org_fiscal_id}/${rowData.direccion_id}/${rowData.sorting_val}/edit`),
-            disabled: !isAllowed('CLSF', PERMISSIONS.UPDATE)
+              history.push(`/estatus/${rowData.org_fiscal_id}/${rowData.pre_ires}/${rowData.id}/edit`),
+            disabled: !isAllowed('EST', PERMISSIONS.UPDATE)
           },
           {
             icon: 'delete',
-            tooltip: 'Eliminar Clasificación Interna de CyTG',
+            tooltip: 'Eliminar Estatus (Pre e IRes)',
             onClick: (event, rowData: any) => {
               if (
                 // eslint-disable-next-line no-restricted-globals
                 confirm(
-                  `¿Realmente quieres eliminar la Clasificación Interna de CyTG ${rowData.sorting_val}?\n Esta acción es irreversible`
+                  `¿Realmente quieres eliminar el Estatus (Pre e IRes) ${rowData.id}?\n Esta acción es irreversible`
                 )
               ) {
-                const { org_fiscal_id, direccion_id, sorting_val } = rowData;
-                const id = sorting_val;
-                removeInternalClasAction({ org_fiscal_id, direccion_id, id });
+                const { org_fiscal_id, pre_ires, id } = rowData;
+                removeStatusAction({ org_fiscal_id, pre_ires, id });
               }
             },
-            disabled: !isAllowed('CLSF', PERMISSIONS.DELETE)
+            disabled: !isAllowed('ACC', PERMISSIONS.DELETE)
           },
         ]}
         isLoading={loading}

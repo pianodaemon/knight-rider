@@ -64,21 +64,25 @@ def getDataASF( sql, ente, permission ):
             from seguimientos_obs_asf as seg 
             join clasifs_internas_cytg as clas on seg.clasif_final_interna_cytg = clas.sorting_val and {} = clas.direccion_id and {} = clas.org_fiscal_id
             where observacion_id = {}
-            order by seguimiento_id desc
-            limit 1;
+            order by seguimiento_id asc;
         '''.format( r['direccion_id'], ente, r['ires_id'])
 
         try:
-            seg = exec_steady(sql)
+            segs = exec_steady(sql)
         except EmptySetError:
-            seg = []            
+            segs = []
             
-        if seg:
-            segd = dict(seg[0])
-            r['clasif_id']          = segd['clasif_final_interna_cytg']
-            r['monto']              = segd['monto_pendiente_solventar']
-            r['clasif_name']        = segd['title']
-            r['monto_solventado']   = segd['monto_solventado']
+        solventado = 0.0
+
+        # keep this loop as efficient as posible
+        for seg in segs:
+            solventado += seg[3]
+
+        if segs:
+            r['clasif_id']          = seg[0]
+            r['monto']              = r['monto_observado'] - solventado
+            r['clasif_name']        = seg[2]
+            r['monto_solventado']   = solventado
             l.append(r)
 
     return l

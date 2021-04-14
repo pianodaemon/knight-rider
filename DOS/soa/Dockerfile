@@ -26,7 +26,8 @@ ENV APP_DIR=/app
 COPY service $APP_DIR
 WORKDIR $APP_DIR
 
-RUN pip3 install -r requirements.txt
+RUN python3 -m pip install -U pip
+RUN python3 -m pip install -r requirements.txt
 
 RUN chmod 744 /app/docker-entrypoint.sh
 

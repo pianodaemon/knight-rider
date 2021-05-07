@@ -45,6 +45,7 @@ import { Reports58Container } from '../../reports/views/reports58.container';
 import { Reports59Container } from '../../reports/views/reports59.container';
 import { Reports61Container } from '../../reports/views/reports61.container';
 import { Reports63Container } from '../../reports/views/reports63.container';
+import { TarjetaInfo01Container } from '../../reports/views/tarjeta-info01.container';
 import { TabPanelMenu } from './home-screen.component';
 import { PERMISSIONS } from 'src/shared/constants/permissions.contants';
 
@@ -403,6 +404,14 @@ const routes: Array<CustomRoute> = [
     },
     component: <Reports63Container />,
     app: 'R63',
+  },
+  {
+    props: {
+      path: ['/tarjeta-info'],
+      exact: true,
+    },
+    component: <TarjetaInfo01Container />,
+    app: 'R64',
   },
   {
     props: {

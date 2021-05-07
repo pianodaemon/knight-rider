@@ -288,6 +288,11 @@ export function AppBarComponent(props: Props) {
           text: 'Reporte de Detalle (No montos)',
           icon: <GridOnIcon />,
         },
+        {
+          url: '/tarjeta-info',
+          text: 'Tarjeta informativa',
+          icon: <GridOnIcon />,
+        },
       ],
     },
     user: {

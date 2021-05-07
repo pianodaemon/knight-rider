@@ -298,6 +298,14 @@ const tabCategories = {
           path: "/reports-63"
         },
       },
+      {
+        R64: {
+          color: '#0E7EBC',
+          icon: "DeveloperBoardIcon",
+          name: "Tarjeta informativa",
+          path: "/tarjeta-info"
+        },
+      },
     ],
     path: "/reportes",
   },

@@ -60,7 +60,9 @@ def getRowsASF(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dict
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
             join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and pre.observacion_ires_id > 0
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
@@ -114,7 +116,9 @@ def getRowsCyTG(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dic
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
             join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         group by dep_cat.title, anio.anio_cuenta_pub

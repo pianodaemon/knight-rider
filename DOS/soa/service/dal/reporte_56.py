@@ -151,12 +151,17 @@ def getDataSFP( sql, ente, permission ):
         for seg in segs:
             solventado += seg[3]
 
+        r['monto']            = r['monto_observado'] - solventado
+        r['monto_solventado'] = solventado
+
         if segs:
-            r['clasif_id']          = seg[0]
-            r['monto']              = r['monto_observado'] - solventado
-            r['clasif_name']        = seg[2]
-            r['monto_solventado']   = solventado
-            l.append(r)
+            r['clasif_id']   = seg[0]
+            r['clasif_name'] = seg[2]
+        else:
+            r['clasif_id']   = 0
+            r['clasif_name'] = 'Sin clasificación'
+
+        l.append(r)
 
     return l
 

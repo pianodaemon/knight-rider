@@ -323,7 +323,8 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
             join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
             {}
-            where not pre.blocked {}
+            where not pre.blocked
+                and not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
                 {}
             order by dependencia {};

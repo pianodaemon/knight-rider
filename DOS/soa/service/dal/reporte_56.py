@@ -64,21 +64,25 @@ def getDataASF( sql, ente, permission ):
             from seguimientos_obs_asf as seg 
             join clasifs_internas_cytg as clas on seg.clasif_final_interna_cytg = clas.sorting_val and {} = clas.direccion_id and {} = clas.org_fiscal_id
             where observacion_id = {}
-            order by seguimiento_id desc
-            limit 1;
+            order by seguimiento_id asc;
         '''.format( r['direccion_id'], ente, r['ires_id'])
 
         try:
-            seg = exec_steady(sql)
+            segs = exec_steady(sql)
         except EmptySetError:
-            seg = []            
+            segs = []
             
-        if seg:
-            segd = dict(seg[0])
-            r['clasif_id']          = segd['clasif_final_interna_cytg']
-            r['monto']              = segd['monto_pendiente_solventar']
-            r['clasif_name']        = segd['title']
-            r['monto_solventado']   = segd['monto_solventado']
+        solventado = 0.0
+
+        # keep this loop as efficient as posible
+        for seg in segs:
+            solventado += seg[3]
+
+        if segs:
+            r['clasif_id']          = seg[0]
+            r['monto']              = r['monto_observado'] - solventado
+            r['clasif_name']        = seg[2]
+            r['monto_solventado']   = solventado
             l.append(r)
 
     return l
@@ -94,27 +98,29 @@ def getDataCYTG( sql, ente, permission ):
     for row in rows:
         r = dict(row)
         sql = '''
-            select seg.monto_pendiente_solventar, clas.title
-            from seguimientos_obs_cytg as seg 
-            join clasifs_internas_cytg as clas on {} = clas.sorting_val and {} = clas.direccion_id and {} = clas.org_fiscal_id
-            where observacion_id = {}
-            order by seguimiento_id desc
-            limit 1;
-        '''.format( r['clasif_final_cytg'], r['direccion_id'], ente, r['ires_id'])
-    
+            select title
+              from clasifs_internas_cytg
+             where sorting_val = {}
+               and direccion_id = {}
+               and org_fiscal_id = {};
+        '''.format( r['clasif_final_cytg'], r['direccion_id'], ente)
+
         try:
-            seg = exec_steady(sql)
+            segs = exec_steady(sql)
         except EmptySetError:
-            seg = []            
-            
-        if seg:
-            segd = dict(seg[0])
-            r['clasif_id']          = r['clasif_final_cytg']
-            r['monto']              = segd['monto_pendiente_solventar']
-            r['clasif_name']        = segd['title']
-            r['monto_observado']    = 0
-            l.append(r)
-    
+            segs = []
+
+        r['monto'] = r['monto_observado'] - r['monto_solventado']
+        r['clasif_id'] = r['clasif_final_cytg']
+
+        if segs:
+            segd = dict(segs[0])
+            r['clasif_name'] = segd['title']
+        else:
+            r['clasif_name'] = 'Sin clasificación'
+
+        l.append(r)
+
     return l
 
 
@@ -133,23 +139,31 @@ def getDataSFP( sql, ente, permission ):
             from seguimientos_obs_sfp as seg 
             join clasifs_internas_cytg as clas on seg.clasif_final_interna_cytg = clas.sorting_val and {} = clas.direccion_id and {} = clas.org_fiscal_id
             where observacion_id = {}
-            order by seguimiento_id desc
-            limit 1;
+            order by seguimiento_id asc;
         '''.format(r['direccion_id'], ente, r['ires_id'])
 
-
         try:
-            seg = exec_steady(sql)
+            segs = exec_steady(sql)
         except EmptySetError:
-            seg = []              
-            
-        if seg:
-            segd = dict(seg[0])
-            r['clasif_id']          = segd['clasif_final_interna_cytg']
-            r['monto']              = segd['monto_pendiente_solventar']
-            r['clasif_name']        = segd['title']
-            r['monto_solventado']   = segd['monto_solventado']
-            l.append(r)
+            segs = []
+
+        solventado = 0.0
+
+        # keep this loop as efficient as posible
+        for seg in segs:
+            solventado += seg[3]
+
+        r['monto']            = r['monto_observado'] - solventado
+        r['monto_solventado'] = solventado
+
+        if segs:
+            r['clasif_id']   = seg[0]
+            r['clasif_name'] = seg[2]
+        else:
+            r['clasif_id']   = 0
+            r['clasif_name'] = 'Sin clasificación'
+
+        l.append(r)
 
     return l
 
@@ -290,7 +304,7 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
             order by dependencia {};
         '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
         'CYTG': '''
-            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.observacion as observacion, ires.monto_solventado as monto_solventado
+            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.observacion as observacion, ires.monto_solventado as monto_solventado, pre.monto_observado
             from observaciones_ires_cytg as ires
             join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
@@ -311,7 +325,8 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
             join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
             {}
-            where not pre.blocked {}
+            where not pre.blocked
+                and not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
                 {}
             order by dependencia {};

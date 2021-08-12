@@ -60,7 +60,9 @@ def getRowsASF(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dict
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
             join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and pre.observacion_ires_id > 0
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
@@ -87,7 +89,9 @@ def getRowsASENL(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_di
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
             join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and pre.observacion_ires_id > 0
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
@@ -108,13 +112,15 @@ def getRowsASENL(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_di
 def getRowsCyTG(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dict, permission):
     ignored_audit_str = ignored_audit_str.replace('ires.', 'pre.')
     sql = '''
-        select dep_cat.title, anio.anio_cuenta_pub, count(ires.id) as cant_obs
+        select dep_cat.title, anio.anio_cuenta_pub, count(ires.id) as cant_obs, sum(pre.monto_observado) as monto_observado_ires
         from observaciones_ires_cytg as ires
             join observaciones_pre_cytg as pre on ires.id = pre.observacion_ires_id
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
             join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         group by dep_cat.title, anio.anio_cuenta_pub
@@ -126,9 +132,9 @@ def getRowsCyTG(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, aux_dic
         rows = []
     for row in rows:
         if (row[0], row[1]) in aux_dict:
-            aux_dict[(row[0], row[1])]['cytg'] = (row[2], 0)
+            aux_dict[(row[0], row[1])]['cytg'] = (row[2], row[3])
         else:
-            aux_dict[(row[0], row[1])] = {'cytg': (row[2], 0)}
+            aux_dict[(row[0], row[1])] = {'cytg': (row[2], row[3])}
     return aux_dict
 
 def set_data_rows( aux_l ):

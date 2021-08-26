@@ -88,17 +88,27 @@ def setObjFiscal( fiscal, rows, aux_dict, str_no_atendidas ):
 
 
 def getFiscalData(table_name, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, permission):
+
+    ires_table_name = table_name.replace('pre', 'ires')
+    if ires_table_name == 'observaciones_ires_cytg':
+        tabla_monto = 'pre.monto_observado'
+    else:
+        tabla_monto = 'ires.monto_observado'
+
     sql = '''
-        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.resp_dependencia as resp_dependencia, pre.monto_observado as monto
+        select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.resp_dependencia as resp_dependencia, {} as monto
         from {} as pre
+        join {} as ires on ires.id = pre.observacion_ires_id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         order by dependencia, pre_id;
-    '''.format( table_name, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion )
+    '''.format(tabla_monto, table_name, ires_table_name, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion)
     try:
         rows = exec_steady(sql) if permission else []
     except EmptySetError:

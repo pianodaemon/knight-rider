@@ -95,7 +95,7 @@ const useStyles = makeStyles((theme: Theme) =>
         color: '#FFF',
       },
       display: 'block',
-      margin: '2em auto auto'
+      margin: '2em auto auto',
     },
     hrDivider: {
       borderTop: 0,
@@ -144,17 +144,20 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     progress: {
       marginLeft: '10px',
-      verticalAlign: "middle"
-    }
+      verticalAlign: 'middle',
+    },
+    headline: {
+      color: '#128aba',
+    },
+    title: {
+      color: '#128aba',
+      textAlign: 'center',
+    },
   }),
 );
 
 export const LoginForm = (props: Props) => {
-  const {
-    authTokenAction,
-    checked,
-    isLoading,
-  } = props;
+  const { authTokenAction, checked, isLoading } = props;
   const classes = useStyles();
   const { action } = useParams<any>();
   const initialValues = {
@@ -164,12 +167,11 @@ export const LoginForm = (props: Props) => {
   const validate = (values: any) => {
     const errors: any = {};
     const fields = Object.keys(initialValues);
-    fields
-      .forEach((field: string) => {
-        if (!values[field]) {
-          errors[field] = 'Required';
-        }
-      });
+    fields.forEach((field: string) => {
+      if (!values[field]) {
+        errors[field] = 'Required';
+      }
+    });
     return errors;
   };
   const [data, setData] = React.useState<any>({
@@ -179,11 +181,12 @@ export const LoginForm = (props: Props) => {
   const handleClickShowPassword = () => {
     setData({ ...data, showPassword: !data.showPassword });
   };
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
     event.preventDefault();
   };
-  return (
-    checked ? (
+  return checked ? (
     <>
       <Paper elevation={3} className={classes.paper}>
         <Formik
@@ -192,7 +195,7 @@ export const LoginForm = (props: Props) => {
           onSubmit={(values, { setSubmitting }) => {
             const releaseForm: () => void = () => setSubmitting(false);
             const fields: any = { ...values };
-            authTokenAction({ credentials: fields, releaseForm});
+            authTokenAction({ credentials: fields, releaseForm });
           }}
           enableReinitialize
         >
@@ -206,14 +209,23 @@ export const LoginForm = (props: Props) => {
           }: any) => {
             return (
               <>
-                <h1 style={{ color: '#128aba' }}>
-                Iniciar sesión
-                </h1>
+                <h1 className={classes.headline}>Iniciar sesión</h1>
+                <h2 className={classes.title}>
+                  Seguimiento a Observaciones de Auditorías
+                </h2>
                 <hr className={classes.hrDivider} />
                 <form onSubmit={handleSubmit} className={classes.form}>
-                  <Grid container alignItems="center" justify="center" direction="column">
+                  <Grid
+                    container
+                    alignItems="center"
+                    justify="center"
+                    direction="column"
+                  >
                     <Grid item xs={12}>
-                      <FormControl className={clsx(classes.margin, classes.textField)} variant="outlined">
+                      <FormControl
+                        className={clsx(classes.margin, classes.textField)}
+                        variant="outlined"
+                      >
                         <TextField
                           id="username"
                           label="Usuario"
@@ -234,7 +246,10 @@ export const LoginForm = (props: Props) => {
                       </FormControl>
                     </Grid>
                     <Grid item xs={12}>
-                      <FormControl className={clsx(classes.margin, classes.textField)} variant="outlined">
+                      <FormControl
+                        className={clsx(classes.margin, classes.textField)}
+                        variant="outlined"
+                      >
                         <TextField
                           autoComplete="on"
                           id="password"
@@ -244,7 +259,7 @@ export const LoginForm = (props: Props) => {
                           onChange={handleChange('password')}
                           placeholder="Contraseña"
                           InputProps={{
-                            endAdornment:
+                            endAdornment: (
                               <InputAdornment position="end">
                                 <IconButton
                                   aria-label="toggle password visibility"
@@ -252,9 +267,14 @@ export const LoginForm = (props: Props) => {
                                   onMouseDown={handleMouseDownPassword}
                                   edge="end"
                                 >
-                                  {data.showPassword ? <Visibility /> : <VisibilityOff />}
+                                  {data.showPassword ? (
+                                    <Visibility />
+                                  ) : (
+                                    <VisibilityOff />
+                                  )}
                                 </IconButton>
                               </InputAdornment>
+                            ),
                           }}
                           variant="outlined"
                         />
@@ -280,7 +300,12 @@ export const LoginForm = (props: Props) => {
                       >
                         {'Enviar'}
                       </Button>
-                      {(isSubmitting || isLoading) && <CircularProgress className={classes.progress} size={20} /> }
+                      {(isSubmitting || isLoading) && (
+                        <CircularProgress
+                          className={classes.progress}
+                          size={20}
+                        />
+                      )}
                     </>
                   )}
                 </form>
@@ -290,6 +315,5 @@ export const LoginForm = (props: Props) => {
         </Formik>
       </Paper>
     </>
-    ) : null
-  );
+  ) : null;
 };

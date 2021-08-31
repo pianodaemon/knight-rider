@@ -81,11 +81,14 @@ def preASF( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, permi
     sql = '''
         select dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, pre.direccion_id as direccion_id, pre.num_observacion as num_observacion, pre.observacion as observacion, estatus_pre_asf.title as estatus, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto
         from observaciones_pre_asf as pre
+        join observaciones_ires_asf as ires on ires.id = pre.observacion_ires_id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         join estatus_pre_asf as estatus_pre_asf on pre.estatus_criterio_int_id = estatus_pre_asf.id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         group by dependencia, num_observacion, observacion, estatus, ejercicio, direccion_id
@@ -135,11 +138,14 @@ def preCYTG( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, perm
     sql = '''
         select pre.id as pre_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, pre.num_observacion as num_observacion, pre.observacion as observacion, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto
         from observaciones_pre_cytg as pre
+        join observaciones_ires_cytg as ires on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         join observation_types as tipos on pre.tipo_observacion_id = tipos.id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         group by dependencia, pre.num_observacion, pre.observacion, tipo_observacion, pre_id, ejercicio, direccion_id
@@ -162,12 +168,15 @@ def preASENL( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, per
     sql = '''
         select dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, pre.num_observacion as num_observacion, pre.observacion as observacion, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto, estatus_pre_asenl.title as estatus
         from observaciones_pre_asenl as pre
+        join observaciones_ires_asenl as ires on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         join observation_types as tipos on pre.tipo_observacion_id = tipos.id
         join estatus_pre_asenl as estatus_pre_asenl on pre.estatus_proceso_id = estatus_pre_asenl.id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         group by dependencia, pre.num_observacion, observacion, tipo_observacion, estatus, ejercicio, direccion_id
@@ -224,15 +233,15 @@ def iresASF( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, perm
         except EmptySetError:
             seg = []            
             
-        r['estatus']          = ''
         r['num_observacion']  = ''   #No lo tiene como campo 
         r['cant_obs']         = 1    #No se agrupa -> 1
-        r['monto_solventado'] = 0
         if seg:
             segd = dict(seg[0])
             r['estatus']           = segd['estatus']
             r['monto_solventado']  = segd['monto_solventado']
-        
+        else:
+            r['estatus']           = ''
+            r['monto_solventado']  = 0
         l.append(r)
 
     return l
@@ -352,17 +361,18 @@ def iresSFP( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, perm
         try:
             seg = exec_steady(sql)
         except EmptySetError:
-            seg = []            
+            seg = []
 
-        r['estatus']          = ''
-        r['cant_obs']         = 1
-        r['monto_solventado'] = 0
+        r['cant_obs'] = 1
         if seg:
             segd = dict(seg[0])
             r['estatus']          = segd['estatus']
             r['monto_solventado'] = segd['monto_solventado']
-
+        else:
+            r['estatus']          = ''
+            r['monto_solventado'] = 0
         l.append(r)
+
     return l
 
 def setEntesIds():

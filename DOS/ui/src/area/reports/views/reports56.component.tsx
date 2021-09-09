@@ -128,8 +128,15 @@ const TableReports = ( props: any ) => {
       c_obs: 0,
       m: new Decimal(0),
   };
+  let rep = report.filter((row: any) => {
+    if ((atributoNameTipoMonto === 'm_sol' || atributoNameTipoMonto === 'monto') && row[atributoNameTipoMonto] === 0.0) {
+      return false;
+    } else {
+      return true;
+    }
+  });
   const sumRows = () => {
-    report.forEach( (dep:any) => {
+    rep.forEach( (dep:any) => {
       sum.c_obs += dep.c_obs      ;
       sum.m      = Decimal.add( sum.m, dep[atributoNameTipoMonto] )
     })
@@ -166,7 +173,7 @@ const TableReports = ( props: any ) => {
           <th >Monto (Miles)</th> 
           <th >% Monto</th> 
         </tr> 
-        {report.map((dep: any) =>
+        {rep.map((dep: any) =>
           <tr> 
             <td>{dep.dep}</td> 
             <td style={{textAlign: 'center'}} >{dep.ej}</td>

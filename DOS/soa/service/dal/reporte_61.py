@@ -141,14 +141,12 @@ def preASENL( ignored_audit_str, ej_ini, ej_fin, ente, str_filtro_direccion, per
     sql = '''
         select dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, pre.num_observacion as num_observacion, pre.observacion as observacion, count(pre.id) as cant_obs, sum(pre.monto_observado) as monto, estatus_pre_asenl.title as estatus
         from observaciones_pre_asenl as pre
-        join observaciones_ires_asenl as ires on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         join observation_types as tipos on pre.tipo_observacion_id = tipos.id
         join estatus_pre_asenl as estatus_pre_asenl on pre.estatus_proceso_id = estatus_pre_asenl.id
         where not pre.blocked
-            and not ires.blocked
             {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}

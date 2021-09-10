@@ -119,7 +119,8 @@ def getRowsASF(ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, fiscal, 
     for row in rows:
         estatusStr = estatuses[row[1]] if isinstance(row[1], int) else '_none'
         if (row[0], 'no_data') in aux_dict:
-            aux_dict[(row[0], 'no_data')]['to' + estatusStr ] = ('asf', row[2], row[3])
+            t = aux_dict[(row[0], 'no_data')]['to' + estatusStr]
+            aux_dict[(row[0], 'no_data')]['to' + estatusStr] = ('asf', t[1] + row[2], t[2] + row[3])
         else:
             aux_dict[(row[0], 'no_data')] = {'to' + estatusStr: ('asf', row[2], row[3])}
     return aux_dict

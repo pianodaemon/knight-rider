@@ -78,13 +78,16 @@ def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_
             seg = exec_steady(sql)
         except EmptySetError:
             seg = []            
-        
+
+        r['monto'] = r['monto_observado']
         if seg:
             segd = dict(seg[0])
             r['clasif_id']   = segd['clasif_final_interna_cytg']
-            r['monto']       = r['monto_observado']
             r['clasif_name'] = segd['title']
-            l.append(r)
+        else:
+            r['clasif_id']   = 0
+            r['clasif_name'] = 'Sin Clasificación'
+        l.append(r)
 
     data_rowsl = {}
 
@@ -113,14 +116,17 @@ def getDataASF( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_
 def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_direccion, permission ):
     data_rows = []
     sql = '''
-        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg
+        select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, tipos.title as tipo_observacion, pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg,
+               pre.monto_observado
         from observaciones_ires_cytg as ires
         join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
         join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         join observation_types as tipos on ires.tipo_observacion_id = tipos.id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         order by dependencia, tipo_observacion, ejercicio, ires_id;
@@ -147,13 +153,16 @@ def getDataCYTG( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro
             seg = exec_steady(sql)
         except EmptySetError:
             seg = []            
-            
+
+        r['monto'] = r['monto_observado']
         if seg:
             segd = dict(seg[0])
             r['clasif_id']   = r['clasif_final_cytg']
-            r['monto']       = 0
             r['clasif_name'] = segd['title']
-            l.append(r)
+        else:
+            r['clasif_id']   = 0
+            r['clasif_name'] = 'Sin Clasificación'
+        l.append(r)
     
     data_rowsl = {}
     
@@ -213,18 +222,20 @@ def getDataSFP( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtro_
             limit 1;
         '''.format(r['direccion_id'], ente, r['ires_id'])
 
-
         try:
             seg = exec_steady(sql)
         except EmptySetError:
             seg = []              
             
+        r['monto'] = r['monto_observado']
         if seg:
             segd = dict(seg[0])
             r['clasif_id']   = segd['clasif_final_interna_cytg']
-            r['monto']       = r['monto_observado']
             r['clasif_name'] = segd['title']
-            l.append(r)
+        else:
+            r['clasif_id']   = 0
+            r['clasif_name'] = 'Sin Clasificación'
+        l.append(r)
 
     data_rowsl = {}
     for i in l:
@@ -260,7 +271,9 @@ def getDataASENL( ignored_audit_str, ej_ini, ej_fin, ente, only_obras, str_filtr
         join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
         join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
         join observation_types as tipos on ires.tipo_observacion_id = tipos.id
-        where not pre.blocked {}
+        where not pre.blocked
+            and not ires.blocked
+            {}
             and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
             {}
         order by dependencia, ejercicio, tipo_observacion, ires_id;

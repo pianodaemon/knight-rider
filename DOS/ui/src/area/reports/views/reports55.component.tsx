@@ -121,6 +121,12 @@ const TableReports = ( props: any ) => {
     m_na_asf :  new Decimal(0),
     c_a_asf :   0,
     m_a_asf :   new Decimal(0),
+    c_sfp :     0,
+    m_sfp :     new Decimal(0),
+    c_na_sfp :  0,
+    m_na_sfp :  new Decimal(0),
+    c_a_sfp :   0,
+    m_a_sfp :   new Decimal(0),
     c_asenl :   0,
     m_asenl :   new Decimal(0),
     c_na_asenl: 0,
@@ -146,6 +152,12 @@ const TableReports = ( props: any ) => {
       sum_obj.m_na_asf     =  Decimal.add( sum_obj.m_na_asf, x.m_na_asf )   ;
       sum_obj.c_a_asf     += x.c_a_asf                                      ;
       sum_obj.m_a_asf      =  Decimal.add( sum_obj.m_a_asf, x.m_a_asf)      ;
+      sum_obj.c_sfp       += x.c_sfp                                        ;
+      sum_obj.m_sfp        =  Decimal.add( sum_obj.m_sfp, x.m_sfp )         ;
+      sum_obj.c_na_sfp    += x.c_na_sfp                                     ;
+      sum_obj.m_na_sfp     =  Decimal.add( sum_obj.m_na_sfp, x.m_na_sfp )   ;
+      sum_obj.c_a_sfp     += x.c_a_sfp                                      ;
+      sum_obj.m_a_sfp      =  Decimal.add( sum_obj.m_a_sfp, x.m_a_sfp)      ;
       sum_obj.c_asenl     += x.c_asenl                                      ;
       sum_obj.m_asenl      =  Decimal.add( sum_obj.m_asenl, x.m_asenl)      ;
       sum_obj.c_na_asenl  += x.c_na_asenl                                   ;
@@ -187,6 +199,9 @@ const TableReports = ( props: any ) => {
           <th colSpan={2}>ASF</th>
           <th colSpan={2} className={classes.hrAtentidasYPorAtender} >TOTAL ATENDIDAS</th> 
           <th colSpan={2} className={classes.hrAtentidasYPorAtender} >POR ATENDER</th> 
+          <th colSpan={2}>SFP</th>
+          <th colSpan={2} className={classes.hrAtentidasYPorAtender} >TOTAL ATENDIDAS</th>
+          <th colSpan={2} className={classes.hrAtentidasYPorAtender} >POR ATENDER</th>
           <th colSpan={2}>ASENL</th>
           <th colSpan={2} className={classes.hrAtentidasYPorAtender} >TOTAL ATENDIDAS</th> 
           <th colSpan={2} className={classes.hrAtentidasYPorAtender} >POR ATENDER</th> 
@@ -219,6 +234,12 @@ const TableReports = ( props: any ) => {
           <td className={classes.montos} >Monto (Miles)</td> 
           <td className={classes.cantObs} >Cant. Obs.</td> 
           <td className={classes.montos} >Monto (Miles)</td> 
+          <td className={classes.cantObs} >Cant. Obs.</td>
+          <td className={classes.montos} >Monto (Miles)</td>
+          <td className={classes.cantObs} >Cant. Obs.</td>
+          <td className={classes.montos} >Monto (Miles)</td>
+          <td className={classes.cantObs} >Cant. Obs.</td>
+          <td className={classes.montos} >Monto (Miles)</td>
         </tr> 
          {report.map((dep: any) =>
            <tr> 
@@ -230,6 +251,13 @@ const TableReports = ( props: any ) => {
              <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={isVisibleFiscal.asf} monto={dep.m_a_asf} /> </td>
              <td className={classes.cantObs} > {isVisibleFiscal.asf ? dep.c_na_asf               : '-' }</td>
              <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={isVisibleFiscal.asf} monto={dep.m_na_asf} /> </td>
+
+             <td className={classes.cantObs} > {isVisibleFiscal.sfp ? dep.c_sfp                  : '-' }</td>
+             <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={isVisibleFiscal.sfp} monto={dep.m_sfp} /> </td>
+             <td className={classes.cantObs} > {isVisibleFiscal.sfp ? dep.c_a_sfp                : '-' }</td>
+             <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={isVisibleFiscal.sfp} monto={dep.m_a_sfp} /> </td>
+             <td className={classes.cantObs} > {isVisibleFiscal.sfp ? dep.c_na_sfp               : '-' }</td>
+             <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={isVisibleFiscal.sfp} monto={dep.m_na_sfp} /> </td>
 
              <td className={classes.cantObs} >{isVisibleFiscal.asenl ? dep.c_asenl                 : '-' }</td>
              <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={isVisibleFiscal.asenl} monto={dep.m_asenl} /> </td>
@@ -245,10 +273,10 @@ const TableReports = ( props: any ) => {
              <td className={classes.cantObs} >{isVisibleFiscal.cytg ? dep.c_na_cytg              : '-' }</td>
              <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={isVisibleFiscal.cytg} monto={dep.m_na_cytg} /> </td>
 
-             <td className={classes.cantObs} >{(isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? dep.c_a_total               : '-' }</td>
-             <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={(isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg)} monto={dep.m_a_total} /> </td>
-             <td className={classes.cantObs} >{(isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? dep.c_na_total              : '-' }</td>
-             <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={(isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg)} monto={dep.m_na_total} /> </td>
+             <td className={classes.cantObs} >{(isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? dep.c_a_total               : '-' }</td>
+             <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={(isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg)} monto={dep.m_a_total} /> </td>
+             <td className={classes.cantObs} >{(isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? dep.c_na_total              : '-' }</td>
+             <td className={classes.montos}  > <MoneyFormat isVisibleFiscal={(isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg)} monto={dep.m_na_total} /> </td>
            </tr>
         )
         }   
@@ -260,6 +288,13 @@ const TableReports = ( props: any ) => {
           <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={isVisibleFiscal.asf} monto={sum_obj.m_a_asf.valueOf()} /> </td>
           <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asf ? sum_obj.c_na_asf               : '-' }</td>
           <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={isVisibleFiscal.asf} monto={sum_obj.m_na_asf.valueOf()} /> </td>
+
+          <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.sfp ? sum_obj.c_sfp                  : '-' }</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={isVisibleFiscal.sfp} monto={sum_obj.m_sfp.valueOf()} /> </td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.sfp ? sum_obj.c_a_sfp                : '-' }</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={isVisibleFiscal.sfp} monto={sum_obj.m_a_sfp.valueOf()} /> </td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.sfp ? sum_obj.c_na_sfp               : '-' }</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={isVisibleFiscal.sfp} monto={sum_obj.m_na_sfp.valueOf()} /> </td>
 
           <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.asenl ? sum_obj.c_asenl                  : '-' }</td>
           <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={isVisibleFiscal.asenl} monto={sum_obj.m_asenl.valueOf()} /> </td>
@@ -275,10 +310,10 @@ const TableReports = ( props: any ) => {
           <td style={{fontWeight: "bold", textAlign: "center"}}>{ isVisibleFiscal.cytg ? sum_obj.c_na_cytg               : '-' }</td>
           <td style={{fontWeight: "bold", textAlign: "right"}}> <MoneyFormat isVisibleFiscal={isVisibleFiscal.cytg} monto={sum_obj.m_na_cytg.valueOf()} /> </td>
           
-          <td style={{fontWeight: "bold", textAlign: "center"}}>{ (isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? sum_obj.c_a_total                : '-' }</td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}>  <MoneyFormat isVisibleFiscal={(isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg)} monto={sum_obj.m_a_total.valueOf()} /> </td>
-          <td style={{fontWeight: "bold", textAlign: "center"}}>{ (isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? sum_obj.c_na_total               : '-' }</td>
-          <td style={{fontWeight: "bold", textAlign: "right"}}>  <MoneyFormat isVisibleFiscal={(isVisibleFiscal.asf || isVisibleFiscal.asenl || isVisibleFiscal.cytg)} monto={sum_obj.m_na_total.valueOf()} /> </td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? sum_obj.c_a_total                : '-' }</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}>  <MoneyFormat isVisibleFiscal={(isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg)} monto={sum_obj.m_a_total.valueOf()} /> </td>
+          <td style={{fontWeight: "bold", textAlign: "center"}}>{ (isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg) ? sum_obj.c_na_total               : '-' }</td>
+          <td style={{fontWeight: "bold", textAlign: "right"}}>  <MoneyFormat isVisibleFiscal={(isVisibleFiscal.asf || isVisibleFiscal.sfp || isVisibleFiscal.asenl || isVisibleFiscal.cytg)} monto={sum_obj.m_na_total.valueOf()} /> </td>
         </tr>
       </tbody>
     </table>
@@ -306,7 +341,12 @@ export const Report55 = (props: Props) => {
   const classes = useStyles();
   const permissions: any = useSelector((state: any) => state.authSlice);
   const isVisible = (app: string): boolean => resolvePermission(permissions?.claims?.authorities, app);
-  const isVisibleFiscal = { 'asf' : isVisible('ASFP'), 'asenl' : isVisible('ASEP'), 'cytg' : isVisible('CYTP') };
+  const isVisibleFiscal = {
+    'asf'  : isVisible('ASFP'),
+    'sfp'  : isVisible('SFPR'),
+    'asenl': isVisible('ASEP'),
+    'cytg' : isVisible('CYTP')
+  };
   const setVisibleRows = (dep: any): boolean => {
     if(dep.dep === dependency || dependency === '' || dependency === 'Todas' || dependency === '0'){
       return true;

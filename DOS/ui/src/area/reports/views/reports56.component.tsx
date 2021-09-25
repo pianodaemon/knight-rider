@@ -134,6 +134,13 @@ const TableReports = (props: any) => {
     c_obs: 0,
     m: new Decimal(0),
   };
+  let rep = report.filter((row: any) => {
+    if ((atributoNameTipoMonto === 'm_sol' || atributoNameTipoMonto === 'monto') && row[atributoNameTipoMonto] === 0.0) {
+      return false;
+    } else {
+      return true;
+    }
+  });
   const sumRows = () => {
     report.forEach((dep: any) => {
       sum.c_obs += dep.c_obs;

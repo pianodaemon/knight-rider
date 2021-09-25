@@ -21,5 +21,5 @@ function mapStateToProps(state: any) {
 
 export const Reports56Container = connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(Report56);

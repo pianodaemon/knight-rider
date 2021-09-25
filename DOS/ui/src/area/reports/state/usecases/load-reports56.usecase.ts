@@ -10,9 +10,9 @@ const LOAD_REPORT56 = `LOAD_REPORT56${postfix}`;
 const LOAD_REPORT56_SUCCESS = `LOAD_REPORT56_SUCCESS${postfix}`;
 const LOAD_REPORT56_ERROR = `LOAD_REPORT56_ERROR${postfix}`;
 
-export const loadReport56Action: ActionFunctionAny<
-  Action<any>
-> = createAction(LOAD_REPORT56);
+export const loadReport56Action: ActionFunctionAny<Action<any>> = createAction(
+  LOAD_REPORT56,
+);
 export const loadReport56SuccessAction: ActionFunctionAny<
   Action<any>
 > = createAction(LOAD_REPORT56_SUCCESS);
@@ -22,16 +22,18 @@ export const loadReport56ActionErrorAction: ActionFunctionAny<
 
 function* loadReport56Worker(action?: any): Generator<any, any, any> {
   try {
-    const { ejercicio_fin, ejercicio_ini, fiscal } = action.payload || {};
+    const { ejercicio_fin, ejercicio_ini, fiscal, tipo_monto } =
+      action.payload || {};
 
     const options = {
       ...action.payload,
       ejercicio_fin: ejercicio_fin,
       ejercicio_ini: ejercicio_ini,
-      fiscal       : fiscal,
+      fiscal: fiscal,
+      tipo_monto,
     };
 
-    if(ejercicio_fin < ejercicio_ini){
+    if (ejercicio_fin < ejercicio_ini) {
       yield put(
         notificationAction({
           message: `La fecha inicial debe ser menor`,
@@ -42,8 +44,8 @@ function* loadReport56Worker(action?: any): Generator<any, any, any> {
 
     const result = yield call(getReport56, options);
 
-    var sendData = {data_rows: result.data.data_rows};
-    yield put(loadReport56SuccessAction( sendData ));
+    var sendData = { data_rows: result.data.data_rows };
+    yield put(loadReport56SuccessAction(sendData));
   } catch (e) {
     console.log(e);
     yield put(loadReport56ActionErrorAction());

@@ -262,6 +262,7 @@ export const Report56 = (props: Props) => {
         reporte_num: 'reporte56',
         division_id: divisionId,
         is_clasif: isClasif,
+        tipo_monto: 'pendiente',
       });
     }
     setDependency('Todas');

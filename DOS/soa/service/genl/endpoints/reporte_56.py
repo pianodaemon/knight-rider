@@ -23,6 +23,7 @@ reporte_56_ns_captions = {
     'is_clasif': 'True si obtendra la clasificacion',
     'm_obs': 'Monto observado',
     'm_sol': 'Monto solventado',
+    'tipo_monto': 'Tipo de monto (pendiente de solventar, solventado, observado)',
 }
 
 ns = api.namespace("reporte_56", description="(Reporte 56 y 58) Observaciones Pendientes de Solventar por Ente Fiscalizador")
@@ -57,6 +58,7 @@ class Reporte56(Resource):
     @ns.param('reporte_num',   reporte_56_ns_captions['reporte_num'],   required=False)
     @ns.param('division_id',   reporte_56_ns_captions['division_id'],   required=True)
     @ns.param('is_clasif',     reporte_56_ns_captions['is_clasif'],     required=False)
+    @ns.param('tipo_monto',    reporte_56_ns_captions['tipo_monto'],    required=False)
     def get(self):
         ''' Obtiene un arreglo con Entidad, Ejercicio, Tipo, Clasificacion, Cant Obs y Monto para IRES, se filtra por ente '''
         try:
@@ -70,10 +72,11 @@ class Reporte56(Resource):
         fiscal        = request.args.get('fiscal',        'SFP')
         reporte_num   = request.args.get('reporte_num',   'reporte56')
         division_id   = request.args.get('division_id',   '0')
-        is_clasif     = request.args.get('is_clasif',   'True')
+        is_clasif     = request.args.get('is_clasif',     'True')
+        tipo_monto    = request.args.get('tipo_monto',    'pendiente')
 
         try:
-            rep = reporte_56.get(ejercicio_ini, ejercicio_fin, fiscal, reporte_num, division_id, auth, is_clasif)
+            rep = reporte_56.get(ejercicio_ini, ejercicio_fin, fiscal, reporte_num, division_id, auth, is_clasif, tipo_monto)
         except ServerError as err:
             ns.abort(500, message=err)
         except Exception as err:

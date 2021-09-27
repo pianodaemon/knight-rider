@@ -142,7 +142,7 @@ const TableReports = (props: any) => {
     }
   });
   const sumRows = () => {
-    report.forEach((dep: any) => {
+    rep.forEach((dep: any) => {
       sum.c_obs += dep.c_obs;
       sum.m = Decimal.add(sum.m, dep[atributoNameTipoMonto]);
     });
@@ -181,7 +181,7 @@ const TableReports = (props: any) => {
           <th>Monto (Miles)</th>
           <th>% Monto</th>
         </tr>
-        {report.map((dep: any, index: number) => (
+        {rep.map((dep: any, index: number) => (
           <tr key={`row-${index}`}>
             <td>{dep.dep}</td>
             <td style={{ textAlign: 'center' }}>{dep.ej}</td>
@@ -262,7 +262,7 @@ export const Report56 = (props: Props) => {
         reporte_num: 'reporte56',
         division_id: divisionId,
         is_clasif: isClasif,
-        tipo_monto: 'pendiente',
+        tipo_monto: tipoMonto,
       });
     }
     setDependency('Todas');

@@ -1,6 +1,7 @@
 import time
 import jwt
 import redis
+import os
 
 from genl.restplus import public_key
 
@@ -39,7 +40,9 @@ def verify_token(headers):
         raise Exception('El token ha expirado')
 
     # Black list (token of logged out user)
-    r = redis.Redis(host='cache_obs', port=6379, db=0)
+    redis_host = os.getenv('REDIS_HOST')
+    redis_port = int(os.getenv('REDIS_PORT'))
+    r = redis.Redis(host=redis_host, port=redis_port, db=0)
     try:
         from_redis = r.get(headers['Authorization'])
     except:

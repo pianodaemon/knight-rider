@@ -1,7 +1,7 @@
 from dal.helper import exec_steady, get_direction_str_condition, get_ignored_audit_structs, get_ignored_audits
 from misc.helperpg import EmptySetError, ServerError
 
-def get(ej_ini, ej_fin, fiscal, reporte_num, division_id, auth, is_clasif):
+def get(ej_ini, ej_fin, fiscal, reporte_num, division_id, auth, is_clasif, tipo_monto):
     ''' Returns an instance of Reporte 56 and 58'''
     
     # Tratamiento de filtros
@@ -39,7 +39,7 @@ def get(ej_ini, ej_fin, fiscal, reporte_num, division_id, auth, is_clasif):
         l = []
 
     if is_clasif:
-        data_rows = setDataObj56(l) if (reporte_num == 'reporte56') else (setDataObj58(l) if (reporte_num == 'reporte58') else [])
+        data_rows = setDataObj56(l, tipo_monto) if (reporte_num == 'reporte56') else (setDataObj58(l) if (reporte_num == 'reporte58') else [])
     else:
         data_rows = setDataObjObs56(l) if (reporte_num == 'reporte56') else []
 
@@ -199,18 +199,20 @@ def getDataASENL( sql, ente, permission ):
     return l
 
 
-def setDataObj56(l):
+def setDataObj56(l, tipo_monto):
     data_rows = []
     data_rowsl = {}
     for i in l:
-        key = (i['dependencia'], i['ejercicio'], i['tipo_observacion'], i['clasif_id'])
-        if key in data_rowsl:
-            data_rowsl[key]['cant_obs'] += 1
-            data_rowsl[key]['monto'] += i['monto']
-            data_rowsl[key]['monto_observado'] += i['monto_observado']
-            data_rowsl[key]['monto_solventado'] += i['monto_solventado']
-        else:
-            data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'monto_observado': i['monto_observado'], 'monto_solventado': i['monto_solventado'], 'clasif_name': i['clasif_name']}
+        if tipo_monto == 'observado' or (i['monto'] != 0.0 and tipo_monto == 'pendiente') or (i['monto_solventado'] != 0.0 and tipo_monto == 'solventado'):
+            key = (i['dependencia'], i['ejercicio'], i['tipo_observacion'], i['clasif_id'])
+            if key in data_rowsl:
+                data_rowsl[key]['cant_obs'] += 1
+                data_rowsl[key]['monto'] += i['monto']
+                data_rowsl[key]['monto_observado'] += i['monto_observado']
+                data_rowsl[key]['monto_solventado'] += i['monto_solventado']
+            else:
+                data_rowsl[key] = {'cant_obs': 1, 'monto': i['monto'], 'monto_observado': i['monto_observado'], 'monto_solventado': i['monto_solventado'], 'clasif_name': i['clasif_name']}
+
     for item in data_rowsl:
         value = data_rowsl[item]
         o = {}
@@ -223,7 +225,9 @@ def setDataObj56(l):
         o['m_obs']            = value['monto_observado']
         o['m_sol']            = value['monto_solventado']
         data_rows.append(o)
+
     return data_rows
+
 
 def setDataObjObs56(l):
     data_rows = []
@@ -238,7 +242,9 @@ def setDataObjObs56(l):
         o['m_obs']            = item['monto_observado']
         o['m_sol']            = item['monto_solventado']
         data_rows.append(o)
+
     return data_rows
+
 
 def setDataObj58(l):
     data_rows = []
@@ -263,6 +269,7 @@ def setDataObj58(l):
         o['m_obs']            = value['monto_observado']
         o['m_sol']            = 0
         data_rows.append(o)
+
     return data_rows
 
 

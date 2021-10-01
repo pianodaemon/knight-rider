@@ -169,12 +169,13 @@ const TableReports = (props: any) => {
         <tr style={{ display: 'none' }}></tr>
 
         <tr>
-          <th colSpan={8}> {titleTable} </th>
+          <th colSpan={isClasif === 'False' ? 9 : 8}> {titleTable} </th>
         </tr>
         <tr className={classes.titrow}>
           <th>Secretaría/Entidad/Municipio</th>
           <th>Ejercicio</th>
           <th>Tipo</th>
+          {isClasif === 'False' ? <th>Clave de Auditoría</th> : ''}
           <th> {titleColumn} </th>
           <th>Cantidad Obs.</th>
           <th>% Obs.</th>
@@ -186,6 +187,7 @@ const TableReports = (props: any) => {
             <td>{dep.dep}</td>
             <td style={{ textAlign: 'center' }}>{dep.ej}</td>
             <td style={{ textAlign: 'center' }}>{dep.tipo}</td>
+            {isClasif === 'False' ? <td style={{ textAlign: 'center' }}>{dep.audit}</td> : ''}
             <td style={{ textAlign: 'center' }}>{dep.clasif_name}</td>
             <td className={classes.cantObs}>{dep.c_obs}</td>
             <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
@@ -207,7 +209,8 @@ const TableReports = (props: any) => {
         <tr>
           <td style={{ fontWeight: 'bold' }}> Totales</td>
           <td style={{ fontWeight: 'bold', textAlign: 'center' }}></td>
-          <td style={{ fontWeight: 'bold', textAlign: 'center' }}> </td>
+          <td style={{ fontWeight: 'bold', textAlign: 'center' }}></td>
+          {isClasif === 'False' ? <td style={{ fontWeight: 'bold', textAlign: 'center' }}></td> : ''}
           <td style={{ fontWeight: 'bold', textAlign: 'center' }}></td>
           <td style={{ fontWeight: 'bold', textAlign: 'center' }}>
             {' '}

@@ -24,6 +24,7 @@ reporte_56_ns_captions = {
     'm_obs': 'Monto observado',
     'm_sol': 'Monto solventado',
     'tipo_monto': 'Tipo de monto (pendiente de solventar, solventado, observado)',
+    'audit': 'Clave de la auditoría',
 }
 
 ns = api.namespace("reporte_56", description="(Reporte 56 y 58) Observaciones Pendientes de Solventar por Ente Fiscalizador")
@@ -37,6 +38,7 @@ data_row = api.model('Data row (Reporte 56)', {
     'monto':        fields.Float(description=reporte_56_ns_captions['monto']),
     'm_obs':        fields.Float(description=reporte_56_ns_captions['m_obs']),
     'm_sol':        fields.Float(description=reporte_56_ns_captions['m_sol']),
+    'audit':        fields.String(description=reporte_56_ns_captions['audit']),
 })
 
 report = api.model('Reporte 56', {

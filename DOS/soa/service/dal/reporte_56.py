@@ -241,6 +241,7 @@ def setDataObjObs56(l):
         o['monto']            = item['monto']
         o['m_obs']            = item['monto_observado']
         o['m_sol']            = item['monto_solventado']
+        o['audit']            = item['audit']
         data_rows.append(o)
 
     return data_rows
@@ -285,13 +286,14 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
 
     sqls = {
         'ASF': '''
-            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.observacion_ir as observacion, ires.monto_observado as monto_observado
+            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.observacion_ir as observacion, ires.monto_observado as monto_observado, aud.title as audit
             from observaciones_ires_asf as ires
             join observaciones_pre_asf as pre on ires.id = pre.observacion_ires_id
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
             join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
             {}
+            join audits as aud on pre.auditoria_id = aud.id
             where not pre.blocked
     	        and not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
@@ -299,25 +301,27 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
             order by dependencia {};
         '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
         'SFP': '''
-            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} ires.direccion_id as direccion_id, ires.observacion as observacion, ires.monto_observado as monto_observado
+            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} ires.direccion_id as direccion_id, ires.observacion as observacion, ires.monto_observado as monto_observado, aud.title as audit
             from observaciones_sfp as ires
             join auditoria_dependencias     as dep      on ires.auditoria_id        = dep.auditoria_id
             join dependencies               as dep_cat  on dep.dependencia_id       = dep_cat.id
             join auditoria_anios_cuenta_pub as anio     on ires.auditoria_id        = anio.auditoria_id
             {}
+            join audits as aud on ires.auditoria_id = aud.id
             where not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
                 {}
             order by dependencia {};
         '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
         'CYTG': '''
-            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.observacion as observacion, ires.monto_solventado as monto_solventado, pre.monto_observado
+            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.observacion as observacion, ires.monto_solventado as monto_solventado, pre.monto_observado, aud.title as audit
             from observaciones_ires_cytg as ires
             join observaciones_pre_cytg as pre on ires.observacion_pre_id = pre.id
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
             join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
             {}
+            join audits as aud on pre.auditoria_id = aud.id
             where not pre.blocked
     	        and not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
@@ -325,13 +329,14 @@ def setSQLs( ignored_audit_str, ej_ini, ej_fin, repNum, ent, str_filtro_direccio
             order by dependencia {};
         '''.format( strSelectTipo, strJOINTipo, ignored_audit_str, ej_ini, ej_fin, str_filtro_direccion, strOrderBy),
         'ASENL': '''
-            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar, ires.observacion_final as observacion, ires.monto_observado as monto_observado, ires.monto_solventado as monto_solventado
+            select ires.id as ires_id, dep_cat.title as dependencia, anio.anio_cuenta_pub as ejercicio, {} pre.direccion_id as direccion_id, ires.clasif_final_cytg as clasif_final_cytg, ires.monto_pendiente_solventar as monto_pendiente_solventar, ires.observacion_final as observacion, ires.monto_observado as monto_observado, ires.monto_solventado as monto_solventado, aud.title as audit
             from observaciones_ires_asenl as ires
             join observaciones_pre_asenl as pre on ires.observacion_pre_id = pre.id
             join auditoria_dependencias as dep on pre.auditoria_id = dep.auditoria_id
             join dependencies as dep_cat on dep.dependencia_id = dep_cat.id
             join auditoria_anios_cuenta_pub as anio on pre.auditoria_id = anio.auditoria_id
             {}
+            join audits as aud on pre.auditoria_id = aud.id
             where not pre.blocked
                 and not ires.blocked {}
                 and anio.anio_cuenta_pub >= {} and anio.anio_cuenta_pub <= {}
